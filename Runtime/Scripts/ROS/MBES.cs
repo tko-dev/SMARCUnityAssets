@@ -10,8 +10,6 @@ namespace DefaultNamespace
     {
 
         Sonar sonar;
-        public float gain = 1;
-        public bool drawHits = true;
 
         void Start()
         {
@@ -55,42 +53,6 @@ namespace DefaultNamespace
 
         }
 
-        float GetSonarHitIntensity(RaycastHit sonarHit)
-        {
-            // intensity of hit between 1-255
-            // It is a function of
-            // 1) The distance traveled by the beam -> distance
-            float hitDistIntensity = (sonar.max_distance - sonarHit.distance) / sonar.max_distance;
-
-            // 2) The angle of hit -> angle between the ray and normal
-            // the hit originated from transform position, and hit sonarHit
-            float hitAngle = Vector3.Angle(transform.position - sonarHit.point, sonarHit.normal);
-            float hitAngleIntensity = Mathf.Sin(hitAngle*Mathf.Deg2Rad);
-
-            // 3) The properties of the point of hit -> material
-            float hitMaterialIntensity = 1; // just set to 1 by default
-            // if available, use the material of the hit object to determine the reflectivitity.
-            Debug.Log(sonarHit.collider.material.name);
-            
-
-            float intensity = hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
-            intensity *= gain;
-            if(intensity > 1) intensity=1;
-            if(intensity < 0) intensity=0;
-
-            if(drawHits)
-            {
-                // Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
-                Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
-                // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
-                // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
-                Debug.DrawRay(sonarHit.point, Vector3.up, c, 1f);
-                // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
-            }
-
-            return intensity;
-
-        }
 
         byte[] GetSonarHitAsROSBytes(RaycastHit sonarHit)
         {
@@ -103,7 +65,7 @@ namespace DefaultNamespace
             var yb = BitConverter.GetBytes(point.y);
             var zb = BitConverter.GetBytes(point.z);
 
-            var intensity = GetSonarHitIntensity(sonarHit);
+            var intensity = sonar.GetSonarHitIntensity(sonarHit);
             byte[] ib = {(byte)(intensity*255)};
 
             int totalBytes = xb.Length + yb.Length + zb.Length+ ib.Length;

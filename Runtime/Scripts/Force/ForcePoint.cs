@@ -5,6 +5,7 @@ using UnityEngine;
 
 // This is a very simple example of how we could compute a buoyancy force at variable points along the body.
 // Its not really accurate per se.
+[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(IForceModel))]
 public class ForcePoint : MonoBehaviour
 {

@@ -1,7 +1,10 @@
-﻿using Unity.Burst;
+using System.Linq;
+using System.Collections.Generic;
+using Unity.Burst;
 using UnityEngine;
 using Unity.Collections;
 using Unity.Jobs;
+using Random = UnityEngine.Random;
 
 namespace DefaultNamespace
 {
@@ -10,16 +13,81 @@ namespace DefaultNamespace
         public int beam_count = 500;
         public float beam_breath_deg = 45;
         public float max_distance = 100;
+        public float gain = 1;
+
         // we use this one to keep the latest hit in memory and
         // accessible to outside easily.
         public RaycastHit[] hits;
-        public bool drawRays = true;
+        public bool drawRays = false;
+        public bool drawHits = true;
         private JobHandle handle;
 
         private NativeArray<RaycastHit> results;
         private NativeArray<RaycastCommand> commands;
 
         private Color rayColor;
+
+
+        public static readonly Dictionary<string, float> simpleMaterialReflectivity = new Dictionary<string, float>()
+        {
+            {"Rock", 0.8f},
+            {"Mud", 0.2f}
+        };
+
+
+        public static float GetMaterialReflectivity(string name)
+        {
+            // name can have " (instance of)" added to it,
+            // remove that...
+            if(name.Contains("("))
+            {
+                name = name.Split("(")[0].Trim();
+            }
+
+            // if its a simple one, just return that
+            if(simpleMaterialReflectivity.ContainsKey(name))
+            {
+                return simpleMaterialReflectivity[name];
+            }
+            // if its a complex material that we want a function for,
+            // switch for it here?
+            // TODO that switch lol
+            return 0.5f;
+        }
+
+        public float GetSonarHitIntensity(RaycastHit sonarHit)
+        {
+            // intensity of hit between 1-255
+            // It is a function of
+            // 1) The distance traveled by the beam -> distance
+            float hitDistIntensity = (max_distance - sonarHit.distance) / max_distance;
+
+            // 2) The angle of hit -> angle between the ray and normal
+            // the hit originated from transform position, and hit sonarHit
+            float hitAngle = Vector3.Angle(transform.position - sonarHit.point, sonarHit.normal);
+            float hitAngleIntensity = Mathf.Sin(hitAngle*Mathf.Deg2Rad);
+
+            // 3) The properties of the point of hit -> material
+            // if available, use the material of the hit object to determine the reflectivitity.
+            float hitMaterialIntensity = Sonar.GetMaterialReflectivity(sonarHit.collider.material.name);
+
+            float intensity = hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
+            intensity *= gain;
+            if(intensity > 1) intensity=1;
+            if(intensity < 0) intensity=0;
+
+            if(drawHits)
+            {
+                Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
+                // Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
+                // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
+                // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
+                Debug.DrawRay(sonarHit.point, Vector3.up, c, 1f);
+                // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
+            }
+            return intensity;
+        }
+
 
         public void Awake()
         {
@@ -90,7 +158,7 @@ namespace DefaultNamespace
             {
                 var beamBreathDeg = -Beam_breath_deg / 2 + i * Beam_breath_deg / Beam_count;
                 Vector3 direction = Quaternion.AngleAxis(beamBreathDeg, Rotation_axis) * Direction;
-                Commands[i] = new RaycastCommand(Origin, direction, Max_distance);
+                Commands[i] = new RaycastCommand(Origin, direction, QueryParameters.Default, Max_distance);
             }
         }
     }
