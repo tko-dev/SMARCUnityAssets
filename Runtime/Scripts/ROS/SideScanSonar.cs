@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using RosMessageTypes.Smarc;
 using UnityEngine;
-using RosMessageTypes.Smarc;
 
 namespace DefaultNamespace
 {
-    public class SSS : Sensor<SidescanMsg>
+    public class SideScanSonar : Sensor<SidescanMsg>
     {
         Sonar sonarPort;
         Sonar sonarStrb;
