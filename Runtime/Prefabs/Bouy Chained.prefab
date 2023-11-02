@@ -51,7 +51,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 769613593491211083}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -396,11 +396,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  water: {fileID: 0}
   depthBeforeSubmerged: 0.15
   displacementAmount: 1.5
-  waterDrag: 2
-  waterAngularDrag: 0.5
 --- !u!33 &298425090669020811
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -689,7 +686,7 @@ Transform:
   m_GameObject: {fileID: 4405586027991340006}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1735927351967940005}
@@ -705,7 +702,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4405586027991340006}
-  m_Mesh: {fileID: -4806286192815170044, guid: 6a8d5c08a8f77d24d8132c33e786e1fe, type: 3}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &4813938290616207307
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -726,7 +723,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1c27454d861e55849a097682ad3dbb41, type: 2}
+  - {fileID: 2100000, guid: caa322e747d511c478b8f1f3a485e66d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1233,11 +1230,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  water: {fileID: 0}
   depthBeforeSubmerged: 0.15
   displacementAmount: 1.5
-  waterDrag: 2
-  waterAngularDrag: 0.5
 --- !u!33 &9176340800619411374
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1547,11 +1541,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  water: {fileID: 0}
   depthBeforeSubmerged: 0.15
   displacementAmount: 1.5
-  waterDrag: 2
-  waterAngularDrag: 0.5
 --- !u!33 &8228022903653507335
 MeshFilter:
   m_ObjectHideFlags: 0
