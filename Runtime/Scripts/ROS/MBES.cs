@@ -54,38 +54,12 @@ namespace DefaultNamespace
         }
 
 
-        byte[] GetSonarHitAsROSBytes(RaycastHit sonarHit)
-        {
-            // so first, we gotta convert the unity points to ros points
-            // then x,y,z need to be byte-ified
-            // then a fourth "intensity" needs to be created and byte-ified
-            var point = sonarHit.point.To<FLU>();
-
-            var xb = BitConverter.GetBytes(point.x);
-            var yb = BitConverter.GetBytes(point.y);
-            var zb = BitConverter.GetBytes(point.z);
-
-            var intensity = sonar.GetSonarHitIntensity(sonarHit);
-            byte[] ib = {(byte)(intensity*255)};
-
-            int totalBytes = xb.Length + yb.Length + zb.Length+ ib.Length;
-            byte[] ret = new byte[totalBytes];
-            // src, offset, dest, offset, count
-            // Imma hard-code the offsets and counts, to act as a weird
-            // error catching mechanism
-            Buffer.BlockCopy(xb, 0, ret, 0, 4);
-            Buffer.BlockCopy(yb, 0, ret, 4, 4);
-            Buffer.BlockCopy(zb, 0, ret, 8, 4);
-            Buffer.BlockCopy(ib, 0, ret, 12,1);
-
-            return ret;
-        }
 
         public override bool UpdateSensor(double deltaTime)
         {
-            for(int i=0; i<sonar.hits.Length; i++)
+            for(int i=0; i<sonar.sonarHits.Length; i++)
             {
-                byte[] pointByte = GetSonarHitAsROSBytes(sonar.hits[i]);
+                byte[] pointByte = sonar.sonarHits[i].GetBytes();
                 Buffer.BlockCopy(pointByte, 0, ros_msg.data, i*pointByte.Length, pointByte.Length);
             }
 

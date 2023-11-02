@@ -1,3 +1,4 @@
+using System; //Bit converter
 using System.Linq;
 using System.Collections.Generic;
 using Unity.Burst;
@@ -5,9 +6,58 @@ using UnityEngine;
 using Unity.Collections;
 using Unity.Jobs;
 using Random = UnityEngine.Random;
+using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 namespace DefaultNamespace
 {
+    public class SonarHit
+    {
+        RaycastHit hit;
+        float intensity;
+
+        public SonarHit()
+        {
+            intensity = -1;
+        }
+
+        public SonarHit(RaycastHit hit, float intensity)
+        {
+            this.hit = hit;
+            this.intensity = intensity;
+        }
+
+        public void Update(RaycastHit hit, float intensity)
+        {
+            this.hit = hit;
+            this.intensity = intensity;
+        }
+
+        public byte[] GetBytes()
+        {
+            // so first, we gotta convert the unity points to ros points
+            // then x,y,z need to be byte-ified
+            // then a fourth "intensity" needs to be created and byte-ified
+            var point = hit.point.To<FLU>();
+
+            var xb = BitConverter.GetBytes(point.x);
+            var yb = BitConverter.GetBytes(point.y);
+            var zb = BitConverter.GetBytes(point.z);
+
+            byte[] ib = {(byte)(intensity*255)};
+
+            int totalBytes = xb.Length + yb.Length + zb.Length+ ib.Length;
+            byte[] ret = new byte[totalBytes];
+            // src, offset, dest, offset, count
+            // Imma hard-code the offsets and counts, to act as a weird
+            // error catching mechanism
+            Buffer.BlockCopy(xb, 0, ret, 0, 4);
+            Buffer.BlockCopy(yb, 0, ret, 4, 4);
+            Buffer.BlockCopy(zb, 0, ret, 8, 4);
+            Buffer.BlockCopy(ib, 0, ret, 12,1);
+
+            return ret;
+        }
+    }
     public class Sonar : MonoBehaviour
     {
         public int beam_count = 500;
@@ -17,7 +67,7 @@ namespace DefaultNamespace
 
         // we use this one to keep the latest hit in memory and
         // accessible to outside easily.
-        public RaycastHit[] hits;
+        public SonarHit[] sonarHits;
         public bool drawRays = false;
         public bool drawHits = true;
         private JobHandle handle;
@@ -35,8 +85,20 @@ namespace DefaultNamespace
         };
 
 
-        public static float GetMaterialReflectivity(string name)
+        public static float GetMaterialReflectivity(RaycastHit hit)
         {
+            // Return some default value for things that dont hit
+            // 0 intensity = no hit
+            if(!(hit.collider))
+            {
+                return 0f;
+            }
+            if(!(hit.collider.material))
+            {
+                return 0.5f;
+            }
+
+            string name = hit.collider.material.name;
             // name can have " (instance of)" added to it,
             // remove that...
             if(name.Contains("("))
@@ -55,21 +117,21 @@ namespace DefaultNamespace
             return 0.5f;
         }
 
-        public float GetSonarHitIntensity(RaycastHit sonarHit)
+        public float GetSonarHitIntensity(RaycastHit hit)
         {
             // intensity of hit between 1-255
             // It is a function of
             // 1) The distance traveled by the beam -> distance
-            float hitDistIntensity = (max_distance - sonarHit.distance) / max_distance;
+            float hitDistIntensity = (max_distance - hit.distance) / max_distance;
 
             // 2) The angle of hit -> angle between the ray and normal
             // the hit originated from transform position, and hit sonarHit
-            float hitAngle = Vector3.Angle(transform.position - sonarHit.point, sonarHit.normal);
+            float hitAngle = Vector3.Angle(transform.position - hit.point, hit.normal);
             float hitAngleIntensity = Mathf.Sin(hitAngle*Mathf.Deg2Rad);
 
             // 3) The properties of the point of hit -> material
             // if available, use the material of the hit object to determine the reflectivitity.
-            float hitMaterialIntensity = Sonar.GetMaterialReflectivity(sonarHit.collider.material.name);
+            float hitMaterialIntensity = Sonar.GetMaterialReflectivity(hit);
 
             float intensity = hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
             intensity *= gain;
@@ -82,7 +144,7 @@ namespace DefaultNamespace
                 // Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
                 // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
                 // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
-                Debug.DrawRay(sonarHit.point, Vector3.up, c, 1f);
+                Debug.DrawRay(hit.point, Vector3.up, c, 1f);
                 // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
             }
             return intensity;
@@ -92,7 +154,13 @@ namespace DefaultNamespace
         public void Awake()
         {
             rayColor = Color.white; //Random.ColorHSV();
-            hits = new RaycastHit[beam_count];
+            // Initialize all the hits as empty so we can just update them later
+            // rather than spamming new ones
+            sonarHits = new SonarHit[beam_count];
+            for(int i=0; i<beam_count; i++)
+            {
+                sonarHits[i] = new SonarHit();
+            }
         }
 
 
@@ -107,14 +175,9 @@ namespace DefaultNamespace
                 for(int i=0; i<beam_count; i++)
                 {
                     var hit = results[i];
-                    hits[i] = hit;
+                    sonarHits[i].Update(hit, GetSonarHitIntensity(hit));
                     if (drawRays && hit.point != Vector3.zero) Debug.DrawLine(transform.position, hit.point, rayColor);
                 }
-
-                // foreach (var vector3 in results.Select(result => result.point))
-                // {
-                //     if (vector3 != Vector3.zero) Debug.DrawLine(transform.position, vector3, rayColor);
-                // }
 
 
                 // Dispose the buffers
