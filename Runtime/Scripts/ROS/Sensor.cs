@@ -33,6 +33,8 @@ namespace DefaultNamespace
 
         protected ROSConnection ros;
         protected T ros_msg;
+
+        public static readonly string linkSeparator = "_";
         
         protected void MoveToLink()
         // Call this in Update function of anything that extends this
@@ -48,7 +50,7 @@ namespace DefaultNamespace
         protected void SetLink()
         // Call this if you over-write the Setup method below
         {
-            robotLinkName = robot.name + "_" + linkName;
+            robotLinkName = robot.name + linkSeparator + linkName;
             linkGo = Utils.FindDeepChildWithName(robot, robotLinkName);
             if(linkGo == null)
             {

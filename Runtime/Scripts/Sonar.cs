@@ -12,24 +12,91 @@ namespace DefaultNamespace
 {
     public class SonarHit
     {
-        RaycastHit hit;
-        float intensity;
+        public RaycastHit hit;
+        public float intensity;
+        Sonar sonar;
 
-        public SonarHit()
+        public static readonly Dictionary<string, float> simpleMaterialReflectivity = new Dictionary<string, float>()
+        {
+            {"Rock", 0.8f},
+            {"Mud", 0.2f}
+        };
+
+        public SonarHit(Sonar sonar)
         {
             intensity = -1;
+            this.sonar = sonar;
         }
 
-        public SonarHit(RaycastHit hit, float intensity)
+        public void Update(RaycastHit hit)
         {
             this.hit = hit;
-            this.intensity = intensity;
+            this.intensity = GetIntensity();
         }
 
-        public void Update(RaycastHit hit, float intensity)
+
+        public float GetMaterialReflectivity()
         {
-            this.hit = hit;
-            this.intensity = intensity;
+            // Return some default value for things that dont hit
+            // 0 intensity = no hit
+            if(!(hit.collider))
+            {
+                return 0f;
+            }
+            if(!(hit.collider.material))
+            {
+                return 0.5f;
+            }
+
+            string name = hit.collider.material.name;
+            // name can have " (instance of)" added to it,
+            // remove that...
+            if(name.Contains("("))
+            {
+                name = name.Split("(")[0].Trim();
+            }
+
+            // if its a simple one, just return that
+            if(simpleMaterialReflectivity.ContainsKey(name))
+            {
+                return simpleMaterialReflectivity[name];
+            }
+            // if its a complex material that we want a function for,
+            // switch for it here?
+            // TODO that switch lol
+            return 0.5f;
+        }
+
+        public float GetIntensity()
+        {
+            // intensity of hit between 1-255
+            // It is a function of
+            // 1) The distance traveled by the beam -> distance
+            float hitDistIntensity = (sonar.max_distance - hit.distance) / sonar.max_distance;
+
+            // 2) The angle of hit -> angle between the ray and normal
+            // the hit originated from transform position, and hit sonarHit
+            float hitAngle = Vector3.Angle(sonar.transform.position - hit.point, hit.normal);
+            float hitAngleIntensity = Mathf.Sin(hitAngle*Mathf.Deg2Rad);
+
+            // 3) The properties of the point of hit -> material
+            // if available, use the material of the hit object to determine the reflectivitity.
+            float hitMaterialIntensity = GetMaterialReflectivity();
+
+            float intensity = hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
+            if(intensity > 1) intensity=1;
+            if(intensity < 0) intensity=0;
+
+            if(sonar.drawHits)
+            {
+                Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
+                // Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
+                // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
+                // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
+                Debug.DrawRay(hit.point, Vector3.up, c, 1f);
+                // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
+            }
+            return intensity;
         }
 
         public byte[] GetBytes()
@@ -63,7 +130,6 @@ namespace DefaultNamespace
         public int beam_count = 500;
         public float beam_breath_deg = 45;
         public float max_distance = 100;
-        public float gain = 1;
 
         // we use this one to keep the latest hit in memory and
         // accessible to outside easily.
@@ -78,77 +144,7 @@ namespace DefaultNamespace
         private Color rayColor;
 
 
-        public static readonly Dictionary<string, float> simpleMaterialReflectivity = new Dictionary<string, float>()
-        {
-            {"Rock", 0.8f},
-            {"Mud", 0.2f}
-        };
 
-
-        public static float GetMaterialReflectivity(RaycastHit hit)
-        {
-            // Return some default value for things that dont hit
-            // 0 intensity = no hit
-            if(!(hit.collider))
-            {
-                return 0f;
-            }
-            if(!(hit.collider.material))
-            {
-                return 0.5f;
-            }
-
-            string name = hit.collider.material.name;
-            // name can have " (instance of)" added to it,
-            // remove that...
-            if(name.Contains("("))
-            {
-                name = name.Split("(")[0].Trim();
-            }
-
-            // if its a simple one, just return that
-            if(simpleMaterialReflectivity.ContainsKey(name))
-            {
-                return simpleMaterialReflectivity[name];
-            }
-            // if its a complex material that we want a function for,
-            // switch for it here?
-            // TODO that switch lol
-            return 0.5f;
-        }
-
-        public float GetSonarHitIntensity(RaycastHit hit)
-        {
-            // intensity of hit between 1-255
-            // It is a function of
-            // 1) The distance traveled by the beam -> distance
-            float hitDistIntensity = (max_distance - hit.distance) / max_distance;
-
-            // 2) The angle of hit -> angle between the ray and normal
-            // the hit originated from transform position, and hit sonarHit
-            float hitAngle = Vector3.Angle(transform.position - hit.point, hit.normal);
-            float hitAngleIntensity = Mathf.Sin(hitAngle*Mathf.Deg2Rad);
-
-            // 3) The properties of the point of hit -> material
-            // if available, use the material of the hit object to determine the reflectivitity.
-            float hitMaterialIntensity = Sonar.GetMaterialReflectivity(hit);
-
-            float intensity = hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
-            intensity *= gain;
-            if(intensity > 1) intensity=1;
-            if(intensity < 0) intensity=0;
-
-            if(drawHits)
-            {
-                Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
-                // Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
-                // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
-                // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
-                Debug.DrawRay(hit.point, Vector3.up, c, 1f);
-                // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
-            }
-            return intensity;
-        }
 
 
         public void Awake()
@@ -159,7 +155,7 @@ namespace DefaultNamespace
             sonarHits = new SonarHit[beam_count];
             for(int i=0; i<beam_count; i++)
             {
-                sonarHits[i] = new SonarHit();
+                sonarHits[i] = new SonarHit(this);
             }
         }
 
@@ -175,7 +171,7 @@ namespace DefaultNamespace
                 for(int i=0; i<beam_count; i++)
                 {
                     var hit = results[i];
-                    sonarHits[i].Update(hit, GetSonarHitIntensity(hit));
+                    sonarHits[i].Update(hit);
                     if (drawRays && hit.point != Vector3.zero) Debug.DrawLine(transform.position, hit.point, rayColor);
                 }
 
