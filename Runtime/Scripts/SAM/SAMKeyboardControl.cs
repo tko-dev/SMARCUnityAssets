@@ -7,7 +7,7 @@ namespace DefaultNamespace
     {
         private SAMForceModel _samForceModel;
 
-        private SAMROSActuatorController rosControl;
+        private SamActuatorController rosControl;
         [Tooltip("If true, pressing any key will disable the ros controllers")]
         public bool takeOverRosController = true;
 
@@ -25,7 +25,7 @@ namespace DefaultNamespace
         private void Awake()
         {
             _samForceModel = GetComponent<SAMForceModel>();
-            rosControl = GetComponent<SAMROSActuatorController>();
+            rosControl = GetComponent<SamActuatorController>();
             points = new List<ForcePoint>(GetComponentsInChildren<ForcePoint>());
 
         }

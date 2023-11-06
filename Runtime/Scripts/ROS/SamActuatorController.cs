@@ -5,7 +5,7 @@ using RosMessageTypes.Smarc; // ThrusterRPM
 
 namespace DefaultNamespace
 {
-    public class SAMROSActuatorController : MonoBehaviour
+    public class SamActuatorController : MonoBehaviour
     {
         SAMForceModel model;
         float vertical;
