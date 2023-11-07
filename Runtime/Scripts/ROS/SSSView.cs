@@ -6,19 +6,24 @@ using UnityEngine;
 namespace DefaultNamespace{
     public class SSSView : MonoBehaviour
     {
-        [SerializeField][Min(4)] int textureWidth = 64;
-        [SerializeField][Min(4)] int textureHeight = 64;
+        int textureWidth = 64;
+        int textureHeight = 64;
         Texture2D texture;
 
         SideScanSonar sss;
 
-        public int screenx=0;
-        public int screeny=30;
+        public int viewX=0;
+        public int viewY=30;
+        public int viewHeight = 500;
+        public int viewWidth = 1000;
+
+        public bool flip=true;
         
         // the raw data to copy into texture
         byte[] line;
         byte[] reversePort;
         byte[] image;
+        byte[] flippedImage;
 
         void CreateNewTexture ()
         {
@@ -28,8 +33,8 @@ namespace DefaultNamespace{
                 width:textureWidth,
                 height:textureHeight,
                 textureFormat:TextureFormat.R8, 
-                mipCount:3,
-                linear:false
+                mipCount:1,
+                linear:true
             );
             texture.Apply();
         }
@@ -42,13 +47,14 @@ namespace DefaultNamespace{
             CreateNewTexture();
             line = new byte[textureWidth];
             image = new byte[textureWidth*textureHeight];
+            flippedImage = new byte[image.Length];
             reversePort = new byte[sss.numBucketsPerSide];
         }
 
         void OnGUI()
         {
             GUI.DrawTexture(
-                position:new Rect(screenx, screeny, width:textureWidth/2, height:textureHeight/2),
+                position:new Rect(viewX, viewY, width:viewWidth, height:viewHeight),
                 image:texture,
                 scaleMode:ScaleMode.ScaleToFit,
                 alphaBlend:false
@@ -76,8 +82,20 @@ namespace DefaultNamespace{
             // Copy the new line at the top
             Buffer.BlockCopy(line, 0, image, 0, textureWidth);
 
-            // Straight up set the texture data to our bytes. 
-            texture.SetPixelData(image, 0);
+            if(flip)
+            {
+                // Flip it upside-down
+                for(int i=0; i<textureHeight; i++)
+                {
+                    Buffer.BlockCopy(image, i*textureWidth, flippedImage, (textureHeight-i-1)*textureWidth, textureWidth);
+                }
+                // Straight up set the texture data to our bytes. 
+                texture.SetPixelData(flippedImage, 0);
+            }
+            else
+            {
+                texture.SetPixelData(image, 0);
+            }
             texture.Apply();
         }
     }
