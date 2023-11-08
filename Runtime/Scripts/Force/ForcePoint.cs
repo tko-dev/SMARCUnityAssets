@@ -5,7 +5,7 @@ using UnityEngine;
 
 // This is a very simple example of how we could compute a buoyancy force at variable points along the body.
 // Its not really accurate per se.
-[RequireComponent(typeof(Rigidbody))]
+// [RequireComponent(typeof(Rigidbody))]
 // [RequireComponent(typeof(IForceModel))]
 public class ForcePoint : MonoBehaviour
 {
@@ -17,14 +17,16 @@ public class ForcePoint : MonoBehaviour
     public float depthBeforeSubmerged = 1.5f;
     public float displacementAmount = 1f;
 
-    private IForceModel _forceModel;
+    IForceModel _forceModel;
+
+    public GameObject motionModel;
 
     public void Awake()
     {
+        if(motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
+        _rigidbody = motionModel.GetComponent<Rigidbody>();
         _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
-        _rigidbody = GetComponent<Rigidbody>();
-        _forceModel = GetComponentInParent<IForceModel>();
-        if (_rigidbody == null) _rigidbody = GetComponentInParent<Rigidbody>();
+        _forceModel = motionModel.GetComponent<IForceModel>();
         _rigidbody.useGravity = false;
         _pointCount = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>().Length;
     }
