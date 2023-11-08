@@ -15,10 +15,24 @@ namespace DefaultNamespace
         public byte[] portBuckets;
         public byte[] strbBuckets;
 
+        public int openingAngleDeg = 60;
+        public int maxRange = 100;
+        public int totalBeamCount = 256;
+
+        public float multGain = 1;
+        public bool useAdditiveNoise = true;
+        public float addNoiseStd = 1;
+        public float addNoiseMean = 0;
+
+        NormalDistribution additiveNormal;
+
         void Start()
         {
             sonarPort = transform.Find("SSS Port").GetComponent<Sonar>();
             sonarStrb = transform.Find("SSS Strb").GetComponent<Sonar>();
+
+            SetSonars();
+
             ros_msg.header.frame_id = robot.name + linkSeparator + "base_link";
             // Each bucket has a 1 byte intensity value 0-255
             portBuckets = new byte[numBucketsPerSide];
@@ -26,34 +40,60 @@ namespace DefaultNamespace
             ros_msg.port_channel = portBuckets;
             ros_msg.starboard_channel = strbBuckets;
             // Other fields seem unused in the rosbags, so thats what we do too.
+
+            additiveNormal = new NormalDistribution(addNoiseMean, addNoiseStd);
         }
 
-        byte[] GetBucket(Sonar s)
+        void SetSonars()
         {
+            sonarPort.beam_breadth_deg = openingAngleDeg/2;
+            sonarPort.transform.localRotation = Quaternion.Euler(0, 0, -openingAngleDeg/4);
+            sonarPort.max_distance = maxRange;
+            sonarPort.beam_count = totalBeamCount/2;
+            sonarPort.InitHits();
+
+            sonarStrb.beam_breadth_deg = openingAngleDeg/2;
+            sonarStrb.transform.localRotation = Quaternion.Euler(0, 0, openingAngleDeg/4);
+            sonarStrb.max_distance = maxRange;
+            sonarStrb.beam_count = totalBeamCount/2;
+            sonarStrb.InitHits();
+        }
+
+        void FillBucket(Sonar s, byte[] bucket)
+        {
+            // 0-out, since maybe not the same buckets will be written to.
+            Array.Clear(bucket, 0, bucket.Length);
+
             // First we gotta know what distance ranges each bucket needs to
             // have, we can ask the sonar object for its max distance;
-            byte[] ret = new byte[numBucketsPerSide];
             float max_distance = s.max_distance;
             float min_distance = 0;
             float bucketSize = (max_distance-min_distance)/numBucketsPerSide;
             for(int i=0; i<s.beam_count; i++)
             {
                 SonarHit sh = s.sonarHits[i];
-                int bucketIndex = Mathf.FloorToInt((sh.hit.distance - min_distance)/bucketSize);
+
+                double addNoise = 0;
+                if(useAdditiveNoise) addNoise = additiveNormal.Sample();
+
+                float dis = (float)(sh.hit.distance + addNoise);
+                if(dis<0) dis=0;
+                int bucketIndex = Mathf.FloorToInt((dis - min_distance)/bucketSize);
+
+                if(bucketIndex >= bucket.Length || bucketIndex < 0) continue;
                 // Maybe there's a function for accumulation of intensities
                 // but this'll do for now
                 // intensities are stored as floats in [0,1], but we want bytes in 0-255 range
-                ret[bucketIndex] += (byte)(sh.intensity * 255);
-                if(ret[bucketIndex] > 255) ret[bucketIndex] = 255;
+                bucket[bucketIndex] += (byte)(sh.intensity * 255 * multGain);
+                if(bucket[bucketIndex] > 255) bucket[bucketIndex] = 255;
             }
-            return ret;
         }
 
         public override bool UpdateSensor(double deltaTime)
         {
             ros_msg.header.stamp = new TimeStamp(Clock.time);
-            portBuckets = GetBucket(sonarPort);
-            strbBuckets = GetBucket(sonarStrb);
+            FillBucket(sonarPort, portBuckets);
+            FillBucket(sonarStrb, strbBuckets);
             ros_msg.port_channel = portBuckets;
             ros_msg.starboard_channel = strbBuckets;
             return true;

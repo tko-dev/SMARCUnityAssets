@@ -77,22 +77,29 @@ namespace DefaultNamespace
             // 2) The angle of hit -> angle between the ray and normal
             // the hit originated from transform position, and hit sonarHit
             float hitAngle = Vector3.Angle(sonar.transform.position - hit.point, hit.normal);
-            float hitAngleIntensity = Mathf.Sin(hitAngle*Mathf.Deg2Rad);
+            float hitAngleIntensity = Mathf.Abs(Mathf.Cos(hitAngle*Mathf.Deg2Rad));
 
             // 3) The properties of the point of hit -> material
             // if available, use the material of the hit object to determine the reflectivitity.
             float hitMaterialIntensity = GetMaterialReflectivity();
 
+            // Lambert's cosine law:
+            // Intensity = K * Ensonification at point * Reflectivity at p * abs(cos(incidence angle at p))
+            // We just set K = 1 here.
+            // Ensonification = distance traveled
+            // Reflectivity = material prop.
+            // Angle is obvious.
             float intensity = hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
             if(intensity > 1) intensity=1;
             if(intensity < 0) intensity=0;
 
             if(sonar.drawHits)
             {
-                Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
+                // Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
                 // Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
                 // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
                 // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
+                Color c = new Color(intensity, 0f, 0f, 1f);
                 Debug.DrawRay(hit.point, Vector3.up, c, 1f);
                 // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
             }
@@ -128,7 +135,7 @@ namespace DefaultNamespace
     public class Sonar : MonoBehaviour
     {
         public int beam_count = 500;
-        public float beam_breath_deg = 45;
+        public float beam_breadth_deg = 45;
         public float max_distance = 100;
 
         // we use this one to keep the latest hit in memory and
@@ -150,6 +157,11 @@ namespace DefaultNamespace
         public void Awake()
         {
             rayColor = Color.white; //Random.ColorHSV();
+            InitHits();
+        }
+
+        public void InitHits()
+        {
             // Initialize all the hits as empty so we can just update them later
             // rather than spamming new ones
             sonarHits = new SonarHit[beam_count];
@@ -193,7 +205,7 @@ namespace DefaultNamespace
                 Direction = -transform1.up,
                 Rotation_axis = transform1.forward,
                 Max_distance = max_distance,
-                Beam_breath_deg = beam_breath_deg,
+                Beam_breath_deg = beam_breadth_deg,
                 Beam_count = beam_count
             };
 

@@ -2,9 +2,72 @@
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace DefaultNamespace
 {
+               
+        // From https://forum.unity.com/threads/random-number-with-normal-distribution-passing-average-value.1229193/
+        /// <summary>
+        /// A gaussian or normal distribution.
+        /// </summary>
+        public class NormalDistribution
+        {
+    
+            private double m_factor;
+    
+            public NormalDistribution(double mean, double sigma)
+            {
+                Mean = mean;
+                Sigma = sigma;
+                Variance = sigma * sigma;
+            }
+    
+            public double Mean { get; private set; }
+    
+            public double Variance { get; private set; }
+    
+            public double Sigma { get; private set; }
+    
+            private bool m_useLast;
+    
+            private double m_y2;
+    
+            /// <summary>
+            /// Sample a value from distribution for a given random varible.
+            /// </summary>
+            /// <returns>A value from the distribution</returns>
+            public double Sample()
+            {
+                double x1, x2, w, y1;
+    
+                if (m_useLast)
+                {
+                    y1 = m_y2;
+                    m_useLast = false;
+                }
+                else
+                {
+                    do
+                    {
+                        x1 = 2.0 * Random.value - 1.0;
+                        x2 = 2.0 * Random.value - 1.0;
+                        w = x1 * x1 + x2 * x2;
+                    }
+                    while (w >= 1.0);
+    
+                    w = Math.Sqrt(-2.0 * Math.Log(w) / w);
+                    y1 = x1 * w;
+                    m_y2 = x2 * w;
+                    m_useLast = true;
+                }
+    
+                return Mean + y1 * Sigma;
+            }
+    
+        }
+
+
     public static class Utils
     {
         public static DenseMatrix Skew(this MatrixBuilder<Double> mb, Vector<double> cb)
@@ -79,6 +142,8 @@ namespace DefaultNamespace
             Debug.Log("Going up a level");
             return FindParentWithTag(parent_tf.gameObject, tag, returnTopLevel);
         }
+
+        
     }
 
 }

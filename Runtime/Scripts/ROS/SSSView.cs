@@ -72,6 +72,12 @@ namespace DefaultNamespace{
             Buffer.BlockCopy(reversePort, 0, line, 0, reversePort.Length);
             Buffer.BlockCopy(sss.strbBuckets, 0, line, sss.numBucketsPerSide, sss.numBucketsPerSide);
 
+            // Draw a dotted line in the middle
+            byte t = 0;
+            if((int)Time.time %2 == 0) t = (byte)255;
+            line[sss.numBucketsPerSide] = t;
+            line[sss.numBucketsPerSide+1] = t;
+
             // Scroll the current image by 1 pixel down
             // Since image is a flattened array, that means
             // shifting by width and copying one width-worth fewer pixels
