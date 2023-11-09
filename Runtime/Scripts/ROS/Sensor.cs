@@ -20,12 +20,12 @@ namespace DefaultNamespace
         protected FixedJoint joint;
 
 
-        [SerializeField]
         public string linkName = "";
         protected string robotLinkName;
         protected GameObject linkGo;
 
         public bool sensorEnabled = true;
+        public bool isROSCamera = false;
         public string topic = "";
         public float frequency = 10f;
         private float period => 1.0f/frequency;
@@ -36,17 +36,6 @@ namespace DefaultNamespace
 
         public static readonly string linkSeparator = "_";
         
-        protected void MoveToLink()
-        // Call this in Update function of anything that extends this
-        {
-            if(linkGo != null)
-            {
-                transform.SetPositionAndRotation(
-                    linkGo.transform.position,
-                    linkGo.transform.rotation);
-            }
-        }
-
         protected void SetLink()
         // Call this if you over-write the Setup method below
         {
@@ -62,6 +51,16 @@ namespace DefaultNamespace
             transform.SetPositionAndRotation(
                 linkGo.transform.position,
                 linkGo.transform.rotation);
+            // ...except if its a camera, ROS
+            // defines it with Y forw, Z right, X up (mapped to unity)
+            // instead of ZXY
+            // so we gotta turn our ZXY camera to match the YZX frame
+            if(isROSCamera)
+            {
+                transform.Rotate(Vector3.up, 90);
+                transform.Rotate(Vector3.right, -90);
+                transform.Rotate(Vector3.forward, 180);
+            }
 
             // and finally attacht the rigid body of this sensor
             // to the motion model's rigid body with a link.
