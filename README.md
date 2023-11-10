@@ -16,6 +16,7 @@ The rest of the features are the same.
 We recommend using the the Editor Version 2023.1.13f1.
 
 We rely on a few non unity asset store packages, so follow the instructions below to install the package into your project.
+It might seem like a lot of things to do, but all of the operations can be done in the Unity editor and should not take more than a few minutes.
 
 ### Install Packages for Unity from Github
 
@@ -53,6 +54,17 @@ The code will work with ROS 1, but you will need to update the code to support R
 3. Click on "Apply"
 4. Wait for the compilation to finish.
 
+### Install SMARC Unity Assets
+
+Once all the dependencies are installed and configured, you can install this package using the same method as before.
+
+1. Open Package Manager window (Window | Package Manager)
+2. Click `+` button on the upper-left of a window, and select "Add package from git URL..."
+3. Enter the following URL and click `Add` button
+
+```
+UPDATE THIS BEFORE PUBLIC
+```
 
 ## New to Unity?
 
