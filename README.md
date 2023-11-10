@@ -35,7 +35,7 @@ https://github.com/Unity-Technologies/URDF-Importer.git?path=/com.unity.robotics
 
 ### Install NuGet packages
 
-Once you have installed NuGet, install the Numerics package for matrix algebra.
+Once you have installed NuGet, install the following packages.
 
 1. Click the NuGet dropdown at the top of your Unity Editor (Sometimes requires editor restart to appear).
 2. Manage NuGet packages
