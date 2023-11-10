@@ -6,6 +6,10 @@ If you are new to unity or just want to avoid installation for now and just try 
 -  https://github.com/martkartasev/SMARCUnityHDRP
 -  https://github.com/martkartasev/SMARCUnityStandard
 
+HDRP Is our primary development pipeline, but we also support the Standard Built-In pipeline. 
+In general HDRP has more features, including the Unity Water simulation and better graphical fidelity, while Standard is more performant.
+The rest of the features are the same.
+
 ## Installation
 
 ------
