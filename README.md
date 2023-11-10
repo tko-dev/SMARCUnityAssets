@@ -1,7 +1,7 @@
 # SMARC Unity Assets
 This is a package containing all of the SMARC Unity assets and scripts including vehicles, dynamics, sensors and more. 
 
-If you are new to unity or just want to avoid installation for now and just try things out, I suggest using one of our pre-existing example projects at:
+If you are new to Unity or just want to avoid installation for now and just try things out, I suggest using one of our pre-existing example projects at:
 
 -  https://github.com/martkartasev/SMARCUnityHDRP
 -  https://github.com/martkartasev/SMARCUnityStandard
@@ -15,7 +15,7 @@ The rest of the features are the same.
 ------
 We recommend using the the Editor Version 2023.1.13f1.
 
-We rely on a few non unity asset store packages, so follow the instructions below to install the package in your project.
+We rely on a few non unity asset store packages, so follow the instructions below to install the package into your project.
 
 ### Install Packages for Unity from Github
 
