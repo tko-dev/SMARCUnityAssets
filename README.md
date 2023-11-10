@@ -40,8 +40,8 @@ Once you have installed NuGet, install the Numerics package for matrix algebra.
 1. Click the NuGet dropdown at the top of your Unity Editor (Sometimes requires editor restart to appear).
 2. Manage NuGet packages
 3. Search and install:
-  a. MathNet.Numerics
-  b. CoordinateSharp
+  *  MathNet.Numerics
+  *  CoordinateSharp
 
 ### Configure the ROS Connector
 
