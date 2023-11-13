@@ -52,7 +52,7 @@ Once you have installed NuGet, install the following packages.
 ### Configure the ROS Connector
 
 Our codebase is scripted towards ROS 2. You will need to change some default settings to ensure your messages are compiled for ROS 2.
-The code will work with ROS 1, but you will need to update the code to support ROS 1 messages your self - the messages are somewhat different.
+The code will work with ROS 1, but you will need to update the scripts to support ROS 1 messages yourself.
 
 1. Open the ROS settings menu (Robotics | ROS Settings)
 2. Change the `Protocol` to "ROS 2"
