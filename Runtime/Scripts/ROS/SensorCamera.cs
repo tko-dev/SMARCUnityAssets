@@ -46,6 +46,7 @@ namespace DefaultNamespace
         {
             // If need be, use AsyncGPUReadback.RequestIntoNativeArray
             // for asynch render->texture movement
+            // Check this for more: https://blog.unity.com/engine-platform/accessing-texture-data-efficiently
 
             // gotta read from the ARGB32 render into RGB24 (which is rgb8 in ros... THANK YOU.)
             RenderTexture.active = rendTex;
