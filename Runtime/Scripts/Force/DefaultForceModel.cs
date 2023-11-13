@@ -9,7 +9,7 @@ namespace DefaultNamespace
         public float waterAngularDrag = 0.5f;
         private void Awake()
         {
-            _rigidbody = new Rigidbody();
+            _rigidbody = GetComponent<Rigidbody>();
         }
 
         private void FixedUpdate()
@@ -23,11 +23,11 @@ namespace DefaultNamespace
         }
         public Vector3 GetTorqueDamping()
         {
-            throw new System.NotImplementedException();
+            return Vector3.zero;
         }
         public Vector3 GetForceDamping()
         {
-            throw new System.NotImplementedException();
+            return Vector3.zero;
         }
     }
 }
