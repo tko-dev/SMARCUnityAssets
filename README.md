@@ -18,10 +18,10 @@ The rest of the features are the same.
 
 ------
 
-We recommend using the the Editor Version 2023.1.13f1.
-
 We rely on a few non unity asset store packages, so follow the instructions below to install the package into your project.
 It might seem like a lot of things to do, but all of the operations can be done in the Unity editor and should not take more than a few minutes.
+
+We recommend using the the Editor Version **2023.1.13f1**.
 
 ### Install Packages for Unity from Github
 
