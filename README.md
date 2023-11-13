@@ -68,5 +68,5 @@ Once all the dependencies are installed and configured, you can install this pac
 3. Enter the following URL and click `Add` button
 
 ```
-UPDATE THIS BEFORE PUBLIC
+https://github.com/martkartasev/SMARCUnityAssets.git
 ```
