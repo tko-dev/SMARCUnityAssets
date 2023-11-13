@@ -104,8 +104,15 @@ namespace DefaultNamespace
             {
                 for(int i=0; i<sensors_tf.childCount; i++)
                 {
-                    var sensor_script = sensors_tf.GetChild(i).gameObject.GetComponent<ISensor>();
-                    if(sensor_script != null) sensor_script.Setup(robot);
+                    ISensor[] sensor_scripts = sensors_tf.GetChild(i).gameObject.GetComponents<ISensor>();
+                    foreach(ISensor sensor_script in sensor_scripts)
+                    {
+                        if(sensor_script == null) continue; 
+                        Behaviour b = (Behaviour)sensor_script;
+                        if(!b.enabled) continue;
+
+                        sensor_script.Setup(robot);
+                    }
                 }
             }
         }

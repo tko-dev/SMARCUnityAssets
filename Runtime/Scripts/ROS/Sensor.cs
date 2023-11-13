@@ -40,12 +40,23 @@ namespace DefaultNamespace
         // Call this if you over-write the Setup method below
         {
             robotLinkName = robot.name + linkSeparator + linkName;
+
+            // First, check if another sensormsg has
+            // called this method before us;
+            // if so, just quit.
+            if(GetComponent<Rigidbody>())
+            {
+                Debug.Log($"({robotLinkName}) already had SetLink ran before.");
+                return;
+            }
+
             linkGo = Utils.FindDeepChildWithName(robot, robotLinkName);
             if(linkGo == null)
             {
-                Debug.Log("Link GO was null for "+ robotLinkName);
+                Debug.Log($"({robotLinkName}) Link GO was null for.");
                 return;
             }
+
             // Set the pose of the sensor to the pose of the link
             // so that when we set the joint, it tracks gud.
             transform.SetPositionAndRotation(
@@ -124,9 +135,9 @@ namespace DefaultNamespace
             // do the update
             var pub = UpdateSensor(deltaTime);
             // but only publish if the update was good
-            if(topic == null) Debug.Log("Topic is null!");
-            if(ros_msg == null) Debug.Log("ros_msg is null!");
-            if(ros == null) Debug.Log("ros is null?!?!");
+            if(topic == null) Debug.Log($"({robotLinkName}) Topic is null!");
+            if(ros_msg == null) Debug.Log($"({robotLinkName}) ros_msg is null!");
+            if(ros == null) Debug.Log($"({robotLinkName}) ros is null?!?!");
             if(pub) ros.Publish(topic, ros_msg);
 
             // always update timing after an update

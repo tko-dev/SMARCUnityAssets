@@ -9,12 +9,13 @@ namespace DefaultNamespace
 {
     public class SensorCamera : Sensor<ImageMsg>
     {
-        int textureWidth = 640;
-        int textureHeight = 480;
+        public readonly int textureWidth = 640;
+        public readonly int textureHeight = 480;
         RenderTexture rendTex;
+        Texture2D tex;
         Camera cam;
-        byte[] colorPixels;
-        Texture2D debugTex;
+        byte[] ros_img;
+
 
         public bool viewCam=true;
         public int viewX=100;
@@ -24,26 +25,40 @@ namespace DefaultNamespace
 
         void Start()
         {
+            rendTex = new RenderTexture(textureWidth, textureHeight, 0, RenderTextureFormat.ARGB32);
+
             cam = GetComponent<Camera>();
-            rendTex = new RenderTexture(textureWidth, textureHeight, 16, RenderTextureFormat.ARGB32);
             cam.targetTexture = rendTex;
-            colorPixels = new byte[textureHeight * textureWidth * 3];
-            debugTex = new Texture2D(textureWidth, textureHeight, TextureFormat.RGB24, false);
+
+            ros_img = new byte[textureHeight * textureWidth * 3];
+            tex = new Texture2D(textureWidth, textureHeight, TextureFormat.RGB24, false);
 
 
-            ros_msg.encoding = "rbg8";
-            ros_msg.height = (byte)textureHeight;
-            ros_msg.width = (byte)textureWidth;
+            ros_msg.encoding = "rgb8";
+            ros_msg.height = (uint) textureHeight;
+            ros_msg.width = (uint) textureWidth;
             ros_msg.is_bigendian = 0;
-            // not sure where 1920 came from, smells like
-            // old stuff to me.
-            ros_msg.step = 1920;
+            ros_msg.step = (uint)(3*textureWidth);
 
         }
 
         public override bool UpdateSensor(double deltaTime)
         {
-            cam.Render();
+            // If need be, use AsyncGPUReadback.RequestIntoNativeArray
+            // for asynch render->texture movement
+
+            // gotta read from the ARGB32 render into RGB24 (which is rgb8 in ros... THANK YOU.)
+            RenderTexture.active = rendTex;
+            tex.ReadPixels (new Rect (0, 0, textureWidth, textureHeight), 0, 0);
+            tex.Apply ();
+            RenderTexture.active = null;
+
+            ros_img = tex.GetRawTextureData();
+            ros_msg.data = ros_img;
+
+            ros_msg.header.stamp = new TimeStamp(Clock.time);
+            ros_msg.header.frame_id = robotLinkName;
+
             return true;
         }
 
@@ -53,7 +68,7 @@ namespace DefaultNamespace
             {
                 GUI.DrawTexture(
                     position:new Rect(viewX, viewY, width:viewWidth, height:viewHeight),
-                    image:rendTex,
+                    image:tex,
                     scaleMode:ScaleMode.ScaleToFit,
                     alphaBlend:false
                 );
