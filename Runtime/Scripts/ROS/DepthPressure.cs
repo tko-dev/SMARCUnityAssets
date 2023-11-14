@@ -7,6 +7,8 @@ namespace DefaultNamespace
 {
     public class DepthPressure : Sensor<FluidPressureMsg>
     {
+
+        [Header("Depth-Pressure")]
         public float maxDepth;
         float pressure;
         private WaterQueryModel _waterModel;

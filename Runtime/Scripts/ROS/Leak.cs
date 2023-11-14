@@ -5,8 +5,9 @@ namespace DefaultNamespace
 {
     public class Leak : Sensor<LeakMsg>
     {
-        [SerializeField]
-        bool leaked = false;
+        [Header("Leak")]
+        [Tooltip("Manually set this to trigger a leak.")]
+        public bool leaked = false;
         int count = 0;
 
         public override bool UpdateSensor(double deltaTime)

@@ -6,11 +6,13 @@ namespace DefaultNamespace
 {
     public class GPS : Sensor<NavSatFixMsg>
     {
+        [Header("GPS")]
         public double easting;
         public double northing;
         public double lat;
         public double lon;
 
+        [Tooltip("Assign a Terrain object for the GPS to reference its location.")]
         public GameObject terrain;
         private TerrainOnGlobe tog;
         private WaterQueryModel _waterModel;

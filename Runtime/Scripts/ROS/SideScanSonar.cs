@@ -10,6 +10,7 @@ namespace DefaultNamespace
         Sonar sonarPort;
         Sonar sonarStrb;
 
+        [Header("Sidescan")]
         public int numBucketsPerSide = 1000;
 
         public byte[] portBuckets;

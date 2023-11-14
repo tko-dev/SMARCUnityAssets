@@ -8,6 +8,7 @@ namespace DefaultNamespace
 {
     public class DVL : Sensor<DVLMsg>
     {
+        [Header("DVL")]
         public int numBeams = 4;
         public int minHitsToReport = 3;
         public float maxRange = 50f;

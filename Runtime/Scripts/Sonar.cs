@@ -134,6 +134,8 @@ namespace DefaultNamespace
     }
     public class Sonar : MonoBehaviour
     {
+
+        [Header("Sonar")]
         public int beam_count = 500;
         public float beam_breadth_deg = 45;
         public float max_distance = 100;
@@ -141,7 +143,9 @@ namespace DefaultNamespace
         // we use this one to keep the latest hit in memory and
         // accessible to outside easily.
         public SonarHit[] sonarHits;
+        [Tooltip("Draw rays in the scene view as lines?")]
         public bool drawRays = false;
+        [Tooltip("Just draw the hit points as 1m-long lines?")]
         public bool drawHits = true;
         private JobHandle handle;
 

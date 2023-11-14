@@ -12,11 +12,13 @@ namespace DefaultNamespace{
 
         SideScanSonar sss;
 
+        [Header("Sidescan viewer")]
         public int viewX=0;
         public int viewY=30;
         public int viewHeight = 500;
         public int viewWidth = 1000;
 
+        [Tooltip("If true, then new lines will be from the top, otherwise from the bottom")]
         public bool flip=true;
         
         // the raw data to copy into texture

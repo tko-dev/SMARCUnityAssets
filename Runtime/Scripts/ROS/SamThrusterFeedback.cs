@@ -1,3 +1,4 @@
+using UnityEngine;
 using RosMessageTypes.Smarc;
 using Unity.Robotics.Core; // Clock
 
@@ -5,6 +6,9 @@ namespace DefaultNamespace
 {
     public class SamThrusterFeedback : Sensor<ThrusterFeedbackMsg>
     {
+        [Header("Thruster FB")]
+        [Tooltip("Set the number (1 or 2) of the thruster the feedback will come from")]
+        [Range(1,2)]
         public int thrusterNum;
         SAMForceModel model;
         double rpm;

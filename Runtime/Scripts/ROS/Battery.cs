@@ -1,10 +1,11 @@
-// using Unity.Robotics.ROSTCPConnector;
+using UnityEngine;
 using RosMessageTypes.Sensor;
 
 namespace DefaultNamespace
 {
     public class Battery : Sensor<BatteryStateMsg>
     {
+        [Header("Battery")]
         public float dischargePercentPerMinute = 1;
         public float currentPercent = 95f;
 

@@ -8,6 +8,7 @@ namespace DefaultNamespace
     public class IMU : Sensor<ImuMsg>
     {
         // Mostly copied from https://github.com/MARUSimulator/marus-core/blob/21c003a384335777b9d9fb6805eeab1cdb93b2f0/Scripts/Sensors/Primitive/ImuSensor.cs
+        [Header("IMU")]
         public bool withGravity = true;
         Vector3 linearAcceleration;
         Vector3 localVelocity;

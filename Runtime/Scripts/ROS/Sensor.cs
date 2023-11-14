@@ -18,22 +18,26 @@ namespace DefaultNamespace
         protected GameObject robotMotionModel;
         protected Rigidbody rb;
         protected FixedJoint joint;
-
-
-        public string linkName = "";
-        protected string robotLinkName;
         protected GameObject linkGo;
+        protected string robotLinkName;
 
+        [Header("General sensor settings")]
+        [Tooltip("The name of the link the sensor should be attached to.")]
+        public string linkName = "";
         public bool sensorEnabled = true;
+        [Tooltip("Set to true if this is a camera, as they need special handling.")]
         public bool isROSCamera = false;
+        [Tooltip("Robot name will be pre-pended automatically unless topic starts with a /")]
         public string topic = "";
         public float frequency = 10f;
+
         private float period => 1.0f/frequency;
         private double lastTime;
 
         protected ROSConnection ros;
         protected T ros_msg;
 
+        [Tooltip("ROBOTNAME<Link Separator>LINKNAME<Link separator>CHILDLINK")]
         public static readonly string linkSeparator = "_";
         
         protected void SetLink()

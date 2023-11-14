@@ -5,14 +5,24 @@ public class TerrainOnGlobe : MonoBehaviour
 {
     // Asko should be around lat/lon: 58.823220, 17.635160 which should be UTM east:652146.44 north: 6523362.01 zone: 33v
     // The asko terrain is at 33V 
+
+    [Header("Terrain on globe")]
+    [Tooltip("If true, uses the given lat,lon as the reference, otherwise uses the utm properties")]
+    public bool originIsLatLon = true;
+
+    [Tooltip("Draw a line from each GPS object to the reference point of this terrain")]
+    public bool drawLineToReferencePoint = true;
+
+    [Header("Lat/lon in decimal degrees")]
+    public double lon = 17.596178; // asko bottom left defaults
+    public double lat = 58.811481;
+
+    [Header("UTM properties")]
     public string band;
     public int zone;
     public double easting;
     public double northing;
-    public double lon = 17.596178; // asko bottom left defaults
-    public double lat = 58.811481;
-    public bool originIsLatLon = true;
-    public bool drawLineToReferencePoint = true;
+
 
     void Start()
     {
