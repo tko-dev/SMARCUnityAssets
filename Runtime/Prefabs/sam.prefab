@@ -1208,6 +1208,7 @@ GameObject:
   - component: {fileID: 3998655006323791459}
   - component: {fileID: 6292897715279045727}
   - component: {fileID: 470445096011760194}
+  - component: {fileID: 3876399906106941874}
   m_Layer: 0
   m_Name: CameraFront
   m_TagString: Untagged
@@ -1430,6 +1431,9 @@ MonoBehaviour:
   isROSCamera: 1
   topic: payload/cam_down/image_raw
   frequency: 10
+  textureWidth: 640
+  textureHeight: 480
+  image: {fileID: 0}
   viewCam: 1
   viewX: 206
   viewY: 260
@@ -1452,6 +1456,39 @@ MonoBehaviour:
   isROSCamera: 0
   topic: payload/cam_down/camera_info
   frequency: 15
+  k1: 1
+  k2: 1
+  t1: 1
+  t2: 1
+  k3: 1
+  fx: 1
+  fy: 1
+  cx: 1
+  cy: 1
+  fxp: 1
+  fyp: 1
+  cxp: 1
+  cyp: 1
+  Tx: 1
+  Ty: 1
+--- !u!114 &3876399906106941874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044545453250593933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cdd9755bbd9f01dcb2d11aa5904cd7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkName: camera_down_link
+  sensorEnabled: 1
+  isROSCamera: 0
+  topic: payload/cam_down/image_raw/compressed
+  frequency: 10
+  quality: 75
 --- !u!1 &1053377452036451553
 GameObject:
   m_ObjectHideFlags: 0
@@ -1564,6 +1601,7 @@ GameObject:
   - component: {fileID: 5008289210779157495}
   - component: {fileID: 5262045989418756037}
   - component: {fileID: 5531823502163181282}
+  - component: {fileID: 6617540274640966184}
   m_Layer: 0
   m_Name: CameraStrb
   m_TagString: Untagged
@@ -1786,6 +1824,9 @@ MonoBehaviour:
   isROSCamera: 1
   topic: payload/cam_starboard/image_raw
   frequency: 10
+  textureWidth: 640
+  textureHeight: 480
+  image: {fileID: 0}
   viewCam: 1
   viewX: 409
   viewY: 260
@@ -1808,6 +1849,39 @@ MonoBehaviour:
   isROSCamera: 0
   topic: payload/cam_starboard/camera_info
   frequency: 15
+  k1: 1
+  k2: 1
+  t1: 1
+  t2: 1
+  k3: 1
+  fx: 1
+  fy: 1
+  cx: 1
+  cy: 1
+  fxp: 1
+  fyp: 1
+  cxp: 1
+  cyp: 1
+  Tx: 1
+  Ty: 1
+--- !u!114 &6617540274640966184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093649603979486930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cdd9755bbd9f01dcb2d11aa5904cd7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkName: camera_front_right_link
+  sensorEnabled: 1
+  isROSCamera: 0
+  topic: payload/cam_starboard/image_raw/compressed
+  frequency: 10
+  quality: 75
 --- !u!1 &1686752233185198013
 GameObject:
   m_ObjectHideFlags: 0
@@ -4054,6 +4128,7 @@ GameObject:
   - component: {fileID: 5481540692446718211}
   - component: {fileID: 726488902682035558}
   - component: {fileID: 4256938742614680759}
+  - component: {fileID: 256910395302533194}
   m_Layer: 0
   m_Name: CameraPort
   m_TagString: Untagged
@@ -4276,6 +4351,9 @@ MonoBehaviour:
   isROSCamera: 1
   topic: payload/cam_port/image_raw
   frequency: 10
+  textureWidth: 640
+  textureHeight: 480
+  image: {fileID: 0}
   viewCam: 1
   viewX: 3
   viewY: 260
@@ -4298,6 +4376,39 @@ MonoBehaviour:
   isROSCamera: 0
   topic: payload/cam_port/camera_info
   frequency: 15
+  k1: 1
+  k2: 1
+  t1: 1
+  t2: 1
+  k3: 1
+  fx: 1
+  fy: 1
+  cx: 1
+  cy: 1
+  fxp: 1
+  fyp: 1
+  cxp: 1
+  cyp: 1
+  Tx: 1
+  Ty: 1
+--- !u!114 &256910395302533194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4050577146848748639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cdd9755bbd9f01dcb2d11aa5904cd7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkName: camera_front_left_link
+  sensorEnabled: 1
+  isROSCamera: 0
+  topic: payload/cam_port/image_raw/compressed
+  frequency: 10
+  quality: 75
 --- !u!1 &4123065543165272893
 GameObject:
   m_ObjectHideFlags: 0

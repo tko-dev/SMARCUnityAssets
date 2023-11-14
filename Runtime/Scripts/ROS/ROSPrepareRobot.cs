@@ -107,9 +107,11 @@ namespace DefaultNamespace
                     ISensor[] sensor_scripts = sensors_tf.GetChild(i).gameObject.GetComponents<ISensor>();
                     foreach(ISensor sensor_script in sensor_scripts)
                     {
+                        // Avoid running setup if not needed.
                         if(sensor_script == null) continue; 
                         Behaviour b = (Behaviour)sensor_script;
                         if(!b.enabled) continue;
+                        if(!b.gameObject.activeInHierarchy) continue;
 
                         sensor_script.Setup(robot);
                     }
