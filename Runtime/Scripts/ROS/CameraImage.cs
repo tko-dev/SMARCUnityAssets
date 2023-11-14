@@ -50,10 +50,12 @@ namespace DefaultNamespace
 
         public override bool UpdateSensor(double deltaTime)
         {
+            
             // If need be, use AsyncGPUReadback.RequestIntoNativeArray
             // for asynch render->texture movement
             // Check this for more: https://blog.unity.com/engine-platform/accessing-texture-data-efficiently
-
+            // TODO: Found this as well. Might help with async impl. https://forum.unity.com/threads/getting-a-render-texture-byte-using-asyncgpureadback-request.1029679/
+            
             // gotta read from the ARGB32 render into RGB24 (which is rgb8 in ros... THANK YOU.)
             RenderTexture.active = renderedTexture;
             image.ReadPixels (new Rect (0, 0, textureWidth, textureHeight), 0, 0);
@@ -67,7 +69,7 @@ namespace DefaultNamespace
             // from a GC standpoint, as test in profiler.
             // _I think_
             var img = image.GetRawTextureData<byte>();
-            for(int i=0; i<img.Length; i++) ros_msg.data[i] = img[i];
+            for(int i=0; i<img.Length; i++) ros_msg.data[i] = img[i]; 
 
             ros_msg.header.stamp = new TimeStamp(Clock.time);
             ros_msg.header.frame_id = robotLinkName;
