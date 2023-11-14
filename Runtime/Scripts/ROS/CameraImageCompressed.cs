@@ -30,7 +30,6 @@ namespace DefaultNamespace
             ros_msg.header.frame_id = robotLinkName;
             ros_img = ImageConversion.EncodeToJPG(camImg.image, quality);
             ros_msg.data = ros_img;
-            Debug.Log($"Compressed image from {robotLinkName}");
             return true;
         }
 

@@ -38,11 +38,13 @@ namespace DefaultNamespace
             image = new Texture2D(textureWidth, textureHeight, TextureFormat.RGB24, false);
 
 
+            ros_msg.data = ros_img;
             ros_msg.encoding = "rgb8";
             ros_msg.height = (uint) textureHeight;
             ros_msg.width = (uint) textureWidth;
             ros_msg.is_bigendian = 0;
             ros_msg.step = (uint)(3*textureWidth);
+
 
         }
 
@@ -58,8 +60,14 @@ namespace DefaultNamespace
             image.Apply ();
             RenderTexture.active = null;
 
-            ros_img = image.GetRawTextureData();
-            ros_msg.data = ros_img;
+            // ros_img = image.GetRawTextureData();
+            // ros_msg.data = ros_img;
+            // Iterating over every byte and setting it is _slightly_ better
+            // than the above, where the get method returns a fresh new byte[]
+            // from a GC standpoint, as test in profiler.
+            // _I think_
+            var img = image.GetRawTextureData<byte>();
+            for(int i=0; i<img.Length; i++) ros_msg.data[i] = img[i];
 
             ros_msg.header.stamp = new TimeStamp(Clock.time);
             ros_msg.header.frame_id = robotLinkName;
