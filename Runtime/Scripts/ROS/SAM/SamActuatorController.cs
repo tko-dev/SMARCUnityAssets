@@ -7,7 +7,7 @@ namespace DefaultNamespace
 {
     public class SamActuatorController : MonoBehaviour
     {
-        SAMForceModel model;
+        ISAMControl model;
         float vertical;
         float horizontal;
         float rpm1;
@@ -29,7 +29,7 @@ namespace DefaultNamespace
 
         void Start()
         {
-            model = GetComponent<SAMForceModel>();
+            model = GetComponent<ISAMControl>();
             var ros = ROSConnection.GetOrCreateInstance();
             ros.Subscribe<ThrusterAnglesMsg>(anglesTopic, SetAngles);
             ros.Subscribe<ThrusterRPMMsg>(rpm1_topic, SetRpm1);

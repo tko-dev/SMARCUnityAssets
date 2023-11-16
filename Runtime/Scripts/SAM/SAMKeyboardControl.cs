@@ -5,7 +5,7 @@ namespace DefaultNamespace
 {
     public class SAMKeyboardControl : MonoBehaviour
     {
-        private SAMForceModel _samForceModel;
+        private ISAMControl _samControl;
 
         private SamActuatorController rosControl;
         [Tooltip("If true, pressing any key will disable the ros controllers")]
@@ -24,7 +24,7 @@ namespace DefaultNamespace
 
         private void Awake()
         {
-            _samForceModel = GetComponent<SAMForceModel>();
+            _samControl = GetComponent<ISAMControl>();
             rosControl = GetComponent<SamActuatorController>();
             points = new List<ForcePoint>(GetComponentsInChildren<ForcePoint>());
 
@@ -34,72 +34,72 @@ namespace DefaultNamespace
         {
             if(useBothRpms)
             {
-                _samForceModel.SetRpm(bothRpms, bothRpms);
+                _samControl.SetRpm(bothRpms, bothRpms);
             }
 
             if (Input.GetKeyDown("down"))
             {
-                _samForceModel.SetRpm(-moveRpms, -moveRpms);
+                _samControl.SetRpm(-moveRpms, -moveRpms);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("q"))
             {
-                _samForceModel.SetRpm(-rollRpms, rollRpms);
+                _samControl.SetRpm(-rollRpms, rollRpms);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("e"))
             {
-                _samForceModel.SetRpm(rollRpms, -rollRpms);
+                _samControl.SetRpm(rollRpms, -rollRpms);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("up"))
             {
-                _samForceModel.SetRpm(moveRpms, moveRpms);
+                _samControl.SetRpm(moveRpms, moveRpms);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyUp("up") || Input.GetKeyUp("down") || Input.GetKeyUp("q") || Input.GetKeyUp("e"))
             {
-                _samForceModel.SetRpm(0, 0);
+                _samControl.SetRpm(0, 0);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("a"))
             {
-                _samForceModel.SetRudderAngle(-angles);
+                _samControl.SetRudderAngle(-angles);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("d"))
             {
-                _samForceModel.SetRudderAngle(angles);
+                _samControl.SetRudderAngle(angles);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyUp("a") || Input.GetKeyUp("d"))
             {
-                _samForceModel.SetRudderAngle(0);
+                _samControl.SetRudderAngle(0);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("w"))
             {
-                _samForceModel.SetElevatorAngle(-angles);
+                _samControl.SetElevatorAngle(-angles);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("s"))
             {
-                _samForceModel.SetElevatorAngle(angles);
+                _samControl.SetElevatorAngle(angles);
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyUp("w") || Input.GetKeyUp("s"))
             {
-                _samForceModel.SetElevatorAngle(0);
+                _samControl.SetElevatorAngle(0);
                 if(takeOverRosController) rosControl.enable=false;
             }
 

@@ -5,11 +5,11 @@ namespace DefaultNamespace
 {
     public class SamVBSFeedback: Sensor<PercentStampedMsg>
     {
-        SAMForceModel model;
+        ISAMControl model;
         double vbs;
         void Start()
         {
-            model = robotMotionModel.GetComponent<SAMForceModel>();
+            model = robotMotionModel.GetComponent<ISAMControl>();
         }
 
         public override bool UpdateSensor(double deltaTime)

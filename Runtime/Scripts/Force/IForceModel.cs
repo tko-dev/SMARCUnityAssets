@@ -6,5 +6,8 @@ namespace DefaultNamespace
     {
         public Vector3 GetTorqueDamping();
         public Vector3 GetForceDamping();
+
+       
+
     }
 }

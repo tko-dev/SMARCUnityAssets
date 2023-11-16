@@ -5,11 +5,11 @@ namespace DefaultNamespace
 {
     public class SamLCGFeedback: Sensor<PercentStampedMsg>
     {
-        SAMForceModel model;
+        ISAMControl model;
         double lcg;
         void Start()
         {
-            model = robotMotionModel.GetComponent<SAMForceModel>();
+            model = robotMotionModel.GetComponent<ISAMControl>();
         }
 
         public override bool UpdateSensor(double deltaTime)

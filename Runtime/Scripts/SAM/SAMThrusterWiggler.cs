@@ -4,7 +4,7 @@ namespace DefaultNamespace
 {
     public class SAMThrusterWiggler : MonoBehaviour
     {
-        private SAMForceModel _samForceModel;
+        private ISAMControl _samForceModel;
         private Transform yaw_link;
         private Transform front_prop_link;
         private Transform back_prop_link;
@@ -16,7 +16,7 @@ namespace DefaultNamespace
             // We will read the thruster angles from the force model
             // so that we dont care what is controlling that model
             var sam_motion_model = robot.transform.parent.gameObject;
-            _samForceModel = sam_motion_model.GetComponent<SAMForceModel>();
+            _samForceModel = sam_motion_model.GetComponent<ISAMControl>();
 
             // Need access to the thruster_yaw_link object
             // Normally the transform.Find method would work for this, but

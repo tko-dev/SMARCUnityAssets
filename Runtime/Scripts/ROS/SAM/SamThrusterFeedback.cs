@@ -10,11 +10,11 @@ namespace DefaultNamespace
         [Tooltip("Set the number (1 or 2) of the thruster the feedback will come from")]
         [Range(1,2)]
         public int thrusterNum;
-        SAMForceModel model;
+        ISAMControl model;
         double rpm;
         void Start()
         {
-            model = robotMotionModel.GetComponent<SAMForceModel>();
+            model = robotMotionModel.GetComponent<ISAMControl>();
         }
 
         public override bool UpdateSensor(double deltaTime)

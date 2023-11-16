@@ -48,8 +48,8 @@ public class ForcePoint : MonoBehaviour
 
             if (_forceModel != null)
             {
-                _rigidbody.AddRelativeForce(_forceModel.GetForceDamping() / _pointCount, ForceMode.Force);
-                _rigidbody.AddRelativeTorque(_forceModel.GetTorqueDamping() / _pointCount, ForceMode.Force);
+            //    _rigidbody.AddRelativeForce(_forceModel.GetForceDamping() / _pointCount, ForceMode.Force);
+            //    _rigidbody.AddRelativeTorque(_forceModel.GetTorqueDamping() / _pointCount, ForceMode.Force);
             }
         }
 
