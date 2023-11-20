@@ -17,8 +17,6 @@ public class ForcePoint : MonoBehaviour
     public float depthBeforeSubmerged = 1.5f;
     public float displacementAmount = 1f;
 
-    IForceModel _forceModel;
-
     public GameObject motionModel;
 
     public void Awake()
@@ -26,7 +24,6 @@ public class ForcePoint : MonoBehaviour
         if(motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
         _rigidbody = motionModel.GetComponent<Rigidbody>();
         _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
-        _forceModel = motionModel.GetComponent<IForceModel>();
         _rigidbody.useGravity = false;
         _pointCount = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>().Length;
     }
@@ -45,12 +42,6 @@ public class ForcePoint : MonoBehaviour
                 new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
                 forcePointPosition,
                 ForceMode.Acceleration);
-
-            if (_forceModel != null)
-            {
-            //    _rigidbody.AddRelativeForce(_forceModel.GetForceDamping() / _pointCount, ForceMode.Force);
-            //    _rigidbody.AddRelativeTorque(_forceModel.GetTorqueDamping() / _pointCount, ForceMode.Force);
-            }
         }
 
     }
