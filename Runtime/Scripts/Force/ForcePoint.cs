@@ -18,30 +18,34 @@ public class ForcePoint : MonoBehaviour
     public float displacementAmount = 1f;
 
     public GameObject motionModel;
-
+    public bool addGravity = false;
     public void Awake()
     {
-        if(motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
+        if (motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
         _rigidbody = motionModel.GetComponent<Rigidbody>();
         _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
-        _rigidbody.useGravity = false;
         _pointCount = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>().Length;
+        addGravity = !_rigidbody.useGravity;
     }
 
     private void FixedUpdate()
     {
         var forcePointPosition = transform.position;
+        if (addGravity)
+        {
+            _rigidbody.AddForceAtPosition(_rigidbody.mass * Physics.gravity / _pointCount, forcePointPosition, ForceMode.Force);
+        }
 
-        _rigidbody.AddForceAtPosition(Physics.gravity / _pointCount, forcePointPosition, ForceMode.Acceleration);
 
         float waterSurfaceLevel = _waterModel.GetWaterLevelAt(forcePointPosition);
         if (forcePointPosition.y < waterSurfaceLevel)
         {
             float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged) * displacementAmount;
+
             _rigidbody.AddForceAtPosition(
-                new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
+                _rigidbody.mass * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
                 forcePointPosition,
-                ForceMode.Acceleration);
+                ForceMode.Force);
         }
 
     }

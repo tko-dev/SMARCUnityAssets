@@ -116,7 +116,7 @@ Transform:
   m_GameObject: {fileID: 82134941883309996}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.041, y: 0, z: -0.005}
+  m_LocalPosition: {x: -0.055, y: 0, z: 0}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -135,8 +135,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &3023137686364969161
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1215,7 +1216,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2501860669878315415
 Transform:
   m_ObjectHideFlags: 0
@@ -1238,7 +1239,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1044545453250593933}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -1430,7 +1431,7 @@ MonoBehaviour:
   sensorEnabled: 1
   isROSCamera: 1
   topic: payload/cam_down/image_raw
-  frequency: 10
+  frequency: 30
   textureWidth: 640
   textureHeight: 480
   image: {fileID: 0}
@@ -1517,7 +1518,7 @@ Transform:
   m_GameObject: {fileID: 1053377452036451553}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.041, y: 0, z: 0.31}
+  m_LocalPosition: {x: 0.055, y: 0, z: 0.3}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1536,8 +1537,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &2645649664630991316
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1608,7 +1610,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2002073595073803833
 Transform:
   m_ObjectHideFlags: 0
@@ -1631,7 +1633,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1093649603979486930}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -1823,7 +1825,7 @@ MonoBehaviour:
   sensorEnabled: 1
   isROSCamera: 1
   topic: payload/cam_starboard/image_raw
-  frequency: 10
+  frequency: 30
   textureWidth: 640
   textureHeight: 480
   image: {fileID: 0}
@@ -2152,7 +2154,7 @@ Transform:
   m_GameObject: {fileID: 1958923942894397154}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.041, y: 0, z: 0.58}
+  m_LocalPosition: {x: 0.055, y: 0, z: 0.57}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2171,8 +2173,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &512291334907796943
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2430,19 +2433,19 @@ Transform:
   m_GameObject: {fileID: 2053530204712732844}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.003626438, y: 0, z: -0.003534663}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1958923942894397153}
-  - {fileID: 8428669745765333152}
-  - {fileID: 3415417110717976932}
-  - {fileID: 93624735369024584}
-  - {fileID: 1265184392946573644}
   - {fileID: 2056313681752292904}
+  - {fileID: 8428669745765333152}
   - {fileID: 6582814034922537683}
+  - {fileID: 3415417110717976932}
   - {fileID: 1723680339104573626}
+  - {fileID: 93624735369024584}
   - {fileID: 441545343596626239}
+  - {fileID: 1265184392946573644}
   - {fileID: 6519780199555801445}
   m_Father: {fileID: 6409738292780927702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2474,7 +2477,7 @@ Transform:
   m_GameObject: {fileID: 2423388732711402899}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.041, y: 0, z: -0.571}
+  m_LocalPosition: {x: 0.055, y: 0, z: -0.57}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2493,8 +2496,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &2306590884283667965
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2637,7 +2641,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 14
   m_Drag: 1.02
-  m_AngularDrag: 8
+  m_AngularDrag: 2
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -2649,7 +2653,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 0
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -2667,7 +2671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   takeOverRosController: 1
-  angles: 0.3
+  angles: 0.1
   rollRpms: 100
   moveRpms: 800
   useBothRpms: 0
@@ -2766,8 +2770,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: -0.000000044703484, y: 0, z: -0.677}
+  m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -2792,19 +2796,19 @@ ArticulationBody:
     upperLimit: 0
     stiffness: 0
     damping: 0
-    forceLimit: 3.4028235e+38
+    forceLimit: 1000
     target: 0
     targetVelocity: 0
-    driveType: 0
+    driveType: 2
   m_ZDrive:
     lowerLimit: 0
     upperLimit: 0
     stiffness: 0
     damping: 0
-    forceLimit: 3.4028235e+38
+    forceLimit: 1000
     target: 0
     targetVelocity: 0
-    driveType: 0
+    driveType: 2
   m_LinearDamping: 0
   m_AngularDamping: 0
   m_JointFriction: 0
@@ -2911,7 +2915,7 @@ Transform:
   m_GameObject: {fileID: 2683411258753976289}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.008, y: 0, z: -0.74}
+  m_LocalPosition: {x: -0.055, y: 0, z: -0.57}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2930,8 +2934,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &1096516710144653737
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3541,7 +3546,7 @@ Transform:
   m_GameObject: {fileID: 3437604430173676850}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.041, y: 0, z: 0.58}
+  m_LocalPosition: {x: -0.055, y: 0, z: 0.57}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3560,8 +3565,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &3069142068633537719
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3684,7 +3690,7 @@ Transform:
   m_GameObject: {fileID: 3690356325665017059}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.041, y: 0, z: 0.31}
+  m_LocalPosition: {x: -0.055, y: 0, z: 0.3}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3703,8 +3709,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &6024502872528146635
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -4130,7 +4137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3778594907080867585
 Transform:
   m_ObjectHideFlags: 0
@@ -4153,7 +4160,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4050577146848748639}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -4345,7 +4352,7 @@ MonoBehaviour:
   sensorEnabled: 1
   isROSCamera: 1
   topic: payload/cam_port/image_raw
-  frequency: 10
+  frequency: 30
   textureWidth: 640
   textureHeight: 480
   image: {fileID: 0}
@@ -5298,7 +5305,7 @@ Transform:
   m_GameObject: {fileID: 5515424490652486421}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.041, y: 0, z: -0.307}
+  m_LocalPosition: {x: 0.055, y: 0, z: -0.3}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5317,8 +5324,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &1283874999851570660
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5498,7 +5506,7 @@ Transform:
   m_GameObject: {fileID: 5727247608729598829}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.041, y: 0, z: -0.307}
+  m_LocalPosition: {x: -0.055, y: 0, z: -0.3}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5517,8 +5525,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &4853703400080107307
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -6023,7 +6032,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.000000059604645}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.0000019669533}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -6878,7 +6887,7 @@ Transform:
   m_GameObject: {fileID: 7036119088113974369}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.041, y: 0, z: -0.005}
+  m_LocalPosition: {x: 0.055, y: 0, z: 0}
   m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6897,8 +6906,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1
+  displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
+  addGravity: 0
 --- !u!33 &7838473390502747913
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -8356,7 +8366,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.05429989}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.054201186}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
@@ -8487,7 +8497,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.0770002}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.076906264}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
