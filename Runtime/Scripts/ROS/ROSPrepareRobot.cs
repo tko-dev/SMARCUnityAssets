@@ -76,6 +76,11 @@ namespace DefaultNamespace
             foreach(Behaviour childComp in robot.GetComponentsInChildren<Behaviour>()){
                 childComp.enabled = false;
             }
+            // Also remove any colliders auto-added from the URDF, since they'll cause
+            // physics issues if they are inside the vehicle
+            foreach(Collider childComp in robot.GetComponentsInChildren<Collider>()){
+                childComp.enabled = false;
+            }
         }
 
 
@@ -93,8 +98,10 @@ namespace DefaultNamespace
             Rename();
             StripURDF();
 
-            var wiggler = GetComponent<SAMThrusterWiggler>();
-            wiggler.Setup(robot);
+            if(TryGetComponent<SAMThrusterWiggler>(out var wiggler))
+            {
+                wiggler.Setup(robot);
+            }
 
             // Setup the sensors in the "Sensors" child
             // They all need access to the auv object

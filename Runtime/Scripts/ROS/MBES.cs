@@ -6,6 +6,7 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 namespace DefaultNamespace
 {
+    [RequireComponent(typeof(Sonar))]
     public class MBES : Sensor<PointCloud2Msg>
     {
 
