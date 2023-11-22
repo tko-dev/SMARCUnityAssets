@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using DefaultNamespace;
 using DefaultNamespace.Water;
 using UnityEngine;
@@ -19,12 +20,21 @@ public class ForcePoint : MonoBehaviour
 
     public GameObject motionModel;
     public bool addGravity = false;
+
+    public bool automaticCenterOfGravity = false;
     public void Awake()
     {
         if (motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
         _rigidbody = motionModel.GetComponent<Rigidbody>();
         _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
-        _pointCount = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>().Length;
+        var forcePoints = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>();
+        if (automaticCenterOfGravity)
+        {
+            _rigidbody.automaticCenterOfMass = false;
+            var centerOfMass = forcePoints.Select(point => point.transform.localPosition).Aggregate(new Vector3(0, 0, 0), (s, v) => s + v);
+            _rigidbody.centerOfMass = centerOfMass / forcePoints.Length;
+        }
+        _pointCount = forcePoints.Length;
         addGravity = !_rigidbody.useGravity;
     }
 

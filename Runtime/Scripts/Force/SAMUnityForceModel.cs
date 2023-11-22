@@ -17,7 +17,7 @@ namespace DefaultNamespace
         public double rpm1 { get; set; }
         public double rpm2 { get; set; }
 
-
+        public Vector3 ThrusterPosition = new(0, 0, -0.73f);
 
         private void Awake()
         {
@@ -56,7 +56,8 @@ namespace DefaultNamespace
             var r2 = rpm2 / 1000;
 
 
-            var rotorPositionGlobalFrame = transform.position + transform.TransformDirection(new Vector3(0, 0, -0.73f));
+
+            var rotorPositionGlobalFrame = transform.position + transform.TransformDirection(ThrusterPosition);
 
             rigidBody.AddForceAtPosition(ThrustVectorForPropller(r1), rotorPositionGlobalFrame, ForceMode.Force);
             rigidBody.AddForceAtPosition(ThrustVectorForPropller(r2), rotorPositionGlobalFrame, ForceMode.Force);
@@ -71,7 +72,7 @@ namespace DefaultNamespace
             var globalDirection = transform.TransformDirection(localScaled);
             return globalDirection;
         }
-        
+
         public Vector3 GetTorqueDamping()
         {
             throw new System.NotImplementedException();
