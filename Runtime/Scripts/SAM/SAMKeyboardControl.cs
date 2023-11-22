@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace DefaultNamespace
 {
+    [RequireComponent(typeof(ISAMControl))]
+    [RequireComponent(typeof(SamActuatorController))]
     public class SAMKeyboardControl : MonoBehaviour
     {
         private ISAMControl _samControl;
