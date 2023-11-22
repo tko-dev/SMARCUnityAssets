@@ -31765,7 +31765,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -31925,7 +31925,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -32085,7 +32085,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -32245,7 +32245,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -32403,7 +32403,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -32557,7 +32557,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -32711,7 +32711,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -32875,7 +32875,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -33033,7 +33033,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -33167,7 +33167,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -33301,7 +33301,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -33463,7 +33463,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -33617,7 +33617,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -33775,7 +33775,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -33909,7 +33909,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -34073,7 +34073,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -34233,7 +34233,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -34391,7 +34391,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -34525,7 +34525,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -34683,7 +34683,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -34845,7 +34845,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -34999,7 +34999,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -35163,7 +35163,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -35279,7 +35279,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -35413,7 +35413,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -35571,7 +35571,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -35729,7 +35729,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -35883,7 +35883,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -36041,7 +36041,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -36175,7 +36175,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -36309,7 +36309,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -36471,7 +36471,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -36625,7 +36625,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -36783,7 +36783,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -36945,7 +36945,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -37105,7 +37105,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -37269,7 +37269,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -37403,7 +37403,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -37563,7 +37563,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -37697,7 +37697,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -37859,7 +37859,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -38023,7 +38023,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -38187,7 +38187,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -38351,7 +38351,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -38485,7 +38485,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -38645,7 +38645,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -38807,7 +38807,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -38971,7 +38971,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -39105,7 +39105,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -39265,7 +39265,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -39427,7 +39427,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -39589,7 +39589,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -39751,7 +39751,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -39909,7 +39909,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -40069,7 +40069,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -40229,7 +40229,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -40363,7 +40363,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -40497,7 +40497,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -40651,7 +40651,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -40785,7 +40785,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -40919,7 +40919,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -41073,7 +41073,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -41237,7 +41237,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -41397,7 +41397,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -41559,7 +41559,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -41693,7 +41693,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -41827,7 +41827,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -41961,7 +41961,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -42115,7 +42115,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -42273,7 +42273,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -42437,7 +42437,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -42599,7 +42599,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -42759,7 +42759,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -42913,7 +42913,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -43067,7 +43067,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -43231,7 +43231,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -43371,7 +43371,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -43535,7 +43535,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -43689,7 +43689,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -43823,7 +43823,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -43977,7 +43977,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -44111,7 +44111,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -44273,7 +44273,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
@@ -44435,7 +44435,7 @@ Cloth:
   m_StretchingStiffness: 0.05
   m_BendingStiffness: 0
   m_UseTethers: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_Damping: 0
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
