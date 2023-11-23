@@ -8,6 +8,8 @@ namespace DefaultNamespace
     public class ROSPrepareRobot : MonoBehaviour
     {
         GameObject robot;
+        [Tooltip("ROBOTNAME<Link Separator>LINKNAME<Link separator>CHILDLINK")]
+        public static readonly string linkSeparator = "_";
 
         public static List<GameObject> GetAllChildrenLinks(GameObject Go)
         {
@@ -55,7 +57,7 @@ namespace DefaultNamespace
             foreach(GameObject child_go in children_links)
             {
                 // and rename them to have the same name as a prefix
-                child_go.transform.name = rosName+"_"+child_go.transform.name;
+                child_go.transform.name = rosName+ linkSeparator +child_go.transform.name;
             }
 
         }
@@ -120,7 +122,7 @@ namespace DefaultNamespace
                         if(!b.enabled) continue;
                         if(!b.gameObject.activeInHierarchy) continue;
 
-                        sensor_script.Setup(robot);
+                        sensor_script.Setup(robot, linkSeparator);
                     }
                 }
             }

@@ -7,7 +7,7 @@ namespace DefaultNamespace
 
     public interface ISensor
     {
-        void Setup(GameObject robot);
+        void Setup(GameObject robot, string linkSeparator);
         bool UpdateSensor(double deltaTime);
     }
 
@@ -37,8 +37,8 @@ namespace DefaultNamespace
         protected ROSConnection ros;
         protected T ros_msg;
 
-        [Tooltip("ROBOTNAME<Link Separator>LINKNAME<Link separator>CHILDLINK")]
-        public static readonly string linkSeparator = "_";
+        protected string linkSeparator;
+
         
         protected void SetLink()
         // Call this if you over-write the Setup method below
@@ -104,10 +104,11 @@ namespace DefaultNamespace
 
         }
 
-        public void Setup(GameObject robot)
+        public void Setup(GameObject robot, string linkSeparator)
         // Call this in the PrepareRobot bit
         {
             this.robot = robot;
+            this.linkSeparator = linkSeparator;
             // Only add the robot name to the topic if the given topic is relative!
             if(topic[0] != '/') topic = "/" + robot.name + "/" + topic;
             ros_msg = new T();
