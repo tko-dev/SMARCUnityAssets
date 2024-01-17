@@ -100,10 +100,18 @@ namespace DefaultNamespace
             Rename();
             StripURDF();
 
+            //TODO dirty hacks these two... v
             if(TryGetComponent<SAMThrusterWiggler>(out var wiggler))
             {
                 wiggler.Setup(robot);
             }
+
+            var motion_model_tf = transform.Find("sam_motion_model");
+            if(motion_model_tf.gameObject.TryGetComponent<SamActuatorController>(out var cont))
+            {
+                cont.Setup(robot);
+            }
+            // ^ hacks
 
             // Setup the sensors in the "Sensors" child
             // They all need access to the auv object

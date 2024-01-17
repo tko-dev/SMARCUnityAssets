@@ -67,6 +67,16 @@ namespace DefaultNamespace
         }
 
 
+        public void Setup(GameObject robot)
+        // Called from ROSPrepareRobot to set the topics in awake()
+        {
+            anglesTopic = "/" + robot.name + "/" + anglesTopic;
+            rpm1_topic = "/" + robot.name + "/" + rpm1_topic;
+            rpm2_topic = "/" + robot.name + "/" + rpm2_topic;
+            vbs_topic = "/" + robot.name + "/" + vbs_topic;
+            lcg_topic = "/" + robot.name + "/" + lcg_topic;
+        }
+
         void Update()
         {
             var sinceLastCmd = Time.time - lastCommandTime;
