@@ -107,13 +107,13 @@ namespace DefaultNamespace
 
             if (Input.GetKeyDown("c"))
             {
-                points.ForEach(point => point.displacementAmount = 1.0f );
+                points.ForEach(point => point.displacementWaterCoefficent = 1.0f );
                 if(takeOverRosController) rosControl.enable=false;
             }
 
             if (Input.GetKeyDown("space"))
             {
-                points.ForEach(point => point.displacementAmount = 1.1f );
+                points.ForEach(point => point.displacementWaterCoefficent = 1.1f );
                 if(takeOverRosController) rosControl.enable=false;
             }
 

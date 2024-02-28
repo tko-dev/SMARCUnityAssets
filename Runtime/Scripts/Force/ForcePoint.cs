@@ -3,6 +3,7 @@ using System.Linq;
 using DefaultNamespace;
 using DefaultNamespace.Water;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // This is a very simple example of how we could compute a buoyancy force at variable points along the body.
 // Its not really accurate per se.
@@ -16,8 +17,9 @@ public class ForcePoint : MonoBehaviour
     private WaterQueryModel _waterModel;
 
     public float depthBeforeSubmerged = 1.5f;
-    public float displacementAmount = 1f;
-
+    public float displacementWaterCoefficent = 1.023f; // Salt water. 1023, 998.2 in fresh water
+    // Revisit this to ensure the force is calculated correctly. 
+    // Should only depend on volume. Buoyancy does not care about mass just the displaced water volume. 
     public GameObject motionModel;
     public bool addGravity = false;
 
@@ -50,7 +52,7 @@ public class ForcePoint : MonoBehaviour
         float waterSurfaceLevel = _waterModel.GetWaterLevelAt(forcePointPosition);
         if (forcePointPosition.y < waterSurfaceLevel)
         {
-            float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged) * displacementAmount;
+            float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged) * displacementWaterCoefficent;
 
             _rigidbody.AddForceAtPosition(
                 _rigidbody.mass * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
