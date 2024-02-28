@@ -15,23 +15,25 @@ namespace Force.LookUpTable
         public static double dVisc_DynamicViscosity = 0.0001002; // 1.002 e-3
         public static double C_SamLength = 1.2705;
 
-        public static double Ar = 0.4754;
-        public static double dens_Density = WaterDensity;
 
+        public static double Ar = 0.4754;
         public static double CKpp = 0.1;
         public static double CMqq = 40;
         public static double CNrr = 40;
+        public static LookUpTables LookupTables;
 
-        public static (Vector3 forces, Vector3 moments) CalculateDamping(Rigidbody rb)
+        public static (Vector3 forces, Vector3 moments) CalculateDamping(Rigidbody rb, Transform samTransform)
         {
-            var uvw_nm_nb = rb.velocity.To<NED>().ToDense(); // Might need to revisit. Rel. velocity in point m block.
-            var pqr_nm = rb.angularVelocity.To<NED>().ToDense();
+            var uvw_nm_nb = samTransform.InverseTransformDirection(rb.velocity).To<NED>().ToDense(); // Might need to revisit. Rel. velocity in point m block.
+            var pqr_nm = samTransform.InverseTransformDirection(rb.angularVelocity).To<NED>().ToDense();
 
             var aoa_alpha_angleOfAttack = AngleOfAttack(uvw_nm_nb);
             var (forces, moments) = CalculateMomentsForces(uvw_nm_nb, pqr_nm, aoa_alpha_angleOfAttack);
 
-            var forcesUnity = new Vector3<NED>(forces).toUnity;
-            var momentsUnity = new Vector3<NED>(moments).toUnity;
+
+            var forcesUnity = new Vector3(forces.y, -forces.z, forces.x);
+            var momentsUnity = new Vector3(moments.y, -moments.z, moments.x);
+            Debug.Log("Velocities: " + uvw_nm_nb.ToVector3() + " : " + pqr_nm.ToVector3() + "       Damping: " + forces + " : " + moments);
             return (forcesUnity, momentsUnity);
         }
 
@@ -43,10 +45,11 @@ namespace Force.LookUpTable
 
             var vInf = aoa[4];
             var Re_velocityReynolds = CalculateReynolds(vInf, WaterDensity, C_SamLength, dVisc_DynamicViscosity);
-            var CX = FetchCoefficients_CX(Re_velocityReynolds, aoa[2]);
-            var CY = FetchCoefficients_CY(Re_velocityReynolds, aoa[1]);
-            var CZ = FetchCoefficients_CZ(Re_velocityReynolds, aoa[0]);
-            var XCp = FetchCoefficients_XCp(Re_velocityReynolds, aoa[2]);
+            // Should fetch based on Re, but for now use vinf
+            var CX = FetchCoefficients_CX(vInf, aoa[2]);
+            var CY = FetchCoefficients_CY(vInf, aoa[1]);
+            var CZ = FetchCoefficients_CZ(vInf, aoa[0]);
+            var XCp = FetchCoefficients_XCp(vInf, aoa[2]);
             var aoaTransversal = aoa[3];
 
             var u = uvw_nm[0];
@@ -61,9 +64,9 @@ namespace Force.LookUpTable
 
             var translationalDampingCoefficients = Vector.Build.DenseOfArray(new[]
             {
-                0.5 * dens_Density * Ar * CX,
-                0.5 * dens_Density * Ar * CY,
-                0.5 * dens_Density * Ar * CZ
+                0.5 * WaterDensity * Ar * CX,
+                0.5 * WaterDensity * Ar * CY,
+                0.5 * WaterDensity * Ar * CZ
             });
 
             var rotationalDampingCoefficients = Vector.Build.DenseOfArray(new[]
@@ -75,9 +78,9 @@ namespace Force.LookUpTable
 
             var sth = mb.Diagonal(new[]
             {
-                Math.Pow(u, 2), // Paper says Abs of |u| * u, etc
-                Math.Pow(v, 2),
-                Math.Pow(w, 2)
+                u * Math.Abs(u), // Paper says Abs of |u| * u, etc
+                v * Math.Abs(v),
+                w * Math.Abs(w)
             });
 
             var forces = -sth.Multiply(translationalDampingCoefficients);
@@ -104,24 +107,41 @@ namespace Force.LookUpTable
                 : Vector.Build.DenseOfArray(new[] { 0, 0, 0, 0.0, 0.0 });
         }
 
-        public static double FetchCoefficients_CX(Double v_inf, Double ae_effectiveAngleOfAttack)
+        // Tables indexes are velocity / angle (degrees).
+        // For example:
+        // Velocity is from 0 to 10 with 0.1 step.
+        // Angles are degrees, 360 with 1 degree step. 
+        // Creates a table of 100 x 360 
+        // So round to closest degree and velocity.
+        // So round to closest decimal for velocity
+        public static int TableVelocityIndex(double v_inf) //Should use raynolds instead, but we simplify for now.
         {
-            return 0.0;
+            return (int)Math.Round(Math.Abs(v_inf) * 10);
         }
 
-        public static double FetchCoefficients_CY(Double v_inf, Double b_beta)
+        public static int TableDegreeIndex(double rad)
         {
-            return 0.0;
+            return (int)Math.Round(Mathf.Rad2Deg * rad) + 180;
         }
 
-        public static double FetchCoefficients_CZ(Double v_inf, Double a_alpha)
+        public static double FetchCoefficients_CX(Double re, Double ae_effectiveAngleOfAttack)
         {
-            return 0.0;
+            return LookupTables.cx[TableVelocityIndex(re)][TableDegreeIndex(ae_effectiveAngleOfAttack)];
         }
 
-        public static double FetchCoefficients_XCp(Double v_inf, Double ae_effectiveAngleOfAttack)
+        public static double FetchCoefficients_CY(Double re, Double b_beta)
         {
-            return 0.0;
+            return LookupTables.cy[TableVelocityIndex(re)][TableDegreeIndex(b_beta)];
+        }
+
+        public static double FetchCoefficients_CZ(Double re, Double a_alpha)
+        {
+            return LookupTables.cz[TableVelocityIndex(re)][TableDegreeIndex(a_alpha)];
+        }
+
+        public static double FetchCoefficients_XCp(Double re, Double ae_effectiveAngleOfAttack)
+        {
+            return LookupTables.xcp[TableVelocityIndex(re)][TableDegreeIndex(ae_effectiveAngleOfAttack)];
         }
     }
 }
