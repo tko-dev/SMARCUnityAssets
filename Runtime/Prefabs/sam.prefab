@@ -138,6 +138,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &3023137686364969161
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1540,6 +1541,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &2645649664630991316
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2176,6 +2178,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &512291334907796943
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2499,6 +2502,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &2306590884283667965
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2606,6 +2610,7 @@ GameObject:
   - component: {fileID: 5537357250328288402}
   - component: {fileID: 5083030870392789864}
   - component: {fileID: 1553085490730387082}
+  - component: {fileID: 2667209502744879299}
   m_Layer: 0
   m_Name: sam_motion_model
   m_TagString: motion_model
@@ -2708,6 +2713,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rpm_multiplier: 9
+  ThrusterPosition: {x: 0, y: 0, z: -0.73}
+--- !u!136 &2667209502744879299
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2486751600669263706}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.063
+  m_Height: 1.2705
+  m_Direction: 2
+  m_Center: {x: 0.0028929783, y: 0, z: 0.02}
 --- !u!1 &2653024634976607227
 GameObject:
   m_ObjectHideFlags: 0
@@ -2937,6 +2966,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &1096516710144653737
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3568,6 +3598,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &3069142068633537719
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3712,6 +3743,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &6024502872528146635
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5327,6 +5359,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &1283874999851570660
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5528,6 +5561,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &4853703400080107307
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -6909,6 +6943,7 @@ MonoBehaviour:
   displacementAmount: 1.005
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  automaticCenterOfGravity: 0
 --- !u!33 &7838473390502747913
 MeshFilter:
   m_ObjectHideFlags: 0
