@@ -7,10 +7,10 @@ namespace DefaultNamespace.LookUpTable
 {
     public static class NumericsUtils
     {
-
         public static Vector<double> ToDense(this Vector3<NED> vec)
         {
             return Vector.Build.Dense(new[] { (double)vec.x, vec.y, vec.z });
         }
+        
     }
 }
