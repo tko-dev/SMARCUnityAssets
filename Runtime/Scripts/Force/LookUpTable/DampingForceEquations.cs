@@ -30,7 +30,7 @@ namespace Force.LookUpTable
             var aoa_alpha_angleOfAttack = AngleOfAttack(uvw_nm_nb);
             var (forces, moments) = CalculateMomentsForces(uvw_nm_nb, pqr_nm, aoa_alpha_angleOfAttack);
 
-
+            NED.ConvertToRUF()
             var forcesUnity = new Vector3(forces.y, -forces.z, forces.x);
             var momentsUnity = new Vector3(moments.y, -moments.z, moments.x);
             Debug.Log("Velocities: " + uvw_nm_nb.ToVector3() + " : " + pqr_nm.ToVector3() + "       Damping: " + forces + " : " + moments);
