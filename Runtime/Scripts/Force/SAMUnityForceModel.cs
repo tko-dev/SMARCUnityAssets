@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-using Unity.Mathematics;
 
-namespace DefaultNamespace
+namespace Force
 {
     public class SAMUnityForceModel : MonoBehaviour, IForceModel, ISAMControl
     {

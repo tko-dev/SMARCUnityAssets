@@ -1,4 +1,4 @@
-﻿namespace DefaultNamespace
+﻿namespace Force
 {
     public interface ISAMControl
     {
