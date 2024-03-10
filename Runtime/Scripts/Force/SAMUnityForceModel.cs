@@ -22,6 +22,7 @@ namespace DefaultNamespace
         private void Awake()
         {
             rigidBody = GetComponent<Rigidbody>();
+            if (rigidBody == null) rigidBody = transform.parent.GetComponent<Rigidbody>();
         }
 
         public void SetRpm(double rpm1, double rpm2)
@@ -56,19 +57,19 @@ namespace DefaultNamespace
             var r2 = rpm2 / 1000;
 
 
-
             var rotorPositionGlobalFrame = transform.position + transform.TransformDirection(ThrusterPosition);
 
             rigidBody.AddForceAtPosition(ThrustVectorForPropller(r1), rotorPositionGlobalFrame, ForceMode.Force);
             rigidBody.AddForceAtPosition(ThrustVectorForPropller(r2), rotorPositionGlobalFrame, ForceMode.Force);
-            rigidBody.AddTorque(Vector3.forward * -(float)r1 * rpm_multiplier / 2, ForceMode.Force);
-            rigidBody.AddTorque(Vector3.forward * (float)r2 * rpm_multiplier / 2, ForceMode.Force);
+            rigidBody.AddTorque(Vector3.forward * -(float) r1 * rpm_multiplier / 2, ForceMode.Force);
+            rigidBody.AddTorque(Vector3.forward * (float) r2 * rpm_multiplier / 2, ForceMode.Force);
         }
 
         public Vector3 ThrustVectorForPropller(double r)
         {
-            var localDirection = Quaternion.Euler(d_aileron * Mathf.Rad2Deg, -d_rudder * Mathf.Rad2Deg, 0) * transform.InverseTransformDirection(transform.forward);
-            var localScaled = localDirection * (float)r * rpm_multiplier / 2; //Divide by 2 since two forces
+            var localDirection = Quaternion.Euler(d_aileron * Mathf.Rad2Deg, -d_rudder * Mathf.Rad2Deg, 0) *
+                                 transform.InverseTransformDirection(transform.forward);
+            var localScaled = localDirection * (float) r * rpm_multiplier / 2; //Divide by 2 since two forces
             var globalDirection = transform.TransformDirection(localScaled);
             return globalDirection;
         }
