@@ -24,7 +24,7 @@ namespace Force
 
         public Mesh volumeMesh;
         public bool automaticCenterOfGravity = false;
-        private float volume;
+        public float volume;
         public float density = 997; // kg/m3
         
 
@@ -43,7 +43,7 @@ namespace Force
             }
             _pointCount = forcePoints.Length;
             addGravity = !_rigidbody.useGravity;
-            if (volumeMesh != null) volume = MeshVolume.CalculateVolumeOfMesh(volumeMesh, Vector3.one);
+            if (volumeMesh != null) volume = MeshVolume.CalculateVolumeOfMesh(volumeMesh, transform.parent.localScale);
         }
         // Volume * Density * Gravity
         private void FixedUpdate()
