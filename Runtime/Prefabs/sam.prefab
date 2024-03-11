@@ -135,9 +135,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &3023137686364969161
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1537,9 +1541,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &2645649664630991316
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2173,9 +2181,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &512291334907796943
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2496,9 +2508,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &2306590884283667965
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2602,7 +2618,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6409738292780927702}
-  - component: {fileID: 8233709735855152073}
   - component: {fileID: 5537357250328288402}
   - component: {fileID: 5083030870392789864}
   - component: {fileID: 1553085490730387082}
@@ -2631,33 +2646,6 @@ Transform:
   - {fileID: 2536419772015315485}
   m_Father: {fileID: 1806914932985786378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &8233709735855152073
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2486751600669263706}
-  serializedVersion: 4
-  m_Mass: 14
-  m_Drag: 1.02
-  m_AngularDrag: 2
-  m_CenterOfMass: {x: 0, y: 0, z: -0.0005}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 0
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &5537357250328288402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2708,6 +2696,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rpm_multiplier: 9
+  ThrusterPosition: {x: 0, y: 0, z: -0.73}
 --- !u!1 &2653024634976607227
 GameObject:
   m_ObjectHideFlags: 0
@@ -2934,9 +2923,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &1096516710144653737
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3565,9 +3558,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &3069142068633537719
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3709,9 +3706,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &6024502872528146635
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5229,6 +5230,7 @@ GameObject:
   - component: {fileID: 1806914932985786378}
   - component: {fileID: 6346258851313487843}
   - component: {fileID: 2840772932886376435}
+  - component: {fileID: 5979306239951027471}
   m_Layer: 0
   m_Name: sam
   m_TagString: Untagged
@@ -5277,6 +5279,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5cf9eb00d9a33cb2a28e2cf1ac6b6bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &5979306239951027471
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5331949522250179390}
+  serializedVersion: 4
+  m_Mass: 14
+  m_Drag: 1.02
+  m_AngularDrag: 2
+  m_CenterOfMass: {x: 0, y: -0.01, z: -0.0005}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 0
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &5515424490652486421
 GameObject:
   m_ObjectHideFlags: 0
@@ -5324,9 +5353,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &1283874999851570660
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5525,9 +5558,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &4853703400080107307
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -6032,8 +6069,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: -0.000000044703484, y: 0, z: 0}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.0000019669533}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0, w: 1}
   m_MatchAnchors: 1
@@ -6906,9 +6943,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   depthBeforeSubmerged: 0.03
-  displacementAmount: 1.005
+  displacementAmount: 0.95
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
+  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+    type: 3}
+  automaticCenterOfGravity: 0
+  density: 997
 --- !u!33 &7838473390502747913
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -8366,8 +8407,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: -0.000000029802322, y: 0, z: -0.05430001}
-  m_ParentAnchorRotation: {x: 0, y: 0.7071069, z: 0, w: 0.7071069}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.054201186}
+  m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_MatchAnchors: 1
@@ -8497,8 +8538,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: -0.000000014901161, y: 0, z: -0.07700008}
-  m_ParentAnchorRotation: {x: 0, y: 0.7071069, z: 0, w: 0.7071069}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.076906264}
+  m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_MatchAnchors: 1
