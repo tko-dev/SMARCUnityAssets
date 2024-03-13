@@ -43,7 +43,7 @@ namespace Force
             }
             _pointCount = forcePoints.Length;
             addGravity = !_rigidbody.useGravity;
-            if (volumeMesh != null) volume = MeshVolume.CalculateVolumeOfMesh(volumeMesh, transform.parent.localScale);
+            if (volume == 0 && volumeMesh != null) volume = MeshVolume.CalculateVolumeOfMesh(volumeMesh, transform.parent.localScale);
         }
         // Volume * Density * Gravity
         private void FixedUpdate()
