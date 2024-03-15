@@ -138,9 +138,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &3023137686364969161
 MeshFilter:
@@ -1544,9 +1545,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &2645649664630991316
 MeshFilter:
@@ -2184,9 +2186,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &512291334907796943
 MeshFilter:
@@ -2511,9 +2514,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &2306590884283667965
 MeshFilter:
@@ -2659,7 +2663,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   takeOverRosController: 1
-  angles: 0.1
   rollRpms: 100
   moveRpms: 800
   useBothRpms: 0
@@ -2695,6 +2698,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf8bea3b7874caf9b267db44fe8efa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VBSFixedPoint: 0.921
+  VBSMaxDeviation: 0.009
+  ThrusterAngleRange: 0.1
   rpm_multiplier: 9
   ThrusterPosition: {x: 0, y: 0, z: -0.73}
 --- !u!1 &2653024634976607227
@@ -2926,9 +2932,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &1096516710144653737
 MeshFilter:
@@ -3561,9 +3568,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &3069142068633537719
 MeshFilter:
@@ -3709,9 +3717,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &6024502872528146635
 MeshFilter:
@@ -5402,9 +5411,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &1283874999851570660
 MeshFilter:
@@ -5607,9 +5617,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &4853703400080107307
 MeshFilter:
@@ -6992,9 +7003,10 @@ MonoBehaviour:
   displacementAmount: 0.98
   motionModel: {fileID: 2486751600669263706}
   addGravity: 0
-  volumeMesh: {fileID: -2432090755550338912, guid: 245ef083faa3d554ba1e0530d7a4a413,
+  volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
+  volume: 0
   density: 997
 --- !u!33 &7838473390502747913
 MeshFilter:
