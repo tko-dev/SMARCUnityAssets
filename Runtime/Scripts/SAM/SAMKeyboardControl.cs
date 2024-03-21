@@ -16,7 +16,7 @@ namespace DefaultNamespace
         public bool takeOverRosController = true;
 
         public float rollRpms = 0.1f;
-        public float moveRpms = 0.8f;
+        public float moveRpms = 800f;
 
         [Header("Mouse control")] [Tooltip("Use these when you dont want to press down for 10 minutes")]
         public bool useBothRpms = false;
@@ -26,7 +26,7 @@ namespace DefaultNamespace
 
         private void Awake()
         {
-            _samControl = GetComponent<ISAMControl>();
+            _samControl = GetComponentInParent<ISAMControl>();
             rosControl = GetComponent<SamActuatorController>();
         }
 
@@ -105,13 +105,13 @@ namespace DefaultNamespace
 
             if (Input.GetKeyDown("f"))
             {
-                _samControl.SetWaterPump(0);
+                _samControl.SetWaterPump(0.5f);
                 if (takeOverRosController) rosControl.enable = false;
             }
 
             if (Input.GetKeyDown("c"))
             {
-                _samControl.SetWaterPump(-1);
+                _samControl.SetWaterPump(0);
                 if (takeOverRosController) rosControl.enable = false;
             }
 
