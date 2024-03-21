@@ -27,14 +27,14 @@ namespace Force.LookUpTable
             var inverseTransformDirection = samTransform.InverseTransformDirection(rb.velocity);
             var transformAngularVelocity = samTransform.InverseTransformDirection(rb.angularVelocity);
             var uvw_nm_nb = inverseTransformDirection.To<NED>().ToDense(); // Might need to revisit. Rel. velocity in point m block.
-            var pqr_nm =  FRD.ConvertAngularVelocityFromRUF(transformAngularVelocity).ToDense(); // FRD is same as NED for ANGLES ONLY
+            var pqr_nm = FRD.ConvertAngularVelocityFromRUF(transformAngularVelocity).ToDense(); // FRD is same as NED for ANGLES ONLY
 
             var aoa_alpha_angleOfAttack = AngleOfAttack(uvw_nm_nb);
             var (forces, moments) = CalculateMomentsForces(uvw_nm_nb, pqr_nm, aoa_alpha_angleOfAttack);
-
-            // NED.ConvertToRUF()
-            var forcesUnity = new Vector3(forces.y, -forces.z, forces.x);
-            var momentsUnity = new Vector3(moments.y, -moments.z, moments.x);
+            
+            var forcesUnity = NED.ConvertToRUF(forces);
+            var momentsUnity = FRD.ConvertAngularVelocityToRUF(moments);
+            
             Debug.Log("Velocities: " + uvw_nm_nb.ToVector3() + " : " + pqr_nm.ToVector3() + "       Damping: " + forces + " : " + moments);
             // Debug.Log("RUF: " + inverseTransformDirection + " : " + transformAngularVelocity + "       NED: " + uvw_nm_nb.ToVector3() + " : " + pqr_nm.ToVector3() +                       "       BACK 2 RUF: " +NED.ConvertToRUF(uvw_nm_nb.ToVector3()) + " : " + FRD.ConvertAngularVelocityToRUF(pqr_nm.ToVector3()));
 
@@ -82,9 +82,9 @@ namespace Force.LookUpTable
 
             var sth = mb.Diagonal(new[]
             {
-                u * Math.Abs(u), // Paper says Abs of |u| * u, etc
-                v * Math.Abs(v),
-                w * Math.Abs(w)
+                u * u, // Paper says Abs of |u| * u, etc
+                v * v,
+                w * w
             });
 
             var forces = -sth.Multiply(translationalDampingCoefficients);
@@ -145,7 +145,8 @@ namespace Force.LookUpTable
 
         public static double FetchCoefficients_XCp(Double re, Double ae_effectiveAngleOfAttack)
         {
-            return LookupTables.xcp[TableVelocityIndex(re)][TableDegreeIndex(ae_effectiveAngleOfAttack)];
+            var fetchCoefficientsXCp = LookupTables.xcp[TableVelocityIndex(re)][TableDegreeIndex(ae_effectiveAngleOfAttack)];
+            return (1 - fetchCoefficientsXCp) * C_SamLength;
         }
     }
 }

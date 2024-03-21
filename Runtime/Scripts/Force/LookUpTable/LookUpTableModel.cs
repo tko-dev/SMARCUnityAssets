@@ -19,8 +19,8 @@ namespace DefaultNamespace.LookUpTable
         {
             var (forces, moments) = DampingForceEquations.CalculateDamping(rb, transform);
 
-            // rb.AddRelativeForce(forces, ForceMode.Force);
-            // rb.AddRelativeTorque(moments);
+            rb.AddRelativeForce(forces, ForceMode.Force);
+           rb.AddRelativeTorque(moments, ForceMode.Force);
         }
     }
 }
