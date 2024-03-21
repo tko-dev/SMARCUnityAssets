@@ -1,3 +1,4 @@
+using Force;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -51,8 +52,8 @@ namespace DefaultNamespace
             if(front_prop_link == null || back_prop_link == null) return;
             else{
                 // These guys can just turn and stop whereever.
-                front_prop_link.Rotate(Vector3.forward * (float)(_samForceModel.rpm1*60) * Time.deltaTime);
-                back_prop_link.Rotate(Vector3.forward * -(float)(_samForceModel.rpm2*60) * Time.deltaTime);
+                front_prop_link.Rotate(Vector3.forward * (float)(_samForceModel.rpm1) * Time.deltaTime);
+                back_prop_link.Rotate(Vector3.forward * -(float)(_samForceModel.rpm2) * Time.deltaTime);
             }
         }
     }
