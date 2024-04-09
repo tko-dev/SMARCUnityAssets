@@ -12,14 +12,16 @@ namespace DefaultNamespace
 
         [Header("Sidescan")]
         public int numBucketsPerSide = 1000;
-
         public byte[] portBuckets;
         public byte[] strbBuckets;
-
-        public int openingAngleDeg = 60;
+        [Header("Beam Profile")]
+        public float beamOrientationAngleDeg = 45.0f;
+        public float fullBeamAngleDeg = 90.0f;
+        public float fwhmBeamAngleDeg = 60.0f;
+        public bool gaussianProfile = false;
         public int maxRange = 100;
         public int totalBeamCount = 256;
-
+        [Header("Noise")]
         public float multGain = 1;
         public bool useAdditiveNoise = true;
         public float addNoiseStd = 1;
@@ -47,17 +49,36 @@ namespace DefaultNamespace
 
         void SetSonars()
         {
-            sonarPort.beam_breadth_deg = openingAngleDeg/2;
-            sonarPort.transform.localRotation = Quaternion.Euler(0, 0, -openingAngleDeg/4);
+            sonarPort.beam_breadth_deg = fullBeamAngleDeg;
+            sonarPort.beam_fwhm_deg = fwhmBeamAngleDeg;
+            sonarPort.transform.localRotation = Quaternion.Euler(0, 0, -beamOrientationAngleDeg);
             sonarPort.max_distance = maxRange;
             sonarPort.beam_count = totalBeamCount/2;
             sonarPort.InitHits();
+            if (gaussianProfile)
+            {
+                sonarPort.InitBeamProfileGaussian();
+            }
+            else
+            {
+                sonarPort.InitBeamProfileSimple();
+            }
 
-            sonarStrb.beam_breadth_deg = openingAngleDeg/2;
-            sonarStrb.transform.localRotation = Quaternion.Euler(0, 0, openingAngleDeg/4);
+            sonarStrb.beam_breadth_deg = fullBeamAngleDeg;
+            sonarStrb.beam_fwhm_deg = fwhmBeamAngleDeg;
+            sonarStrb.transform.localRotation = Quaternion.Euler(0, 0, beamOrientationAngleDeg);
             sonarStrb.max_distance = maxRange;
             sonarStrb.beam_count = totalBeamCount/2;
             sonarStrb.InitHits();
+            if (gaussianProfile)
+            {
+                sonarStrb.InitBeamProfileGaussian();
+            }
+            else
+            {
+                sonarStrb.InitBeamProfileSimple();
+            }
+            
         }
 
         void FillBucket(Sonar s, byte[] bucket)
