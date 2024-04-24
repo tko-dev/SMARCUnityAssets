@@ -42,7 +42,7 @@ namespace DefaultNamespace
             ros_msg.header.stamp = new TimeStamp(Clock.time);
             ros_msg.header.frame_id = robotLinkName; //from sensor
 
-            ros_msg.orientation = orientation.To<FLU>();
+            ros_msg.orientation = orientation.To<ENU>();
 
             // ros_msg.orientation_covariance = orientationCovariance;
 
