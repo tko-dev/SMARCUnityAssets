@@ -10,6 +10,7 @@ namespace DefaultNamespace
 
         [Header("Depth-Pressure")]
         public float maxDepth;
+        public bool includeAtmosphericPressure;
         float pressure;
         private WaterQueryModel _waterModel;
 
@@ -30,6 +31,7 @@ namespace DefaultNamespace
 
             // 1m water = 9806.65 Pa
             pressure = depth * 9806.65f;
+            if (includeAtmosphericPressure) pressure += 101325.0f;
             ros_msg.fluid_pressure = pressure;
 
             ros_msg.header.stamp = new TimeStamp(Clock.time);

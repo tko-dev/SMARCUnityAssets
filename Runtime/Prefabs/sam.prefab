@@ -291,6 +291,7 @@ MonoBehaviour:
   topic: core/depth300_pressure
   frequency: 25
   maxDepth: 300
+  includeAtmosphericPressure: 1
 --- !u!1 &256252594634226809
 GameObject:
   m_ObjectHideFlags: 0
@@ -4526,6 +4527,7 @@ MonoBehaviour:
   topic: core/imu
   frequency: 10
   withGravity: 1
+  useNED: 0
 --- !u!1 &4396861928839194196
 GameObject:
   m_ObjectHideFlags: 0
@@ -7518,6 +7520,7 @@ MonoBehaviour:
   topic: core/sbg_imu
   frequency: 10
   withGravity: 1
+  useNED: 0
 --- !u!1 &7914120608803456668
 GameObject:
   m_ObjectHideFlags: 0
@@ -7620,6 +7623,7 @@ MonoBehaviour:
   topic: core/depth20_pressure
   frequency: 25
   maxDepth: 20
+  includeAtmosphericPressure: 1
 --- !u!1 &7951499339210936219
 GameObject:
   m_ObjectHideFlags: 0
