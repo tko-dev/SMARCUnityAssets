@@ -1,6 +1,7 @@
 using DefaultNamespace.Water;
 using UnityEngine;
 using RosMessageTypes.Sensor;
+using Unity.Robotics.Core; //Clock
 
 namespace DefaultNamespace
 {
@@ -44,6 +45,7 @@ namespace DefaultNamespace
             {
                 ros_msg.status.status = NavSatStatusMsg.STATUS_NO_FIX;
             }
+            ros_msg.header.stamp = new TimeStamp(Clock.time);
             return true;
         }
     }
