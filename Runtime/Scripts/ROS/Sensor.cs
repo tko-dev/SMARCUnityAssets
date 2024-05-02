@@ -130,7 +130,7 @@ namespace DefaultNamespace
         // {
         // }
 
-        void Update()
+        void FixedUpdate()
         {
             if(!sensorEnabled) return;
             // If enough time has passed since last update

@@ -1,5 +1,6 @@
 using UnityEngine;
 using RosMessageTypes.Sensor;
+using Unity.Robotics.Core; //Clock
 
 namespace DefaultNamespace
 {
@@ -15,6 +16,7 @@ namespace DefaultNamespace
            if(currentPercent < 0f) currentPercent = 0f;
            ros_msg.voltage = 12.5f;
            ros_msg.percentage = currentPercent;
+           ros_msg.header.stamp = new TimeStamp(Clock.time);
            return true;
         }
     }

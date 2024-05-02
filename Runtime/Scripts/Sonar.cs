@@ -14,24 +14,41 @@ namespace DefaultNamespace
     {
         public RaycastHit hit;
         public float intensity;
+        public int label;
         Sonar sonar;
 
         public static readonly Dictionary<string, float> simpleMaterialReflectivity = new Dictionary<string, float>()
         {
             {"Rock", 0.8f},
-            {"Mud", 0.2f}
+            {"Mud", 0.2f},
+            {"Buoy", 0.99f},  // Buoy, Algae, and Rope are currently just wild guesses
+            {"Algae", 0.25f},
+            {"Rope", 0.4f}
+        };
+
+        public static readonly Dictionary<string, int> materialLabels = new Dictionary<string, int>()
+        {
+            // Labels are assigned based on importance, lower values will be over-written by higher values 
+            {"Rock", 1},
+            {"Mud", 1},
+            {"Buoy", 3},  // Buoy, Algae, and Rope are currently just wild guesses
+            {"Algae", 2},
+            {"Rope", 4}
         };
 
         public SonarHit(Sonar sonar)
         {
             intensity = -1;
+            label = 0;
             this.sonar = sonar;
         }
 
-        public void Update(RaycastHit hit)
+        public void Update(RaycastHit hit, float beam_intensity)
         {
+            
+            intensity = GetIntensity(beam_intensity);
+            label = GetMaterialLabel();
             this.hit = hit;
-            this.intensity = GetIntensity();
         }
 
 
@@ -66,8 +83,39 @@ namespace DefaultNamespace
             // TODO that switch lol
             return 0.5f;
         }
+        
+        public int GetMaterialLabel()
+        {
+            // Return some default value for things that dont hit
+            // 0 is default for no hit, hit w/o material, hit w/o named material no is materialLabels{}
+            if(!(hit.collider))
+            {
+                return 0;
+            }
+            
+            if(!(hit.collider.material))
+            {
+                return 0;
+            }
 
-        public float GetIntensity()
+            string name = hit.collider.material.name;
+            // name can have " (instance of)" added to it,
+            // remove that...
+            if(name.Contains("("))
+            {
+                name = name.Split("(")[0].Trim();
+            }
+
+            // Return the label
+            if(materialLabels.ContainsKey(name))
+            {
+                return materialLabels[name];
+            }
+            // if the named material has ne specified label
+            return 0;
+        }
+
+        public float GetIntensity(float beamIntensity)
         {
             // intensity of hit between 1-255
             // It is a function of
@@ -89,7 +137,8 @@ namespace DefaultNamespace
             // Ensonification = distance traveled
             // Reflectivity = material prop.
             // Angle is obvious.
-            float intensity = hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
+            // beamIntensity accounts for the angular dependence of the ensonification intensity, beam profile
+            float intensity = beamIntensity * hitDistIntensity * hitAngleIntensity * hitMaterialIntensity;
             if(intensity > 1) intensity=1;
             if(intensity < 0) intensity=0;
 
@@ -137,7 +186,8 @@ namespace DefaultNamespace
 
         [Header("Sonar")]
         public int beam_count = 500;
-        public float beam_breadth_deg = 45;
+        public float beam_breadth_deg = 90;
+        public float beam_fwhm_deg = 60;
         public float max_distance = 100;
 
         // we use this one to keep the latest hit in memory and
@@ -154,7 +204,7 @@ namespace DefaultNamespace
 
         private Color rayColor;
 
-
+        public List<float> beamProfile;
 
 
 
@@ -162,6 +212,7 @@ namespace DefaultNamespace
         {
             rayColor = Color.white; //Random.ColorHSV();
             InitHits();
+            InitBeamProfileSimple();
         }
 
         public void InitHits()
@@ -175,8 +226,38 @@ namespace DefaultNamespace
             }
         }
 
-
-
+        public void InitBeamProfileGaussian()
+        {
+            // Initialize the Gaussian beam profile
+            // The Gaussian is specified be its full width half max (fwhm), 
+            float CalculateGaussianIntensity(float beamAngle, float beamCenter, float sigma)
+            {
+                var gaussianIntensity = Mathf.Exp(-(Mathf.Pow(beamAngle - beamCenter, 2) / (2 * Mathf.Pow(sigma, 2))));
+                return gaussianIntensity;
+            }
+            var angleStepDeg = beam_breadth_deg / (beam_count - 1.0f);
+            var fwhmSigma = beam_fwhm_deg / (2 * Mathf.Sqrt(2.0f * Mathf.Log(2.0f)));
+            beamProfile = new List<float>();
+            for(int i=0; i<beam_count; i++)
+            {
+                var beamAngleDeg = -beam_breadth_deg / 2 + i * angleStepDeg;
+                float intensity =
+                    CalculateGaussianIntensity(beamAngle: beamAngleDeg, beamCenter: 0.0f, sigma: fwhmSigma);
+                beamProfile.Add(intensity);
+            }
+        }
+        
+        public void InitBeamProfileSimple()
+        {
+            // Initialize simple beam profile
+            beamProfile = new List<float>();
+            for(int i=0; i<beam_count; i++)
+            {
+                beamProfile.Add(1.0f);
+            }
+        }
+            
+            
         public void FixedUpdate()
         {
             if (results.Length > 0)
@@ -187,7 +268,7 @@ namespace DefaultNamespace
                 for(int i=0; i<beam_count; i++)
                 {
                     var hit = results[i];
-                    sonarHits[i].Update(hit);
+                    sonarHits[i].Update(hit, beamProfile[i]);
                     if (drawRays && hit.point != Vector3.zero) Debug.DrawLine(transform.position, hit.point, rayColor);
                 }
 
@@ -231,7 +312,7 @@ namespace DefaultNamespace
 
             public void Execute(int i)
             {
-                var beamBreathDeg = -Beam_breath_deg / 2 + i * Beam_breath_deg / Beam_count;
+                var beamBreathDeg = -Beam_breath_deg / 2 + i * Beam_breath_deg / (Beam_count - 1);
                 Vector3 direction = Quaternion.AngleAxis(beamBreathDeg, Rotation_axis) * Direction;
                 Commands[i] = new RaycastCommand(Origin, direction, QueryParameters.Default, Max_distance);
             }
