@@ -8,7 +8,7 @@
         public float ThrusterAngleMax = 0.12f;
 
         public float RPMMax = 1000;
-        public float RPMToForceMultiplier = 1;
+        public float RPMToForceMultiplier = 5;
 
     }
 }
