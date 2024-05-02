@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Force;
+using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Unity.Mathematics;
@@ -10,6 +11,7 @@ namespace DefaultNamespace
         private Rigidbody rigidBody;
         public double lcg { get; set; }
         public double vbs { get; set; }
+        public SAMParameters parameters { get; set; }
         public float d_rudder { get; set; }
         public float d_aileron { get; set; }
         public double rpm1 { get; set; }
@@ -41,7 +43,7 @@ namespace DefaultNamespace
             this.lcg = lcg;
         }
 
-        public void SetWaterPump(double vbs)
+        public void SetWaterPump(float vbs)
         {
             this.vbs = vbs;
         }

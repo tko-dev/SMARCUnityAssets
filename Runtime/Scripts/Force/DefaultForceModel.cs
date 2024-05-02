@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using DefaultNamespace;
+using UnityEngine;
 
-namespace DefaultNamespace
+namespace Force
 {
     public class DefaultForceModel : MonoBehaviour, IForceModel
     {
