@@ -15,11 +15,11 @@ public static class TransformExtensions
             tfUnity.localRotation.To<FLU>());
     }
 
-    public static TransformStampedMsg ToROSTransformStamped(this Transform tfUnity, double timeStamp)
+    public static TransformStampedMsg ToROSTransformStamped(this Transform tfUnity, double timeStamp, string prefix)
     {
         return new TransformStampedMsg(
             new HeaderMsg(new TimeStamp(timeStamp), tfUnity.parent.gameObject.name),
-            tfUnity.gameObject.name,
+            prefix+"/"+tfUnity.gameObject.name,
             tfUnity.ToROSTransform());
     }
 }

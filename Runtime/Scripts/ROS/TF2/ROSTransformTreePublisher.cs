@@ -16,11 +16,12 @@ namespace DefaultNamespace
     {
         [SerializeField]
         List<string> m_GlobalFrameIds = new List<string> { "map", "odom" };
+        public string prefix;
 
         TransformTreeNode m_TransformRoot;
         void Start()
         {
-            m_TransformRoot = new TransformTreeNode(robot);
+            m_TransformRoot = new TransformTreeNode(robot, prefix);
         }
 
         static void PopulateTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)
@@ -46,7 +47,7 @@ namespace DefaultNamespace
             {
                 var tfRootToGlobal = new TransformStampedMsg(
                     new HeaderMsg(new TimeStamp(Clock.time), m_GlobalFrameIds.Last()),
-                    m_TransformRoot.name,
+                    m_TransformRoot.PrefixedName(),
                     m_TransformRoot.Transform.To<FLU>());
                 tfMessageList.Add(tfRootToGlobal);
             }

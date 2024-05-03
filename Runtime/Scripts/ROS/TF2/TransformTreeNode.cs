@@ -14,16 +14,29 @@ namespace Unity.Robotics.SlamExample
         public string name => SceneObject.name;
         public bool IsALeafNode => Children.Count == 0;
 
-        public TransformTreeNode(GameObject sceneObject)
+        public readonly string prefix;
+
+        public TransformTreeNode(GameObject sceneObject, string prefix)
         {
             SceneObject = sceneObject;
+            this.prefix = prefix;
             Children = new List<TransformTreeNode>();
             PopulateChildNodes(this);
         }
 
+        public string PrefixedName()
+        {
+            if(prefix == null)
+            {
+                return SceneObject.name;
+            }
+            return prefix+"/"+SceneObject.name; 
+        }
+
+
         public static TransformStampedMsg ToTransformStamped(TransformTreeNode node)
         {
-            return node.Transform.ToROSTransformStamped(Clock.time);
+            return node.Transform.ToROSTransformStamped(Clock.time, node.prefix);
         }
 
         static void PopulateChildNodes(TransformTreeNode tfNode)
@@ -37,7 +50,7 @@ namespace Unity.Robotics.SlamExample
                 // If game object has a URDFLink attached, it's a link in the transform tree
                 if (childGO.TryGetComponent(out UrdfLink _))
                 {
-                    var childNode = new TransformTreeNode(childGO);
+                    var childNode = new TransformTreeNode(childGO, tfNode.prefix);
                     tfNode.Children.Add(childNode);
                 }
             }
