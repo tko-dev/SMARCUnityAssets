@@ -49,7 +49,7 @@ namespace VehicleComponents
             }
             transform.SetParent(attachedLink.transform);
 
-            articulationBody = gameObject.GetComponent<ArticulationBody>();
+            articulationBody = GetComponent<ArticulationBody>();
         }
 
     }
