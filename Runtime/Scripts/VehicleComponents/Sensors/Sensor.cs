@@ -5,7 +5,13 @@ using Utils = DefaultNamespace.Utils;
 
 namespace VehicleComponents.Sensors
 {
-    public class Sensor: LinkAttachment
+    public interface ISensor
+    {
+        public float Frequency();
+        public bool HasNewData();
+    }
+
+    public class Sensor: LinkAttachment, ISensor
     {
         [Header("Sensor")]
         public float frequency = 10f;
@@ -13,6 +19,17 @@ namespace VehicleComponents.Sensors
 
         private float period => 1.0f/frequency;
         private double lastTime;
+
+
+        public float Frequency()
+        {
+            return frequency;
+        }
+
+        public bool HasNewData()
+        {
+            return hasNewData;
+        }
 
 
         double NowTimeInSeconds()
