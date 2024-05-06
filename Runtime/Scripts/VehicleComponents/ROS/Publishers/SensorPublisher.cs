@@ -6,7 +6,7 @@ using Unity.Robotics.ROSTCPConnector;
 using Sensor = VehicleComponents.Sensors.Sensor;
 using ISensor = VehicleComponents.Sensors.ISensor;
 
-namespace VehicleComponents.ROS
+namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(Sensor))]
     public class SensorPublisher<RosMsgType, SensorType> : MonoBehaviour
