@@ -37,11 +37,22 @@ namespace VehicleComponents.Sensors
             // and that the children need not be manually created.
             GameObject sonarPort_go = new GameObject("SonarPort");
             sonarPort_go.transform.SetParent(this.transform, false);
+            
             sonarPort = sonarPort_go.AddComponent(typeof(Sonar)) as Sonar;
+            sonarPort.frequency = frequency;
+
+            var port_ab = sonarPort_go.GetComponent<ArticulationBody>();
+            port_ab.enabled = articulationBody.enabled;
+
 
             GameObject sonarStrb_go = new GameObject("SonarStrb");
             sonarStrb_go.transform.SetParent(this.transform, false);
+            
             sonarStrb = sonarStrb_go.AddComponent(typeof(Sonar)) as Sonar;
+            sonarStrb.frequency = frequency;
+
+            var strb_ab = sonarStrb_go.GetComponent<ArticulationBody>();
+            strb_ab.enabled = articulationBody.enabled;
 
 
             SetSonars();
@@ -117,10 +128,11 @@ namespace VehicleComponents.Sensors
             }
         }
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
             FillBucket(sonarPort, portBuckets);
             FillBucket(sonarStrb, strbBuckets); 
+            return true;
         }
 
 

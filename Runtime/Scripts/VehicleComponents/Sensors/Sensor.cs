@@ -9,9 +9,11 @@ namespace VehicleComponents.Sensors
     {
         [Header("Sensor")]
         public float frequency = 10f;
+        public bool hasNewData = false;
 
         private float period => 1.0f/frequency;
         private double lastTime;
+
 
         double NowTimeInSeconds()
         {
@@ -22,17 +24,32 @@ namespace VehicleComponents.Sensors
             return Time.timeAsDouble + UnityUnscaledTimeSinceFrameStart * Time.timeScale;
         }
 
-        public virtual void UpdateSensor(double deltaTime)
+        public virtual bool UpdateSensor(double deltaTime)
         {
             Debug.Log("This sensor needs to override UpdateSensor!");
+            return false;
         }
 
         void FixedUpdate()
         {
             var deltaTime = NowTimeInSeconds() - lastTime;
             if(deltaTime < period) return;
-            UpdateSensor(deltaTime);
+            hasNewData = UpdateSensor(deltaTime);
             lastTime = NowTimeInSeconds();
+        }
+
+        void OnDrawGizmosSelected()
+        {
+            // Draw a semitransparent red cube at the transforms position
+            Gizmos.color = new Color(1, 0, 0, 0.2f);
+            Gizmos.DrawCube(transform.position, new Vector3(0.1f, 0.1f, 0.1f));
+        }
+
+        void OnDrawGizmos()
+        {
+            // Draw a semitransparent green cube at the transforms position
+            Gizmos.color = new Color(0, 1, 0, 0.2f);
+            Gizmos.DrawCube(transform.position, new Vector3(0.1f, 0.1f, 0.1f));
         }
     }
 }

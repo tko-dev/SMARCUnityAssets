@@ -30,7 +30,7 @@ namespace VehicleComponents.Sensors
             ranges = new float[numBeams];
         }
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
             // Base directions depending on the pose of the DVL
             Vector3 right = transform.TransformDirection(Vector3.right);
@@ -73,7 +73,7 @@ namespace VehicleComponents.Sensors
 
             bottomLock = numHits >= minHitsToReport;
             // If not enough hits, no velocity or altitude or anything...
-            if(!bottomLock) return;
+            if(!bottomLock) return false;
 
             velocity = articulationBody.transform.InverseTransformVector(articulationBody.velocity);
             
@@ -88,6 +88,8 @@ namespace VehicleComponents.Sensors
             {
                 altitude = altHit.distance;
             }
+            
+            return true;
 
         }
 

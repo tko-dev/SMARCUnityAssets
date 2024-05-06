@@ -26,7 +26,7 @@ namespace VehicleComponents.Sensors
 
         Vector3 lastVelocity = Vector3.zero;
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
             var ab = articulationBody;
             localVelocity = ab.transform.InverseTransformVector(ab.velocity);
@@ -48,6 +48,7 @@ namespace VehicleComponents.Sensors
                 Vector3 localGravity = ab.transform.InverseTransformDirection(Physics.gravity);
                 linearAcceleration += localGravity;
             }
+            return true;
         }
     }
 }

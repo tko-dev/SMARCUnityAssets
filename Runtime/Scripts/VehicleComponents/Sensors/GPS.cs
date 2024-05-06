@@ -39,14 +39,18 @@ namespace VehicleComponents.Sensors
 
         }
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
-            if(_gpsRef == null) return;
+            if(_gpsRef == null) return false;
             if(_waterModel == null) fix = true;
             else fix = transform.position.y > _waterModel.GetWaterLevelAt(transform.position);
 
-            // It is! We can get a fix
-            if (fix) (easting, northing, lat, lon) = _gpsRef.GetUTMLatLonOfObject(gameObject);
+            if (fix) 
+            {
+                (easting, northing, lat, lon) = _gpsRef.GetUTMLatLonOfObject(gameObject);
+                return true;
+            } 
+            else return false;
         }
     }
 

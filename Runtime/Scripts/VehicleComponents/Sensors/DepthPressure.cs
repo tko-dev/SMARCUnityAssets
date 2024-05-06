@@ -21,7 +21,7 @@ namespace VehicleComponents.Sensors
         }
 
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
             var waterSurfaceLevel = _waterModel.GetWaterLevelAt(transform.position);
             float depth = waterSurfaceLevel - transform.position.y;
@@ -29,11 +29,13 @@ namespace VehicleComponents.Sensors
             else pressure = 0;
 
             // 1m water = 9806.65 Pa
-            if (depth > maxDepth) {
-                pressure += maxDepth * 9806.65f;
-            }else{
+            if (depth > maxDepth) return false;
+            else
+            {
                 pressure += depth * 9806.65f;
+                return true;
             }
+            
         }
     }
 }

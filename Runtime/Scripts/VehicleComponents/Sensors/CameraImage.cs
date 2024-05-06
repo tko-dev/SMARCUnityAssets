@@ -31,7 +31,7 @@ namespace VehicleComponents.Sensors
             image = new Texture2D(textureWidth, textureHeight, TextureFormat.RGB24, false);
         }
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
             // If need be, use AsyncGPUReadback.RequestIntoNativeArray
             // for asynch render->texture movement
@@ -43,6 +43,7 @@ namespace VehicleComponents.Sensors
             image.ReadPixels (new Rect (0, 0, textureWidth, textureHeight), 0, 0);
             image.Apply ();
             RenderTexture.active = null;
+            return true;
         }
 
     }

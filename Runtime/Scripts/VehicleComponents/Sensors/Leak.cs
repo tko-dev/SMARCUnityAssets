@@ -12,9 +12,10 @@ namespace VehicleComponents.Sensors
         public bool leaked = false;
         public int count = 0;
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
             if(leaked) count++;
+            return true;
         }
     
     }

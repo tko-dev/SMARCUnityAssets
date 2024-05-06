@@ -13,11 +13,12 @@ namespace VehicleComponents.Sensors
         public float maxVoltage = 12.5f;
         public float currentVoltage = 12.5f;
 
-        public override void UpdateSensor(double deltaTime)
+        public override bool UpdateSensor(double deltaTime)
         {
             currentPercent -= (float) ((deltaTime/60) * dischargePercentPerMinute);
             if(currentPercent < 0f) currentPercent = 0f;
             currentVoltage = maxVoltage * currentPercent / 100f;
+            return true;
         }
     
     }

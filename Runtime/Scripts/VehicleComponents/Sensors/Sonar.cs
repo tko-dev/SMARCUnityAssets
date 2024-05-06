@@ -181,7 +181,10 @@ namespace VehicleComponents.Sensors
             return ret;
         }
     }
-    public class Sonar : MonoBehaviour
+
+
+
+    public class Sonar : Sensor
     {
 
         [Header("Sonar")]
@@ -258,7 +261,7 @@ namespace VehicleComponents.Sensors
         }
             
             
-        public void FixedUpdate()
+        public override bool UpdateSensor(double deltaTime)
         {
             if (results.Length > 0)
             {
@@ -279,8 +282,8 @@ namespace VehicleComponents.Sensors
             }
 
 
-            results = new NativeArray<RaycastHit>(beam_count, Allocator.TempJob);
-            commands = new NativeArray<RaycastCommand>(beam_count, Allocator.TempJob);
+            results = new NativeArray<RaycastHit>(beam_count, Allocator.Persistent);
+            commands = new NativeArray<RaycastCommand>(beam_count, Allocator.Persistent);
 
             var transform1 = transform;
             var setupJob = new SetupJob()
@@ -296,6 +299,8 @@ namespace VehicleComponents.Sensors
 
             JobHandle deps = setupJob.Schedule(commands.Length, 10, default(JobHandle));
             handle = RaycastCommand.ScheduleBatch(commands, results, 20, deps);
+
+            return true;
         }
 
 
