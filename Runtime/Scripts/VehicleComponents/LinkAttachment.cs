@@ -13,6 +13,8 @@ namespace VehicleComponents
         public string linkName = "";
         [Tooltip("If ROS uses a different camera refenrece frame.")]
         public bool rotateForROSCamera = false;
+        [Tooltip("Rotate the object with respect to the attached link after attaching.")]
+        public float roll=0f, pitch=0f, yaw=0f;
 
         GameObject attachedLink;
         protected ArticulationBody articulationBody;
@@ -36,6 +38,9 @@ namespace VehicleComponents
                 attachedLink.transform.position,
                 attachedLink.transform.rotation
             );
+            transform.Rotate(Vector3.up, yaw);
+            transform.Rotate(Vector3.right, pitch);
+            transform.Rotate(Vector3.forward, roll);
 
             // ...except if its a camera, ROS
             // defines it with Y forw, Z right, X up (mapped to unity)
