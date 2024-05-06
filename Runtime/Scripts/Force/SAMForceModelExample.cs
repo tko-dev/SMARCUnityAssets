@@ -17,7 +17,7 @@ namespace DefaultNamespace
         public double rpm1 { get; set; }
         public double rpm2 { get; set; }
 
-        //Unity method that gets run on startup. Fetches the rigidBody on the SAM in the scene.
+        //Unity method that gets run on startup. Fetches the rigidBody on the vehicle (SAM) in the scene.
         private void Awake()
         {
             rigidBody = GetComponent<Rigidbody>();
@@ -114,12 +114,12 @@ namespace DefaultNamespace
             var Nrr = 20; // #150.0
             
             
-            //TODO: Magic model :)
+            //TODO: Magic model :). Based on current velocity, angle of attack etc.
             
             var force_control = Vector3.zero; //These will be replaced with your model output
             var torque_control = Vector3.zero;
             
-            //TODO: Usually the control and damping forces need to be computed separately based on current velocity
+            //TODO: Usually the control and damping forces need to be computed separately 
             
             var force_damping = Vector3.zero; //These will be replaced with your model output
             var torque_damping = Vector3.zero;
