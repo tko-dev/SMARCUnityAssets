@@ -57,5 +57,19 @@ namespace VehicleComponents
             articulationBody = GetComponent<ArticulationBody>();
         }
 
+        void OnDrawGizmosSelected()
+        {
+            // Draw a semitransparent red cube at the transforms position
+            Gizmos.color = new Color(1, 0, 0, 0.2f);
+            Gizmos.DrawCube(transform.position, new Vector3(0.1f, 0.1f, 0.1f));
+        }
+
+        void OnDrawGizmos()
+        {
+            // Draw a semitransparent green cube at the transforms position
+            Gizmos.color = new Color(0, 1, 0, 0.2f);
+            Gizmos.DrawCube(transform.position, new Vector3(0.1f, 0.1f, 0.1f));
+        }
+
     }
 }
