@@ -43,6 +43,7 @@ namespace VehicleComponents.Sensors
 
             var port_ab = sonarPort_go.GetComponent<ArticulationBody>();
             port_ab.enabled = articulationBody.enabled;
+            port_ab.useGravity = articulationBody.useGravity;
 
 
             GameObject sonarStrb_go = new GameObject("SonarStrb");
@@ -53,6 +54,7 @@ namespace VehicleComponents.Sensors
 
             var strb_ab = sonarStrb_go.GetComponent<ArticulationBody>();
             strb_ab.enabled = articulationBody.enabled;
+            strb_ab.useGravity = articulationBody.useGravity;
 
 
             SetSonars();

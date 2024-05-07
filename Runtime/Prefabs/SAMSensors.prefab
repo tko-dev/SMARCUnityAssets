@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1826258810406453701}
   - component: {fileID: 6005534071584513333}
   - component: {fileID: 552104329578755247}
+  - component: {fileID: 8884087720595522815}
   m_Layer: 0
   m_Name: PressureDepth20
   m_TagString: Untagged
@@ -97,7 +98,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &552104329578755247
 MonoBehaviour:
@@ -121,6 +122,19 @@ MonoBehaviour:
   maxDepth: 20
   includeAtmosphericPressure: 1
   pressure: 0
+--- !u!114 &8884087720595522815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 37083984397539589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f360f4e5a062ee9d9d2906381193552, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/depth20_pressure
 --- !u!1 &526723256100818091
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,6 +146,7 @@ GameObject:
   - component: {fileID: 8217180637614953186}
   - component: {fileID: 2131255630525619321}
   - component: {fileID: 532773392560741983}
+  - component: {fileID: 7952145118333299728}
   m_Layer: 0
   m_Name: PressureDepth300
   m_TagString: Untagged
@@ -218,7 +233,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &532773392560741983
 MonoBehaviour:
@@ -242,6 +257,19 @@ MonoBehaviour:
   maxDepth: 300
   includeAtmosphericPressure: 1
   pressure: 0
+--- !u!114 &7952145118333299728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 526723256100818091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f360f4e5a062ee9d9d2906381193552, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/depth300_pressure
 --- !u!1 &775822008436368950
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,6 +281,7 @@ GameObject:
   - component: {fileID: 4842783156039748442}
   - component: {fileID: 7179362785174537278}
   - component: {fileID: 2345857688884597299}
+  - component: {fileID: 3233740112089776240}
   m_Layer: 0
   m_Name: IMU
   m_TagString: Untagged
@@ -339,7 +368,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &2345857688884597299
 MonoBehaviour:
@@ -396,6 +425,20 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+--- !u!114 &3233740112089776240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775822008436368950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32ccbfb20e694c726875aa7c68c0bca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/imu
+  useNED: 0
 --- !u!1 &1428056172735903286
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,7 +450,8 @@ GameObject:
   - component: {fileID: 8439111156665184728}
   - component: {fileID: 7031581570369594284}
   - component: {fileID: 8602572389605596039}
-  - component: {fileID: 4992816656027310605}
+  - component: {fileID: 2226706261522372351}
+  - component: {fileID: 3024406395976714858}
   m_Layer: 0
   m_Name: SSS
   m_TagString: Untagged
@@ -494,7 +538,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &8602572389605596039
 MonoBehaviour:
@@ -528,7 +572,7 @@ MonoBehaviour:
   useAdditiveNoise: 1
   addNoiseStd: 1
   addNoiseMean: 0
---- !u!114 &4992816656027310605
+--- !u!114 &2226706261522372351
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -537,13 +581,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 1428056172735903286}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4294dfe5d2e7b8861b1efd12ec24d2ea, type: 3}
+  m_Script: {fileID: 11500000, guid: 4d48e31a385b4944483627b44fcd43e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewX: 2
-  viewY: -19
-  viewHeight: 320
-  viewWidth: 440
+  topic: payload/sidescan
+--- !u!114 &3024406395976714858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1428056172735903286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d6539137936b754f836ac112e71e32b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewX: 0
+  viewY: 30
+  viewHeight: 500
+  viewWidth: 1000
   flip: 1
 --- !u!1 &1905596893524856152
 GameObject:
@@ -556,6 +613,7 @@ GameObject:
   - component: {fileID: 3019645885186991366}
   - component: {fileID: 297368083888239267}
   - component: {fileID: 5277222799356921945}
+  - component: {fileID: 5921188030123203473}
   m_Layer: 0
   m_Name: Leak
   m_TagString: Untagged
@@ -642,7 +700,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &5277222799356921945
 MonoBehaviour:
@@ -665,6 +723,19 @@ MonoBehaviour:
   hasNewData: 0
   leaked: 0
   count: 0
+--- !u!114 &5921188030123203473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905596893524856152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0b413b5dc0c51c2296e027fc46a0bc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/leak
 --- !u!1 &2156977267458112211
 GameObject:
   m_ObjectHideFlags: 0
@@ -862,7 +933,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &6430093331807830112
 MonoBehaviour:
@@ -1089,6 +1160,7 @@ GameObject:
   - component: {fileID: 3968524564369647197}
   - component: {fileID: 6634857565802003842}
   - component: {fileID: 3966603666515322230}
+  - component: {fileID: 505266131889324098}
   m_Layer: 0
   m_Name: GPS
   m_TagString: Untagged
@@ -1175,7 +1247,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &3966603666515322230
 MonoBehaviour:
@@ -1201,6 +1273,19 @@ MonoBehaviour:
   lat: 0
   lon: 0
   fix: 0
+--- !u!114 &505266131889324098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3146692748297791027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eee95b5d1413e86d4bed3e951d06a085, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/gps
 --- !u!1 &3843895428679184279
 GameObject:
   m_ObjectHideFlags: 0
@@ -1354,7 +1439,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &2812953105009214308
 MonoBehaviour:
@@ -1668,7 +1753,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &4550407508287003253
 MonoBehaviour:
@@ -1717,6 +1802,7 @@ GameObject:
   - component: {fileID: 7288870487080276620}
   - component: {fileID: 3984351535651391873}
   - component: {fileID: 5267075980409387503}
+  - component: {fileID: 8114926106281486478}
   m_Layer: 0
   m_Name: MBES
   m_TagString: Untagged
@@ -1803,7 +1889,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &5267075980409387503
 MonoBehaviour:
@@ -1831,6 +1917,20 @@ MonoBehaviour:
   drawRays: 0
   drawHits: 1
   beamProfile: []
+--- !u!114 &8114926106281486478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5764492076202473243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c404bcc3ca14f048dbe0147fad1cebc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: mbes/odom/bathy_points
+  frame_id: odom
 --- !u!1 &7611823193007283588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1842,6 +1942,7 @@ GameObject:
   - component: {fileID: 5284466520250364702}
   - component: {fileID: 4192665802447947497}
   - component: {fileID: 1218810719957298084}
+  - component: {fileID: 8866592725120951033}
   m_Layer: 0
   m_Name: DVL WaterLinkedA50
   m_TagString: Untagged
@@ -1928,7 +2029,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &1218810719957298084
 MonoBehaviour:
@@ -1963,6 +2064,19 @@ MonoBehaviour:
   altitude: 0
   ranges: []
   numHits: 0
+--- !u!114 &8866592725120951033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7611823193007283588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cc571f3d07e418f59f2cadd3744da3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/dvl
 --- !u!1 &7856187343067556969
 GameObject:
   m_ObjectHideFlags: 0
@@ -1974,6 +2088,7 @@ GameObject:
   - component: {fileID: 1288243303893278256}
   - component: {fileID: 8921096746309416013}
   - component: {fileID: 2147931179597612432}
+  - component: {fileID: 3067360293598247023}
   m_Layer: 0
   m_Name: IMU SBG
   m_TagString: Untagged
@@ -2060,7 +2175,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &2147931179597612432
 MonoBehaviour:
@@ -2117,6 +2232,20 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+--- !u!114 &3067360293598247023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7856187343067556969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32ccbfb20e694c726875aa7c68c0bca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: core/sbg_imu
+  useNED: 0
 --- !u!1 &8074562714775754671
 GameObject:
   m_ObjectHideFlags: 0
@@ -2270,7 +2399,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &1229204938312922303
 MonoBehaviour:

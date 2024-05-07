@@ -211,7 +211,7 @@ namespace VehicleComponents.Sensors
 
 
 
-        public void Awake()
+        public void Start()
         {
             rayColor = Color.white; //Random.ColorHSV();
             InitHits();
