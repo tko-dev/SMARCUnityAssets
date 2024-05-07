@@ -32,32 +32,8 @@ namespace VehicleComponents.Sensors
 
         void Start()
         {
-            // Create two child objects that each contain a sonar script
-            // So that we can modify them at game start
-            // and that the children need not be manually created.
-            GameObject sonarPort_go = new GameObject("SonarPort");
-            sonarPort_go.transform.SetParent(this.transform, false);
-            
-            sonarPort = sonarPort_go.AddComponent(typeof(Sonar)) as Sonar;
-            sonarPort.frequency = frequency;
-
-            var port_ab = sonarPort_go.GetComponent<ArticulationBody>();
-            port_ab.enabled = articulationBody.enabled;
-            port_ab.useGravity = articulationBody.useGravity;
-
-
-            GameObject sonarStrb_go = new GameObject("SonarStrb");
-            sonarStrb_go.transform.SetParent(this.transform, false);
-            
-            sonarStrb = sonarStrb_go.AddComponent(typeof(Sonar)) as Sonar;
-            sonarStrb.frequency = frequency;
-
-            var strb_ab = sonarStrb_go.GetComponent<ArticulationBody>();
-            strb_ab.enabled = articulationBody.enabled;
-            strb_ab.useGravity = articulationBody.useGravity;
-
-
-            SetSonars();
+            sonarPort = CreateSonar("sonarPort", -1);
+            sonarStrb = CreateSonar("sonarStrb",  1);
 
             // Each bucket has a 1 byte intensity value 0-255
             portBuckets = new byte[numBucketsPerSide];
@@ -66,39 +42,29 @@ namespace VehicleComponents.Sensors
             additiveNormal = new NormalDistribution(addNoiseMean, addNoiseStd);
         }
 
-        void SetSonars()
+        Sonar CreateSonar(string name, int sign)
         {
-            sonarPort.beam_breadth_deg = fullBeamAngleDeg;
-            sonarPort.beam_fwhm_deg = fwhmBeamAngleDeg;
-            sonarPort.transform.localRotation = Quaternion.Euler(0, 0, -beamOrientationAngleDeg);
-            sonarPort.max_distance = maxRange;
-            sonarPort.beam_count = totalBeamCount/2;
-            sonarPort.InitHits();
-            if (gaussianProfile)
-            {
-                sonarPort.InitBeamProfileGaussian();
-            }
-            else
-            {
-                sonarPort.InitBeamProfileSimple();
-            }
-
-            sonarStrb.beam_breadth_deg = fullBeamAngleDeg;
-            sonarStrb.beam_fwhm_deg = fwhmBeamAngleDeg;
-            sonarStrb.transform.localRotation = Quaternion.Euler(0, 0, beamOrientationAngleDeg);
-            sonarStrb.max_distance = maxRange;
-            sonarStrb.beam_count = totalBeamCount/2;
-            sonarStrb.InitHits();
-            if (gaussianProfile)
-            {
-                sonarStrb.InitBeamProfileGaussian();
-            }
-            else
-            {
-                sonarStrb.InitBeamProfileSimple();
-            }
+            GameObject sonar_go = new GameObject(name);
             
+            Sonar sonar = sonar_go.AddComponent(typeof(Sonar)) as Sonar;
+
+            sonar_go.transform.SetParent(this.transform, false);
+
+            var ab = sonar_go.GetComponent<ArticulationBody>();
+            ab.enabled = false;
+            
+            sonar.frequency = frequency;
+            sonar.beam_breadth_deg = fullBeamAngleDeg;
+            sonar.beam_fwhm_deg = fwhmBeamAngleDeg;
+            sonar.transform.localRotation = Quaternion.Euler(0, 0, sign*beamOrientationAngleDeg);
+            sonar.max_distance = maxRange;
+            sonar.beam_count = totalBeamCount/2;
+            sonar.InitHits();
+            if (gaussianProfile) sonar.InitBeamProfileGaussian();
+            else sonar.InitBeamProfileSimple();
+            return sonar;
         }
+
 
         void FillBucket(Sonar s, byte[] bucket)
         {
