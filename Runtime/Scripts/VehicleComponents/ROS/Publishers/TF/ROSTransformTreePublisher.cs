@@ -1,0 +1,110 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using RosMessageTypes.Geometry;
+using RosMessageTypes.Std;
+using RosMessageTypes.Tf2;
+using Unity.Robotics.Core;
+using Unity.Robotics.ROSTCPConnector;
+using Unity.Robotics.ROSTCPConnector.ROSGeometry;
+using UnityEngine;
+
+using LinkAttachment = VehicleComponents.LinkAttachment;
+
+namespace VehicleComponents.ROS.Publishers
+{
+    public class ROSTransformTreePublisher : LinkAttachment
+    {
+        [SerializeField]
+        List<string> m_GlobalFrameIds = new List<string> { "map" };
+        TransformTreeNode m_TransformRoot;
+
+        [Header("TF Tree")]
+        string prefix;
+
+        public float frequency = 10f;
+        
+        float period => 1.0f/frequency;
+        double lastTime;
+
+        ROSConnection ros;
+        string topic = "/tf";
+
+        void Start()
+        {
+            prefix = transform.root.name;
+            m_TransformRoot = new TransformTreeNode(attachedLink);
+            ros = ROSConnection.GetOrCreateInstance();
+            ros.RegisterPublisher<TFMessageMsg>(topic);
+        }
+
+        static void PopulateTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)
+        {
+            // TODO: Some of this could be done once and cached rather than doing from scratch every time
+            // Only generate transform messages from the children, because This node will be parented to the global frame
+            foreach (var childTf in tfNode.Children)
+            {
+                tfList.Add(TransformTreeNode.ToTransformStamped(childTf));
+
+                if (!childTf.IsALeafNode)
+                {
+                    PopulateTFList(tfList, childTf);
+                }
+            }
+        }
+
+        void PopulateGlobalFrames(List<TransformStampedMsg> tfMessageList)
+        {
+            if (m_GlobalFrameIds.Count > 0)
+            {
+                var tfRootToGlobal = new TransformStampedMsg(
+                    new HeaderMsg(new TimeStamp(Clock.time), m_GlobalFrameIds.Last()),
+                    $"{prefix}/{m_TransformRoot.name}",
+                    m_TransformRoot.Transform.To<FLU>());
+                tfMessageList.Add(tfRootToGlobal);
+            }
+            else
+            {
+                Debug.LogWarning($"No {m_GlobalFrameIds} specified, transform tree will be entirely local coordinates.");
+            }
+            
+            // In case there are multiple "global" transforms that are effectively the same coordinate frame, 
+            // treat this as an ordered list, first entry is the "true" global
+            for (var i = 1; i < m_GlobalFrameIds.Count; ++i)
+            {
+                var tfGlobalToGlobal = new TransformStampedMsg(
+                    new HeaderMsg(new TimeStamp(Clock.time), m_GlobalFrameIds[i - 1]),
+                    m_GlobalFrameIds[i],
+                    // Initializes to identity transform
+                    new TransformMsg());
+                tfMessageList.Add(tfGlobalToGlobal);
+            }
+        }
+
+        void PublishMessage()
+        {
+            var tfMessageList = new List<TransformStampedMsg>();
+
+            PopulateTFList(tfMessageList, m_TransformRoot);
+            foreach(TransformStampedMsg msg in tfMessageList)
+            {
+                msg.header.frame_id = $"{prefix}/{msg.header.frame_id}";
+                msg.child_frame_id = $"{prefix}/{msg.child_frame_id}";
+            }
+
+            // populate the global frames last, dont wanna prefix those.
+            PopulateGlobalFrames(tfMessageList);
+
+            var ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
+            ros.Publish(topic, ROSMsg);
+        }
+
+        void FixedUpdate()
+        {
+            var deltaTime = Clock.NowTimeInSeconds - lastTime;
+            if(deltaTime < period) return;
+            PublishMessage();
+            lastTime = Clock.NowTimeInSeconds;
+        }
+    }
+}

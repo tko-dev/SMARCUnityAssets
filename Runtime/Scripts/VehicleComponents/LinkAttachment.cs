@@ -16,7 +16,7 @@ namespace VehicleComponents
         [Tooltip("Rotate the object with respect to the attached link after attaching.")]
         public float roll=0f, pitch=0f, yaw=0f;
 
-        GameObject attachedLink;
+        protected GameObject attachedLink;
         protected ArticulationBody articulationBody;
 
         void Awake()
