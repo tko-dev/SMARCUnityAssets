@@ -11,7 +11,7 @@ namespace Force
 {
     public class ForcePoint : MonoBehaviour
     {
-        private Rigidbody _rigidbody;
+        private ArticulationBody _rigidbody;
         private int _pointCount;
 
         private WaterQueryModel _waterModel;
@@ -31,8 +31,8 @@ namespace Force
         public void Awake()
         {
             if (motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
-            _rigidbody = motionModel.GetComponent<Rigidbody>();
-            if (_rigidbody == null) _rigidbody = motionModel.transform.parent.GetComponent<Rigidbody>();
+            _rigidbody = motionModel.GetComponent<ArticulationBody>();
+            if (_rigidbody == null) _rigidbody = motionModel.transform.parent.GetComponent<ArticulationBody>();
             _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
             var forcePoints = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>();
             if (automaticCenterOfGravity)

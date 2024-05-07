@@ -7,7 +7,7 @@ namespace Force
 {
     public class SAMUnityForceModel : MonoBehaviour, IForceModel, ISAMControl
     {
-        private Rigidbody rigidBody;
+        private ArticulationBody rigidBody;
 
         public double lcg { get; set; }
         public double vbs { get; set; }
@@ -28,9 +28,9 @@ namespace Force
 
         private void Awake()
         {
-            rigidBody = GetComponent<Rigidbody>();
+            rigidBody = GetComponent<ArticulationBody>();
             points = new List<ForcePoint>(GetComponentsInChildren<ForcePoint>());
-            if (rigidBody == null) rigidBody = transform.parent.GetComponent<Rigidbody>();
+            if (rigidBody == null) rigidBody = transform.parent.GetComponent<ArticulationBody>();
         }
 
         public void SetRpm(double rpm1, double rpm2)
