@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2970021653359921310}
-  - component: {fileID: 4977274314378380931}
+  - component: {fileID: 4256275728255460879}
   m_Layer: 0
   m_Name: ROSClock
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4977274314378380931
+--- !u!114 &4256275728255460879
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
