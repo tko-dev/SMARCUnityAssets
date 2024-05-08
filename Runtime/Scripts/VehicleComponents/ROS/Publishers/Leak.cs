@@ -1,7 +1,7 @@
 using UnityEngine;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
-using RosMessageTypes.Sam;
+using RosMessageTypes.Smarc;
 
 using SensorLeak = VehicleComponents.Sensors.Leak;
 

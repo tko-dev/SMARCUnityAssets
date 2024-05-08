@@ -2061,7 +2061,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!114 &5141562942098093957
 MonoBehaviour:
@@ -2075,7 +2075,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78564e3e0c2d8c65cb6601a38bee530d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkName: base_
+  linkName: base_link
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
