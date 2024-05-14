@@ -9,10 +9,10 @@ namespace DefaultNamespace
     public class SamActuatorController : MonoBehaviour
     {
         ISAMControl model;
-        float vertical;
-        float horizontal;
-        float rpm1;
-        float rpm2;
+        // float vertical;
+        // float horizontal;
+        // float rpm1;
+        // float rpm2;
         float vbs;
         float lcg;
 
@@ -20,9 +20,9 @@ namespace DefaultNamespace
         public bool enable = true;
         bool wasEnabled = true;
 
-        public string anglesTopic = "core/thrust_vector_cmd";
-        public string rpm1_topic = "core/thruster1_cmd";
-        public string rpm2_topic = "core/thruster2_cmd";
+        // public string anglesTopic = "core/thrust_vector_cmd";
+        // public string rpm1_topic = "core/thruster1_cmd";
+        // public string rpm2_topic = "core/thruster2_cmd";
         public string vbs_topic = "core/vbs_cmd";
         public string lcg_topic = "core/lcg_cmd";
 
@@ -30,32 +30,34 @@ namespace DefaultNamespace
 
         void Start()
         {
+            if(vbs_topic[0] != '/') vbs_topic = $"/{transform.root.name}/{vbs_topic}";
+            if(lcg_topic[0] != '/') lcg_topic = $"/{transform.root.name}/{lcg_topic}";
             model = GetComponent<ISAMControl>();
             var ros = ROSConnection.GetOrCreateInstance();
-            ros.Subscribe<ThrusterAnglesMsg>(anglesTopic, SetAngles);
-            ros.Subscribe<ThrusterRPMMsg>(rpm1_topic, SetRpm1);
-            ros.Subscribe<ThrusterRPMMsg>(rpm2_topic, SetRpm2);
+            // ros.Subscribe<ThrusterAnglesMsg>(anglesTopic, SetAngles);
+            // ros.Subscribe<ThrusterRPMMsg>(rpm1_topic, SetRpm1);
+            // ros.Subscribe<ThrusterRPMMsg>(rpm2_topic, SetRpm2);
             ros.Subscribe<PercentStampedMsg>(vbs_topic, SetVbs);
             ros.Subscribe<PercentStampedMsg>(lcg_topic, SetLcg);
             lastCommandTime = Time.time;
         }
 
-        void SetAngles(ThrusterAnglesMsg msg)
-        {
-            vertical = msg.thruster_vertical_radians;
-            horizontal = msg.thruster_horizontal_radians;
-            lastCommandTime = Time.time;
-        }
-        void SetRpm1(ThrusterRPMMsg msg)
-        {
-            rpm1 = msg.rpm;
-            lastCommandTime = Time.time;
-        }
-        void SetRpm2(ThrusterRPMMsg msg)
-        {
-            rpm2 = msg.rpm;
-            lastCommandTime = Time.time;
-        }
+        // void SetAngles(ThrusterAnglesMsg msg)
+        // {
+            // vertical = msg.thruster_vertical_radians;
+            // horizontal = msg.thruster_horizontal_radians;
+        //     lastCommandTime = Time.time;
+        // }
+        // void SetRpm1(ThrusterRPMMsg msg)
+        // {
+        //     rpm1 = msg.rpm;
+        //     lastCommandTime = Time.time;
+        // }
+        // void SetRpm2(ThrusterRPMMsg msg)
+        // {
+        //     rpm2 = msg.rpm;
+        //     lastCommandTime = Time.time;
+        // }
         void SetVbs(PercentStampedMsg msg)
         {
             vbs = msg.value;
@@ -68,17 +70,17 @@ namespace DefaultNamespace
         }
 
 
-        public void Setup(GameObject robot)
+        // public void Setup(GameObject robot)
         // Called from ROSPrepareRobot to set the topics in awake()
-        {
-            anglesTopic = "/" + robot.name + "/" + anglesTopic;
-            rpm1_topic = "/" + robot.name + "/" + rpm1_topic;
-            rpm2_topic = "/" + robot.name + "/" + rpm2_topic;
-            vbs_topic = "/" + robot.name + "/" + vbs_topic;
-            lcg_topic = "/" + robot.name + "/" + lcg_topic;
-        }
+        // {
+        //     anglesTopic = "/" + robot.name + "/" + anglesTopic;
+        //     rpm1_topic = "/" + robot.name + "/" + rpm1_topic;
+        //     rpm2_topic = "/" + robot.name + "/" + rpm2_topic;
+        //     vbs_topic = "/" + robot.name + "/" + vbs_topic;
+        //     lcg_topic = "/" + robot.name + "/" + lcg_topic;
+        // }
 
-        void Update()
+        void FixedUpdate()
         {
             var sinceLastCmd = Time.time - lastCommandTime;
             if(sinceLastCmd > sleepTime) return;
@@ -88,16 +90,16 @@ namespace DefaultNamespace
                 {
                     wasEnabled = false;
                     // model.SetRpm(0, 0);
-                    model.SetElevatorAngle(0);
-                    model.SetRudderAngle(0);
+                    // model.SetElevatorAngle(0);
+                    // model.SetRudderAngle(0);
                 }
                 return;
             }
             wasEnabled = enable;
 
             // model.SetRpm(rpm1, rpm2);
-            model.SetElevatorAngle(vertical);
-            model.SetRudderAngle(horizontal);
+            // model.SetElevatorAngle(vertical);
+            // model.SetRudderAngle(horizontal);
             model.SetWaterPump(vbs);
             model.SetBatteryPack(lcg);
         }

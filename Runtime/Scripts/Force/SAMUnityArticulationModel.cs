@@ -8,10 +8,6 @@ namespace Force
     public class SAMUnityArticulationModel : MonoBehaviour, IForceModel, ISAMControl
     {
         [FormerlySerializedAs("rigidBody")] public ArticulationBody baseLink;
-        public ArticulationBody propller1;
-        public ArticulationBody propller2;
-        public ArticulationBody rudder;
-        public ArticulationBody aileron;
 
         public double lcg { get; set; }
         public double vbs { get; set; }
@@ -34,10 +30,10 @@ namespace Force
         {
             //    rigidBody = GetComponent<Rigidbody>();
             Debug.Log(baseLink.inertiaTensor);
-            Debug.Log(propller1.inertiaTensor);
-            Debug.Log(propller2.inertiaTensor);
-            Debug.Log(rudder.inertiaTensor);
-            Debug.Log(aileron.inertiaTensor);
+            // Debug.Log(propller1.inertiaTensor);
+            // Debug.Log(propller2.inertiaTensor);
+            // Debug.Log(rudder.inertiaTensor);
+            // Debug.Log(aileron.inertiaTensor);
           
             points = new List<ForcePoint>(GetComponentsInChildren<ForcePoint>());
             //   if (rigidBody == null) rigidBody = transform.parent.GetComponent<Rigidbody>();
@@ -45,29 +41,29 @@ namespace Force
 
         public void SetRpm1(double rpm)
         {
-            this.rpm1 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
+            // this.rpm1 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
         }
 
         public void SetRpm2(double rpm)
         {
-            this.rpm2 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
+            // this.rpm2 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
         }
 
 
         public void SetRpm(double rpm1, double rpm2)
         {
-            SetRpm1(rpm1);
-            SetRpm2(rpm2);
+            // SetRpm1(rpm1);
+            // SetRpm2(rpm2);
         }
 
         public void SetRudderAngle(float dr)
         {
-            d_rudder = Mathf.Clamp(dr, -parameters.ThrusterAngleMax, parameters.ThrusterAngleMax);
+            // d_rudder = Mathf.Clamp(dr, -parameters.ThrusterAngleMax, parameters.ThrusterAngleMax);
         }
 
         public void SetElevatorAngle(float de)
         {
-            d_aileron = Mathf.Clamp(de, -parameters.ThrusterAngleMax, parameters.ThrusterAngleMax);
+            // d_aileron = Mathf.Clamp(de, -parameters.ThrusterAngleMax, parameters.ThrusterAngleMax);
         }
 
         public void SetBatteryPack(double lcg)
@@ -90,8 +86,8 @@ namespace Force
             // propller1.SetDriveTargetVelocity(ArticulationDriveAxis.X, -(float)rpm1);
             // propller2.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)rpm2);
 
-            rudder.SetDriveTarget(ArticulationDriveAxis.X, d_rudder * Mathf.Rad2Deg);
-            aileron.SetDriveTarget(ArticulationDriveAxis.X, d_aileron * Mathf.Rad2Deg);
+            // rudder.SetDriveTarget(ArticulationDriveAxis.X, d_rudder * Mathf.Rad2Deg);
+            // aileron.SetDriveTarget(ArticulationDriveAxis.X, d_aileron * Mathf.Rad2Deg);
 
           //  var rotorPositionGlobalFrame = transform.position + transform.TransformDirection(ThrusterPosition);
 

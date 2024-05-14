@@ -56,7 +56,7 @@ namespace VehicleComponents
             transform.SetParent(attachedLink.transform);
 
             articulationBody = GetComponent<ArticulationBody>();
-            parentArticulationBody = transform.parent.GetComponent<ArticulationBody>();
+            parentArticulationBody = attachedLink.GetComponent<ArticulationBody>();
         }
 
         void OnDrawGizmosSelected()
