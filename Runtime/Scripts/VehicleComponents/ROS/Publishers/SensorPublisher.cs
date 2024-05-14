@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector;
+using ROSMessage = Unity.Robotics.ROSTCPConnector.MessageGeneration.Message;
 
 using Sensor = VehicleComponents.Sensors.Sensor;
 using ISensor = VehicleComponents.Sensors.ISensor;
@@ -10,7 +11,7 @@ namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(Sensor))]
     public class SensorPublisher<RosMsgType, SensorType> : MonoBehaviour
-        where RosMsgType: Unity.Robotics.ROSTCPConnector.MessageGeneration.Message, new()
+        where RosMsgType: ROSMessage, new()
         where SensorType: ISensor
     {
         ROSConnection ros;
