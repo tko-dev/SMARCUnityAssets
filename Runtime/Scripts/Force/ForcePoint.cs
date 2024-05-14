@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using DefaultNamespace.Water;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // This is a very simple example of how we could compute a buoyancy force at variable points along the body.
 // Its not really accurate per se.
@@ -11,7 +12,7 @@ namespace Force
 {
     public class ForcePoint : MonoBehaviour
     {
-        public ArticulationBody _rigidbody;
+        [FormerlySerializedAs("_rigidbody")] public ArticulationBody _body;
         private int _pointCount;
 
         private WaterQueryModel _waterModel;
@@ -22,36 +23,40 @@ namespace Force
         public GameObject motionModel;
         public bool addGravity = false;
 
+        public GameObject volumeObject;
         public Mesh volumeMesh;
         public bool automaticCenterOfGravity = false;
         public float volume;
         public float density = 997; // kg/m3
-        
+
 
         public void Awake()
         {
             if (motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
             //_rigidbody = motionModel.GetComponent<Rigidbody>();
-          //  if (_rigidbody == null) _rigidbody = motionModel.transform.parent.GetComponent<Rigidbody>();
+            //  if (_rigidbody == null) _rigidbody = motionModel.transform.parent.GetComponent<Rigidbody>();
             _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
             var forcePoints = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>();
             if (automaticCenterOfGravity)
             {
-                _rigidbody.automaticCenterOfMass = false;
+                _body.automaticCenterOfMass = false;
                 var centerOfMass = forcePoints.Select(point => point.transform.localPosition).Aggregate(new Vector3(0, 0, 0), (s, v) => s + v);
-                _rigidbody.centerOfMass = centerOfMass / forcePoints.Length;
+                _body.centerOfMass = centerOfMass / forcePoints.Length;
             }
+
             _pointCount = forcePoints.Length;
-            addGravity = !_rigidbody.useGravity;
-            if (volume == 0 && volumeMesh != null) volume = MeshVolume.CalculateVolumeOfMesh(volumeMesh, transform.parent.localScale);
+            addGravity = !_body.useGravity;
+            if (volumeMesh == null && volumeObject != null) volumeMesh = volumeObject.GetComponent<MeshFilter>().mesh;
+            if (volume == 0 && volumeMesh != null) volume = MeshVolume.CalculateVolumeOfMesh(volumeMesh, volumeObject.transform.lossyScale);
         }
+
         // Volume * Density * Gravity
         private void FixedUpdate()
         {
             var forcePointPosition = transform.position;
             if (addGravity)
             {
-                _rigidbody.AddForceAtPosition(_rigidbody.mass * Physics.gravity / _pointCount, forcePointPosition, ForceMode.Force);
+                _body.AddForceAtPosition(_body.mass * Physics.gravity / _pointCount, forcePointPosition, ForceMode.Force);
             }
 
 
@@ -60,12 +65,11 @@ namespace Force
             {
                 float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged) * displacementAmount;
 
-                _rigidbody.AddForceAtPosition(
+                _body.AddForceAtPosition(
                     volume * density * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
                     forcePointPosition,
                     ForceMode.Force);
             }
-
         }
     }
 }
