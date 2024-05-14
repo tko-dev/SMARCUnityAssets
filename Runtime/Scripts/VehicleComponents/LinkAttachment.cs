@@ -18,6 +18,7 @@ namespace VehicleComponents
 
         protected GameObject attachedLink;
         protected ArticulationBody articulationBody;
+        protected ArticulationBody parentArticulationBody;
 
         void Awake()
         {
@@ -55,6 +56,7 @@ namespace VehicleComponents
             transform.SetParent(attachedLink.transform);
 
             articulationBody = GetComponent<ArticulationBody>();
+            parentArticulationBody = transform.parent.GetComponent<ArticulationBody>();
         }
 
         void OnDrawGizmosSelected()
