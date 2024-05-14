@@ -602,38 +602,6 @@ MonoBehaviour:
   viewHeight: 500
   viewWidth: 1000
   flip: 1
---- !u!1 &1695196819701293388
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1467444125670215521}
-  m_Layer: 0
-  m_Name: ROSPubs
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1467444125670215521
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1695196819701293388}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3756791423329683274}
-  m_Father: {fileID: 7714421906245486986}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1905596893524856152
 GameObject:
   m_ObjectHideFlags: 0
@@ -810,7 +778,7 @@ Transform:
   - {fileID: 3019645885186991366}
   - {fileID: 8439111156665184728}
   - {fileID: 7288870487080276620}
-  - {fileID: 1467444125670215521}
+  - {fileID: 3756791423329683274}
   - {fileID: 7799467171448454796}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1977,7 +1945,7 @@ GameObject:
   - component: {fileID: 4731118496912730696}
   - component: {fileID: 5141562942098093957}
   m_Layer: 0
-  m_Name: TF
+  m_Name: ROS_TF
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1991,12 +1959,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6843956064454985405}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1467444125670215521}
+  m_Father: {fileID: 7714421906245486986}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!171741748 &4731118496912730696
 ArticulationBody:
@@ -2781,15 +2749,13 @@ GameObject:
   - component: {fileID: 5539919345389556555}
   - component: {fileID: 6195378034906474223}
   - component: {fileID: 5041653224253877213}
-  - component: {fileID: 5628862051958364100}
-  - component: {fileID: 7047764607965182838}
   m_Layer: 0
-  m_Name: SAMActuators
+  m_Name: SAMActuatorFB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7799467171448454796
 Transform:
   m_ObjectHideFlags: 0
@@ -2920,31 +2886,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/lcg_fb
---- !u!114 &5628862051958364100
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8852932693316798651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 839adaf74bab831b1a9c75a088b4f9fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  topic: core/thruster1_fb
-  thrusterNum: 1
---- !u!114 &7047764607965182838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8852932693316798651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 839adaf74bab831b1a9c75a088b4f9fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  topic: core/thruster2_fb
-  thrusterNum: 2

@@ -87,7 +87,7 @@ namespace DefaultNamespace
                 if(wasEnabled)
                 {
                     wasEnabled = false;
-                    model.SetRpm(0, 0);
+                    // model.SetRpm(0, 0);
                     model.SetElevatorAngle(0);
                     model.SetRudderAngle(0);
                 }
@@ -95,7 +95,7 @@ namespace DefaultNamespace
             }
             wasEnabled = enable;
 
-            model.SetRpm(rpm1, rpm2);
+            // model.SetRpm(rpm1, rpm2);
             model.SetElevatorAngle(vertical);
             model.SetRudderAngle(horizontal);
             model.SetWaterPump(vbs);

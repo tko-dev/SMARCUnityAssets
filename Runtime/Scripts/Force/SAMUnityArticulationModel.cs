@@ -43,10 +43,21 @@ namespace Force
             //   if (rigidBody == null) rigidBody = transform.parent.GetComponent<Rigidbody>();
         }
 
+        public void SetRpm1(double rpm)
+        {
+            this.rpm1 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
+        }
+
+        public void SetRpm2(double rpm)
+        {
+            this.rpm2 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
+        }
+
+
         public void SetRpm(double rpm1, double rpm2)
         {
-            this.rpm1 = Mathf.Clamp((float)rpm1, -parameters.RPMMax, parameters.RPMMax);
-            this.rpm2 = Mathf.Clamp((float)rpm2, -parameters.RPMMax, parameters.RPMMax);
+            SetRpm1(rpm1);
+            SetRpm2(rpm2);
         }
 
         public void SetRudderAngle(float dr)
@@ -73,19 +84,19 @@ namespace Force
 
         private void FixedUpdate()
         {
-            var r1 = rpm1 / 1000 * parameters.RPMToForceMultiplier;
-            var r2 = rpm2 / 1000 * parameters.RPMToForceMultiplier;
+            // var r1 = rpm1 / 1000 * parameters.RPMToForceMultiplier;
+            // var r2 = rpm2 / 1000 * parameters.RPMToForceMultiplier;
       
-            propller1.SetDriveTargetVelocity(ArticulationDriveAxis.X, -(float)rpm1);
-            propller2.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)rpm2);
+            // propller1.SetDriveTargetVelocity(ArticulationDriveAxis.X, -(float)rpm1);
+            // propller2.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)rpm2);
 
             rudder.SetDriveTarget(ArticulationDriveAxis.X, d_rudder * Mathf.Rad2Deg);
             aileron.SetDriveTarget(ArticulationDriveAxis.X, d_aileron * Mathf.Rad2Deg);
 
           //  var rotorPositionGlobalFrame = transform.position + transform.TransformDirection(ThrusterPosition);
 
-            aileron.AddForceAtPosition((float)r1 * aileron.transform.forward, aileron.transform.position, ForceMode.Force);
-            aileron.AddForceAtPosition((float)r2 * aileron.transform.forward, aileron.transform.position, ForceMode.Force);
+            // aileron.AddForceAtPosition((float)r1 * aileron.transform.forward, aileron.transform.position, ForceMode.Force);
+            // aileron.AddForceAtPosition((float)r2 * aileron.transform.forward, aileron.transform.position, ForceMode.Force);
         }
 
         // public Vector3 ThrustVectorForPropller(double r)

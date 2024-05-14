@@ -23,11 +23,21 @@ namespace DefaultNamespace
             rigidBody = GetComponent<Rigidbody>();
         }
 
+        public void SetRpm1(double rpm)
+        {
+            this.rpm1 = rpm;
+        }
+
+        public void SetRpm2(double rpm)
+        {
+            this.rpm2 = rpm;
+        }
+
         //The below methods are for the controls that we input into SAM. I.e what your controller will input to control your vehicle (Will be different from BlueROV)
         public void SetRpm(double rpm1, double rpm2)
         {
-            this.rpm1 = rpm1;
-            this.rpm2 = rpm2;
+            SetRpm1(rpm1);
+            SetRpm2(rpm2);
         }
 
         public void SetRudderAngle(float dr)
