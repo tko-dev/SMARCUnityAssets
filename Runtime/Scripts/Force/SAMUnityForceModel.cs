@@ -7,7 +7,7 @@ namespace Force
 {
     public class SAMUnityForceModel : MonoBehaviour, IForceModel, ISAMControl
     {
-        private Rigidbody rigidBody;
+        private ArticulationBody rigidBody;
 
         public double lcg { get; set; }
         public double vbs { get; set; }
@@ -28,15 +28,25 @@ namespace Force
 
         private void Awake()
         {
-            rigidBody = GetComponent<Rigidbody>();
+            rigidBody = GetComponent<ArticulationBody>();
             points = new List<ForcePoint>(GetComponentsInChildren<ForcePoint>());
-            if (rigidBody == null) rigidBody = transform.parent.GetComponent<Rigidbody>();
+            if (rigidBody == null) rigidBody = transform.parent.GetComponent<ArticulationBody>();
+        }
+
+        public void SetRpm1(double rpm)
+        {
+            this.rpm1 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
+        }
+
+        public void SetRpm2(double rpm)
+        {
+            this.rpm2 = Mathf.Clamp((float)rpm, -parameters.RPMMax, parameters.RPMMax);
         }
 
         public void SetRpm(double rpm1, double rpm2)
         {
-            this.rpm1 = Mathf.Clamp((float)rpm1, -parameters.RPMMax, parameters.RPMMax);
-            this.rpm2 = Mathf.Clamp((float)rpm2, -parameters.RPMMax, parameters.RPMMax);
+            SetRpm1(rpm1);
+            SetRpm2(rpm2);            
         }
 
         public void SetRudderAngle(float dr)
