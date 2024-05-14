@@ -28,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 16508918131042608}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.055, y: 0, z: 0}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: -0.055, y: 0.029999971, z: 0}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -46,11 +46,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -2133,7 +2134,7 @@ ArticulationBody:
   m_GameObject: {fileID: 2009370802786589029}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 15.05
+  m_Mass: 12.35
   m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -2176,7 +2177,7 @@ ArticulationBody:
   m_LinearDamping: 1.02
   m_AngularDamping: 2
   m_JointFriction: 0.05
-  m_CenterOfMass: {x: 0, y: -0.03, z: -0.005}
+  m_CenterOfMass: {x: 0, y: -0.03, z: -0.019}
   m_InertiaTensor: {x: 1.6202, y: 1.6202, z: 0.0293}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -3228,8 +3229,8 @@ Transform:
   m_GameObject: {fileID: 2851657168443340653}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.055, y: 0, z: 0}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: 0.055, y: 0.029999971, z: 0}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -3246,11 +3247,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -3334,8 +3336,8 @@ Transform:
   m_GameObject: {fileID: 2904167736829692243}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.055, y: 0, z: 0.3}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: 0.055, y: 0.029999971, z: 0.3}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -3352,11 +3354,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -5374,8 +5377,8 @@ Transform:
   m_GameObject: {fileID: 4315069877053674557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.055, y: 0, z: -0.57}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: -0.055, y: 0.029999971, z: -0.57}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -5392,11 +5395,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -6159,8 +6163,8 @@ Transform:
   m_GameObject: {fileID: 5038145100136501339}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.055, y: 0, z: 0.57}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: 0.055, y: 0.03, z: 0.57}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -6177,11 +6181,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -6983,8 +6988,8 @@ Transform:
   m_GameObject: {fileID: 5552643237234854677}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.055, y: 0, z: -0.3}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: 0.055, y: 0.029999971, z: -0.3}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -7001,11 +7006,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -7119,7 +7125,7 @@ ArticulationBody:
   m_GameObject: {fileID: 5558114598880233991}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 0.0000001
+  m_Mass: 2.7
   m_ParentAnchorPosition: {x: -0.000000016880222, y: 0, z: 0.083}
   m_ParentAnchorRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -7133,11 +7139,11 @@ ArticulationBody:
   m_SwingZ: 2
   m_Twist: 2
   m_XDrive:
-    lowerLimit: -0.01
-    upperLimit: 0.01
-    stiffness: 0
-    damping: 0
-    forceLimit: 1
+    lowerLimit: -0.03
+    upperLimit: 0.03
+    stiffness: 1000
+    damping: 500
+    forceLimit: 10
     target: 0
     targetVelocity: 0
     driveType: 0
@@ -7776,8 +7782,8 @@ Transform:
   m_GameObject: {fileID: 6043774856865223745}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.055, y: 0, z: 0.57}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: -0.055, y: 0.029999971, z: 0.57}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -7794,11 +7800,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -7971,8 +7978,8 @@ Transform:
   m_GameObject: {fileID: 6364627678026356331}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.055, y: 0, z: -0.3}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: -0.055, y: 0.029999971, z: -0.3}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -7989,11 +7996,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -8880,8 +8888,8 @@ Transform:
   m_GameObject: {fileID: 7392179170812410801}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.055, y: 0, z: 0.3}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: -0.055, y: 0.029999971, z: 0.3}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -8898,11 +8906,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
@@ -8986,8 +8995,8 @@ Transform:
   m_GameObject: {fileID: 7433099110653151568}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.055, y: 0, z: -0.57}
-  m_LocalScale: {x: 0.13299999, y: 0.133, z: 0.13299999}
+  m_LocalPosition: {x: 0.055, y: 0.029999971, z: -0.57}
+  m_LocalScale: {x: 0.02014551, y: 0.01014551, z: 0.02014551}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 769686619659844280}
@@ -9004,11 +9013,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 812475576104893903}
+  _body: {fileID: 812475576104893903}
   depthBeforeSubmerged: 0.03
   displacementAmount: 0
   motionModel: {fileID: 404238267517893062}
   addGravity: 0
+  volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5,
     type: 3}
   automaticCenterOfGravity: 0
