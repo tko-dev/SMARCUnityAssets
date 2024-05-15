@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 using DefaultNamespace.Water;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -28,6 +30,30 @@ namespace Force
         public bool automaticCenterOfGravity = false;
         public float volume;
         public float density = 997; // kg/m3
+
+        // Keep a dict of current query objects
+        // that we'll update as we enter and exit
+        // their colliders. On update, we'll 
+        // go through the dict and query the current
+        // vector with the points position and apply it.
+        Dictionary<string, IWaterCurrent> currents = new Dictionary<string, IWaterCurrent>();
+
+
+        void OnTriggerEnter(Collider col)
+        {
+            if(col.gameObject.TryGetComponent<IWaterCurrent>(out IWaterCurrent current))
+            {
+                currents.Add(col.gameObject.name, current);
+            }
+        }
+
+        void OnTriggerExit(Collider col)
+        {
+            if(col.gameObject.TryGetComponent<IWaterCurrent>(out IWaterCurrent current))
+            {
+                currents.Remove(col.gameObject.name);
+            }
+        }
 
 
         public void Awake()
@@ -63,12 +89,24 @@ namespace Force
             float waterSurfaceLevel = _waterModel.GetWaterLevelAt(forcePointPosition);
             if (forcePointPosition.y < waterSurfaceLevel)
             {
+                //Underwater
+                //Apply buoyancy
                 float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged) * displacementAmount;
 
                 _body.AddForceAtPosition(
                     volume * density * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
                     forcePointPosition,
                     ForceMode.Force);
+
+                // Also apply currents while underwater
+                foreach(IWaterCurrent current in currents.Values)
+                {
+                    _body.AddForceAtPosition(
+                    current.GetCurrentAt(forcePointPosition),
+                    forcePointPosition,
+                    ForceMode.Force);
+                }
+
             }
         }
     }
