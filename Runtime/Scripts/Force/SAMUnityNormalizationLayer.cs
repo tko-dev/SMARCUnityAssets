@@ -11,6 +11,16 @@ namespace Force
             underlyingController = samControl;
         }
 
+        public void SetRpm1(double rpm)
+        {
+            underlyingController.SetRpm1(rpm * underlyingController.parameters.RPMMax);
+        }
+
+        public void SetRpm2(double rpm)
+        {
+            underlyingController.SetRpm2(rpm * underlyingController.parameters.RPMMax);
+        }
+
         public void SetRpm(double rpm1, double rpm2)
         {
             underlyingController.SetRpm(

@@ -3,6 +3,8 @@
     public interface ISAMControl
     {
         
+        public void SetRpm1(double rpm);
+        public void SetRpm2(double rpm);
         public void SetRpm(double rpm1, double rpm2);
 
 
