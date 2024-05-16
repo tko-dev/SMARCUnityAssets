@@ -35,14 +35,14 @@ namespace Force
         // their colliders. On update, we'll 
         // go through the dict and query the current
         // vector with the points position and apply it.
-        Dictionary<string, IWaterCurrent> currents = new Dictionary<string, IWaterCurrent>();
+        Dictionary<int, IWaterCurrent> currents = new Dictionary<int, IWaterCurrent>();
 
 
         void OnTriggerEnter(Collider col)
         {
             if(col.gameObject.TryGetComponent<IWaterCurrent>(out IWaterCurrent current))
             {
-                currents.Add(col.gameObject.name, current);
+                currents.Add(col.gameObject.GetInstanceID(), current);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Force
         {
             if(col.gameObject.TryGetComponent<IWaterCurrent>(out IWaterCurrent current))
             {
-                currents.Remove(col.gameObject.name);
+                currents.Remove(col.gameObject.GetInstanceID());
             }
         }
 
@@ -100,10 +100,12 @@ namespace Force
                 // Also apply currents while underwater
                 foreach(IWaterCurrent current in currents.Values)
                 {
-                    _body.AddForceAtPosition(
-                    current.GetCurrentAt(forcePointPosition),
-                    forcePointPosition,
-                    ForceMode.Force);
+                    _body.AddForceAtPosition
+                    (
+                        current.GetCurrentAt(forcePointPosition),
+                        forcePointPosition,
+                        ForceMode.Force
+                    );
                 }
 
             }

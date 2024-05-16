@@ -24,7 +24,13 @@ namespace DefaultNamespace.Water
 
         void OnDrawGizmos()
         {
-            
+            Gizmos.color = new Color(1f, 0, 1f, 0.01f);
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawCube(Vector3.zero, Vector3.one);
+        }
+
+        void OnDrawGizmosSelected()
+        {
             BoxCollider col = GetComponent<BoxCollider>();
             Vector3 size = col.bounds.size;
             // Random numbers. 5 seems ok for inside of a box.
@@ -43,13 +49,6 @@ namespace DefaultNamespace.Water
                         Gizmos.color = new Color(c.x, c.y, c.z, 0.1f);
                         Gizmos.DrawSphere(transform.position + p, 0.1f);
                     }
-                        
-
-            Gizmos.color = new Color(1f, 0, 1f, 0.05f);
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawCube(Vector3.zero, Vector3.one);
-            
-
         }
 
     }
