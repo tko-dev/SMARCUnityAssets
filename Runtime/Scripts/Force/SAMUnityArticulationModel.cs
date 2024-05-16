@@ -19,7 +19,6 @@ namespace Force
         public double rpm2 { get; set; }
 
         public Vector3 ThrusterPosition = new(0, 0, -0.73f);
-        private List<ForcePoint> points;
 
         public SAMUnityArticulationModel()
         {
@@ -28,15 +27,7 @@ namespace Force
 
         private void Awake()
         {
-            //    rigidBody = GetComponent<Rigidbody>();
             Debug.Log(baseLink.inertiaTensor);
-            // Debug.Log(propller1.inertiaTensor);
-            // Debug.Log(propller2.inertiaTensor);
-            // Debug.Log(rudder.inertiaTensor);
-            // Debug.Log(aileron.inertiaTensor);
-          
-            points = new List<ForcePoint>(GetComponentsInChildren<ForcePoint>());
-            //   if (rigidBody == null) rigidBody = transform.parent.GetComponent<Rigidbody>();
         }
 
         public void SetRpm1(double rpm)
@@ -74,8 +65,8 @@ namespace Force
         public void SetWaterPump(float vbs)
         {
             vbs = Mathf.Clamp01(vbs); //Percentages, given as decimal
-            this.vbs = parameters.VBSFixedPoint + Mathf.Lerp(-parameters.VBSMaxDeviation, parameters.VBSMaxDeviation, vbs);
-            points.ForEach(point => point.displacementAmount = (float)this.vbs);
+            this.vbs = 0;
+
         }
 
         private void FixedUpdate()

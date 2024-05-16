@@ -5,16 +5,16 @@ using Utils = DefaultNamespace.Utils;
 
 namespace VehicleComponents
 {
-    [RequireComponent(typeof(ArticulationBody))]
-    public class LinkAttachment: MonoBehaviour
+    public class LinkAttachment : MonoBehaviour
     {
-        [Header("Link attachment")]
-        [Tooltip("The name of the link the sensor should be attached to.")]
+        [Header("Link attachment")] [Tooltip("The name of the link the sensor should be attached to.")]
         public string linkName = "";
+
         [Tooltip("If ROS uses a different camera refenrece frame.")]
         public bool rotateForROSCamera = false;
+
         [Tooltip("Rotate the object with respect to the attached link after attaching.")]
-        public float roll=0f, pitch=0f, yaw=0f;
+        public float roll = 0f, pitch = 0f, yaw = 0f;
 
         protected GameObject attachedLink;
         protected ArticulationBody articulationBody;
@@ -29,11 +29,12 @@ namespace VehicleComponents
             // and includes the link we are looking to attach to
             // as a child at an arbitrary depth.
             attachedLink = Utils.FindDeepChildWithName(transform.root.gameObject, linkName);
-            if(attachedLink == null)
+            if (attachedLink == null)
             {
                 Debug.Log($"Object with name [{linkName}] not found under parent [{transform.root.name}]");
                 return;
             }
+
             transform.SetPositionAndRotation
             (
                 attachedLink.transform.position,
@@ -47,16 +48,18 @@ namespace VehicleComponents
             // defines it with Y forw, Z right, X up (mapped to unity)
             // instead of ZXY
             // so we gotta turn our ZXY camera to match the YZX frame
-            if(rotateForROSCamera)
+            if (rotateForROSCamera)
             {
                 transform.Rotate(Vector3.up, 90);
                 transform.Rotate(Vector3.right, -90);
                 transform.Rotate(Vector3.forward, 180);
             }
+
             transform.SetParent(attachedLink.transform);
 
             articulationBody = GetComponent<ArticulationBody>();
             parentArticulationBody = attachedLink.GetComponent<ArticulationBody>();
+            if (articulationBody == null) articulationBody = parentArticulationBody;
         }
 
         void OnDrawGizmosSelected()
@@ -72,6 +75,5 @@ namespace VehicleComponents
             Gizmos.color = new Color(0, 1, 0, 0.2f);
             Gizmos.DrawCube(transform.position, new Vector3(0.1f, 0.1f, 0.1f));
         }
-
     }
 }

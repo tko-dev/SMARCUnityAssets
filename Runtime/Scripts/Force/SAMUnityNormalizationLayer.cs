@@ -30,12 +30,12 @@ namespace Force
 
         public void SetRudderAngle(float dr)
         {
-            underlyingController.SetRudderAngle(dr * underlyingController.parameters.ThrusterAngleMax);
+            //TODO: Fix underlyingController.SetRudderAngle(dr * underlyingController.parameters.ThrusterAngleMax);
         }
 
         public void SetElevatorAngle(float de)
         {
-            underlyingController.SetElevatorAngle(de * underlyingController.parameters.ThrusterAngleMax);
+            //TODO: Fix underlyingController.SetElevatorAngle(de * underlyingController.parameters.ThrusterAngleMax);
         }
 
         public void SetBatteryPack(double lcg)

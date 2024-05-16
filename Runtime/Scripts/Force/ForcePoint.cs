@@ -20,7 +20,6 @@ namespace Force
         private WaterQueryModel _waterModel;
 
         public float depthBeforeSubmerged = 1.5f;
-        public float displacementAmount = 1f;
 
         public GameObject motionModel;
         public bool addGravity = false;
@@ -91,7 +90,7 @@ namespace Force
             {
                 //Underwater
                 //Apply buoyancy
-                float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged) * displacementAmount;
+                float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged);
 
                 _body.AddForceAtPosition(
                     volume * density * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
