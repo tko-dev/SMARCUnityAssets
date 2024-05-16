@@ -24,7 +24,7 @@ namespace DefaultNamespace.Water
 
         void OnDrawGizmos()
         {
-            Gizmos.color = new Color(1f, 0, 1f, 0.05f);
+            Gizmos.color = new Color(1f, 0, 1f, 0.01f);
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.DrawCube(Vector3.zero, Vector3.one);
         }
