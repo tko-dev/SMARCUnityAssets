@@ -22,6 +22,14 @@ namespace DefaultNamespace.Water
             return current;
         }
 
+        void OnTriggerStay(Collider col)
+        {
+            if(col.gameObject.TryGetComponent<ForcePoint>(out ForcePoint fp))
+            {
+                fp.ApplyCurrent(GetCurrentAt(col.transform.position));
+            }
+        }
+
         void OnDrawGizmos()
         {
             Gizmos.color = new Color(1f, 0, 1f, 0.01f);
