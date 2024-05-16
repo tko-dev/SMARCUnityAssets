@@ -16,7 +16,7 @@ so that we can generate a concrete urdf file to be imported in Unity-->
     </visual>
 	<inertial>
       <origin rpy="0.0 0.0 0.0" xyz="-0.019 0 -0.03"/>
-      <mass value="12.35"/>
+      <mass value="12.29"/>
       <inertia ixx="0.0293" ixy="0.0" ixz="0.0" iyy="1.6202" iyz="0.0" izz="1.6202"/>
     </inertial>
   </link>
@@ -118,7 +118,7 @@ so that we can generate a concrete urdf file to be imported in Unity-->
   <link name="vbs_link">
 	<inertial>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
-      <mass value="0.150"/>
+      <mass value="0.300"/>
 	  <inertia ixx="0.0293" ixy="0.0" ixz="0.0" iyy="1.6202" iyz="0.0" izz="1.6202"/>
     </inertial>
   </link>
