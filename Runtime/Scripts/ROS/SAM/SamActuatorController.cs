@@ -13,7 +13,7 @@ namespace DefaultNamespace
         // float horizontal;
         // float rpm1;
         // float rpm2;
-        float vbs;
+        // float vbs;
         float lcg;
 
         public float sleepTime = 0.1f;
@@ -23,21 +23,21 @@ namespace DefaultNamespace
         // public string anglesTopic = "core/thrust_vector_cmd";
         // public string rpm1_topic = "core/thruster1_cmd";
         // public string rpm2_topic = "core/thruster2_cmd";
-        public string vbs_topic = "core/vbs_cmd";
+        // public string vbs_topic = "core/vbs_cmd";
         public string lcg_topic = "core/lcg_cmd";
 
         float lastCommandTime;
 
         void Start()
         {
-            if(vbs_topic[0] != '/') vbs_topic = $"/{transform.root.name}/{vbs_topic}";
+            // if(vbs_topic[0] != '/') vbs_topic = $"/{transform.root.name}/{vbs_topic}";
             if(lcg_topic[0] != '/') lcg_topic = $"/{transform.root.name}/{lcg_topic}";
             model = GetComponent<ISAMControl>();
             var ros = ROSConnection.GetOrCreateInstance();
             // ros.Subscribe<ThrusterAnglesMsg>(anglesTopic, SetAngles);
             // ros.Subscribe<ThrusterRPMMsg>(rpm1_topic, SetRpm1);
             // ros.Subscribe<ThrusterRPMMsg>(rpm2_topic, SetRpm2);
-            ros.Subscribe<PercentStampedMsg>(vbs_topic, SetVbs);
+            // ros.Subscribe<PercentStampedMsg>(vbs_topic, SetVbs);
             ros.Subscribe<PercentStampedMsg>(lcg_topic, SetLcg);
             lastCommandTime = Time.time;
         }
@@ -58,11 +58,11 @@ namespace DefaultNamespace
         //     rpm2 = msg.rpm;
         //     lastCommandTime = Time.time;
         // }
-        void SetVbs(PercentStampedMsg msg)
-        {
-            vbs = msg.value;
-            lastCommandTime = Time.time;
-        }
+        // void SetVbs(PercentStampedMsg msg)
+        // {
+        //     vbs = msg.value;
+        //     lastCommandTime = Time.time;
+        // }
         void SetLcg(PercentStampedMsg msg)
         {
             lcg = msg.value;
@@ -100,7 +100,7 @@ namespace DefaultNamespace
             // model.SetRpm(rpm1, rpm2);
             // model.SetElevatorAngle(vertical);
             // model.SetRudderAngle(horizontal);
-            model.SetWaterPump(vbs);
+            // model.SetWaterPump(vbs);
             model.SetBatteryPack(lcg);
         }
     }

@@ -6,9 +6,12 @@ using UnityEngine;
 
 namespace VehicleComponents.Actuators
 {
-    public class VBS : LinkAttachment
+    public class VBS : LinkAttachment, IPercentageActuator
     {
-        [Header("VBS")] [Range(0, 100)] public float percentage = 50f;
+        [Header("VBS")]
+        [Header("VBS")]
+        [Range(0, 100)] public float percentage = 50f;
+        [Range(0, 100)] public float resetValue = 50f;
 
         private float _initialMass;
         private float _maximumPos;
@@ -26,6 +29,16 @@ namespace VehicleComponents.Actuators
         public void SetPercentage(float newValue)
         {
             percentage = Mathf.Clamp(newValue, 0, 100);
+        }
+
+        public float GetResetValue()
+        {
+            return resetValue;
+        }
+
+        public float GetCurrentValue()
+        {
+            return percentage;
         }
 
         public void FixedUpdate()

@@ -22,6 +22,14 @@ namespace DefaultNamespace.Water
             return current;
         }
 
+        void OnTriggerStay(Collider col)
+        {
+            if(col.gameObject.TryGetComponent<ForcePoint>(out ForcePoint fp))
+            {
+                fp.ApplyCurrent(GetCurrentAt(col.transform.position));
+            }
+        }
+
         void OnDrawGizmos()
         {
             Gizmos.color = new Color(1f, 0, 1f, 0.01f);
@@ -31,24 +39,11 @@ namespace DefaultNamespace.Water
 
         void OnDrawGizmosSelected()
         {
-            BoxCollider col = GetComponent<BoxCollider>();
-            Vector3 size = col.bounds.size;
-            // Random numbers. 5 seems ok for inside of a box.
-            // Actually getting the exact volume of an arbitrary box from
-            // a collider seems like a PITA, so i shant.
-            double sizeDiv = 5;
-            double spacing = 1;
-            for(double x = -(size.x)/sizeDiv; x < (size.x)/sizeDiv; x += spacing)
-                for(double y = -(size.y)/sizeDiv; y < (size.y)/sizeDiv; y += spacing)
-                    for(double z = -(size.z)/sizeDiv; z < (size.z)/sizeDiv; z += spacing)
-                    {
-                        Vector3 p = new Vector3((float)x,(float)y,(float)z);
-                        Vector3 c = GetCurrentAt(p);
-                        Gizmos.color = new Color(c.x, c.y, c.z, 1f);
-                        Gizmos.DrawRay(transform.position + p, c);
-                        Gizmos.color = new Color(c.x, c.y, c.z, 0.1f);
-                        Gizmos.DrawSphere(transform.position + p, 0.1f);
-                    }
+            Vector3 c = GetCurrentAt(transform.position);
+            Gizmos.color = new Color(c.x, c.y, c.z, 1f);
+            Gizmos.DrawRay(transform.position, c);
+            Gizmos.color = new Color(c.x, c.y, c.z, 1);
+            Gizmos.DrawSphere(transform.position, 0.3f);
         }
 
     }

@@ -4,8 +4,10 @@ using UnityEngine;
 
 using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
+using VBS = VehicleComponents.Actuators.VBS;
 using HingeCommand = VehicleComponents.ROS.Subscribers.HingeCommand;
 using PropellerCommand = VehicleComponents.ROS.Subscribers.PropellerCommand;
+using PercentageCommand = VehicleComponents.ROS.Subscribers.PercentageCommand;
 
 namespace DefaultNamespace
 {
@@ -21,11 +23,15 @@ namespace DefaultNamespace
         public GameObject pitchHingeGo;
         public GameObject frontPropGo;
         public GameObject backPropGo;
+        public GameObject vbsGo;
 
         Hinge yaw, pitch;
         HingeCommand yawCmd, pitchCmd;
         Propeller frontProp, backProp;
         PropellerCommand frontPropCmd, backPropCmd;
+        VBS vbs;
+        PercentageCommand vbsCmd;
+
 
 
 
@@ -49,6 +55,8 @@ namespace DefaultNamespace
             frontPropCmd = frontPropGo.GetComponent<PropellerCommand>();
             backProp = backPropGo.GetComponent<Propeller>();
             backPropCmd = backPropGo.GetComponent<PropellerCommand>();
+            vbs = vbsGo.GetComponent<VBS>();
+            vbsCmd = vbsGo.GetComponent<PercentageCommand>();
         }
 
         private void FixedUpdate()
@@ -57,6 +65,7 @@ namespace DefaultNamespace
             pitchCmd.enabled = letROSTakeTheWheel;
             frontPropCmd.enabled = letROSTakeTheWheel;
             backPropCmd.enabled = letROSTakeTheWheel;
+            vbsCmd.enabled = letROSTakeTheWheel;
 
             if (useBothRpms)
             {
@@ -138,17 +147,20 @@ namespace DefaultNamespace
 
             if (Input.GetKeyDown("f"))
             {
-                _samControl.SetWaterPump(0.5f);
+                vbs.SetPercentage(0.5f);
+                // _samControl.SetWaterPump(0.5f);
             }
 
             if (Input.GetKeyDown("c"))
             {
-                _samControl.SetWaterPump(0);
+                vbs.SetPercentage(0f);
+                // _samControl.SetWaterPump(0);
             }
 
             if (Input.GetKeyDown("space"))
             {
-                _samControl.SetWaterPump(1);
+                vbs.SetPercentage(1f);
+                // _samControl.SetWaterPump(1);
             }
         }
     }
