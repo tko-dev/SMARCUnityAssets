@@ -19,7 +19,6 @@ namespace Force
         public double rpm2 { get; set; }
 
         public Vector3 ThrusterPosition = new(0, 0, -0.73f);
-        private List<ForcePoint> points;
 
         public SAMUnityArticulationModel()
         {
@@ -28,15 +27,8 @@ namespace Force
 
         private void Awake()
         {
-            //    rigidBody = GetComponent<Rigidbody>();
+            
             Debug.Log(baseLink.inertiaTensor);
-            // Debug.Log(propller1.inertiaTensor);
-            // Debug.Log(propller2.inertiaTensor);
-            // Debug.Log(rudder.inertiaTensor);
-            // Debug.Log(aileron.inertiaTensor);
-          
-            points = new List<ForcePoint>(GetComponentsInChildren<ForcePoint>());
-            //   if (rigidBody == null) rigidBody = transform.parent.GetComponent<Rigidbody>();
         }
 
         public void SetRpm1(double rpm)
@@ -74,35 +66,9 @@ namespace Force
         public void SetWaterPump(float vbs)
         {
             vbs = Mathf.Clamp01(vbs); //Percentages, given as decimal
-            this.vbs = parameters.VBSFixedPoint + Mathf.Lerp(-parameters.VBSMaxDeviation, parameters.VBSMaxDeviation, vbs);
-            points.ForEach(point => point.displacementAmount = (float)this.vbs);
+            this.vbs = 0;
+
         }
-
-        private void FixedUpdate()
-        {
-            // var r1 = rpm1 / 1000 * parameters.RPMToForceMultiplier;
-            // var r2 = rpm2 / 1000 * parameters.RPMToForceMultiplier;
-      
-            // propller1.SetDriveTargetVelocity(ArticulationDriveAxis.X, -(float)rpm1);
-            // propller2.SetDriveTargetVelocity(ArticulationDriveAxis.X, (float)rpm2);
-
-            // rudder.SetDriveTarget(ArticulationDriveAxis.X, d_rudder * Mathf.Rad2Deg);
-            // aileron.SetDriveTarget(ArticulationDriveAxis.X, d_aileron * Mathf.Rad2Deg);
-
-          //  var rotorPositionGlobalFrame = transform.position + transform.TransformDirection(ThrusterPosition);
-
-            // aileron.AddForceAtPosition((float)r1 * aileron.transform.forward, aileron.transform.position, ForceMode.Force);
-            // aileron.AddForceAtPosition((float)r2 * aileron.transform.forward, aileron.transform.position, ForceMode.Force);
-        }
-
-        // public Vector3 ThrustVectorForPropller(double r)
-        // {
-        //     var localDirection = Quaternion.Euler(d_aileron * Mathf.Rad2Deg, -d_rudder * Mathf.Rad2Deg, 0) *
-        //                          transform.InverseTransformDirection(transform.forward);
-        //     var localScaled = localDirection * (float)r; //Divide by 2 since two forces
-        //     var globalDirection = transform.TransformDirection(localScaled);
-        //     return globalDirection;
-        // }
 
         public Vector3 GetTorqueDamping()
         {
