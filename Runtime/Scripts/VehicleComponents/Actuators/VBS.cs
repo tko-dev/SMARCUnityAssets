@@ -8,8 +8,7 @@ namespace VehicleComponents.Actuators
 {
     public class VBS : LinkAttachment
     {
-        [Header("VBS")]
-        [Range(0, 1)] public float percentage = 0.5f;
+        [Header("VBS")] [Range(0, 100)] public float percentage = 50f;
 
         private float _initialMass;
         private float _maximumPos;
@@ -26,13 +25,13 @@ namespace VehicleComponents.Actuators
 
         public void SetPercentage(float newValue)
         {
-            percentage = Mathf.Clamp01(newValue);
+            percentage = Mathf.Clamp(newValue, 0, 100);
         }
 
         public void FixedUpdate()
         {
-            articulationBody.mass = 0.00001f + _initialMass * percentage;
-            articulationBody.SetDriveTarget(ArticulationDriveAxis.X, Mathf.Lerp(_maximumPos, _minimumPos, percentage));
+            articulationBody.mass = 0.00001f + _initialMass * percentage / 100;
+            articulationBody.SetDriveTarget(ArticulationDriveAxis.X, Mathf.Lerp(_maximumPos, _minimumPos, percentage / 100));
         }
     }
 }
