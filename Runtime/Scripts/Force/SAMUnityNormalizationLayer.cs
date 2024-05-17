@@ -1,87 +1,82 @@
 ﻿using UnityEngine;
+using VehicleComponents.Actuators;
 
 namespace Force
 {
-    public class SAMUnityNormalizationLayer : ISAMControl
+    public class SAMUnityNormalizedController : MonoBehaviour
     {
-        private readonly ISAMControl underlyingController;
+        public Hinge yawControl;
+        public Hinge pitchControl;
+        public VBS vbsControl;
+        public Prismatic batteryControl;
+        public Propeller propeller1Control;
+        public Propeller propeller2Control;
 
-        public SAMUnityNormalizationLayer(ISAMControl samControl)
-        {
-            underlyingController = samControl;
-        }
 
         public void SetRpm1(double rpm)
         {
-            underlyingController.SetRpm1(rpm * underlyingController.parameters.RPMMax);
+            propeller1Control.SetRpm(rpm * propeller1Control.RPMMax);
         }
 
         public void SetRpm2(double rpm)
         {
-            underlyingController.SetRpm2(rpm * underlyingController.parameters.RPMMax);
+            propeller2Control.SetRpm(rpm * propeller1Control.RPMMax);
         }
 
         public void SetRpm(double rpm1, double rpm2)
         {
-            underlyingController.SetRpm(
-                rpm1 * underlyingController.parameters.RPMMax,
-                rpm2 * underlyingController.parameters.RPMMax);
+            SetRpm1(rpm1);
+            SetRpm2(rpm2);
         }
 
         public void SetRudderAngle(float dr)
         {
-            //TODO: Fix underlyingController.SetRudderAngle(dr * underlyingController.parameters.ThrusterAngleMax);
+            yawControl.SetAngle(dr * yawControl.AngleMax);
         }
 
         public void SetElevatorAngle(float de)
         {
-            //TODO: Fix underlyingController.SetElevatorAngle(de * underlyingController.parameters.ThrusterAngleMax);
+            pitchControl.SetAngle(de * pitchControl.AngleMax);
         }
 
-        public void SetBatteryPack(double lcg)
+        public void SetBatteryPack(float lcg)
         {
-            underlyingController.SetBatteryPack(lcg);
+            batteryControl.SetPercentage(lcg * 100f);
         }
 
         public void SetWaterPump(float vbs)
         {
-            underlyingController.SetWaterPump((vbs + 1) / 2);
+            vbsControl.SetPercentage(vbs * 100);
         }
 
         public float d_rudder
         {
-            get => underlyingController.d_rudder;
+            get => yawControl.angle;
         }
 
         public float d_aileron
         {
-            get => underlyingController.d_aileron;
+            get => pitchControl.angle;
         }
 
         public double rpm1
         {
-            get => underlyingController.rpm1;
+            get => propeller1Control.rpm;
         }
 
         public double rpm2
         {
-            get => underlyingController.rpm2;
+            get => propeller1Control.rpm;
         }
 
         public double lcg
         {
-            get => underlyingController.lcg;
+            get => batteryControl.percentage;
         }
 
         public double vbs
         {
-            get => underlyingController.vbs;
-        }
-
-        public SAMParameters parameters
-        {
-            get => underlyingController.parameters;
-            set => underlyingController.parameters = value;
+            get => vbsControl.percentage;
         }
     }
 }
