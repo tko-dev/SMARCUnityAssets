@@ -20,7 +20,7 @@ namespace Force
 
         public void SetRpm2(double rpm)
         {
-            propeller2Control.SetRpm(rpm * propeller1Control.RPMMax);
+            propeller2Control.SetRpm(rpm * propeller2Control.RPMMax);
         }
 
         public void SetRpm(double rpm1, double rpm2)
@@ -66,7 +66,7 @@ namespace Force
 
         public double rpm2
         {
-            get => propeller1Control.rpm;
+            get => propeller2Control.rpm;
         }
 
         public double lcg
