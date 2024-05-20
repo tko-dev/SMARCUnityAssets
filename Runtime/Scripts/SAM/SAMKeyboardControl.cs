@@ -5,9 +5,12 @@ using UnityEngine;
 using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
+using Prismatic = VehicleComponents.Actuators.Prismatic;
+
 using HingeCommand = VehicleComponents.ROS.Subscribers.HingeCommand;
 using PropellerCommand = VehicleComponents.ROS.Subscribers.PropellerCommand;
 using PercentageCommand = VehicleComponents.ROS.Subscribers.PercentageCommand;
+
 
 namespace DefaultNamespace
 {
@@ -24,13 +27,15 @@ namespace DefaultNamespace
         public GameObject frontPropGo;
         public GameObject backPropGo;
         public GameObject vbsGo;
+        public GameObject lcgGo;
 
         Hinge yaw, pitch;
         HingeCommand yawCmd, pitchCmd;
         Propeller frontProp, backProp;
         PropellerCommand frontPropCmd, backPropCmd;
         VBS vbs;
-        PercentageCommand vbsCmd;
+        Prismatic lcg;
+        PercentageCommand vbsCmd, lcgCmd;
 
 
 
@@ -57,6 +62,8 @@ namespace DefaultNamespace
             backPropCmd = backPropGo.GetComponent<PropellerCommand>();
             vbs = vbsGo.GetComponent<VBS>();
             vbsCmd = vbsGo.GetComponent<PercentageCommand>();
+            lcg = lcgGo.GetComponent<Prismatic>();
+            lcgCmd = lcgGo.GetComponent<PercentageCommand>();
         }
 
         private void FixedUpdate()
@@ -66,102 +73,104 @@ namespace DefaultNamespace
             frontPropCmd.enabled = letROSTakeTheWheel;
             backPropCmd.enabled = letROSTakeTheWheel;
             vbsCmd.enabled = letROSTakeTheWheel;
+            lcgCmd.enabled = letROSTakeTheWheel;
 
             if (useBothRpms)
             {
-                // _samControl.SetRpm(bothRpms, bothRpms);
                 frontProp.SetRpm(bothRpms);
                 backProp.SetRpm(bothRpms);
             }
 
             if (Input.GetKeyDown("down"))
             {
-                // _samControl.SetRpm(-moveRpms, -moveRpms);
                 frontProp.SetRpm(-moveRpms);
                 backProp.SetRpm(-moveRpms);
             }
 
             if (Input.GetKeyDown("q"))
             {
-                // _samControl.SetRpm(-rollRpms, rollRpms);
                 frontProp.SetRpm(-rollRpms);
                 backProp.SetRpm(rollRpms);
             }
 
             if (Input.GetKeyDown("e"))
             {
-                // _samControl.SetRpm(rollRpms, -rollRpms);
                 frontProp.SetRpm(rollRpms);
                 backProp.SetRpm(-rollRpms);
             }
 
             if (Input.GetKeyDown("up"))
             {
-                // _samControl.SetRpm(moveRpms, moveRpms);
                 frontProp.SetRpm(moveRpms);
                 backProp.SetRpm(moveRpms);
             }
 
             if (Input.GetKeyUp("up") || Input.GetKeyUp("down") || Input.GetKeyUp("q") || Input.GetKeyUp("e"))
             {
-                // _samControl.SetRpm(0, 0);
                 frontProp.SetRpm(0);
                 backProp.SetRpm(0);
             }
 
             if (Input.GetKeyDown("a"))
             {
-                // _samControl.SetRudderAngle(-1);
                 yaw.SetAngle(-1);
             }
 
             if (Input.GetKeyDown("d"))
             {
-                // _samControl.SetRudderAngle(1);
                 yaw.SetAngle(1);
             }
 
             if (Input.GetKeyUp("a") || Input.GetKeyUp("d"))
             {
-                // _samControl.SetRudderAngle(0);
                 yaw.SetAngle(0);
             }
 
             if (Input.GetKeyDown("w"))
             {
-                // _samControl.SetElevatorAngle(-1);
                 pitch.SetAngle(-1);
             }
 
             if (Input.GetKeyDown("s"))
             {
-                // _samControl.SetElevatorAngle(1);
                 pitch.SetAngle(1);
             }
 
             if (Input.GetKeyUp("w") || Input.GetKeyUp("s"))
             {
-                // _samControl.SetElevatorAngle(0);
                 pitch.SetAngle(0);
+            }
+
+            if (Input.GetKeyDown("r"))
+            {
+                vbs.SetPercentage(0f);
             }
 
             if (Input.GetKeyDown("f"))
             {
-                vbs.SetPercentage(0.5f);
-                // _samControl.SetWaterPump(0.5f);
+                vbs.SetPercentage(50f);
             }
 
             if (Input.GetKeyDown("c"))
             {
-                vbs.SetPercentage(0f);
-                // _samControl.SetWaterPump(0);
+                vbs.SetPercentage(100f);
             }
 
-            if (Input.GetKeyDown("space"))
+            if (Input.GetKeyDown("t"))
             {
-                vbs.SetPercentage(1f);
-                // _samControl.SetWaterPump(1);
+                lcg.SetPercentage(0f);
             }
+
+            if (Input.GetKeyDown("g"))
+            {
+                lcg.SetPercentage(50f);
+            }
+
+            if (Input.GetKeyDown("v"))
+            {
+                lcg.SetPercentage(100f);
+            }
+
         }
     }
 }
