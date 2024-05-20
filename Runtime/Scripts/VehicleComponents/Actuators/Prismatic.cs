@@ -2,10 +2,11 @@
 
 namespace VehicleComponents.Actuators
 {
-    public class Prismatic : LinkAttachment
+    public class Prismatic : LinkAttachment, IPercentageActuator
     {
         [Header("Position")]
         [Range(0, 100)] public float percentage = 50f;
+        [Range(0, 100)] public float resetValue = 50f;
      
         private float _maximumPos;
         private float _minimumPos;
@@ -19,7 +20,17 @@ namespace VehicleComponents.Actuators
         
         public void SetPercentage(float newValue)
         {
-            percentage = Mathf.Clamp01(newValue / 100);
+            percentage = Mathf.Clamp(newValue, 0, 100);
+        }
+
+        public float GetResetValue()
+        {
+            return resetValue;
+        }
+
+        public float GetCurrentValue()
+        {
+            return percentage;
         }
         
         public void FixedUpdate()
