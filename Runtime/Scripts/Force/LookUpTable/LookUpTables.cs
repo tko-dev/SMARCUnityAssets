@@ -1,5 +1,5 @@
 ﻿using System;
-using Unity.Plastic.Newtonsoft.Json;
+
 using UnityEngine;
 
 namespace Force.LookUpTable
@@ -14,7 +14,7 @@ namespace Force.LookUpTable
 
         public static LookUpTables CreateFromJSON(string jsonString)
         {
-            return JsonConvert.DeserializeObject<LookUpTables>(jsonString);
+            return new LookUpTables(); // TODO FIX JsonConvert.DeserializeObject<LookUpTables>(jsonString);
         }
     }
 }

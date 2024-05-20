@@ -17,7 +17,7 @@ namespace Force
             return (1.0f / 6.0f) * (-v321 + v231 + v312 - v132 - v213 + v123);
         }
 
-        public static float CalculateVolumeOfMesh(Mesh mesh, Vector3 localScale)
+        public static float CalculateVolumeOfMesh(Mesh mesh, Vector3 scale)
         {
             float volume = 0;
 
@@ -30,9 +30,9 @@ namespace Force
                 Vector3 p2 = vertices[triangles[i + 1]];
                 Vector3 p3 = vertices[triangles[i + 2]];
                 volume += SignedVolumeOfTriangle(p1, p2, p3);
-                volume *= localScale.x * localScale.y * localScale.z;
+              
             }
-
+            volume *= scale.x * scale.y * scale.z;
             return Mathf.Abs(volume);
         }
     }
