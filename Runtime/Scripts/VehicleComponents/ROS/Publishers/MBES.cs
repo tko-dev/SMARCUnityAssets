@@ -10,7 +10,7 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(SensorMBES))]
     class MBES: SensorPublisher<PointCloud2Msg, SensorMBES>
     { 
-        public string frame_id="odom";
+        public string frame_id="map_gt";
         void Start()
         {
             ROSMsg.header.frame_id = frame_id;
