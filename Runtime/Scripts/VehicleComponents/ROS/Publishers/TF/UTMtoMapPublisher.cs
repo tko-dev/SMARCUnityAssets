@@ -47,7 +47,12 @@ namespace VehicleComponents.ROS.Publishers
             // in the scene to publish a "global" frame that is map_gt
             // and they wont need to do any origin shenanigans that way
             this.transform.localPosition = Vector3.zero;
+            ros = ROSConnection.GetOrCreateInstance();
+            ros.RegisterPublisher<TFMessageMsg>(topic);
+        }
 
+        void CreateMsg()
+        {
             string utm_zone_band = $"utm_{gpsRef.zone}_{gpsRef.band}";
             // this is the position of unity-world in utm coordinates
             double lat, lon, originEasting, originNorthing;
@@ -79,17 +84,14 @@ namespace VehicleComponents.ROS.Publishers
             // These transforms never change during play mode
             // so we can publish the same message all the time
             ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
-
-            ros = ROSConnection.GetOrCreateInstance();
-            ros.RegisterPublisher<TFMessageMsg>(topic);
         }
 
         void FixedUpdate()
         {
-            if(ROSMsg == null) return;
-            
             var deltaTime = Clock.NowTimeInSeconds - lastTime;
             if(deltaTime < period) return;
+
+            CreateMsg();
 
             ros.Publish(topic, ROSMsg);
             lastTime = Clock.NowTimeInSeconds;
