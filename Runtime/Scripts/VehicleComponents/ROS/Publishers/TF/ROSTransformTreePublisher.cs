@@ -21,6 +21,8 @@ namespace VehicleComponents.ROS.Publishers
 
         [Header("TF Tree")]
         string prefix;
+        [Tooltip("Suffix to add to all published TF links.")]
+        public string suffix = "_gt";
 
         public float frequency = 10f;
         
@@ -94,6 +96,13 @@ namespace VehicleComponents.ROS.Publishers
 
             // populate the global frames last, dont wanna prefix those.
             PopulateGlobalFrames(tfMessageList);
+
+            // and finally, suffix _everything_
+            foreach(TransformStampedMsg msg in tfMessageList)
+            {
+                msg.header.frame_id = $"{msg.header.frame_id}{suffix}";
+                msg.child_frame_id = $"{msg.child_frame_id}{suffix}";
+            }
 
             var ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
             ros.Publish(topic, ROSMsg);
