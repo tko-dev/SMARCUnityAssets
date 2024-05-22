@@ -22,7 +22,16 @@ namespace VehicleComponents.Sensors
         public double easting;
         public double northing;
 
-        void Start()
+        void OnValidate()
+        {
+            var refpoints = FindObjectsByType<GPSReferencePoint>(FindObjectsSortMode.None);
+            if(refpoints.Length > 1)
+            {
+                Debug.LogWarning("Found too many GPSReferencePoints in the scene, there should only be one!");
+            }
+        }
+
+        void Awake()
         {
             if(originIsLatLon)
             {
