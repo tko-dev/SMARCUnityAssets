@@ -1662,7 +1662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c404bcc3ca14f048dbe0147fad1cebc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: mbes/odom/bathy_points
+  topic: mbes/map_gt/bathy_points
   frame_id: map
 --- !u!1 &6843956064454985405
 GameObject:
