@@ -49,10 +49,7 @@ namespace VehicleComponents.Sensors
             Sonar sonar = sonar_go.AddComponent(typeof(Sonar)) as Sonar;
 
             sonar_go.transform.SetParent(this.transform, false);
-
-            var ab = sonar_go.GetComponent<ArticulationBody>();
-            ab.enabled = false;
-            
+           
             sonar.frequency = frequency;
             sonar.beam_breadth_deg = fullBeamAngleDeg;
             sonar.beam_fwhm_deg = fwhmBeamAngleDeg;

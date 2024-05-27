@@ -160,7 +160,7 @@ namespace VehicleComponents.Sensors
             // so first, we gotta convert the unity points to ros points
             // then x,y,z need to be byte-ified
             // then a fourth "intensity" needs to be created and byte-ified
-            var point = hit.point.To<FLU>();
+            var point = hit.point.To<ENU>();
 
             var xb = BitConverter.GetBytes(point.x);
             var yb = BitConverter.GetBytes(point.y);
