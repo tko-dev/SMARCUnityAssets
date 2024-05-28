@@ -39,11 +39,7 @@ namespace VehicleComponents.ROS.Subscribers
 
             foreach(TransformStampedMsg tfStamped in tfMsg.transforms)
             {
-                string parent_id = tfStamped.header.frame_id;
-                // utm frame is forever away and is uninteresting inside unity
-                // so we skip anything to do with it
-                if(parent_id.Contains("utm")) return;
-                
+                string parent_id = tfStamped.header.frame_id;                
                 string child_id = tfStamped.child_frame_id;
                 TransformMsg ros_tf = tfStamped.transform;
                 // so, we have an objects name, and its child, and the transform
@@ -57,21 +53,55 @@ namespace VehicleComponents.ROS.Subscribers
                     parent_go = new GameObject(parent_id);
                     parent_go.transform.SetParent(tfViz_go.transform);
 
-                    // the map_gt frame should correspond to unity's origin.
-                    // needs to be done once, since it is static.
-                    if(parent_id.Contains("map_gt"))
-                    {
-                        parent_go.transform.position = Vector3.zero;
-                        // the map_gt frame is globally oriented, x=easting y=northing, z=up
-                        // in unity, x=east, y=up, z=north
-                        // so we need to rotate it in unity to match that.
-                        // if we rotate it 90 around unity-X, we get the east/north right
-                        // but then z points down, so we scale z  -1 so it points up 
-                        // then everything will match once the child is also transformed to RUF
-                        parent_go.transform.Rotate(Vector3.right, 90);
-                        parent_go.transform.localScale = new Vector3(1,1,-1);
-                    }
+                    // utm frame(s) needs special handling, since they are
+                    // not at unity origin, and their location is dependent on
+                    // the GPS Reference object in the scene.
+                    // they need to positioned such that map_gt ends up at unity-origin.
+                    // normally, we dont even NEED the utm frame in unity
+                    // but ros-vehicles will be under utm and not map_gt.
+                    // so to be able to compare things under map_gt and utm, 
+                    // we need the utm frame to exist in unity too
+
+                    
                 }
+
+                if(parent_id == "utm" && child_id == "map_gt")
+                {
+                    // the utm frame is globally oriented in ros, x=easting y=northing, z=up
+                    // in unity, x=east, y=up, z=north
+                    // and we want map_gt to end up at unity-origin
+                    // so we move the unity-utm object to negative tf of its child map-gt
+                    var utm_unity_pos = new Vector3((float)-ros_tf.translation.x, 
+                                                    0, //utm frame is always at height=0
+                                                    (float)-ros_tf.translation.y);
+                    parent_go.transform.localPosition = utm_unity_pos;
+                    
+                    // finally, make the map_gt if it doesnt exist
+                    // and put it at unity-origin
+                    var mapgt_go = Utils.FindDeepChildWithName(tfViz_go, child_id);
+                    if(mapgt_go == null)
+                    {
+                        mapgt_go = new GameObject(child_id);
+                    }
+                    mapgt_go.transform.SetParent(parent_go.transform);
+                    var mapgt_unity_pos = new Vector3((float)ros_tf.translation.x, 
+                                                      0,
+                                                      (float)ros_tf.translation.y);
+                    mapgt_go.transform.localPosition = mapgt_unity_pos;
+                    // map_gt should now be in global-unity-origin and the child of "utm"
+                    Gizmos.color = new Color(0f, 1f, 1f, 1f);
+                    Gizmos.DrawLine(parent_go.transform.position, mapgt_go.transform.position);
+                    continue;
+
+
+                    // // then we need to rotate it in unity to match that.
+                    // // if we rotate it 90 around unity-X, we get the east/north right
+                    // // but then z points down, so we scale z  -1 so it points up 
+                    // // then everything will match once the child is also transformed to RUF
+                    // parent_go.transform.Rotate(Vector3.right, 90);
+                    // parent_go.transform.localScale = new Vector3(1,1,-1);
+                }
+
                 // so now the parent object exists.
                 // but, it could be that we are reading the tf of a child
                 // before we read its parent, so the child might already exist
