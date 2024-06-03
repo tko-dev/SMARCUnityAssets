@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   linkName: pressure_link
   retryUntilSuccess: 1
+  retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
@@ -1970,7 +1971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78564e3e0c2d8c65cb6601a38bee530d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkName: base_link
+  linkName: odom
   retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
