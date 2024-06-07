@@ -40,14 +40,16 @@ public class ArticulationChainComponent : MonoBehaviour
 
     public void Restart(Vector3 position, Quaternion rotation)
     {
+        root.immovable = true;
+        root.TeleportRoot(position, rotation);
+        
         foreach (var bodyPart in DriveControllers)
         {
             bodyPart.Key.ResetArticulationBody();
             bodyPart.Value.ResetDrives();
         }
-
-        root.immovable = true;
-        root.TeleportRoot(position, rotation);
+        
+        root.immovable = false;
     }
 
     public class DriveController

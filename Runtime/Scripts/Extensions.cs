@@ -1,9 +1,56 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace DefaultNamespace
 {
     public static class Extensions
     {
+        public static List<T> FindAllChildrenOfType<T>(this Transform item)
+        {
+            var findResults = new List<T>();
+
+            foreach (Transform child in item)
+            {
+                if (child.TryGetComponent(out T searchResult))
+                {
+                    findResults.Add(searchResult);
+                }
+
+                findResults.AddRange(child.FindAllChildrenOfType<T>());
+            }
+
+            return findResults;
+        }
+
+        public static string GetPath(this Transform current, Transform terminalParent = null)
+        {
+            if (current.parent == null || current.parent == terminalParent)
+                return current.name;
+            return current.parent.GetPath(terminalParent) + "/" + current.name;
+        }
+
+        public static Transform CreatePath(this Transform baseObject, String path)
+        {
+            var transform = baseObject.Find(path);
+            if (transform != null)
+            {
+                return transform;
+            }
+
+            var elements = path.Split("/");
+            var lastElement = elements[elements.Length - 1];
+            Array.Resize(ref elements, elements.Length - 1);
+            var rejoined = string.Join("/", elements);
+            
+            transform = CreatePath(baseObject, rejoined);
+            
+            var newObject = new GameObject();
+            newObject.name = lastElement;
+            newObject.transform.parent = transform;
+            
+            return newObject.transform;
+        }
 
         public static void ResetArticulationBody(this ArticulationBody body)
         {
@@ -25,9 +72,9 @@ namespace DefaultNamespace
                     body.jointVelocity = new ArticulationReducedSpace(0f, 0f, 0f);
                     break;
             }
+
             body.velocity = Vector3.zero;
             body.angularVelocity = Vector3.zero;
         }
-        
     }
 }
