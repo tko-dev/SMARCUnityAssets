@@ -143,6 +143,17 @@ namespace DefaultNamespace
             return FindParentWithTag(parent_tf.gameObject, tag, returnTopLevel);
         }
 
+        public static string GetGameObjectPath(GameObject obj)
+        {
+            string path = "/" + obj.name;
+            while (obj.transform.parent != null)
+            {
+                obj = obj.transform.parent.gameObject;
+                path = "/" + obj.name + path;
+            }
+            return path;
+        }
+
         
     }
 
