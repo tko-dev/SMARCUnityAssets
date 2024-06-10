@@ -23,7 +23,8 @@ namespace VehicleComponents.ROS.Publishers
         string topic = "/tf";
         TFMessageMsg ROSMsg;
 
-        void OnValidate()
+
+        void Start() // to let the GPSRef do its thing in Awake()
         {
             var utmpubs = FindObjectsByType<UTMtoMapPublisher>(FindObjectsSortMode.None);
             if(utmpubs.Length > 1)
@@ -37,10 +38,7 @@ namespace VehicleComponents.ROS.Publishers
                 Debug.LogWarning("[UTM->Map pub] No GPS Reference found in the scene. There must be at least one!");
             }
             else gpsRef = gpsRefs[0];
-        }
 
-        void Start() // to let the GPSRef do its thing in Awake()
-        {
             if(gpsRef == null) return;
             // make sure this is in the origin
             // why origin? so that we can tell all other tf publishers
