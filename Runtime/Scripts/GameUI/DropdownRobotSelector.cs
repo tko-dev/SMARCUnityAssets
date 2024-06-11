@@ -4,19 +4,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using VehicleComponents.ROS.Subscribers;
+
 namespace GameUI
 {
     public class DropdownRobotSelector : MonoBehaviour
     {
+        public GameObject DropdownRobotSelect;
+        public GameObject ToggleROSControl;
+        public GameObject ToggleKBControl;
+
         TMP_Dropdown dropdown;
         Toggle toggle_rosControl;
+        Toggle toggle_kbControl;
         
         GameObject selectedRobotRoot;
         
         void Start()
         {
-            dropdown = GetComponentInChildren<TMP_Dropdown>();
-            toggle_rosControl = GetComponentInChildren<Toggle>();
+            dropdown = DropdownRobotSelect.GetComponent<TMP_Dropdown>();
+            toggle_rosControl = ToggleROSControl.GetComponent<Toggle>();
+            toggle_kbControl = ToggleKBControl.GetComponent<Toggle>();
             
             // Get all the #robot tagged objects in the scene
             // then we'll use their root name in the list
@@ -34,10 +42,18 @@ namespace GameUI
 
         void UpdateToggles()
         {
-            IKeyboardController kbc = selectedRobotRoot.GetComponentInChildren<IKeyboardController>();
+            bool atLeastOneROS = false;
+            var actSubs = selectedRobotRoot.GetComponentsInChildren<ActuatorSubscriber>();
+            foreach(var actSub in actSubs)
+            {
+                atLeastOneROS = atLeastOneROS || actSub.enabled;
+            }
+            toggle_rosControl.isOn = atLeastOneROS;
+
+            var kbc = selectedRobotRoot.GetComponentInChildren<KeyboardController>();
             if(kbc != null)
             {
-                toggle_rosControl.isOn = kbc.GetLetROSTakeTheWheel();
+                toggle_kbControl.isOn = kbc.enabled && !atLeastOneROS;
             }
         }
 
@@ -50,10 +66,29 @@ namespace GameUI
 
         public void OnToggleROSControl(bool t)
         {
-            IKeyboardController kbc = selectedRobotRoot.GetComponentInChildren<IKeyboardController>();
+            var actSubs = selectedRobotRoot.GetComponentsInChildren<ActuatorSubscriber>();
+            foreach(var actSub in actSubs)
+            {
+                actSub.enabled = t;
+                if(t)
+                {
+                    OnToggleKBControl(false);
+                    UpdateToggles();
+                }
+            }
+        }
+
+        public void OnToggleKBControl(bool t)
+        {
+            KeyboardController kbc = selectedRobotRoot.GetComponentInChildren<KeyboardController>();
             if(kbc != null)
             {
-                kbc.LetROSTakeTheWheel(toggle_rosControl.isOn);
+                kbc.enabled = t;
+                if(t)
+                {
+                    OnToggleROSControl(false);
+                    UpdateToggles();
+                }
             }
         }
 

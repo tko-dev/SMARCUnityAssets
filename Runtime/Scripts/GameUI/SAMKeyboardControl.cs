@@ -7,20 +7,12 @@ using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
 using Prismatic = VehicleComponents.Actuators.Prismatic;
 
-using HingeCommand = VehicleComponents.ROS.Subscribers.HingeCommand;
-using PropellerCommand = VehicleComponents.ROS.Subscribers.PropellerCommand;
-using PercentageCommand = VehicleComponents.ROS.Subscribers.PercentageCommand;
-
-
 namespace GameUI
 {
     [RequireComponent(typeof(ISAMControl))]
-    public class SAMKeyboardControl : MonoBehaviour, IKeyboardController
+    public class SAMKeyboardControl : KeyboardController
     {
         private ISAMControl _samControl;
-
-        [Tooltip("Set to true to give up control to ROS commands")]
-        public bool letROSTakeTheWheel = true;
 
         public GameObject yawHingeGo;
         public GameObject pitchHingeGo;
@@ -30,12 +22,9 @@ namespace GameUI
         public GameObject lcgGo;
 
         Hinge yaw, pitch;
-        HingeCommand yawCmd, pitchCmd;
         Propeller frontProp, backProp;
-        PropellerCommand frontPropCmd, backPropCmd;
         VBS vbs;
         Prismatic lcg;
-        PercentageCommand vbsCmd, lcgCmd;
 
 
 
@@ -48,41 +37,19 @@ namespace GameUI
 
         public float bothRpms = 0f;
 
-        public void LetROSTakeTheWheel(bool yes)
-        {
-            letROSTakeTheWheel = yes;
-        }
-
-        public bool GetLetROSTakeTheWheel()
-        {
-            return letROSTakeTheWheel;
-        }
-
         private void Awake()
         {
             _samControl = GetComponentInParent<ISAMControl>();
             yaw = yawHingeGo.GetComponent<Hinge>();
-            yawCmd = yawHingeGo.GetComponent<HingeCommand>();
             pitch = pitchHingeGo.GetComponent<Hinge>();
-            pitchCmd = pitchHingeGo.GetComponent<HingeCommand>();
             frontProp = frontPropGo.GetComponent<Propeller>();
-            frontPropCmd = frontPropGo.GetComponent<PropellerCommand>();
             backProp = backPropGo.GetComponent<Propeller>();
-            backPropCmd = backPropGo.GetComponent<PropellerCommand>();
             vbs = vbsGo.GetComponent<VBS>();
-            vbsCmd = vbsGo.GetComponent<PercentageCommand>();
             lcg = lcgGo.GetComponent<Prismatic>();
-            lcgCmd = lcgGo.GetComponent<PercentageCommand>();
         }
 
         private void FixedUpdate()
         {
-            yawCmd.enabled = letROSTakeTheWheel;
-            pitchCmd.enabled = letROSTakeTheWheel;
-            frontPropCmd.enabled = letROSTakeTheWheel;
-            backPropCmd.enabled = letROSTakeTheWheel;
-            vbsCmd.enabled = letROSTakeTheWheel;
-            lcgCmd.enabled = letROSTakeTheWheel;
 
             if (useBothRpms)
             {

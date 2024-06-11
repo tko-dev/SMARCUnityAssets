@@ -10,7 +10,13 @@ using Utils = DefaultNamespace.Utils;
 
 namespace VehicleComponents.ROS.Subscribers
 {
-    public class ActuatorSubscriber<RosMsgType> : MonoBehaviour
+    public abstract class ActuatorSubscriber : MonoBehaviour
+    {
+        // Exists solely to be able to acquire all of these in a list, even though
+        // they might have different ros msg types. So we can mass enable-disable them.
+    }
+
+    public class ActuatorSubscriber<RosMsgType> : ActuatorSubscriber
     where RosMsgType: ROSMessage, new()
     {
         [Header("ROS Subscriber")]
