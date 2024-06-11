@@ -6,14 +6,17 @@ using TMPro;
 
 namespace GameUI
 {
-    [RequireComponent(typeof(TMP_Dropdown))]
     public class DropdownRobotSelector : MonoBehaviour
     {
         TMP_Dropdown dropdown;
-        // Start is called before the first frame update
+        Toggle toggle_rosControl;
+        
+        GameObject selectedRobotRoot;
+        
         void Start()
         {
-            dropdown = GetComponent<TMP_Dropdown>();
+            dropdown = GetComponentInChildren<TMP_Dropdown>();
+            toggle_rosControl = GetComponentInChildren<Toggle>();
             
             // Get all the #robot tagged objects in the scene
             // then we'll use their root name in the list
@@ -22,13 +25,36 @@ namespace GameUI
             {
                 dropdown.options.Add(new TMP_Dropdown.OptionData(){text=robot.transform.root.name});
             }
+
+            selectedRobotRoot = robots[0].transform.root.gameObject;
+            dropdown.value = 0;
+            dropdown.RefreshShownValue();
+            UpdateToggles();
+        }
+
+        void UpdateToggles()
+        {
+            IKeyboardController kbc = selectedRobotRoot.GetComponentInChildren<IKeyboardController>();
+            if(kbc != null)
+            {
+                toggle_rosControl.isOn = kbc.GetLetROSTakeTheWheel();
+            }
         }
 
         public void OnValueChanged(int ddIndex)
         {
             var selection = dropdown.options[ddIndex];
-            GameObject selectedGO = GameObject.Find(selection.text);
+            selectedRobotRoot = GameObject.Find(selection.text);
+            UpdateToggles();
+        }
 
+        public void OnToggleROSControl(bool t)
+        {
+            IKeyboardController kbc = selectedRobotRoot.GetComponentInChildren<IKeyboardController>();
+            if(kbc != null)
+            {
+                kbc.LetROSTakeTheWheel(toggle_rosControl.isOn);
+            }
         }
 
     

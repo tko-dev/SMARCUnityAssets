@@ -9,7 +9,6 @@ using VehicleComponents.Sensors;
 
 namespace GameUI
 {
-    [RequireComponent(typeof(TMP_Dropdown))]
     public class CameraManager : MonoBehaviour
     {
         TMP_Dropdown dropdown;
@@ -19,7 +18,7 @@ namespace GameUI
 
         void Start()
         {
-            dropdown = GetComponent<TMP_Dropdown>();
+            dropdown = GetComponentInChildren<TMP_Dropdown>();
             ddTextToObjectPath = new Dictionary<string, string>();
             // disable all cams except the "main cam" at the start
             Camera[] cams = FindObjectsByType<Camera>(FindObjectsSortMode.None);

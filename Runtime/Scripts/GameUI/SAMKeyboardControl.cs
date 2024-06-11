@@ -12,10 +12,10 @@ using PropellerCommand = VehicleComponents.ROS.Subscribers.PropellerCommand;
 using PercentageCommand = VehicleComponents.ROS.Subscribers.PercentageCommand;
 
 
-namespace DefaultNamespace
+namespace GameUI
 {
     [RequireComponent(typeof(ISAMControl))]
-    public class SAMKeyboardControl : MonoBehaviour
+    public class SAMKeyboardControl : MonoBehaviour, IKeyboardController
     {
         private ISAMControl _samControl;
 
@@ -48,6 +48,15 @@ namespace DefaultNamespace
 
         public float bothRpms = 0f;
 
+        public void LetROSTakeTheWheel(bool yes)
+        {
+            letROSTakeTheWheel = yes;
+        }
+
+        public bool GetLetROSTakeTheWheel()
+        {
+            return letROSTakeTheWheel;
+        }
 
         private void Awake()
         {
