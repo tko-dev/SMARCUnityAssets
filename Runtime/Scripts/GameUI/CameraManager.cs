@@ -34,6 +34,9 @@ namespace GameUI
             }
             currentCam = GameObject.FindGameObjectsWithTag("MainCamera")[0].GetComponent<Camera>();
             currentCam.enabled = true;
+            dropdown.value = 0;
+            dropdown.RefreshShownValue();
+            OnValueChanged(0);
         }
 
         public void OnValueChanged(int ddIndex)
