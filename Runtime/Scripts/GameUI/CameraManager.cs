@@ -12,7 +12,7 @@ namespace GameUI
     public class CameraManager : MonoBehaviour
     {
         TMP_Dropdown dropdown;
-        Camera currentCam;
+        public Camera currentCam;
 
         Dictionary<string, string> ddTextToObjectPath;
 
