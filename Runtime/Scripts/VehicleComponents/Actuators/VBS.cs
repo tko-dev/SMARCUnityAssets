@@ -8,9 +8,9 @@ namespace VehicleComponents.Actuators
 {
     public class VBS : LinkAttachment, IPercentageActuator
     {
-        [Header("VBS")]
-        [Header("VBS")]
-        [Range(0, 100)] public float percentage = 50f;
+        [Header("VBS")] [Header("VBS")] [Range(0, 100)]
+        public float percentage = 50f;
+
         [Range(0, 100)] public float resetValue = 50f;
 
         private float _initialMass;
@@ -38,7 +38,7 @@ namespace VehicleComponents.Actuators
 
         public float GetCurrentValue()
         {
-            return articulationBody.jointPosition[0]; //TODO: REturn as percentage
+            return (1 - (articulationBody.jointPosition[0]-_minimumPos)  / (_maximumPos - _minimumPos)) * 100;
         }
 
         public void FixedUpdate()
