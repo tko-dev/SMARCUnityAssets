@@ -27,6 +27,7 @@ namespace GameUI
         Prismatic lcg;
 
 
+        bool mouseDown = false;
 
 
         public float rollRpms = 0.1f;
@@ -56,6 +57,13 @@ namespace GameUI
                 frontProp.SetRpm(bothRpms);
                 backProp.SetRpm(bothRpms);
             }
+
+            // Ignore inputs while the right mouse
+            // button is held down. Since this is used for camera controls.
+            // There is no "while button down" check, so we DIY.
+            if(Input.GetMouseButtonDown(1)) mouseDown = true;
+            if(Input.GetMouseButtonUp(1)) mouseDown = false;
+            if(mouseDown) return;
 
             if (Input.GetKeyDown("down"))
             {
