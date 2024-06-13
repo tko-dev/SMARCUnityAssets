@@ -13,6 +13,9 @@ namespace VehicleComponents.Actuators
 
         [Range(0, 100)] public float resetValue = 50f;
 
+        public float maxVolume_l = 0.250f;
+        public float density = 997f; //kg/m3
+        
         private float _initialMass;
         private float _maximumPos;
         private float _minimumPos;
@@ -20,8 +23,8 @@ namespace VehicleComponents.Actuators
         public void Start()
         {
             var xDrive = parentArticulationBody.xDrive;
-
-            _initialMass = parentArticulationBody.mass;
+         //   _initialMass = parentArticulationBody.mass;
+            _initialMass = density / 1000 * maxVolume_l;
             _minimumPos = xDrive.upperLimit;
             _maximumPos = xDrive.lowerLimit;
         }
@@ -43,7 +46,7 @@ namespace VehicleComponents.Actuators
 
         public void FixedUpdate()
         {
-            articulationBody.mass = 0.00001f + _initialMass * percentage / 100;
+            articulationBody.mass = 0.00001f + _initialMass * GetCurrentValue() / 100;
             articulationBody.SetDriveTarget(ArticulationDriveAxis.X, Mathf.Lerp(_maximumPos, _minimumPos, percentage / 100));
         }
     }
