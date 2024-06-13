@@ -54,32 +54,32 @@ namespace Importer
             if (collider is BoxCollider)
             {
                 model.colliderType = ColliderType.Box;
-                model.center = ((BoxCollider) collider).center;
-                model.size = ((BoxCollider) collider).size;
+                model.center = ((BoxCollider)collider).center;
+                model.size = ((BoxCollider)collider).size;
             }
 
             if (collider is SphereCollider)
             {
                 model.colliderType = ColliderType.Sphere;
-                model.center = ((SphereCollider) collider).center;
-                model.radius = ((SphereCollider) collider).radius;
+                model.center = ((SphereCollider)collider).center;
+                model.radius = ((SphereCollider)collider).radius;
             }
 
             if (collider is CapsuleCollider)
             {
                 model.colliderType = ColliderType.Capsule;
-                model.center = ((CapsuleCollider) collider).center;
-                model.radius = ((CapsuleCollider) collider).radius;
-                model.height = ((CapsuleCollider) collider).height;
-                model.direction = ((CapsuleCollider) collider).direction;
+                model.center = ((CapsuleCollider)collider).center;
+                model.radius = ((CapsuleCollider)collider).radius;
+                model.height = ((CapsuleCollider)collider).height;
+                model.direction = ((CapsuleCollider)collider).direction;
             }
 
             if (collider is MeshCollider)
             {
                 model.colliderType = ColliderType.Mesh;
-                model.isConvex = ((MeshCollider) collider).convex;
-                model.material = ((MeshCollider) collider).material.name;
-                model.mesh = ((MeshCollider) collider).sharedMesh.name;
+                model.isConvex = ((MeshCollider)collider).convex;
+                model.material = ((MeshCollider)collider).material.name;
+                model.mesh = ((MeshCollider)collider).sharedMesh.name;
             }
 
             return model;
@@ -88,26 +88,28 @@ namespace Importer
         public void LoadOntoObject(GameObject loadedRobot)
         {
             var find = loadedRobot.transform.Find(transformPath);
+            if (find == null) find = loadedRobot.transform.CreatePath(transformPath);
+            
             if (colliderType == ColliderType.Sphere)
             {
                 var collider = find.gameObject.AddComponent(typeof(SphereCollider)) as SphereCollider;
                 collider.center = center;
                 collider.radius = radius;
             }
-            
+
             if (colliderType == ColliderType.Box)
             {
                 var collider = find.gameObject.AddComponent(typeof(BoxCollider)) as BoxCollider;
                 collider.center = center;
                 collider.size = size;
             }
-            
+
             if (colliderType == ColliderType.Capsule)
             {
                 var collider = find.gameObject.AddComponent(typeof(CapsuleCollider)) as CapsuleCollider;
                 collider.center = center;
                 collider.radius = radius;
-                collider.height = radius;
+                collider.height = height;
                 collider.direction = direction;
             }
         }
@@ -140,12 +142,19 @@ namespace Importer
     public class ForcePointModel
     {
         public String transformPath;
+        public Quaternion localRotation;
+        public Vector3 localPosition;
+        public Vector3 localScale;
+        public string volumeObjectTransformPath;
 
         public static ForcePointModel WriteModel(ForcePoint forcePoint, GameObject toStore = null)
         {
             var model = new ForcePointModel();
             model.transformPath = forcePoint.gameObject.transform.GetPath(toStore?.transform);
-
+            model.localPosition = forcePoint.transform.localPosition;
+            model.localRotation = forcePoint.transform.localRotation;
+            model.localScale = forcePoint.transform.localScale;
+            model.volumeObjectTransformPath = forcePoint.volumeObject.transform.GetPath(toStore?.transform);
             return model;
         }
 
@@ -155,8 +164,15 @@ namespace Importer
             if (transform == null)
             {
                 transform = loadedRobot.transform.CreatePath(transformPath);
+                
+                transform.localPosition = localPosition;
+                transform.localRotation = localRotation;
+                transform.localScale = localScale;
             }
-            
+
+            var point = transform.gameObject.AddComponent<ForcePoint>();
+            point.volumeObject = loadedRobot.transform.Find(volumeObjectTransformPath).gameObject;
+            point._body = loadedRobot.transform.Find("base_link").GetComponent<ArticulationBody>();
         }
     }
 

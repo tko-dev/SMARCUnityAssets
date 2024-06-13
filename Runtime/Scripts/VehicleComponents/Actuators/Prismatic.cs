@@ -30,7 +30,7 @@ namespace VehicleComponents.Actuators
 
         public float GetCurrentValue()
         {
-            return percentage;
+            return articulationBody.jointPosition[0];  //TODO: Fix feedback. Percentage.
         }
         
         public void FixedUpdate()

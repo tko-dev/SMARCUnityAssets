@@ -2,34 +2,204 @@
     "urdfFilePath": "./sam_auv.urdf",
     "forcePoints": [
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint"
+            "transformPath": "base_link/ForcePoints/ForcePoint",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": 0.054999999701976779,
+                "y": 0.029999999329447748,
+                "z": 0.5699999928474426
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (5)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (5)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": -0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": 0.5699999928474426
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (1)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (1)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": 0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": 0.30000001192092898
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (6)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (6)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": -0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": 0.30000001192092898
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (2)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (2)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": 0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (7)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (7)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": -0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": 0.0
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (3)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (3)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": 0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": -0.30000001192092898
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (8)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (8)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": -0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": -0.30000001192092898
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (4)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (4)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": 0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": -0.5699999928474426
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         },
         {
-            "transformPath": "base_link/ForcePoints/ForcePoint (9)"
+            "transformPath": "base_link/ForcePoints/ForcePoint (9)",
+            "localRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 1.0
+            },
+            "localPosition": {
+                "x": -0.054999999701976779,
+                "y": 0.029999971389770509,
+                "z": -0.5699999928474426
+            },
+            "localScale": {
+                "x": 0.020145509392023088,
+                "y": 0.010145509615540505,
+                "z": 0.020145509392023088
+            },
+            "volumeObjectTransformPath": "base_link/Visuals/unnamed/SAM_HULL/Brep 3"
         }
     ],
     "colliders": [
@@ -355,7 +525,7 @@
             "direction": 0,
             "isConvex": true,
             "mesh": "Brep",
-            "material": " (Instance)"
+            "material": " (Instance) (Instance)"
         }
     ],
     "articulationModels": [

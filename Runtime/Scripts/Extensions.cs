@@ -48,6 +48,8 @@ namespace DefaultNamespace
             var newObject = new GameObject();
             newObject.name = lastElement;
             newObject.transform.parent = transform;
+            newObject.transform.localPosition = Vector3.zero;
+            newObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
             
             return newObject.transform;
         }
