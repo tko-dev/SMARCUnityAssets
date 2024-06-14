@@ -11,7 +11,7 @@
             },
             "localPosition": {
                 "x": 0.054999999701976779,
-                "y": 0.029999999329447748,
+                "y": 0.0,
                 "z": 0.5699999928474426
             },
             "localScale": {
@@ -31,7 +31,7 @@
             },
             "localPosition": {
                 "x": -0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": 0.5699999928474426
             },
             "localScale": {
@@ -51,7 +51,7 @@
             },
             "localPosition": {
                 "x": 0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": 0.30000001192092898
             },
             "localScale": {
@@ -71,7 +71,7 @@
             },
             "localPosition": {
                 "x": -0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": 0.30000001192092898
             },
             "localScale": {
@@ -91,7 +91,7 @@
             },
             "localPosition": {
                 "x": 0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": 0.0
             },
             "localScale": {
@@ -111,7 +111,7 @@
             },
             "localPosition": {
                 "x": -0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": 0.0
             },
             "localScale": {
@@ -131,7 +131,7 @@
             },
             "localPosition": {
                 "x": 0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": -0.30000001192092898
             },
             "localScale": {
@@ -151,7 +151,7 @@
             },
             "localPosition": {
                 "x": -0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": -0.30000001192092898
             },
             "localScale": {
@@ -171,7 +171,7 @@
             },
             "localPosition": {
                 "x": 0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": -0.5699999928474426
             },
             "localScale": {
@@ -191,7 +191,7 @@
             },
             "localPosition": {
                 "x": -0.054999999701976779,
-                "y": 0.029999971389770509,
+                "y": 0.0,
                 "z": -0.5699999928474426
             },
             "localScale": {
@@ -525,7 +525,7 @@
             "direction": 0,
             "isConvex": true,
             "mesh": "Brep",
-            "material": " (Instance) (Instance)"
+            "material": ""
         }
     ],
     "articulationModels": [
@@ -561,7 +561,7 @@
                 }
             ],
             "linearDamping": 1.0199999809265137,
-            "angularDamping": 2.0,
+            "angularDamping": 1.5,
             "inertiaTensor": {
                 "x": 1.6201999187469483,
                 "y": 1.6201999187469483,
@@ -575,8 +575,8 @@
             },
             "centerOfMass": {
                 "x": 0.0,
-                "y": -0.029999999329447748,
-                "z": -0.01899999938905239
+                "y": -0.014999999664723874,
+                "z": -0.007499999832361937
             },
             "automaticInertiaTensor": false,
             "automaticCenterOfMass": false
@@ -692,8 +692,8 @@
                     "damping": 500.0,
                     "stiffness": 1000.0,
                     "forceLimit": 10.0,
-                    "upperLimit": 0.029999999329447748,
-                    "lowerLimit": -0.029999999329447748,
+                    "upperLimit": 0.05700000002980232,
+                    "lowerLimit": 0.0,
                     "driveType": 0,
                     "axis": 0
                 },
@@ -732,10 +732,10 @@
             "centerOfMass": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.0
+                "z": 0.12115000188350678
             },
             "automaticInertiaTensor": true,
-            "automaticCenterOfMass": true
+            "automaticCenterOfMass": false
         },
         {
             "transformPath": "base_link/camera_front_right_link",
@@ -1105,11 +1105,11 @@
             "transformPath": "base_link/vbs_link",
             "drives": [
                 {
-                    "damping": 500.0,
+                    "damping": 3000.0,
                     "stiffness": 2000.0,
-                    "forceLimit": 10.0,
-                    "upperLimit": 0.0,
-                    "lowerLimit": -0.057999998331069949,
+                    "forceLimit": 5.0,
+                    "upperLimit": 0.05000000074505806,
+                    "lowerLimit": 0.006000000052154064,
                     "driveType": 0,
                     "axis": 0
                 },
@@ -1316,8 +1316,8 @@
                     "damping": 1000.0,
                     "stiffness": 10000.0,
                     "forceLimit": 100.0,
-                    "upperLimit": 11.459156036376954,
-                    "lowerLimit": -11.459156036376954,
+                    "upperLimit": 7.0,
+                    "lowerLimit": -7.0,
                     "driveType": 0,
                     "axis": 0
                 },
@@ -1368,8 +1368,8 @@
                     "damping": 1000.0,
                     "stiffness": 10000.0,
                     "forceLimit": 100.0,
-                    "upperLimit": 11.459156036376954,
-                    "lowerLimit": -11.459156036376954,
+                    "upperLimit": 7.0,
+                    "lowerLimit": -7.0,
                     "driveType": 0,
                     "axis": 0
                 },

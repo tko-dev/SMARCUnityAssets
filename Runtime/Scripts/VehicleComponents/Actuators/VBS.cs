@@ -22,6 +22,7 @@ namespace VehicleComponents.Actuators
 
         public void Start()
         {
+            //TODO: VBS Starts at 5% in the real world.
             var xDrive = parentArticulationBody.xDrive;
          //   _initialMass = parentArticulationBody.mass;
             _initialMass = density / 1000 * maxVolume_l;
@@ -46,7 +47,8 @@ namespace VehicleComponents.Actuators
 
         public void FixedUpdate()
         {
-            articulationBody.mass = 0.00001f + _initialMass * GetCurrentValue() / 100;
+            articulationBody.mass = 0.300f + _initialMass * GetCurrentValue() / 100; // Piston weight + water weight
+            Debug.Log(GetCurrentValue());
             articulationBody.SetDriveTarget(ArticulationDriveAxis.X, Mathf.Lerp(_maximumPos, _minimumPos, percentage / 100));
         }
     }
