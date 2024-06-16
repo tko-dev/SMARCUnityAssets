@@ -5,6 +5,7 @@ using Utils = DefaultNamespace.Utils;
 
 namespace VehicleComponents.Sensors
 {
+    [RequireComponent(typeof(ArticulationBody))]
     public class IMU: Sensor
     {
         // Mostly copied from https://github.com/MARUSimulator/marus-core/blob/21c003a384335777b9d9fb6805eeab1cdb93b2f0/Scripts/Sensors/Primitive/ImuSensor.cs

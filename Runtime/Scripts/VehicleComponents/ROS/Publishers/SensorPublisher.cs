@@ -28,6 +28,8 @@ namespace VehicleComponents.ROS.Publishers
         [Header("ROS Publisher")]
         [Tooltip("The topic will be namespaced under the root objects name if the given topic does not start with '/'.")]
         public string topic;
+        [Tooltip("If true, we will publish regardless, even if the underlying sensor says no data.")]
+        public bool ignoreSensorState = false;
 
 
         void Awake()
@@ -56,7 +58,7 @@ namespace VehicleComponents.ROS.Publishers
             
             // If the underlying sensor does not have new data
             // do not publish anything.
-            if(sensor.HasNewData())
+            if(sensor.HasNewData() || ignoreSensorState)
             {
                 UpdateMessage();
                 ros.Publish(topic, ROSMsg);

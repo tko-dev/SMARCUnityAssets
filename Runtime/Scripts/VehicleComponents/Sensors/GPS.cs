@@ -39,18 +39,20 @@ namespace VehicleComponents.Sensors
 
         }
 
+        public (double, double, double, double) GetUTMLatLon()
+        {
+            return _gpsRef.GetUTMLatLonOfObject(gameObject);
+        }
+
         public override bool UpdateSensor(double deltaTime)
         {
             if(_gpsRef == null) return false;
             if(_waterModel == null) fix = true;
             else fix = transform.position.y > _waterModel.GetWaterLevelAt(transform.position);
 
-            if (fix) 
-            {
-                (easting, northing, lat, lon) = _gpsRef.GetUTMLatLonOfObject(gameObject);
-                return true;
-            } 
-            else return false;
+            if(fix) (easting, northing, lat, lon) = GetUTMLatLon();            
+
+            return fix;
         }
     }
 
