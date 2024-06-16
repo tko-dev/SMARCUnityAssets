@@ -29,10 +29,7 @@ namespace VehicleComponents.Sensors
             {
                 Debug.LogWarning("Found too many GPSReferencePoints in the scene, there should only be one!");
             }
-        }
 
-        void Awake()
-        {
             if(originIsLatLon)
             {
                 var latlon = new Coordinate(lat, lon);
