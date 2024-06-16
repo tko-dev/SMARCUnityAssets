@@ -525,7 +525,7 @@
             "direction": 0,
             "isConvex": true,
             "mesh": "Brep",
-            "material": ""
+            "material": " (Instance) (Instance) (Instance)"
         }
     ],
     "articulationModels": [
@@ -692,8 +692,8 @@
                     "damping": 500.0,
                     "stiffness": 1000.0,
                     "forceLimit": 10.0,
-                    "upperLimit": 0.05700000002980232,
-                    "lowerLimit": 0.0,
+                    "upperLimit": 0.0,
+                    "lowerLimit": -0.05700000002980232,
                     "driveType": 0,
                     "axis": 0
                 },
@@ -1105,7 +1105,7 @@
             "transformPath": "base_link/vbs_link",
             "drives": [
                 {
-                    "damping": 3000.0,
+                    "damping": 6000.0,
                     "stiffness": 2000.0,
                     "forceLimit": 5.0,
                     "upperLimit": 0.05000000074505806,

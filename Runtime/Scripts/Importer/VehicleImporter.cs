@@ -55,14 +55,14 @@ namespace Importer
             saveData.articulationModels.ForEach(model => model.LoadOntoObject(loadedRobot));
             saveData.forcePoints.ForEach(model => model.LoadOntoObject(loadedRobot));
             saveData.colliders.ForEach(model => model.LoadOntoObject(loadedRobot));
-            
+
             odomObject.transform.localPosition = Vector3.zero;
             loadedRobot.transform.localPosition = Vector3.zero;
             loadedRobot.transform.localRotation = Quaternion.Euler(Vector3.zero);
             odomObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
         }
 
-   
+
         public static string ReadFileTextContent(string filename)
         {
             string textContent = "";

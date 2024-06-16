@@ -497,105 +497,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46398bc5d6905ad429a6d2d973afe002, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &404238267517893062
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2612735582382845959}
-  - component: {fileID: 3688420388398686887}
-  - component: {fileID: 3043564853328477985}
-  - component: {fileID: 1637158967418218626}
-  - component: {fileID: 8330292504961017614}
-  m_Layer: 0
-  m_Name: sam_motion_model
-  m_TagString: motion_model
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2612735582382845959
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404238267517893062}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1584968011725696363}
-  m_Father: {fileID: 5884092907814737200}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3688420388398686887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404238267517893062}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f23c38265fa740b193808bc562a9beaf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  letROSTakeTheWheel: 0
-  yawHingeGo: {fileID: 2648042872418929227}
-  pitchHingeGo: {fileID: 2342639975862843077}
-  frontPropGo: {fileID: 3944449903988977280}
-  backPropGo: {fileID: 6939585441773489427}
-  vbsGo: {fileID: 6731814447038354646}
-  lcgGo: {fileID: 3439165739449063850}
-  rollRpms: 100
-  moveRpms: 800
-  useBothRpms: 0
-  bothRpms: 0
---- !u!114 &3043564853328477985
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404238267517893062}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdf8bea3b7874caf9b267db44fe8efa5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseLink: {fileID: 812475576104893903}
-  ThrusterPosition: {x: 0, y: 0, z: -0.73}
---- !u!114 &1637158967418218626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404238267517893062}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 618bab43988449a68c3f88b22fe6d005, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectToSave: {fileID: 0}
---- !u!114 &8330292504961017614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404238267517893062}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 618bab43988449a68c3f88b22fe6d005, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectToSave: {fileID: 0}
 --- !u!1 &642123573740414368
 GameObject:
   m_ObjectHideFlags: 0
@@ -5058,9 +4959,9 @@ ArticulationBody:
   serializedVersion: 5
   m_Mass: 2.7
   m_ParentAnchorPosition: {x: -0.00000002142042, y: 0, z: -0.080000065}
-  m_ParentAnchorRotation: {x: 0, y: -0.7071069, z: 0, w: 0.7071069}
+  m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
-  m_AnchorRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_AnchorRotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
   m_ArticulationJointType: 1
   m_LinearX: 1
@@ -5070,8 +4971,8 @@ ArticulationBody:
   m_SwingZ: 2
   m_Twist: 2
   m_XDrive:
-    lowerLimit: 0
-    upperLimit: 0.057
+    lowerLimit: -0.057
+    upperLimit: 0
     stiffness: 1000
     damping: 500
     forceLimit: 10
@@ -6538,8 +6439,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5884092907814737200}
+  - component: {fileID: 495066721538293359}
   m_Layer: 0
-  m_Name: articulation_sam_not_imported
+  m_Name: articulation_sam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6558,11 +6460,34 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2612735582382845959}
+  - {fileID: 1584968011725696363}
   - {fileID: 6379619070942929917}
   - {fileID: 1711382125502506625}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -20.562, z: 0}
+--- !u!114 &495066721538293359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6882827061601369648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f23c38265fa740b193808bc562a9beaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  letROSTakeTheWheel: 0
+  yawHingeGo: {fileID: 2648042872418929227}
+  pitchHingeGo: {fileID: 2342639975862843077}
+  frontPropGo: {fileID: 3944449903988977280}
+  backPropGo: {fileID: 6939585441773489427}
+  vbsGo: {fileID: 6731814447038354646}
+  lcgGo: {fileID: 3439165739449063850}
+  rollRpms: 100
+  moveRpms: 800
+  useBothRpms: 0
+  bothRpms: 0
 --- !u!1 &7088157191763544699
 GameObject:
   m_ObjectHideFlags: 0
@@ -7859,7 +7784,7 @@ Transform:
   m_Children:
   - {fileID: 3945984921354038131}
   - {fileID: 7524489424037728300}
-  m_Father: {fileID: 2612735582382845959}
+  m_Father: {fileID: 5884092907814737200}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1882690645306636651
 MonoBehaviour:
