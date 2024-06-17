@@ -34,7 +34,7 @@ namespace VehicleComponents.ROS.Publishers
             var gpsRefs = FindObjectsByType<GPSRef>(FindObjectsSortMode.None);
             if(gpsRefs.Length < 1)
             {
-                Debug.LogWarning("No GPS Reference found in the scene. There must be at least one!");
+                Debug.LogWarning("[UTM->Map pub] No GPS Reference found in the scene. There must be at least one!");
             }
             else gpsRef = gpsRefs[0];
         }

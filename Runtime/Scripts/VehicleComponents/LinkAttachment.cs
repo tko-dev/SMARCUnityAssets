@@ -7,8 +7,12 @@ namespace VehicleComponents
 {
     public class LinkAttachment : MonoBehaviour
     {
-        [Header("Link attachment")] [Tooltip("The name of the link the sensor should be attached to.")]
+        [Header("Link attachment")] 
+        [Tooltip("The name of the link the sensor should be attached to.")]
         public string linkName = "";
+
+        [Tooltip("If true, will try on FixedUpdates to attach, if false attach only on Awake")]
+        public bool retryUntilSuccess = true;
 
         [Tooltip("If ROS uses a different camera refenrece frame.")]
         public bool rotateForROSCamera = false;
@@ -22,12 +26,14 @@ namespace VehicleComponents
 
         void Awake()
         {
-            // When the game starts, this object needs to
-            // dig down from the root of the object
-            // until it finds an object with the tag "robot"
-            // This "robot" tagged object is URDF-imported
-            // and includes the link we are looking to attach to
-            // as a child at an arbitrary depth.
+            Attach();
+        }
+
+        void Attach()
+        {
+            // This object needs to dig down from the root
+            // and find an object with the given name to become
+            // a child under.
             attachedLink = Utils.FindDeepChildWithName(transform.root.gameObject, linkName);
             if (attachedLink == null)
             {
@@ -57,9 +63,14 @@ namespace VehicleComponents
 
             transform.SetParent(attachedLink.transform);
 
-            articulationBody = GetComponent<ArticulationBody>();
-            parentArticulationBody = attachedLink.GetComponent<ArticulationBody>();
+            TryGetComponent<ArticulationBody>(out articulationBody);
+            attachedLink.TryGetComponent<ArticulationBody>(out parentArticulationBody);
             if (articulationBody == null) articulationBody = parentArticulationBody;
+        }
+
+        void FixedUpdate()
+        {
+            if(attachedLink == null && retryUntilSuccess) Attach();
         }
 
         void OnDrawGizmosSelected()

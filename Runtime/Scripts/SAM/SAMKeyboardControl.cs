@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using Force;
-using UnityEngine; 
-
+using UnityEngine;
 using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
 using Prismatic = VehicleComponents.Actuators.Prismatic;
-
 using HingeCommand = VehicleComponents.ROS.Subscribers.HingeCommand;
 using PropellerCommand = VehicleComponents.ROS.Subscribers.PropellerCommand;
 using PercentageCommand = VehicleComponents.ROS.Subscribers.PercentageCommand;
@@ -14,7 +12,6 @@ using PercentageCommand = VehicleComponents.ROS.Subscribers.PercentageCommand;
 
 namespace DefaultNamespace
 {
-    [RequireComponent(typeof(ISAMControl))]
     public class SAMKeyboardControl : MonoBehaviour
     {
         private ISAMControl _samControl;
@@ -36,8 +33,6 @@ namespace DefaultNamespace
         VBS vbs;
         Prismatic lcg;
         PercentageCommand vbsCmd, lcgCmd;
-
-
 
 
         public float rollRpms = 0.1f;
@@ -170,7 +165,6 @@ namespace DefaultNamespace
             {
                 lcg.SetPercentage(100f);
             }
-
         }
     }
 }

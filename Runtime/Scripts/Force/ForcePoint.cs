@@ -14,14 +14,9 @@ namespace Force
 {
     public class ForcePoint : MonoBehaviour
     {
-        [FormerlySerializedAs("_rigidbody")] public ArticulationBody _body;
-        private int _pointCount;
-
-        private WaterQueryModel _waterModel;
-
-        public float depthBeforeSubmerged = 1.5f;
-
-        public GameObject motionModel;
+        public ArticulationBody _body;
+        
+        public float depthBeforeSubmerged = 0.03f;
         public bool addGravity = false;
 
         public GameObject volumeObject;
@@ -29,6 +24,9 @@ namespace Force
         public bool automaticCenterOfGravity = false;
         public float volume;
         public float density = 997; // kg/m3
+
+        private int _pointCount;
+        private WaterQueryModel _waterModel;
 
         public void ApplyCurrent(Vector3 current)
         {
@@ -47,9 +45,6 @@ namespace Force
 
         public void Awake()
         {
-            if (motionModel == null) Debug.Log("ForcePoints require a motionModel object with a rigidbody to function!");
-            //_rigidbody = motionModel.GetComponent<Rigidbody>();
-            //  if (_rigidbody == null) _rigidbody = motionModel.transform.parent.GetComponent<Rigidbody>();
             _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
             var forcePoints = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>();
             if (automaticCenterOfGravity)
