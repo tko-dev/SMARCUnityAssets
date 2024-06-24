@@ -13,14 +13,14 @@
 //         public float RPMMax = 1000;
 //         public float RPMToForceMultiplier = 5;
 
-//         private Rigidbody parentRigidBody;
+//         private Articulationbody parentArticulationBody;
 
 //         void Start()
 //         {
-//             parentRigidBody = GetComponentInParent<Rigidbody>();
-//             if (parentRigidBody == null)
+//             parentArticulationBody = GetComponentInParent<Articulationbody>();
+//             if (parentArticulationBody == null)
 //             {
-//                 Debug.LogError("Propeller's parent Rigidbody not found!");
+//                 Debug.LogError("Propeller's parent Articulationbody not found!");
 //             }
 //         }
 
@@ -31,13 +31,13 @@
 
 //         void FixedUpdate()
 //         {
-//             if (parentRigidBody == null) return;
+//             if (parentArticulationBody == null) return;
 
 //             float force = (float)(rpm / 1000 * RPMToForceMultiplier);
 //             int direction = reverse ? -1 : 1;
 //             Vector3 forceVector = direction * force * transform.up;
 
-//             parentRigidBody.AddForceAtPosition(forceVector, transform.position, ForceMode.Force);
+//             parentArticulationBody.AddForceAtPosition(forceVector, transform.position, ForceMode.Force);
 //             Debug
 //         }
 //     }
@@ -58,14 +58,14 @@
 //         public float RPMMax = 10000;
 //         public float RPMToForceMultiplier = 5;
 
-//         private Rigidbody parentRigidBody;
+//         private Articulationbody parentArticulationBody;
 
 //         void Start()
 //         {
-//             parentRigidBody = GetComponentInParent<Rigidbody>();
-//             if (parentRigidBody == null)
+//             parentArticulationBody = GetComponentInParent<Articulationbody>();
+//             if (parentArticulationBody == null)
 //             {
-//                 Debug.LogError("Propeller's parent Rigidbody not found!");
+//                 Debug.LogError("Propeller's parent Articulationbody not found!");
 //                 return;
 //             }
 
@@ -81,13 +81,13 @@
 
 //         void FixedUpdate()
 //         {
-//             if (parentRigidBody == null) return;
+//             if (parentArticulationBody == null) return;
 
 //             float force = (float)(rpm / 1000 * RPMToForceMultiplier);
 //             int direction = reverse ? -1 : 1;
 //             Vector3 forceVector = direction * force * transform.forward;
 
-//             parentRigidBody.AddForceAtPosition(forceVector, transform.position, ForceMode.Force);
+//             parentArticulationBody.AddForceAtPosition(forceVector, transform.position, ForceMode.Force);
 //             Debug.Log($"FixedUpdate called. Current rpm value: {rpm}, Force applied: {forceVector}");
 
 //             // Visualize the applied force
@@ -97,7 +97,7 @@
 //         private void InitializeRPMToStayAfloat()
 //         {
 //             // Calculate the required force to counteract gravity
-//             float requiredForce = parentRigidBody.mass * Physics.gravity.magnitude;
+//             float requiredForce = parentArticulationBody.mass * Physics.gravity.magnitude;
 //             Debug.Log("req force: " + requiredForce );
 
 //             // Calculate the required RPM for each propeller
@@ -121,18 +121,18 @@ namespace VehicleComponents.Actuators
         [Header("DronePropeller")]
         public bool reverse = false;
         public double rpm;
-        public float RPMMax = 10000;
+        public float RPMMax = 100000;
         public float RPMToForceMultiplier = 5;
 
-        private Rigidbody parentRigidBody;
+        private ArticulationBody parentArticulationBody;
         private GameObject propellerModel; // Reference to the propeller model for visual rotation
 
         void Start()
         {
-            parentRigidBody = GetComponentInParent<Rigidbody>();
-            if (parentRigidBody == null)
+            parentArticulationBody = GetComponentInParent<ArticulationBody>();
+            if (parentArticulationBody == null)
             {
-                Debug.LogError("Propeller's parent Rigidbody not found!");
+                Debug.LogError("Propeller's parent ArticulationBody not found!");
                 return;
             }
 
@@ -151,13 +151,13 @@ namespace VehicleComponents.Actuators
 
         void FixedUpdate()
         {
-            if (parentRigidBody == null) return;
+            if (parentArticulationBody == null) return;
 
             float force = (float)(rpm / 1000 * RPMToForceMultiplier);
             int direction = reverse ? -1 : 1;
             Vector3 forceVector = direction * force * transform.forward;
 
-            parentRigidBody.AddForceAtPosition(forceVector, transform.position, ForceMode.Force);
+            parentArticulationBody.AddForceAtPosition(forceVector, transform.position, ForceMode.Force);
             Debug.Log($"FixedUpdate called. Current rpm value: {rpm}, Force applied: {forceVector}");
 
             // Visualize the applied force
@@ -179,8 +179,8 @@ namespace VehicleComponents.Actuators
         private void InitializeRPMToStayAfloat()
         {
             // Calculate the required force to counteract gravity
-            float requiredForce = parentRigidBody.mass * Physics.gravity.magnitude;
-            Debug.Log("Required force to stay afloat: " + requiredForce);
+            float requiredForce = parentArticulationBody.mass * Physics.gravity.magnitude;
+            Debug.Log("Required force to stay afloat: " + parentArticulationBody);
 
             // Calculate the required RPM for each propeller
             float requiredRPM = (requiredForce / (RPMToForceMultiplier * 4)) * 1000;

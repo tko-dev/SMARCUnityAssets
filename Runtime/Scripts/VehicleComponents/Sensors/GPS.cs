@@ -14,6 +14,7 @@ namespace VehicleComponents.Sensors
         public double northing;
         public double lat;
         public double lon;
+        public double alt;
         public bool fix;
 
         private GPSReferencePoint _gpsRef;
@@ -50,7 +51,11 @@ namespace VehicleComponents.Sensors
             if(_waterModel == null) fix = true;
             else fix = transform.position.y > _waterModel.GetWaterLevelAt(transform.position);
 
-            if(fix) (easting, northing, lat, lon) = GetUTMLatLon();            
+            if(fix) 
+            {
+                (easting, northing, lat, lon) = GetUTMLatLon();
+                alt = transform.position.y;
+            }
 
             return fix;
         }

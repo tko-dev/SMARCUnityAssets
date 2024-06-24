@@ -18,6 +18,7 @@ namespace VehicleComponents.ROS.Publishers
                 ROSMsg.status.status = NavSatStatusMsg.STATUS_FIX;
                 ROSMsg.latitude = sensor.lat;
                 ROSMsg.longitude = sensor.lon;
+                ROSMsg.altitude = sensor.alt;
             }
             else ROSMsg.status.status = NavSatStatusMsg.STATUS_NO_FIX;
         }
