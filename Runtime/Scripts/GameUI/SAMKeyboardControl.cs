@@ -8,10 +8,8 @@ using Prismatic = VehicleComponents.Actuators.Prismatic;
 
 namespace GameUI
 {
-    [RequireComponent(typeof(ISAMControl))]
     public class SAMKeyboardControl : KeyboardController
     {
-        private ISAMControl _samControl;
 
         public GameObject yawHingeGo;
         public GameObject pitchHingeGo;
@@ -39,7 +37,6 @@ namespace GameUI
 
         private void Awake()
         {
-            _samControl = GetComponentInParent<ISAMControl>();
             yaw = yawHingeGo.GetComponent<Hinge>();
             pitch = pitchHingeGo.GetComponent<Hinge>();
             frontProp = frontPropGo.GetComponent<Propeller>();
