@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Force;
-using UnityEngine; 
-
+using UnityEngine;
 using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
@@ -154,7 +153,6 @@ namespace GameUI
             {
                 lcg.SetPercentage(100f);
             }
-
         }
     }
 }

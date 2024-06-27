@@ -15,8 +15,8 @@ so that we can generate a concrete urdf file to be imported in Unity-->
       </geometry>
     </visual>
 	<inertial>
-      <origin rpy="0.0 0.0 0.0" xyz="-0.019 0 -0.03"/>
-      <mass value="12.29"/>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.0075 0 -0.015"/>
+      <mass value="12.012"/>
       <inertia ixx="0.0293" ixy="0.0" ixz="0.0" iyy="1.6202" iyz="0.0" izz="1.6202"/>
     </inertial>
   </link>
@@ -68,7 +68,7 @@ so that we can generate a concrete urdf file to be imported in Unity-->
   </link>
   <link name="battery_link">
 	<inertial>
-      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.12115 0.0 0.0"/>
         <mass value="2.7"/>
       <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
     </inertial>
@@ -118,7 +118,7 @@ so that we can generate a concrete urdf file to be imported in Unity-->
   <link name="vbs_link">
 	<inertial>
       <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
-      <mass value="0.300"/>
+      <mass value="0.24925"/>
 	  <inertia ixx="0.0293" ixy="0.0" ixz="0.0" iyy="1.6202" iyz="0.0" izz="1.6202"/>
     </inertial>
   </link>
@@ -259,16 +259,16 @@ so that we can generate a concrete urdf file to be imported in Unity-->
   <joint name="lcg_joint" type="prismatic">
     <parent link="base_link"/>
     <child link="battery_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.083 0.0 0.0"/>
-    <axis xyz="1 0 0"/>
-    <limit effort="1.0" lower="-0.030" upper="0.030" velocity="0.2"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.08 0.0 0.0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1.0" lower="0" upper="0.057" velocity="0.2"/>
   </joint>
     <joint name="vbs_joint" type="prismatic">
     <parent link="base_link"/>
     <child link="vbs_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="-0.245 0 -0.012"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.273 0 -0.0125"/>
     <axis xyz="1 0 0"/>
-    <limit effort="1.0" lower="-0.058" upper="0" velocity="0.2"/>
+    <limit effort="1.0" lower="0.006" upper="0.05" velocity="0.2"/>
   </joint>
   <joint name="tcg_joint1" type="revolute">
     <parent link="base_link"/>

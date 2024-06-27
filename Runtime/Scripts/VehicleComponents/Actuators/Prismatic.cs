@@ -30,7 +30,7 @@ namespace VehicleComponents.Actuators
 
         public float GetCurrentValue()
         {
-            return percentage;
+            return (1 - (articulationBody.jointPosition[0]-_minimumPos) / (_maximumPos - _minimumPos)) * 100; 
         }
         
         public void FixedUpdate()
