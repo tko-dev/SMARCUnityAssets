@@ -8311,6 +8311,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SAMSensors
       objectReference: {fileID: 0}
+    - target: {fileID: 2492340823237382355, guid: eed1d2ed1b093f5a6ab21512c8cefe12, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7714421906245486986, guid: eed1d2ed1b093f5a6ab21512c8cefe12, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
