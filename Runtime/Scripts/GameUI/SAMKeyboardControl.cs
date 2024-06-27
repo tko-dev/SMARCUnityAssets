@@ -5,19 +5,11 @@ using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
 using Prismatic = VehicleComponents.Actuators.Prismatic;
-using HingeCommand = VehicleComponents.ROS.Subscribers.HingeCommand;
-using PropellerCommand = VehicleComponents.ROS.Subscribers.PropellerCommand;
-using PercentageCommand = VehicleComponents.ROS.Subscribers.PercentageCommand;
 
-
-namespace DefaultNamespace
+namespace GameUI
 {
-    public class SAMKeyboardControl : MonoBehaviour
+    public class SAMKeyboardControl : KeyboardController
     {
-        private ISAMControl _samControl;
-
-        [Tooltip("Set to true to give up control to ROS commands")]
-        public bool letROSTakeTheWheel = true;
 
         public GameObject yawHingeGo;
         public GameObject pitchHingeGo;
@@ -27,12 +19,12 @@ namespace DefaultNamespace
         public GameObject lcgGo;
 
         Hinge yaw, pitch;
-        HingeCommand yawCmd, pitchCmd;
         Propeller frontProp, backProp;
-        PropellerCommand frontPropCmd, backPropCmd;
         VBS vbs;
         Prismatic lcg;
-        PercentageCommand vbsCmd, lcgCmd;
+
+
+        bool mouseDown = false;
 
 
         public float rollRpms = 0.1f;
@@ -43,38 +35,31 @@ namespace DefaultNamespace
 
         public float bothRpms = 0f;
 
-
         private void Awake()
         {
-            _samControl = GetComponentInParent<ISAMControl>();
             yaw = yawHingeGo.GetComponent<Hinge>();
-            yawCmd = yawHingeGo.GetComponent<HingeCommand>();
             pitch = pitchHingeGo.GetComponent<Hinge>();
-            pitchCmd = pitchHingeGo.GetComponent<HingeCommand>();
             frontProp = frontPropGo.GetComponent<Propeller>();
-            frontPropCmd = frontPropGo.GetComponent<PropellerCommand>();
             backProp = backPropGo.GetComponent<Propeller>();
-            backPropCmd = backPropGo.GetComponent<PropellerCommand>();
             vbs = vbsGo.GetComponent<VBS>();
-            vbsCmd = vbsGo.GetComponent<PercentageCommand>();
             lcg = lcgGo.GetComponent<Prismatic>();
-            lcgCmd = lcgGo.GetComponent<PercentageCommand>();
         }
 
         private void FixedUpdate()
         {
-            yawCmd.enabled = letROSTakeTheWheel;
-            pitchCmd.enabled = letROSTakeTheWheel;
-            frontPropCmd.enabled = letROSTakeTheWheel;
-            backPropCmd.enabled = letROSTakeTheWheel;
-            vbsCmd.enabled = letROSTakeTheWheel;
-            lcgCmd.enabled = letROSTakeTheWheel;
 
             if (useBothRpms)
             {
                 frontProp.SetRpm(bothRpms);
                 backProp.SetRpm(bothRpms);
             }
+
+            // Ignore inputs while the right mouse
+            // button is held down. Since this is used for camera controls.
+            // There is no "while button down" check, so we DIY.
+            if(Input.GetMouseButtonDown(1)) mouseDown = true;
+            if(Input.GetMouseButtonUp(1)) mouseDown = false;
+            if(mouseDown) return;
 
             if (Input.GetKeyDown("down"))
             {
