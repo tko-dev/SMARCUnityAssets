@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 1267488449559438}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.124, y: 0, z: 0}
+  m_LocalPosition: {x: 0.315, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -112,6 +112,7 @@ MonoBehaviour:
   RPMToForceMultiplier: 5
   c_tau_f: 0.08004
   torque_up: 1
+  baseLinkArticulationBody: {fileID: 0}
 --- !u!114 &7393092729205747640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,7 +174,6 @@ Transform:
   m_Children:
   - {fileID: 4907183174741664}
   - {fileID: 4678159799818649431}
-  - {fileID: 8536244724804241659}
   - {fileID: 8597457138550415401}
   - {fileID: 6650294322077738963}
   - {fileID: 3051417882854025666}
@@ -528,7 +528,7 @@ Transform:
   m_GameObject: {fileID: 1840569289547034}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: 0, z: -0.124}
+  m_LocalPosition: {x: 0, y: 0, z: -0.315}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -610,6 +610,7 @@ MonoBehaviour:
   RPMToForceMultiplier: 5
   c_tau_f: 0.08004
   torque_up: 0
+  baseLinkArticulationBody: {fileID: 0}
 --- !u!114 &1625002166874355300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -669,7 +670,7 @@ Transform:
   m_GameObject: {fileID: 1941850069509544}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: 0, z: 0.124}
+  m_LocalPosition: {x: 0, y: 0, z: 0.315}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -751,6 +752,7 @@ MonoBehaviour:
   RPMToForceMultiplier: 5
   c_tau_f: 0.08004
   torque_up: 0
+  baseLinkArticulationBody: {fileID: 0}
 --- !u!114 &6856956685784002446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,7 +908,7 @@ Transform:
   m_GameObject: {fileID: 1971563020570084}
   serializedVersion: 2
   m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: -0.14, y: 0, z: 0}
+  m_LocalPosition: {x: -0.315, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -988,6 +990,7 @@ MonoBehaviour:
   RPMToForceMultiplier: 5
   c_tau_f: 0.08004
   torque_up: 1
+  baseLinkArticulationBody: {fileID: 0}
 --- !u!114 &405071742256551103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1121,7 +1124,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0, y: 0, z: 0.31500244}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: 0.315}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -1469,6 +1472,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8536244724804241659}
   - {fileID: 4791118420013144}
   - {fileID: 9196475552479073047}
   - {fileID: 3449743509925043727}
@@ -1592,7 +1596,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4800906380731054}
+  m_Father: {fileID: 3051417882854025666}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7607660689778852157
 MonoBehaviour:
@@ -2389,7 +2393,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.31500244}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.315}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -3738,7 +3742,6 @@ GameObject:
   - component: {fileID: 6891795575672521874}
   - component: {fileID: 8518179876847966199}
   - component: {fileID: 514689224194091581}
-  - component: {fileID: 2658037704229697307}
   m_Layer: 0
   m_Name: GPS
   m_TagString: Untagged
@@ -3880,20 +3883,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   topic: /drone/gps
   ignoreSensorState: 0
---- !u!114 &2658037704229697307
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8448910502640532496}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94540d6d3830491839a5c41ee5a942f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  topicName: /articulation_body/velocity
-  publishFrequency: 10
 --- !u!1 &8734656206787643278
 GameObject:
   m_ObjectHideFlags: 0
