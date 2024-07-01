@@ -8,7 +8,8 @@
         "Unity.Burst",
         "Unity.Robotics.ROSTCPConnector.Messages",
         "Unity.Robotics.ROSTCPConnector.MessageGeneration",
-        "Unity.Robotics.UrdfImporter"
+        "Unity.Robotics.UrdfImporter",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
