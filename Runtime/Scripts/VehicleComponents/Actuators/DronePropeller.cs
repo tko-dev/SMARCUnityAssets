@@ -506,7 +506,7 @@ namespace VehicleComponents.Actuators
             }
         }
 
-        private void InitializeRPMToStayAfloat()
+        public void InitializeRPMToStayAfloat()
         {
             // Calculate the required force to counteract gravity
             float requiredForce = baseLinkArticulationBody.mass * Physics.gravity.magnitude;
