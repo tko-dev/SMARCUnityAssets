@@ -17,7 +17,6 @@ public class TwistSubscriber : MonoBehaviour
     
     private Transform gpsLink;
     private ROSConnection ros;
-
     private Vector3 latestForce;
     private Vector3 latestTorque;
     private bool receivedMessage = false;
@@ -25,7 +24,7 @@ public class TwistSubscriber : MonoBehaviour
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
-        ros.Subscribe<TwistMsg>(topicName, ApplyTwistMessage);
+        ros.Subscribe<WrenchMsg>(topicName, ApplyTwistMessage);
 
         // Find the GPS link transform
         gpsLink = quadrotorBody.transform.Find(gpsLinkName);
@@ -35,13 +34,13 @@ public class TwistSubscriber : MonoBehaviour
         }
     }
 
-    void ApplyTwistMessage(TwistMsg twist)
+    void ApplyTwistMessage(WrenchMsg twist)
     {
         if (quadrotorBody == null || gpsLink == null) return;
 
         // Extract force and torque components from the Twist message
-        Vector3 force = new Vector3((float)twist.linear.x, (float)twist.linear.y, (float)twist.linear.z);
-        Vector3 torque = new Vector3((float)twist.angular.x, (float)twist.angular.y, (float)twist.angular.z);
+        Vector3 force = new Vector3((float)twist.force.x, (float)twist.force.z, (float)twist.force.y);
+        Vector3 torque = new Vector3((float)twist.torque.x, (float)twist.torque.z, (float)twist.torque.y);
 
         // Convert force and torque to local space
         Vector3 localForce = gpsLink.TransformDirection(force);
@@ -52,8 +51,8 @@ public class TwistSubscriber : MonoBehaviour
         quadrotorBody.AddTorque(localTorque, ForceMode.Force);
 
         // Store the latest force and torque for visualization
-        latestForce = localForce;
-        latestTorque = localTorque;
+        latestForce = localForce / localForce.magnitude;
+        latestTorque = localTorque / localTorque.magnitude;
         receivedMessage = true;
     }
 
@@ -62,12 +61,12 @@ public class TwistSubscriber : MonoBehaviour
         if (!receivedMessage || gpsLink == null) return;
 
         Gizmos.color = Color.green;
-        // Draw force vector
+        // Draw force unit vector
         Gizmos.DrawLine(quadrotorBody.transform.position, quadrotorBody.transform.position + latestForce);
         DrawArrow(quadrotorBody.transform.position, quadrotorBody.transform.position + latestForce, Color.green);
 
         Gizmos.color = Color.red;
-        // Draw torque vector
+        // Draw torque unit vector
         Gizmos.DrawLine(quadrotorBody.transform.position, quadrotorBody.transform.position + latestTorque);
         DrawArrow(quadrotorBody.transform.position, quadrotorBody.transform.position + latestTorque, Color.red);
     }
