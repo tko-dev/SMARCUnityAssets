@@ -502,7 +502,7 @@ namespace VehicleComponents.Actuators
                 Debug.Log("trying to rotate at: " + rotationSpeed * 1 * Time.deltaTime);
                 // Visualize the axis of rotation
                 Debug.DrawRay(transform.position, transform.forward, Color.green, 0.1f, false);
-                propellerModel.transform.Rotate(rotationSpeed * 20 * Time.deltaTime * Vector3.forward, Space.Self);
+                propellerModel.transform.Rotate(rotationSpeed * 20 /1000* Time.deltaTime * Vector3.forward, Space.Self);
             }
         }
 
