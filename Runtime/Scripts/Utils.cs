@@ -2,6 +2,7 @@
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace DefaultNamespace
@@ -141,6 +142,36 @@ namespace DefaultNamespace
             }
             Debug.Log("Going up a level");
             return FindParentWithTag(parent_tf.gameObject, tag, returnTopLevel);
+        }
+
+        public static string GetGameObjectPath(GameObject obj)
+        {
+            string path = "/" + obj.name;
+            while (obj.transform.parent != null)
+            {
+                obj = obj.transform.parent.gameObject;
+                path = "/" + obj.name + path;
+            }
+            return path;
+        }
+
+        public static Vector2 WorldToCanvasPosition(Canvas canvas, Camera worldCamera, Vector3 worldPosition) 
+        // https://discussions.unity.com/t/how-to-convert-from-world-space-to-canvas-space/117981/18
+        {
+            //Vector position (percentage from 0 to 1) considering camera size.
+            //For example (0,0) is lower left, middle is (0.5,0.5)
+            Vector2 viewportPoint = worldCamera.WorldToViewportPoint(worldPosition);
+
+            var rootCanvasTransform = (canvas.isRootCanvas ? canvas.transform : canvas.rootCanvas.transform) as RectTransform;
+            var rootCanvasSize = rootCanvasTransform!.rect.size;
+            //Calculate position considering our percentage, using our canvas size
+            //So if canvas size is (1100,500), and percentage is (0.5,0.5), current value will be (550,250)
+            var rootCoord = (viewportPoint - rootCanvasTransform.pivot) * rootCanvasSize;
+            if (canvas.isRootCanvas)
+                return rootCoord;
+
+            var rootToWorldPos = rootCanvasTransform.TransformPoint(rootCoord);
+            return canvas.transform.InverseTransformPoint(rootToWorldPos);
         }
 
         

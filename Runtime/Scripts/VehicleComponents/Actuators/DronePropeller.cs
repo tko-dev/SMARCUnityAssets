@@ -501,8 +501,13 @@ namespace VehicleComponents.Actuators
                 float rotationSpeed = (float)rpm * 360.0f / 60.0f; // RPM to degrees per second
                 Debug.Log("trying to rotate at: " + rotationSpeed * 1 * Time.deltaTime);
                 // Visualize the axis of rotation
+<<<<<<< HEAD
                 //Debug.DrawRay(transform.position, transform.forward, Color.green, 0.1f, false);
                 propellerModel.transform.Rotate(direction * rotationSpeed * 20/2000 * Time.deltaTime * Vector3.forward, Space.Self);
+=======
+                Debug.DrawRay(transform.position, transform.forward, Color.green, 0.1f, false);
+                propellerModel.transform.Rotate(rotationSpeed * 20 /1000* Time.deltaTime * Vector3.forward, Space.Self);
+>>>>>>> 5563017984de50dfcef3c42ab48885cded400323
             }
         }
 
