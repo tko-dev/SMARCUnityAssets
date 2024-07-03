@@ -491,18 +491,18 @@ namespace VehicleComponents.Actuators
             parentArticulationBody.AddTorque(torqueVector, ForceMode.Force);
 
             // Rotate the propeller model based on RPM
-            RotatePropeller();
+            RotatePropeller(torque_sign);
         }
 
-        private void RotatePropeller()
+        private void RotatePropeller(int direction)
         {
             if (propellerModel != null)
             {
                 float rotationSpeed = (float)rpm * 360.0f / 60.0f; // RPM to degrees per second
                 Debug.Log("trying to rotate at: " + rotationSpeed * 1 * Time.deltaTime);
                 // Visualize the axis of rotation
-                Debug.DrawRay(transform.position, transform.forward, Color.green, 0.1f, false);
-                propellerModel.transform.Rotate(rotationSpeed * 20 * Time.deltaTime * Vector3.forward, Space.Self);
+                //Debug.DrawRay(transform.position, transform.forward, Color.green, 0.1f, false);
+                propellerModel.transform.Rotate(direction * rotationSpeed * 20/2000 * Time.deltaTime * Vector3.forward, Space.Self);
             }
         }
 
