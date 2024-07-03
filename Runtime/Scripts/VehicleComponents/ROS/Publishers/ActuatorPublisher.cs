@@ -11,8 +11,6 @@ namespace VehicleComponents.ROS.Publishers
         where RosMsgType: ROSMessage, new()
     {
         ROSConnection ros;
-        float frequency = 10f;
-        float period => 1.0f/frequency;
         double lastTime;
 
         // Subclasses should be able to access the
@@ -22,7 +20,17 @@ namespace VehicleComponents.ROS.Publishers
         [Header("ROS Publisher")]
         [Tooltip("The topic will be namespaced under the root objects name if the given topic does not start with '/'.")]
         public string topic;
+        public float frequency = 10f;
+        float period => 1.0f/frequency;
 
+        void OnValidate()
+        {
+            if(period < Time.fixedDeltaTime)
+            {
+                Debug.LogWarning($"Actuator publish frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting actuator period to Unity's fixedDeltaTime!");
+                frequency = 1f/Time.fixedDeltaTime;
+            }
+        }
 
         void Awake()
         {
