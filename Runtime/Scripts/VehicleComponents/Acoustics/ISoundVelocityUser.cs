@@ -4,6 +4,6 @@ namespace Acoustics
 {
     public interface ISoundVelocityUser
     {
-        public void SetSoundVelocity(double vel);     
+        public void SetSoundVelocity(float vel);     
     }
 }
