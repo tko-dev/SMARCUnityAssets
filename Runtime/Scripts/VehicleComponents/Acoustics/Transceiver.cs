@@ -4,6 +4,7 @@ using UnityEngine;
 
 using Unity.Robotics.Core; //Clock
 using DefaultNamespace.Water; // WaterQueryModel
+using Icosphere = DefaultNamespace.IcoSphere;
 
 namespace Acoustics
 {
@@ -20,6 +21,7 @@ namespace Acoustics
     }
 
 
+    [RequireComponent(typeof(MeshFilter))]
     public class Transceiver : MonoBehaviour, ISoundVelocityUser
     {   
         [Tooltip("Speed of sound underwater, defaults to 1500m/s.")]
@@ -43,7 +45,6 @@ namespace Acoustics
         public bool work=false;
 
 
-
         WaterQueryModel waterModel;
         Transceiver[] allTransceivers;
         
@@ -59,6 +60,8 @@ namespace Acoustics
         {
             allTransceivers = GameObject.FindObjectsByType<Transceiver>(FindObjectsSortMode.None);
             waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+
+            Icosphere.Create(gameObject, 1);
         }
 
         bool FrontSphereCast(Vector3 from, Vector3 to, out RaycastHit hit, float maxDist = Mathf.Infinity)
