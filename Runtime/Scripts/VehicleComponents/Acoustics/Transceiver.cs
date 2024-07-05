@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Unity.Robotics.Core; //Clock
+using DefaultNamespace.Water; // WaterQueryModel
 
 namespace Acoustics
 {
@@ -27,52 +28,25 @@ namespace Acoustics
         [Tooltip("Maximum range of this transceiver for broadcasting.")]
         public float MaxRange = 100;
         
-        [Tooltip("Min radius of the channel. Think of a tube between transceivers free of obstacles. How big should it be to transmit?")]
-        public float MinGap = 0.2f;
-        
-        // [Tooltip("Max radius we will consider before we say the channel is completely unobstructed.")]
-        // public float MaxGap = 10f;
-        
-        // [Tooltip("Radius search steps. If too small, you will get a warning about number of steps being too high!")]
-        // public int GapStep = 2;
-        // public int CastCount => (int)((MaxGap-MinGap)/GapStep);
+        [Tooltip("Min radius of the unoccupied channel. Think of a tube between transceivers free of obstacles. How big should it be to transmit?")]
+        public float MinChannelRadius = 0.2f;
+
 
         [Tooltip("Should there be secondary messages received depending on the channel shape?")]
         public bool EnableEchoing = true;
-
-        // [Tooltip("How likely an echo will happen if the unobstructed channel length and radius are equal?")]
-        // [Range(0f,1f)]
-        // public float EchoProbIfSquareChannel = 0.1f;
 
         [Tooltip("If an echo happens, how much distance can that echo travel in total compared to max range?")]
         [Range(0f,1f)]
         public float RangeLossRatioOnEcho = 0.5f;
 
         public bool DrawSignalLines = true;
-
-
-        Transceiver[] allTransceivers;
-
         public bool work=false;
 
-        void OnValidate()
-        {
-            if(CastCount > 10)
-            {
-                Debug.LogWarning($"You have set a transceiver to check {CastCount}>10 different radii every ping. This might be very slow!");
-            }
-            if(MinGap > MaxGap)
-            {
-                Debug.LogWarning($"MinGap must be >= MaxGap. Setting equal.");
-                MinGap = MaxGap;
-            }
-            if(GapStep <= 0)
-            {
-                Debug.LogWarning($"GapStep must be > 0. Setting to 1.");
-                GapStep = 1;
-            }
-        }
 
+
+        WaterQueryModel waterModel;
+        Transceiver[] allTransceivers;
+        
 
         public void SetSoundVelocity(float vel)
         {
@@ -84,41 +58,135 @@ namespace Acoustics
         void Start()
         {
             allTransceivers = GameObject.FindObjectsByType<Transceiver>(FindObjectsSortMode.None);
+            waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
         }
 
-        float FindGapToOtherTx(Transceiver tx)
+        bool FrontSphereCast(Vector3 from, Vector3 to, out RaycastHit hit, float maxDist = Mathf.Infinity)
         {
-            Vector3 selfPos = transform.position;
-            Vector3 otherPos = tx.transform.position;
-            Vector3 posDiffVec = otherPos-selfPos;
+            // SphereCast puts the center of the sphere at the start position
+            // but want it to start/end a channel-radius away to avoid hitting things
+            // that are behind the source/target
+            Vector3 posDiffVec = to-from;
+            float dist = posDiffVec.magnitude;
+            Vector3 direction = posDiffVec.normalized;
+            Vector3 startPos = from + MinChannelRadius * direction;
+            float castDist = Mathf.Min(maxDist, dist) - MinChannelRadius;
+            return Physics.SphereCast(startPos, MinChannelRadius, direction, out hit, castDist);
+        }
 
-            // no need to cast further than point to point distance
-            var dist = posDiffVec.magnitude;
-            float sphereRadius = MinGap;
-            float foundGap = -1;
-            // maybe do a binary search for the max gap? probably overkill :D
-            for(; sphereRadius < MaxGap; sphereRadius += GapStep)
+
+        void TransmitDirectPath(DataPacket data, Transceiver tx)
+        {
+            RaycastHit hit;
+            if(FrontSphereCast(transform.position, tx.transform.position, out hit))
             {
-                // spherecast uses the center of the sphere, we want the tip
-                // otherwise things BEHIND the target point are picked up too.
-                // so we reduce max range by radius and start radius away towards the target
-                var direction = posDiffVec.normalized;
-                var startPos = selfPos + sphereRadius*direction;
-                RaycastHit hit;
-                if(Physics.SphereCast(startPos, sphereRadius, direction, out hit, dist-sphereRadius))
+                // There is no open corridor of given radius between objects.
+                if(DrawSignalLines)
                 {
-                    // There is no open corridor of given radius between objects.
-                    // no need to search wider
-                    // Debug.DrawLine(startPos, hit.point, Color.red, 1);
-                    break;
+                    Debug.DrawLine(transform.position, hit.point, Color.red, 1);
                 }
-                foundGap = sphereRadius;
+                return;
             }
-            return foundGap;
+            else
+            {
+                // There is an unobstructed corridor
+                float delay = Vector3.Distance(transform.position, tx.transform.position) / SoundVelocity;
+                StartCoroutine(TransmitWithDelay(data, tx, delay));
+                if(DrawSignalLines)
+                {
+                    Debug.DrawLine(transform.position, tx.transform.position, Color.green, 1);
+                }
+            }
+        }
+
+        void TransmitSurfaceEcho(DataPacket data, Transceiver tx)
+        {
+            // To create an echo from the water surface, we need to
+            // find out _where_ on the surface the refleciton would occur.
+            // To do this efficiently
+            // - we assume the surface is flat
+            // - reflect the transmitter around the flat plane
+            // -- send a raycast from the reflection towards the target
+            // -- ignore the hits on the water surface
+            // -- if there are no other hits, the water has reflected the signal
+            // - use the hit on the water surface to find the distance the signal travels
+            // etc.
+            float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
+            Vector3 selfPos = transform.position;
+            Vector3 selfReflectionPos = new Vector3(
+                selfPos.x,
+                -selfPos.y + waterSurfaceLevel,
+                selfPos.z
+            );
+
+            Vector3 targetPos = tx.transform.position;
+
+            RaycastHit surfaceHit;
+            if(!Physics.Raycast(selfReflectionPos, targetPos-selfReflectionPos, out surfaceHit, MaxRange))
+            {
+                // the water surface is too far to bounce
+                return;
+            }
+
+            Collider waterCollider = waterModel.GetComponent<Collider>();
+            
+            // found the point on the surface where the echo will happen
+            // now we check from source to surface
+
+            RaycastHit sourceToSurfaceHit;
+            float remainingRange = MaxRange;
+            if(FrontSphereCast(selfPos, surfaceHit.point, out sourceToSurfaceHit, remainingRange))
+            {
+                // there is a hit, but is it just the water?
+                
+                if(sourceToSurfaceHit.colliderInstanceID != waterCollider.GetInstanceID())
+                {
+                    // its not the water. no echo
+                    if(DrawSignalLines) Debug.DrawLine(selfPos, sourceToSurfaceHit.point, Color.red, 1);
+                    return;
+                }
+            } 
+            if(DrawSignalLines) Debug.DrawLine(selfPos, surfaceHit.point, Color.green, 1);
+
+            // either its water, or there's nothing in the way,
+            // source can reach surface, can the surface reach target?
+
+            // reduce availble range due to bounce.
+            remainingRange = (remainingRange-sourceToSurfaceHit.distance) * RangeLossRatioOnEcho;
+            RaycastHit surfaceToTargetHit;
+            if(FrontSphereCast(surfaceHit.point, tx.transform.position, out surfaceToTargetHit, remainingRange))
+            {
+                // there is a hit, check if water again
+                if(surfaceToTargetHit.colliderInstanceID != waterCollider.GetInstanceID())
+                {
+                    // its not the water. no echo
+                    if(DrawSignalLines) Debug.DrawLine(surfaceHit.point, surfaceToTargetHit.point, Color.red, 1);
+                    return;
+                }
+            }
+            if(DrawSignalLines) Debug.DrawLine(surfaceHit.point, targetPos, Color.green, 1);
+            
+            // We got the entire path cleared.
+            // Time to transmit!
+
+            float totalDistanceTraveled = Vector3.Distance(selfPos, surfaceHit.point) + Vector3.Distance(targetPos, surfaceHit.point);
+            float delay = totalDistanceTraveled / SoundVelocity;
+            StartCoroutine(TransmitWithDelay(data, tx, delay));
+
+        }
+
+        void TransmitBottomEcho(DataPacket data, Transceiver tx)
+        {
+
         }
         
         void Broadcast(DataPacket data)
         {
+            // Doesnt work out of water :(
+            float selfWaterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
+            float selfDepth = selfWaterSurfaceLevel - transform.position.y;
+            if(selfDepth < 0) return;
+
             foreach(Transceiver tx in allTransceivers)
             {
                 var id = tx.GetInstanceID();
@@ -127,95 +195,55 @@ namespace Acoustics
                 var dist = Vector3.Distance(transform.position, tx.transform.position);
                 if(dist > MaxRange) continue; // skip too far
 
+                float txWaterSurfaceLevel = waterModel.GetWaterLevelAt(tx.transform.position);
+                float txDepth = txWaterSurfaceLevel - tx.transform.position.y;
+                if(txDepth < 0) return; // skip not-in-water
 
-                float freeRadius = FindGapToOtherTx(tx);
-                if(freeRadius > -1)
+                TransmitDirectPath(data, tx);
+
+                // if an echo is to happen...
+                if(EnableEchoing)
                 {
-                    // There is _some_ gap between the transceivers to send a signal :D
-                    // we want to delay the arrival of the data, so need a thread
-                    // that just sleeps for the duration and then calls the receive function
-                    StartCoroutine(TransmitWithDelay(freeRadius, dist, tx, data));
+                    // Things considered for echo:
+                    // - Do one large sphereCastAll, look at all the normals and decide if any would reflect towards target
+                    // - Do many CastAlls at different radii
+                        // ^ anything with a sphereCast will basically never find a hit such that the normal of the surface
+                        // is perpendicualar to the A-to-B vector precisely because it is a sphere moving along that vector,
+                        // meaning there is exactly one point on that sphere that could hit such a surface.
+                        // Thus sphereCast can never find echo-producing surfaces if it is cast towards the target.
+                    //
+                    // - Shotgun a million rays/spheres
+                        // ^ No need to actually bounce the ray, just finding the normal of the hit is enough to calculate
+                        // if it will bounce towards the target.
+                        // Possibly can be done similar to MBES/SSS in terms of parallelism.
+                        // These pings are way less frequently done than the sensors, but require way more rays due to being 2D rather than 1D.
+                        // However, given that it will still be based on luck (the determinstically cast rays must hit few specific points)
+                        // and that 99% of the time it will be disabled (because most modems already have echo-denial) I will not do this and
+                        // simply approximate the chances of it happening given the unobstructed channel shape.
+                    //
+                    // - Cast ray to surface/bottom
+                        // ^ HDRP surface cant have collider to hit.
+                        // Standard surface is a plane. Use the same plane in all: AcousticReflectorPlane?
+                        // Cheap to calculate the point of inflection and then do a cast to it and from it
+                        // to see if its occluded.
+                        // Bottom is HARD. Cant assume flat, annoying to simplify...
+                    //
+                    // - Combination
+                    // -- Sphere cast in the column towards target to check occlusion only.
+                    // -- Two Casts to/from reflection point on planar surface.
+                    // -- Shotgun rays to bottom and spheres from reflection points towards target
+                    // ^ Doable, accurate enough, accounts for MOST of the reflections. gg.
 
-                    if(DrawSignalLines)
-                    {
-                        // find a color for the channel width/distance ratio because pretty
-                        float green =  freeRadius / (MaxGap - MinGap); // bigger, better
-                        float red = dist / MaxRange; // smaller, better
-                        Color c = new Color(red, green, 0.1f, 1f);
-                        Debug.DrawLine(transform.position, tx.transform.position, c, 1);
-                    }
+                    TransmitSurfaceEcho(data, tx);
+                    TransmitBottomEcho(data, tx);
                 }
             }
         }
 
-        IEnumerator TransmitWithDelay(float channelRadius, float channelLength, Transceiver receiver, DataPacket data)
+        IEnumerator TransmitWithDelay(DataPacket data, Transceiver tx, float delay)
         {
-            // first message arrives directly, and first
-            float delay = channelLength / SoundVelocity;
             yield return new WaitForSeconds(delay);
-            receiver.Receive(data);
-
-            // if an echo is to happen...
-            if(EnableEchoing)
-            {
-                // Things considered for echo:
-                // - Do one large sphereCastAll, look at all the normals and decide if any would reflect towards target
-                // - Do many CastAlls at different radii
-                    // ^ anything with a sphereCast will basically never find a hit such that the normal of the surface
-                    // is perpendicualar to the A-to-B vector precisely because it is a sphere moving along that vector,
-                    // meaning there is exactly one point on that sphere that could hit such a surface.
-                    // Thus sphereCast can never find echo-producing surfaces if it is cast towards the target.
-                //
-                // - Shotgun a million rays/spheres
-                    // ^ No need to actually bounce the ray, just finding the normal of the hit is enough to calculate
-                    // if it will bounce towards the target.
-                    // Possibly can be done similar to MBES/SSS in terms of parallelism.
-                    // These pings are way less frequently done than the sensors, but require way more rays due to being 2D rather than 1D.
-                    // However, given that it will still be based on luck (the determinstically cast rays must hit few specific points)
-                    // and that 99% of the time it will be disabled (because most modems already have echo-denial) I will not do this and
-                    // simply approximate the chances of it happening given the unobstructed channel shape.
-                //
-                // - Cast ray to surface/bottom
-                    // ^ HDRP surface cant have collider to hit.
-                    // Standard surface is a plane. Use the same plane in all: AcousticReflectorPlane?
-                    // Cheap to calculate the point of inflection and then do a cast to it and from it
-                    // to see if its occluded.
-                    // Bottom is HARD. Cant assume flat, annoying to simplify...
-                //
-                // - Combination
-                // -- Sphere cast in the column towards target to check occlusion only.
-                // -- Two Casts to/from reflection point on planar surface.
-                // -- Shotgun rays to bottom and spheres from reflection points towards target
-                // ^ Doable, accurate enough, accounts for MOST of the reflections. gg.
-
-                // First of all, is an echo even feasible given length and radius?
-                // As in, the distance traveled by the (perfect) echo must still be less than MaxRange
-                // An ideal echo happens right in the middle of the channel, so we can do trig to find its
-                // distance traveled.
-                float echoRange = 2 * Mathf.Sqrt(Mathf.Pow(channelLength/2, 2) + Mathf.Pow(channelRadius, 2));
-                if(echoRange <= MaxRange*RangeLossRatioOnEcho)
-                {
-                    // okay, the echo _could_ possibly make it to the target
-                    // how likely is it to happen?
-                    float narrowness = (channelLength/MaxRange) / (channelRadius/MaxGap);
-                    // if its a narrow passage (ratio > 1) more likely than otherwise
-                    // we use a parameter for the probability if it was perfectly square
-                    // and modify that
-                    float echoProb = EchoProbIfSquareChannel * narrowness;
-                    Debug.Log($"l:{channelLength}, r:{channelRadius}, prob:{echoProb}, echoRange:{echoRange}");
-                    Debug.DrawRay(transform.position, Vector3.up * 100* echoProb, new Color(echoProb*10, echoProb*10, echoProb*10, 1), 6000);
-
-                    // a delay has already happened in execution for the primary signal
-                    // so we need to delay _the extra bit_ for the echo
-                    float echoDelay = (echoRange / SoundVelocity) - delay;
-                    if(echoDelay > 0) // impossible, but just in case...
-                    {
-                        yield return new WaitForSeconds(echoDelay);
-                        receiver.Receive(data);
-                    }
-                }
-
-            }
+            tx.Receive(data);
         }
 
         void Receive(DataPacket data)
