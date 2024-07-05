@@ -111,6 +111,9 @@ namespace Acoustics
             // -- if there are no other hits, the water has reflected the signal
             // - use the hit on the water surface to find the distance the signal travels
             // etc.
+
+            // this reflection could be generalized to _any plane_ rather
+            // than the xz-plane we use here with little effort if needed.
             float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
             Vector3 selfPos = transform.position;
             Vector3 selfReflectionPos = new Vector3(
@@ -177,7 +180,22 @@ namespace Acoustics
 
         void TransmitBottomEcho(DataPacket data, Transceiver tx)
         {
+            // bottom is problematic, because we cant in good conciense assume its flat like the surface
+            // thus we use the shotgun approach:
+            // - fire a bunch of rays towards the target and bottom
+            // -- let them reflect once from only the bottom
+            // -- hope one hits the target
+            // -- if it does, transmit
 
+            // any ray that is looking "up" towards
+            // the water surface is a waste, since we handle
+            // both the surface reflections and direct-path 
+            // separately and more efficiently.
+            // so we just need the xz vector out of this:
+            Vector3 toTarget = tx.transform.position - transform.position;
+            toTarget = Vector3.ProjectOnPlane(toTarget, Vector3.up);
+            // now, we can create rays on the sphere-slice where the
+            // surface is relevant
         }
         
         void Broadcast(DataPacket data)
@@ -187,6 +205,7 @@ namespace Acoustics
             float selfDepth = selfWaterSurfaceLevel - transform.position.y;
             if(selfDepth < 0) return;
 
+            // TODO this could be parallelized
             foreach(Transceiver tx in allTransceivers)
             {
                 var id = tx.GetInstanceID();
@@ -197,7 +216,7 @@ namespace Acoustics
 
                 float txWaterSurfaceLevel = waterModel.GetWaterLevelAt(tx.transform.position);
                 float txDepth = txWaterSurfaceLevel - tx.transform.position.y;
-                if(txDepth < 0) return; // skip not-in-water
+                if(txDepth < 0) continue; // skip not-in-water
 
                 TransmitDirectPath(data, tx);
 
@@ -230,7 +249,7 @@ namespace Acoustics
                     //
                     // - Combination
                     // -- Sphere cast in the column towards target to check occlusion only.
-                    // -- Two Casts to/from reflection point on planar surface.
+                    // -- Two Casts to/from reflection point on planar water surface.
                     // -- Shotgun rays to bottom and spheres from reflection points towards target
                     // ^ Doable, accurate enough, accounts for MOST of the reflections. gg.
 
