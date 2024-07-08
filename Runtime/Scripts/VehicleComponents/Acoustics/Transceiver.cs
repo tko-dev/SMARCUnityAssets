@@ -54,6 +54,10 @@ namespace Acoustics
 
         [Tooltip("The tolerance in meters to consider a bottom-echo received. To make up for the fact that we are using rays instead of real sound.")]
         public float BottomEchoTolerance = 1f;
+
+        [Tooltip("Allow multiple echoes from the ground? If true, the first found one will be used. Can improve performance.")]
+        public bool SingleGroundEcho = true;
+
         int terrainColliderID;
 
 
@@ -317,7 +321,7 @@ namespace Acoustics
                 // reflect the ray we sent to the ground around the normal of the ground
                 Vector3 echoDirection = Vector3.Reflect(towardsBottomDirection, groundHit.normal);
                 if(DrawSignalLines) Debug.DrawRay(groundHit.point, 3*groundHit.normal, Color.magenta, 0.1f);
-                
+
                 if(Physics.SphereCast(groundHit.point, MinChannelRadius, echoDirection, out occlusionHit, remainingRangeAfterEcho))
                 {
                     // hit something that isnt the target, abort
@@ -377,6 +381,8 @@ namespace Acoustics
                     Debug.DrawLine(groundHit.point, targetHitPoint, Color.blue, 0.1f);
                 }
 
+                // if we only want _one_ ground echo, we found it. be done, stop casting.
+                if(SingleGroundEcho) return;
 
             }
         }
