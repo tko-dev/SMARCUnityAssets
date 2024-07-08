@@ -412,7 +412,7 @@ namespace VehicleComponents.Actuators
         public double rpm;
         public float RPMMax = 100000;
         public float RPMToForceMultiplier = 5;
-        public float c_tau_f = 8.004e-4f;
+        private float c_tau_f = 8.004e-2f;
         public bool torque_up = true;
         private GameObject propellerModel; // Reference to the propeller model for visual rotation
         [SerializeField] private ArticulationBody baseLinkArticulationBody; // Reference to the base_link ArticulationBody
@@ -482,7 +482,7 @@ namespace VehicleComponents.Actuators
             Debug.Log($"FixedUpdate called. Current rpm value: {rpm}, Force applied: {forceVector}");
 
             // Visualize the applied force
-            Debug.DrawRay(parentArticulationBody.transform.position, forceVector, Color.red, 0.1f, false);
+            Debug.DrawRay(parentArticulationBody.transform.position, ((float)(rpm-2129)/10)*transform.forward, Color.red);
 
             // Apply torque to simulate the propeller's rotation
             int torque_sign = torque_up ? 1 : -1;
