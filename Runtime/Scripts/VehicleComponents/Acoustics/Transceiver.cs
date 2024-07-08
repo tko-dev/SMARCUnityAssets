@@ -49,7 +49,7 @@ namespace Acoustics
         [Range(0,3)]
         public int BottomFiringResolution = 2;
         
-        [Tooltip("The terrain object that we will consider for bottom-echoes")]
+        [Tooltip("The terrain object that we will consider for bottom-echoes. Can be anything with a collider in it.")]
         public GameObject TerrainGO;
 
         [Tooltip("The tolerance in meters to consider a bottom-echo received. To make up for the fact that we are using rays instead of real sound.")]
@@ -84,7 +84,11 @@ namespace Acoustics
                 Debug.LogWarning("Terrain game object not set, trying to find one myself...");
                 TerrainGO = FindObjectsByType<Terrain>(FindObjectsSortMode.None)[0].gameObject;
             }
-            terrainColliderID = TerrainGO.GetComponent<TerrainCollider>().GetInstanceID();
+            terrainColliderID = TerrainGO.GetComponent<Collider>().GetInstanceID();
+            if(terrainColliderID == 0)
+            {
+                Debug.LogWarning("Terrain collider ID is 0, something is wrong!");
+            }
 
             Icosphere.Create(gameObject, BottomFiringResolution);
             // because the icosphre creates 0-centered sphere, we can use the verts as vectors
@@ -287,12 +291,15 @@ namespace Acoustics
                 Vector3 towardsBottomDirection = Quaternion.Euler(0, yawAngle, 0) * bottomFiringVectors[i];
                 // cast towards the ground
                 RaycastHit groundHit;
+                bool hitTheGround = false;
                 if(Physics.SphereCast(transform.position, MinChannelRadius, towardsBottomDirection, out groundHit, MaxRange))
                 {
-                    // check if this is the ground or some other object.
-                    // if its anything but the ground, no reflection
-                    if(groundHit.colliderInstanceID != terrainColliderID) continue;
+                    if(groundHit.colliderInstanceID == terrainColliderID) hitTheGround = true;
                 }
+                // check if this is the ground or some other object.
+                // if its anything but the ground, no reflection
+                if(!hitTheGround) continue;
+
                 // okay, path to ground clear
                 // now reflect it
                 // we do something fun here:
@@ -307,7 +314,10 @@ namespace Acoustics
                 bool hitTarget = false;
                 Vector3 targetHitPoint = Vector3.zero;
                 RaycastHit occlusionHit;
+                // reflect the ray we sent to the ground around the normal of the ground
                 Vector3 echoDirection = Vector3.Reflect(towardsBottomDirection, groundHit.normal);
+                if(DrawSignalLines) Debug.DrawRay(groundHit.point, 3*groundHit.normal, Color.magenta, 0.1f);
+                
                 if(Physics.SphereCast(groundHit.point, MinChannelRadius, echoDirection, out occlusionHit, remainingRangeAfterEcho))
                 {
                     // hit something that isnt the target, abort
@@ -343,15 +353,15 @@ namespace Acoustics
                         }
                     }
                 }
-
+                
                 if(DrawSignalLines)
                 {
                     Color c = Color.red;
                     if(hitTarget) c = Color.blue;
                     Debug.DrawLine(transform.position, groundHit.point, c, 0.1f);
-                    Debug.DrawRay(groundHit.point, 5*echoDirection, Color.white, 0.1f);
+                    Debug.DrawRay(groundHit.point, 5*echoDirection, Color.red, 0.1f);
                 }
-                
+
                 if(!hitTarget) continue;
 
                 // finally:
