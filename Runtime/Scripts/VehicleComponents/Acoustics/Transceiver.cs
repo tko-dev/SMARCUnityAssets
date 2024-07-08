@@ -39,7 +39,26 @@ namespace Acoustics
 
         [Tooltip("If an echo happens, how much distance can that echo travel in total compared to max range?")]
         [Range(0f,1f)]
-        public float RangeLossRatioOnEcho = 0.5f;
+        public float RemainingRangeRatioAfterEcho = 0.5f;
+
+        [Tooltip("Angle in degrees, side-to-side.")]
+        [Range(0f,180f)]
+        public float BottomFiringForwardOpeningAngle = 120;
+        
+        [Tooltip("Resolution of bottom firing. This is an exponent, so 1->2 doubles number of rays, so does 2->3. Can not be changed during play.")]
+        [Range(0,3)]
+        public int BottomFiringResolution = 2;
+        
+        [Tooltip("The terrain object that we will consider for bottom-echoes")]
+        public GameObject TerrainGO;
+
+        [Tooltip("The tolerance in meters to consider a bottom-echo received. To make up for the fact that we are using rays instead of real sound.")]
+        public float BottomEchoTolerance = 1f;
+        int terrainColliderID;
+
+
+        Vector3[] entireSphereVecs;
+        Vector3[] bottomFiringVectors;
 
         public bool DrawSignalLines = true;
         public bool work=false;
@@ -56,12 +75,50 @@ namespace Acoustics
             SoundVelocity = vel;
         }    
 
-        void Start()
+        void Awake()
         {
             allTransceivers = GameObject.FindObjectsByType<Transceiver>(FindObjectsSortMode.None);
             waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+            if(TerrainGO == null)
+            {
+                Debug.LogWarning("Terrain game object not set, trying to find one myself...");
+                TerrainGO = FindObjectsByType<Terrain>(FindObjectsSortMode.None)[0].gameObject;
+            }
+            terrainColliderID = TerrainGO.GetComponent<TerrainCollider>().GetInstanceID();
 
-            Icosphere.Create(gameObject, 1);
+            Icosphere.Create(gameObject, BottomFiringResolution);
+            // because the icosphre creates 0-centered sphere, we can use the verts as vectors
+            entireSphereVecs = GetComponent<MeshFilter>().mesh.vertices;
+            FilterCompleteSphere();
+        }
+
+        void OnValidate()
+        {
+            // so you can play with the opening angle live without doing this every update
+            FilterCompleteSphere(); 
+        }
+
+        void FilterCompleteSphere()
+        {
+            if(entireSphereVecs == null) return;
+
+            var selectedVecs = new List<Vector3>();
+            for (int i = 0; i < entireSphereVecs.Length; i++)
+            {
+                // filter out the ones we wont need for bottom echoes
+                // effectively we want the ones looking downwards and "forward" 
+                // We COULD also do the bottom-echoes not per-target but per-source
+                // effectively firing a larger number of rays to the bottom for _all_ targets
+                // instead of a smaller number of rays for _each_ target. However i feel
+                // that 95% of users will have _maybe_ one or _two_ targets in if any. So
+                // the per-target approach is likely to be more relevant.
+                Vector3 vec = entireSphereVecs[i];
+                if(vec.y > 0) continue; // looking up
+                if(vec.z < 0) continue; // looking backwards
+                if(Vector3.Angle(Vector3.forward, Vector3.ProjectOnPlane(vec, Vector3.up)) > BottomFiringForwardOpeningAngle/2) continue;
+                selectedVecs.Add(vec);
+            }
+            bottomFiringVectors = selectedVecs.ToArray();
         }
 
         bool FrontSphereCast(Vector3 from, Vector3 to, out RaycastHit hit, float maxDist = Mathf.Infinity)
@@ -97,7 +154,7 @@ namespace Acoustics
                 StartCoroutine(TransmitWithDelay(data, tx, delay));
                 if(DrawSignalLines)
                 {
-                    Debug.DrawLine(transform.position, tx.transform.position, Color.green, 1);
+                    Debug.DrawLine(transform.position, tx.transform.position, Color.green, 0.1f);
                 }
             }
         }
@@ -114,10 +171,27 @@ namespace Acoustics
             // -- if there are no other hits, the water has reflected the signal
             // - use the hit on the water surface to find the distance the signal travels
             // etc.
+            //
+            // 
+            //                  X selfReflectionPos
+            //                  |\
+            //                  | \
+            // water plane ~~~~~~~~X~~~~~~~~ X=echoPoint
+            //                  | / \
+            //                  |/   \
+            //          selfPos O     T targetPos 
 
             // this reflection could be generalized to _any plane_ rather
             // than the xz-plane we use here with little effort if needed.
             float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
+
+            // early quit for too-deep-to-reflect-from-surface case
+            // the shortest possible reflection distance is if sound
+            // bounces perpendicular to water and is received by
+            // an acoustically transparent receiver at the surface
+            float selfDepth = waterSurfaceLevel - transform.position.y;
+            if(selfDepth > MaxRange) return; 
+
             Vector3 selfPos = transform.position;
             Vector3 selfReflectionPos = new Vector3(
                 selfPos.x,
@@ -127,55 +201,63 @@ namespace Acoustics
 
             Vector3 targetPos = tx.transform.position;
 
-            RaycastHit surfaceHit;
-            if(!Physics.Raycast(selfReflectionPos, targetPos-selfReflectionPos, out surfaceHit, MaxRange))
+            // check if the total length of the bounced ray would be within range
+            // before we do anything more
+            // for that, we need to know where the bounce happens.
+            // it happens at the intersection of the water plane and reflection-target line
+            Plane waterPlane = new Plane(Vector3.up, new Vector3(0f, waterSurfaceLevel, 0f));
+            float selfToReflectionPointDistance = 0f;
+            float remainingRangeAfterEcho = MaxRange*RemainingRangeRatioAfterEcho - selfToReflectionPointDistance;
+            Ray reflectionToTargetRay = new Ray(selfReflectionPos, targetPos - selfReflectionPos);
+            if(waterPlane.Raycast(reflectionToTargetRay, out selfToReflectionPointDistance))
             {
-                // the water surface is too far to bounce
+                if(selfToReflectionPointDistance > MaxRange) return; // source too far to reflect
+                // re-calc now that we know the distance
+                remainingRangeAfterEcho = MaxRange*RemainingRangeRatioAfterEcho - selfToReflectionPointDistance;
+                if(remainingRangeAfterEcho <= 0) return; // there wouldnt be enough power left after the echo
+            }
+            else
+            {
+                // no intersection means either tx is _on_ the surface or self is on the surface
+                // either way comms break
                 return;
             }
 
-            Collider waterCollider = waterModel.GetComponent<Collider>();
+            // okay, finally we know an echo CAN happen, all distances checked out
+            // now lets find exactly where it will happen so we can
+            // check for occlusions.
+            // we know how far from the reflection point its going to be
+            // and we know its on the vector reflection->target
+            Vector3 echoPoint = reflectionToTargetRay.GetPoint(selfToReflectionPointDistance);
+            // Debug.DrawRay(echoPoint, Vector3.up * 10, Color.magenta, 1);
             
             // found the point on the surface where the echo will happen
-            // now we check from source to surface
+            // now we check from source to surface for occlusions
 
             RaycastHit sourceToSurfaceHit;
-            float remainingRange = MaxRange;
-            if(FrontSphereCast(selfPos, surfaceHit.point, out sourceToSurfaceHit, remainingRange))
+            if(FrontSphereCast(selfPos, echoPoint, out sourceToSurfaceHit, MaxRange))
             {
-                // there is a hit, but is it just the water?
-                
-                if(sourceToSurfaceHit.colliderInstanceID != waterCollider.GetInstanceID())
-                {
-                    // its not the water. no echo
-                    if(DrawSignalLines) Debug.DrawLine(selfPos, sourceToSurfaceHit.point, Color.red, 1);
-                    return;
-                }
+                // there is a hit, no echo
+                if(DrawSignalLines) Debug.DrawLine(selfPos, sourceToSurfaceHit.point, Color.red, 1);
+                return;
             } 
-            if(DrawSignalLines) Debug.DrawLine(selfPos, surfaceHit.point, Color.green, 1);
+            if(DrawSignalLines) Debug.DrawLine(selfPos, echoPoint, Color.green, 0.1f);
 
-            // either its water, or there's nothing in the way,
             // source can reach surface, can the surface reach target?
 
-            // reduce availble range due to bounce.
-            remainingRange = (remainingRange-sourceToSurfaceHit.distance) * RangeLossRatioOnEcho;
             RaycastHit surfaceToTargetHit;
-            if(FrontSphereCast(surfaceHit.point, tx.transform.position, out surfaceToTargetHit, remainingRange))
+            if(FrontSphereCast(echoPoint, tx.transform.position, out surfaceToTargetHit, remainingRangeAfterEcho))
             {
-                // there is a hit, check if water again
-                if(surfaceToTargetHit.colliderInstanceID != waterCollider.GetInstanceID())
-                {
-                    // its not the water. no echo
-                    if(DrawSignalLines) Debug.DrawLine(surfaceHit.point, surfaceToTargetHit.point, Color.red, 1);
-                    return;
-                }
+                // there is a hit, no echo
+                if(DrawSignalLines) Debug.DrawLine(echoPoint, surfaceToTargetHit.point, Color.red, 0.1f);
+                return;
             }
-            if(DrawSignalLines) Debug.DrawLine(surfaceHit.point, targetPos, Color.green, 1);
+            if(DrawSignalLines) Debug.DrawLine(echoPoint, targetPos, Color.green, 0.1f);
             
             // We got the entire path cleared.
             // Time to transmit!
-
-            float totalDistanceTraveled = Vector3.Distance(selfPos, surfaceHit.point) + Vector3.Distance(targetPos, surfaceHit.point);
+            // TODO could also add in receiver pick-up characteristics here!
+            float totalDistanceTraveled = Vector3.Distance(selfPos, echoPoint) + Vector3.Distance(targetPos, echoPoint);
             float delay = totalDistanceTraveled / SoundVelocity;
             StartCoroutine(TransmitWithDelay(data, tx, delay));
 
@@ -190,15 +272,103 @@ namespace Acoustics
             // -- hope one hits the target
             // -- if it does, transmit
 
-            // any ray that is looking "up" towards
-            // the water surface is a waste, since we handle
-            // both the surface reflections and direct-path 
-            // separately and more efficiently.
-            // so we just need the xz vector out of this:
+            // we need to rotate the sphere slice of rays towards the target
             Vector3 toTarget = tx.transform.position - transform.position;
             toTarget = Vector3.ProjectOnPlane(toTarget, Vector3.up);
-            // now, we can create rays on the sphere-slice where the
-            // surface is relevant
+            // our default rays are looking forward on the xz plane
+            float yawAngle = Vector3.SignedAngle(Vector3.forward, toTarget, Vector3.up);
+
+            Vector3 targetPos = tx.transform.position;
+
+            // fire some spheres, pew pew pew
+            // TODO parallelize this like the sensor sonar?
+            for (var i = 0; i < bottomFiringVectors.Length; i++)
+            {
+                Vector3 towardsBottomDirection = Quaternion.Euler(0, yawAngle, 0) * bottomFiringVectors[i];
+                // cast towards the ground
+                RaycastHit groundHit;
+                if(Physics.SphereCast(transform.position, MinChannelRadius, towardsBottomDirection, out groundHit, MaxRange))
+                {
+                    // check if this is the ground or some other object.
+                    // if its anything but the ground, no reflection
+                    if(groundHit.colliderInstanceID != terrainColliderID) continue;
+                }
+                // okay, path to ground clear
+                // now reflect it
+                // we do something fun here:
+                // since the raycasts are a very meh approximation of sound
+                // it is quite unlikely that any of them will ever hit the target.
+                // thus, we cast once for occlusion (small radius) and one for tolerance (big radius, only with target's xz plane)
+                
+                // first reduce range
+                float remainingRangeAfterEcho = MaxRange*RemainingRangeRatioAfterEcho - groundHit.distance;
+                if(remainingRangeAfterEcho <= 0) continue; // echo too weak
+
+                bool hitTarget = false;
+                Vector3 targetHitPoint = Vector3.zero;
+                RaycastHit occlusionHit;
+                Vector3 echoDirection = Vector3.Reflect(towardsBottomDirection, groundHit.normal);
+                if(Physics.SphereCast(groundHit.point, MinChannelRadius, echoDirection, out occlusionHit, remainingRangeAfterEcho))
+                {
+                    // hit something that isnt the target, abort
+                    if(occlusionHit.colliderInstanceID != tx.GetComponent<Collider>().GetInstanceID()) continue;
+                    else
+                    {
+                        targetHitPoint = occlusionHit.point; // if the small one hit the target, we can skip the large spherecast :D
+                        hitTarget = true;
+                    }
+                }
+
+                if(!hitTarget)
+                {
+                    // okay, occlusion is clear, but it didnt hit the target either
+                    // so we cast a ray towards the target's xz-plane to enable some error in reflections
+                    Plane targetPlane = new Plane(Vector3.up, targetPos);
+                    Ray echoRay = new Ray(groundHit.point, echoDirection);
+                    float groundToTargetDistance;
+                    if(targetPlane.Raycast(echoRay, out groundToTargetDistance))
+                    {
+                        // hit the plane!
+                        // get the point
+                        Vector3 targetPlaneHitPoint = echoRay.GetPoint(groundToTargetDistance);
+                        // check its distance to target
+                        // TODO could also use a pick-up pattern of the receiver here... HMM.
+                        float echoDistanceFromTarget = Vector3.Distance(targetPlaneHitPoint, targetPos);
+                        // we "hit" the target
+                        if(echoDistanceFromTarget > BottomEchoTolerance) continue; // not within tolerance, abort this ray
+                        else
+                        {
+                            targetHitPoint = targetPlaneHitPoint;
+                            hitTarget = true;
+                        }
+                    }
+                }
+
+                if(DrawSignalLines)
+                {
+                    Color c = Color.red;
+                    if(hitTarget) c = Color.blue;
+                    Debug.DrawLine(transform.position, groundHit.point, c, 0.1f);
+                    Debug.DrawRay(groundHit.point, 5*echoDirection, Color.white, 0.1f);
+                }
+                
+                if(!hitTarget) continue;
+
+                // finally:
+                // - we have checked occlusion, its clear
+                // - the occlusion ray didnt hit the target, but it got _close enough_
+                // transmit!
+
+                float totalDistanceTraveled = groundHit.distance + Vector3.Distance(groundHit.point, targetPos);
+                float delay = totalDistanceTraveled / SoundVelocity;
+                StartCoroutine(TransmitWithDelay(data, tx, delay));
+                if(DrawSignalLines)
+                {
+                    Debug.DrawLine(groundHit.point, targetHitPoint, Color.blue, 0.1f);
+                }
+
+
+            }
         }
         
         void Broadcast(DataPacket data)
