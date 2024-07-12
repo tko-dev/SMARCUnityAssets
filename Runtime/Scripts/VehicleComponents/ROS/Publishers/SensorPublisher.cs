@@ -31,6 +31,14 @@ namespace VehicleComponents.ROS.Publishers
         [Tooltip("If true, we will publish regardless, even if the underlying sensor says no data.")]
         public bool ignoreSensorState = false;
 
+        void OnValidate()
+        {
+            if(period < Time.fixedDeltaTime)
+            {
+                Debug.LogWarning($"SensorPublisher frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting period to Unity's fixedDeltaTime!");
+                frequency = 1f/Time.fixedDeltaTime;
+            }
+        }
 
         void Awake()
         {
