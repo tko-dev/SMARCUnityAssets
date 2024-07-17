@@ -35,7 +35,7 @@ namespace GameUI
 
         public float bothRpms = 0f;
 
-        private void Awake()
+        void Awake()
         {
             yaw = yawHingeGo.GetComponent<Hinge>();
             pitch = pitchHingeGo.GetComponent<Hinge>();
@@ -45,7 +45,7 @@ namespace GameUI
             lcg = lcgGo.GetComponent<Prismatic>();
         }
 
-        private void FixedUpdate()
+        void Update()
         {
 
             if (useBothRpms)
