@@ -6,17 +6,24 @@ using Unity.Robotics.Core; //Clock
 using DefaultNamespace.Water; // WaterQueryModel
 using Icosphere = DefaultNamespace.IcoSphere;
 
-namespace Acoustics
+namespace VehicleComponents.Acoustics
 {
 
-    public class DataPacket
+    public class StringStamped
     {
         public string Data;
         public double TimeSent;
-        public DataPacket(string data, double timeSent)
+        public double TimeReceived;
+       
+        public StringStamped(string data, double timeSent)
         {
             Data = data;
-            TimeSent = timeSent;
+            this.TimeSent = timeSent;
+        }
+
+        public void Received(double time)
+        {
+            TimeReceived = time;
         }
     }
 
@@ -64,12 +71,18 @@ namespace Acoustics
         Vector3[] entireSphereVecs;
         Vector3[] bottomFiringVectors;
 
+        [Tooltip("Draw debug lines to visualize paths of the signal.")]
         public bool DrawSignalLines = true;
-        public bool work=false;
 
 
         WaterQueryModel waterModel;
         Transceiver[] allTransceivers;
+
+
+        // cant send/receive a million things
+        // in one tick, so we queue them up
+        Queue<string> sendQueue;
+        Queue<StringStamped> receiveQueue;
         
 
         public void SetSoundVelocity(float vel)
@@ -98,6 +111,9 @@ namespace Acoustics
             // because the icosphre creates 0-centered sphere, we can use the verts as vectors
             entireSphereVecs = GetComponent<MeshFilter>().mesh.vertices;
             FilterCompleteSphere();
+
+            sendQueue = new Queue<string>();
+            receiveQueue = new Queue<StringStamped>();
         }
 
         void OnValidate()
@@ -143,31 +159,29 @@ namespace Acoustics
         }
 
 
-        void TransmitDirectPath(DataPacket data, Transceiver tx)
+        void TransmitDirectPath(string data, Transceiver tx)
         {
             RaycastHit hit;
             if(FrontSphereCast(transform.position, tx.transform.position, out hit))
             {
-                // There is no open corridor of given radius between objects.
-                if(DrawSignalLines)
+                // ignore the body that ONLY the target tx is attached to
+                if(hit.transform.root.name != tx.transform.root.name)
                 {
-                    Debug.DrawLine(transform.position, hit.point, Color.red, 1);
+                    // There is no open corridor of given radius between objects.
+                    if(DrawSignalLines) Debug.DrawLine(transform.position, hit.point, Color.red, 1);
+                    return;
                 }
-                return;
+                // we hit the body of the tx, continue with transmission
             }
-            else
-            {
-                // There is an unobstructed corridor
-                float delay = Vector3.Distance(transform.position, tx.transform.position) / SoundVelocity;
-                StartCoroutine(TransmitWithDelay(data, tx, delay));
-                if(DrawSignalLines)
-                {
-                    Debug.DrawLine(transform.position, tx.transform.position, Color.green, 0.1f);
-                }
-            }
+            
+            // There is an unobstructed corridor
+            float delay = Vector3.Distance(transform.position, tx.transform.position) / SoundVelocity;
+            StartCoroutine(TransmitWithDelay(data, tx, delay));
+            if(DrawSignalLines) Debug.DrawLine(transform.position, tx.transform.position, Color.green, 0.1f);
+            
         }
 
-        void TransmitSurfaceEcho(DataPacket data, Transceiver tx)
+        void TransmitSurfaceEcho(string data, Transceiver tx)
         {
             // To create an echo from the water surface, we need to
             // find out _where_ on the surface the refleciton would occur.
@@ -256,9 +270,13 @@ namespace Acoustics
             RaycastHit surfaceToTargetHit;
             if(FrontSphereCast(echoPoint, tx.transform.position, out surfaceToTargetHit, remainingRangeAfterEcho))
             {
-                // there is a hit, no echo
-                if(DrawSignalLines) Debug.DrawLine(echoPoint, surfaceToTargetHit.point, Color.red, 0.1f);
-                return;
+                // ignore the body that ONLY the target tx is attached to
+                if(surfaceToTargetHit.transform.root.name != tx.transform.root.name)
+                {
+                    // there is a hit, no echo
+                    if(DrawSignalLines) Debug.DrawLine(echoPoint, surfaceToTargetHit.point, Color.red, 0.1f);
+                    return;
+                }
             }
             if(DrawSignalLines) Debug.DrawLine(echoPoint, targetPos, Color.green, 0.1f);
             
@@ -271,7 +289,7 @@ namespace Acoustics
 
         }
 
-        void TransmitBottomEcho(DataPacket data, Transceiver tx)
+        void TransmitBottomEcho(string data, Transceiver tx)
         {
             // bottom is problematic, because we cant in good conciense assume its flat like the surface
             // thus we use the shotgun approach:
@@ -325,12 +343,10 @@ namespace Acoustics
                 if(Physics.SphereCast(groundHit.point, MinChannelRadius, echoDirection, out occlusionHit, remainingRangeAfterEcho))
                 {
                     // hit something that isnt the target, abort
-                    if(occlusionHit.colliderInstanceID != tx.GetComponent<Collider>().GetInstanceID()) continue;
-                    else
-                    {
-                        targetHitPoint = occlusionHit.point; // if the small one hit the target, we can skip the large spherecast :D
-                        hitTarget = true;
-                    }
+                    if(occlusionHit.transform.root.name != tx.transform.root.name) continue;
+                    // hit the target tx
+                    targetHitPoint = occlusionHit.point; // if the small one hit the target, we can skip the large spherecast :D
+                    hitTarget = true;
                 }
 
                 if(!hitTarget)
@@ -387,7 +403,7 @@ namespace Acoustics
             }
         }
         
-        void Broadcast(DataPacket data)
+        void Broadcast(string data)
         {
             // Doesnt work out of water :(
             float selfWaterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
@@ -448,24 +464,41 @@ namespace Acoustics
             }
         }
 
-        IEnumerator TransmitWithDelay(DataPacket data, Transceiver tx, float delay)
+        IEnumerator TransmitWithDelay(string data, Transceiver tx, float delay)
         {
+            StringStamped dp = new StringStamped(data, Clock.NowTimeInSeconds);
             yield return new WaitForSeconds(delay);
-            tx.Receive(data);
+            tx.Receive(dp);
         }
 
-        void Receive(DataPacket data)
+        void Receive(StringStamped data)
         {
-            // Debug.Log($"I am {this.GetInstanceID()}, got data:'{data.Data}' at t={data.TimeSent}, delay={Clock.NowTimeInSeconds - data.TimeSent}");
+            data.Received(Clock.NowTimeInSeconds);
+            receiveQueue.Enqueue(data);
         }
 
         void FixedUpdate()
         {
-            if(work)
+            // TODO tie this to some frequency as well.
+            // modems usually have a limit, as a function of
+            // data size
+            if(sendQueue.Count > 0)
             {
-                Broadcast(new DataPacket($"Ping from {this.GetInstanceID()}", Clock.NowTimeInSeconds));
-                // work = false;
+                string data = sendQueue.Dequeue();
+                Broadcast(data);
             }
+        }
+
+        public StringStamped Read()
+        {
+            if(receiveQueue.Count > 0) return receiveQueue.Dequeue();
+            else return null;
+        }
+
+        public void Write(string data)
+        {
+            // TODO limit size? split?
+            sendQueue.Enqueue(data);
         }
 
     }
