@@ -35,6 +35,7 @@ Transform:
   - {fileID: 8625740175431605293}
   - {fileID: 3261409784338774101}
   - {fileID: 1515345754070337021}
+  - {fileID: 5027653057339565069}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1933738784617273911
@@ -84,6 +85,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: back_prop_link
+  retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
@@ -105,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/thruster2_fb
+  frequency: 10
 --- !u!114 &9190152339477900123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,12 +171,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: vbs_link
+  retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
   yaw: 0
   percentage: 50.3
   resetValue: 50
+  maxVolume_l: 0.25
+  density: 997
 --- !u!114 &4532675336326002669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,6 +193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/vbs_fb
+  frequency: 10
 --- !u!114 &2231964782047557348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,6 +257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: front_prop_link
+  retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
@@ -271,6 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/thruster1_fb
+  frequency: 10
 --- !u!114 &8433107569252019721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -334,6 +343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: battery_link
+  retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
@@ -353,6 +363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   topic: core/lcg_fb
+  frequency: 10
 --- !u!114 &8895723212842834944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,6 +426,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: thruster_link
+  retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
@@ -485,6 +497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: thruster_yaw_link
+  retryUntilSuccess: 1
   rotateForROSCamera: 0
   roll: 0
   pitch: 0
@@ -509,3 +522,114 @@ MonoBehaviour:
   resetting: 1
   receivedFrequency: 0
   angleChoice: 1
+--- !u!1 &7554311176727221456
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5027653057339565069}
+  - component: {fileID: 3657685140972750749}
+  - component: {fileID: 5491911011354246064}
+  - component: {fileID: 1016893733898964487}
+  - component: {fileID: 7089654879225866891}
+  - component: {fileID: 4283975466953008098}
+  m_Layer: 0
+  m_Name: AcousticTransceiver
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5027653057339565069
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554311176727221456}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.9040017}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7879141990814986661}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3657685140972750749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554311176727221456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc224755f938807d9f9ef16cbb86d5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linkName: base_link
+  retryUntilSuccess: 1
+  rotateForROSCamera: 0
+  roll: 0
+  pitch: 0
+  yaw: 0
+--- !u!33 &5491911011354246064
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554311176727221456}
+  m_Mesh: {fileID: 0}
+--- !u!114 &1016893733898964487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554311176727221456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b827e4db7977233ec8b401e7ec5942de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundVelocity: 1500
+  MaxRange: 500
+  MinChannelRadius: 0.2
+  EnableEchoing: 1
+  RemainingRangeRatioAfterEcho: 0.5
+  BottomFiringForwardOpeningAngle: 120
+  BottomFiringResolution: 2
+  TerrainGO: {fileID: 0}
+  BottomEchoTolerance: 5
+  SingleGroundEcho: 1
+  DrawSignalLines: 1
+--- !u!114 &7089654879225866891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554311176727221456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 016dbd8ae71b408d6a4f4b8ebf74c512, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: acoustic/write
+--- !u!114 &4283975466953008098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554311176727221456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbf2f27e10a9f2e2996e03f78016f077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: acoustic/read
