@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Acoustics
+namespace VehicleComponents.Acoustics
 {
     public interface ISoundVelocityUser
     {
