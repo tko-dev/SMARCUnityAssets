@@ -15,13 +15,21 @@ namespace Force
     public class ForcePoint : MonoBehaviour
     {
         public ArticulationBody _body;
+
+        public bool drawForces = false;
         
         public float depthBeforeSubmerged = 0.03f;
-        public bool addGravity = false;
+        bool addGravity = false;
 
+        [Tooltip("GameObject that we will calculate the volume of. Set volume below to 0 to use.")]
         public GameObject volumeObject;
+        [Tooltip("If the gameObject above has many meshes, set the one to use for volume calculations here.")]
         public Mesh volumeMesh;
+
+
         public bool automaticCenterOfGravity = false;
+
+        [Tooltip("If not zero, will be used for buoyancy calculations. If zero, the volumeObject/Mesh above will be used to calculate.")]
         public float volume;
         public float density = 997; // kg/m3
 
@@ -66,7 +74,9 @@ namespace Force
             var forcePointPosition = transform.position;
             if (addGravity)
             {
-                _body.AddForceAtPosition(_body.mass * Physics.gravity / _pointCount, forcePointPosition, ForceMode.Force);
+                Vector3 gravityForce = _body.mass * Physics.gravity / _pointCount;
+                _body.AddForceAtPosition(gravityForce, forcePointPosition, ForceMode.Force);
+                if(drawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+gravityForce, Color.red, 0.1f);
             }
 
 
@@ -77,10 +87,12 @@ namespace Force
                 //Apply buoyancy
                 float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged);
 
+                Vector3 buoyancyForce = volume * density * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0);
                 _body.AddForceAtPosition(
-                    volume * density * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0),
+                    buoyancyForce,
                     forcePointPosition,
                     ForceMode.Force);
+                if(drawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+buoyancyForce, Color.blue, 0.1f);
             }
         }
     }
