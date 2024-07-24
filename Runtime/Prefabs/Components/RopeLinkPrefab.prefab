@@ -249,7 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _body: {fileID: 4234441313039161486}
   drawForces: 1
-  depthBeforeSubmerged: 0.005
+  depthBeforeSubmerged: 0.0019999999
   volumeObject: {fileID: 0}
   volumeMesh: {fileID: 0}
   automaticCenterOfGravity: 0
@@ -458,7 +458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _body: {fileID: 4234441313039161486}
   drawForces: 1
-  depthBeforeSubmerged: 0.005
+  depthBeforeSubmerged: 0.0019999999
   volumeObject: {fileID: 0}
   volumeMesh: {fileID: 0}
   automaticCenterOfGravity: 0
@@ -676,6 +676,6 @@ MonoBehaviour:
   RopeLinkPrefab: {fileID: 8527497976637253487}
   RopeDiameter: 0.01
   SegmentLength: 0.1
-  RopeLength: 0.2
-  numSegments: 2
+  RopeLength: 0.3
+  numSegments: 3
   Root: 0

@@ -25,10 +25,9 @@ namespace Rope
 
         [Tooltip("How long the entire rope should be. Rounded to SegmentLength. Ignored if this is not the root of the rope.")]
         public float RopeLength = 1f;
-
         public int numSegments;
 
-        public bool Root = false;
+        GameObject childRope;
 
 
         void OnValidate()
@@ -79,77 +78,32 @@ namespace Rope
             backFP.depthBeforeSubmerged = RopeDiameter/5;
         }
 
-        void Start()
+        public void SpawnRope()
         {
+            SpawnChild(numSegments-1);
+        }
 
-            if(!Root) return; // dont spawn stuff if youre not the root
-
-            GameObject currentTip = gameObject;
-
-            for(int i=0; i < numSegments-1; i++) // -1 because we already have a segment: the root
+        public void DestroyRope()
+        {
+            RopeLink rl;
+            for (var i=transform.childCount-1; i>=0; i--)
             {
-                Debug.Log($"Tip is:{currentTip.name}");
-                // create a new instance of the rope link
-                GameObject newChild = Instantiate(
-                    RopeLinkPrefab,
-                    new Vector3(0, 0, SegmentLength),
-                    Quaternion.identity,
-                    currentTip.transform
-                );
-                newChild.name = $"Link_{i}";
-                foreach (Transform child in newChild.transform)
-                {
-                    Debug.Log($"{newChild}'s child:{child.name}");
-                }
-                Debug.Log($"{newChild}'s parent:{newChild.transform.parent.name}");
-                
-                var rl = newChild.GetComponent<RopeLink>();
-                rl.Root = false;
-                currentTip = newChild;
-                Debug.Log($"New tip is: {currentTip.name}");
+                if (transform.GetChild(i).TryGetComponent<RopeLink>(out rl))
+                    DestroyImmediate(transform.GetChild(i).gameObject);
             }
+        }
 
+        void SpawnChild(int remainingSegments)
+        {
+            if(remainingSegments < 1) return;
+            childRope = Instantiate(RopeLinkPrefab);
+            childRope.transform.SetParent(this.transform);
+            childRope.transform.localPosition = new Vector3(0, 0, SegmentLength);
 
-            // if(RemainingRopeLength <= SegmentLength) return;
-            // if(childSegment != null) return;
+            childRope.name = $"RopeLink_{remainingSegments}";
 
-            // // still got rope to extend, make a child
-            // childSegment = Instantiate(RopeLinkPrefab);
-            // childSegment.transform.SetParent(transform);
-            // childSegment.transform.localPosition = new Vector3(0, 0, SegmentLength);
-            // var childRopeLink = childSegment.GetComponent<RopeLink>();
-            // childRopeLink.RemainingRopeLength = RemainingRopeLength - SegmentLength;
-            // childRopeLink.SegmentLength = SegmentLength;
-            // childRopeLink.RopeDiameter = RopeDiameter;
-            // childSegment.name = $"RopeLink_{childRopeLink.RemainingRopeLength}";
-
-            // // this is the root segment, spawn children
-            // int numSegments = (int)(RemainingRopeLength/SegmentLength);
-            // segments = new Transform[numSegments];
-
-            // for(int i=0; i<numSegments-1; i++) // there is already one segment, the root.
-            // {
-            //     GameObject segment = Instantiate(RopeLinkPrefab);
-            //     RopeLink rl = segment.GetComponent<RopeLink>();
-            //     rl.Root = false;
-            //     segment.name = $"RopeLink_{i+1}";
-            //     segments[i] = segment.transform;
-            // }
-
-            // segments[0].SetParent(this.transform);
-            // Debug.Log($"Setting parent of {segments[0].name} to {this.transform.name}");
-
-            // for(int i=1; i<numSegments-1; i++)
-            // {
-            //     Debug.Log(i);
-            //     var current = segments[i];
-            //     var prev = segments[i-1];
-            //     current.SetParent(prev);
-            //     Debug.Log($"Setting parent of {current.name} to {prev.name}");
-            //     current.localPosition = new Vector3(SegmentLength, 0, 0);
-            // }
-            
-            
+            var rl = childRope.GetComponent<RopeLink>();
+            rl.SpawnChild(remainingSegments-1);
         }
         
     }
