@@ -9,17 +9,17 @@ namespace Editor.Scripts
     [CustomEditor(typeof(RopeLink))]
     public class RopeGeneratorEditor : UnityEditor.Editor
     {
-        RopeLink ropeLink;
+        RopeLink rope;
 
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-            ropeLink = (RopeLink) target;
+            rope = (RopeLink) target;
 
-            if(GUILayout.Button("Generate Rope"))
+            if(GUILayout.Button("(Re)Generate Rope"))
             {
-                ropeLink.DestroyRope();
-                ropeLink.SpawnRope();
+                rope.DestroyRope();
+                rope.SpawnRope();
             }
         }
     }

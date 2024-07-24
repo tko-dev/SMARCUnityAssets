@@ -11,6 +11,8 @@ namespace Rope
     public class RopeLink : MonoBehaviour
     {
         public GameObject RopeLinkPrefab;
+        public GameObject BuoyPrefab;
+
         ArticulationBody body;
         CapsuleCollider capsule;
         SphereCollider frontFP_sphereCollider, backFP_sphereCollider;
@@ -27,13 +29,13 @@ namespace Rope
         public float RopeLength = 1f;
         public int numSegments;
 
-        GameObject childRope;
+        GameObject child;
 
 
         void OnValidate()
         {
             numSegments = (int)(RopeLength / SegmentLength);
-            if(numSegments > 20) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
+            if(numSegments > 30) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
 
             // scale and locate all the little bits and bobs that make up
             // this rope segment depending on the parameters above.
@@ -93,17 +95,34 @@ namespace Rope
             }
         }
 
+        void InstantiateChild(GameObject childPrefab)
+        {
+            child = Instantiate(childPrefab);
+            child.transform.SetParent(this.transform);
+            child.transform.localPosition = new Vector3(0, 0, SegmentLength-RopeDiameter/2);
+            child.transform.rotation = this.transform.rotation;
+        }
+
         void SpawnChild(int remainingSegments)
         {
-            if(remainingSegments < 1) return;
-            childRope = Instantiate(RopeLinkPrefab);
-            childRope.transform.SetParent(this.transform);
-            childRope.transform.localPosition = new Vector3(0, 0, SegmentLength);
+            if(remainingSegments < 1)
+            {
+                // This is the last segment of the rope, spawn a buoy if given
+                if(BuoyPrefab == null) return;
+                InstantiateChild(BuoyPrefab);
+            }
+            else
+            {   
+                // Still got more to spawn
+                InstantiateChild(RopeLinkPrefab);
 
-            childRope.name = $"RopeLink_{remainingSegments}";
+                child.name = $"RopeLink_{remainingSegments}";
 
-            var rl = childRope.GetComponent<RopeLink>();
-            rl.SpawnChild(remainingSegments-1);
+                var rl = child.GetComponent<RopeLink>();
+                rl.SpawnChild(remainingSegments-1);
+                var ab = child.GetComponent<ArticulationBody>();
+                ab.swingZLock = ArticulationDofLock.LockedMotion;
+            }
         }
         
     }
