@@ -22,7 +22,7 @@ namespace VehicleComponents.ROS.Subscribers
         [Header("ROS Subscriber")]
         [Tooltip("The topic will be namespaced under the root objects name if the given topic does not start with '/'.")]
         public string topic;
-        [Tooltip("If the subscription doesn't have data at least this frequently, actuator will be reset.")]
+        [Tooltip("If the subscription doesn't have data at least this frequently, actuator will be reset. Set to < 0 to disable.")]
         public float expectedFrequency = 2f;
 
         public bool resetting = true;
@@ -69,10 +69,18 @@ namespace VehicleComponents.ROS.Subscribers
 
         void FixedUpdate()
         {
-            double deltaTime = Clock.NowTimeInSeconds - lastTime;
-            receivedFrequency = 1.0/deltaTime;
-            if(receivedFrequency < 0) receivedFrequency=0.0;
-            resetting = receivedFrequency < expectedFrequency;
+            if(expectedFrequency > 0)
+            {
+                double deltaTime = Clock.NowTimeInSeconds - lastTime;
+                receivedFrequency = 1.0/deltaTime;
+                if(receivedFrequency < 0) receivedFrequency=0.0;
+                resetting = receivedFrequency < expectedFrequency;
+            }
+            else
+            {
+                resetting = false;
+            }
+            
             UpdateVehicle(resetting);
             
         }
