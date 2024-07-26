@@ -47,9 +47,21 @@ namespace VehicleComponents.Actuators
         public double rpm;
         public float RPMMax = 100000;
         public float RPMToForceMultiplier = 5;
+        
+
+
+
+        [Header("Drone Propeller")]
         [Tooltip("Tick it for Drone and off for SAM/ROV")]
         public bool hoverdefault = true;
+        [Tooltip("should there be a torque")]
+        public bool torque_req = true;
+        [Tooltip("direction of torque")]
+        public bool torque_up = true;
+
         [SerializeField] private ArticulationBody baseLinkArticulationBody;
+        private float c_tau_f = 8.004e-2f;
+        
         
         public void SetRpm(double rpm)
         {
@@ -77,13 +89,23 @@ namespace VehicleComponents.Actuators
         {
             var r = rpm / 1000 * RPMToForceMultiplier;
             if(hoverdefault) Debug.Log("the value of r is: " + r );
-      
+
+            // Visualize the applied force
+            
             int direction = reverse? -1 : 1;
             parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
-            if(hoverdefault) Debug.Log("the torque on propeller is" + parentArticulationBody.GetAccumulatedTorque());
+            
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,
                                                    ForceMode.Force);
+            //manual torqueaddition
+            if  (torque_req)   
+            {
+                int torque_sign = torque_up ? 1 : -1;
+                float torque = torque_sign * c_tau_f * (float)r;
+                Vector3 torqueVector = torque * transform.forward;
+                parentArticulationBody.AddTorque(torqueVector, ForceMode.Force);
+            }
         }
 
         private void InitializeRPMToStayAfloat()

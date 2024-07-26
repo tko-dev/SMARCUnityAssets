@@ -111,6 +111,8 @@ MonoBehaviour:
   RPMMax: 100000
   RPMToForceMultiplier: 5
   hoverdefault: 1
+  torque_req: 1
+  torque_up: 1
   baseLinkArticulationBody: {fileID: 3179540796430959622}
 --- !u!114 &3657326355121176362
 MonoBehaviour:
@@ -709,6 +711,8 @@ MonoBehaviour:
   RPMMax: 100000
   RPMToForceMultiplier: 5
   hoverdefault: 1
+  torque_req: 1
+  torque_up: 0
   baseLinkArticulationBody: {fileID: 3179540796430959622}
 --- !u!114 &7853213438659321280
 MonoBehaviour:
@@ -851,6 +855,8 @@ MonoBehaviour:
   RPMMax: 100000
   RPMToForceMultiplier: 5
   hoverdefault: 1
+  torque_req: 1
+  torque_up: 0
   baseLinkArticulationBody: {fileID: 3179540796430959622}
 --- !u!114 &7651963327394340505
 MonoBehaviour:
@@ -1222,6 +1228,8 @@ MonoBehaviour:
   RPMMax: 100000
   RPMToForceMultiplier: 5
   hoverdefault: 1
+  torque_req: 1
+  torque_up: 1
   baseLinkArticulationBody: {fileID: 3179540796430959622}
 --- !u!114 &2215589600718411196
 MonoBehaviour:
@@ -1362,7 +1370,7 @@ ArticulationBody:
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
-  m_ArticulationJointType: 0
+  m_ArticulationJointType: 2
   m_LinearX: 2
   m_LinearY: 2
   m_LinearZ: 2
@@ -1377,7 +1385,7 @@ ArticulationBody:
     forceLimit: 3.4028235e+38
     target: 0
     targetVelocity: 0
-    driveType: 0
+    driveType: 3
   m_YDrive:
     lowerLimit: 0
     upperLimit: 0
@@ -2201,7 +2209,7 @@ ArticulationBody:
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
-  m_ArticulationJointType: 0
+  m_ArticulationJointType: 2
   m_LinearX: 2
   m_LinearY: 2
   m_LinearZ: 2
@@ -2216,7 +2224,7 @@ ArticulationBody:
     forceLimit: 3.4028235e+38
     target: 0
     targetVelocity: 0
-    driveType: 0
+    driveType: 3
   m_YDrive:
     lowerLimit: 0
     upperLimit: 0
@@ -2819,7 +2827,7 @@ ArticulationBody:
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
-  m_ArticulationJointType: 0
+  m_ArticulationJointType: 2
   m_LinearX: 2
   m_LinearY: 2
   m_LinearZ: 2
@@ -2834,7 +2842,7 @@ ArticulationBody:
     forceLimit: 3.4028235e+38
     target: 0
     targetVelocity: 0
-    driveType: 0
+    driveType: 3
   m_YDrive:
     lowerLimit: 0
     upperLimit: 0
@@ -2969,7 +2977,7 @@ ArticulationBody:
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
-  m_ArticulationJointType: 0
+  m_ArticulationJointType: 2
   m_LinearX: 2
   m_LinearY: 2
   m_LinearZ: 2
@@ -2984,7 +2992,7 @@ ArticulationBody:
     forceLimit: 3.4028235e+38
     target: 0
     targetVelocity: 0
-    driveType: 0
+    driveType: 3
   m_YDrive:
     lowerLimit: 0
     upperLimit: 0
