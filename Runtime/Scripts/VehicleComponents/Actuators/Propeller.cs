@@ -47,6 +47,7 @@ namespace VehicleComponents.Actuators
         public double rpm;
         public float RPMMax = 100000;
         public float RPMToForceMultiplier = 5;
+        [Tooltip("Tick it for Drone and off for SAM/ROV")]
         public bool hoverdefault = true;
         [SerializeField] private ArticulationBody baseLinkArticulationBody;
         
