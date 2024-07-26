@@ -27,7 +27,6 @@ namespace VehicleComponents.ROS.Subscribers
             if(prop == null) return;
             if(reset)
             { 
-                Debug.Log("resettings for: " + prop);
                 prop.SetRpm(0);
                 return;
             }

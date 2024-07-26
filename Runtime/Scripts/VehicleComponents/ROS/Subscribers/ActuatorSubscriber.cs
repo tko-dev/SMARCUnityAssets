@@ -27,10 +27,11 @@ namespace VehicleComponents.ROS.Subscribers
 
         public bool resetting = true;
         public double receivedFrequency;
-
+    
 
         ROSConnection ros;
         protected RosMsgType ROSMsg;
+        public bool ReceivedFirstMessage = false;
         double lastTime;
 
         void Awake()
@@ -53,6 +54,7 @@ namespace VehicleComponents.ROS.Subscribers
         void UpdateMessage(RosMsgType msg)
         {
             ROSMsg = msg;
+            ReceivedFirstMessage = true;
 
             double deltaTime = Clock.NowTimeInSeconds - lastTime;
             receivedFrequency = 1.0/deltaTime;
@@ -80,8 +82,8 @@ namespace VehicleComponents.ROS.Subscribers
             {
                 resetting = false;
             }
-            
-            UpdateVehicle(resetting);
+            //only updatevehicle if you have reieved the message
+            if(ReceivedFirstMessage) UpdateVehicle(resetting);
             
         }
     }
