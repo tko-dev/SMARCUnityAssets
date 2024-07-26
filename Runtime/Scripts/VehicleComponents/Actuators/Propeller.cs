@@ -46,10 +46,8 @@ namespace VehicleComponents.Actuators
         public bool reverse = false;
         public double rpm;
         public float RPMMax = 100000;
-        public float RPMToForceMultiplier = 5;
-        
-
-
+        public float RPMToForceMultiplier = 0.005;
+        public float NumPropellers = 4;
 
         [Header("Drone Propeller")]
         [Tooltip("Tick it for Drone and off for SAM/ROV")]
@@ -71,23 +69,23 @@ namespace VehicleComponents.Actuators
         
         void Start()
         {
-        Transform current = transform;
-        while (current.parent != null)
-        {
-            current = current.parent;
-            ArticulationBody articulationBody = current.GetComponent<ArticulationBody>();
-            if (articulationBody != null && articulationBody.name == "base_link")
+            Transform current = transform;
+            while (current.parent != null)
             {
-                Debug.Log("base_link articulation body found: " + articulationBody);
-                baseLinkArticulationBody = articulationBody;
+                current = current.parent;
+                ArticulationBody articulationBody = current.GetComponent<ArticulationBody>();
+                if (articulationBody != null && articulationBody.name == "base_link")
+                {
+                    Debug.Log("base_link articulation body found: " + articulationBody);
+                    baseLinkArticulationBody = articulationBody;
+                }
             }
-        }
-        if(hoverdefault) InitializeRPMToStayAfloat();
+            if(hoverdefault) InitializeRPMToStayAfloat();
         }
 
         void FixedUpdate()
         {
-            var r = rpm / 1000 * RPMToForceMultiplier;
+            var r = rpm * RPMToForceMultiplier;
             if(hoverdefault) Debug.Log("the value of r is: " + r );
 
             // Visualize the applied force
@@ -111,11 +109,11 @@ namespace VehicleComponents.Actuators
         private void InitializeRPMToStayAfloat()
         {
             // Calculate the required force to counteract gravity
-            float requiredForce = (baseLinkArticulationBody.mass+4) * Physics.gravity.magnitude;
+            float requiredForce = (baseLinkArticulationBody.mass) * Physics.gravity.magnitude;
             Debug.Log("Required force to stay afloat: " + requiredForce);
 
             // Calculate the required RPM for each propeller
-            float requiredRPM = (requiredForce / (RPMToForceMultiplier * 4)) * 1000;
+            float  requiredRPM = (requiredForce/NumPropellers) * RPMToForceMultiplier;
 
             // Set the initial RPM to each propeller
             SetRpm(requiredRPM);
