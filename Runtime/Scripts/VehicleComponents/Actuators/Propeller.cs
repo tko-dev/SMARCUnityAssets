@@ -46,8 +46,8 @@ namespace VehicleComponents.Actuators
         public bool reverse = false;
         public double rpm;
         public float RPMMax = 100000;
-        public float RPMToForceMultiplier = 0.005;
-        public float NumPropellers = 4;
+        public float RPMToForceMultiplier = 0.005f;
+        public float NumPropellers = 4f;
 
         [Header("Drone Propeller")]
         [Tooltip("Tick it for Drone and off for SAM/ROV")]
