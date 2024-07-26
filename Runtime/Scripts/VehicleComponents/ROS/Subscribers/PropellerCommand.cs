@@ -26,12 +26,17 @@ namespace VehicleComponents.ROS.Subscribers
         {
             if(prop == null) return;
             if(reset)
-            {
+            { 
+                Debug.Log("resettings for: " + prop);
                 prop.SetRpm(0);
                 return;
             }
-            prop.SetRpm(ROSMsg.rpm);
+            Debug.Log("rpm from rostopic: " + ROSMsg);
+            if(ROSMsg.rpm != 0) prop.SetRpm(ROSMsg.rpm);
         }
     }
 }
+
+
+
 

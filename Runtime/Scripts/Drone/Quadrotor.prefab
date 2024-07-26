@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4705432896303098}
   - component: {fileID: 33978044778399578}
   - component: {fileID: 23809563312948380}
-  - component: {fileID: 6056281616285507594}
-  - component: {fileID: 7393092729205747640}
-  - component: {fileID: 7158390194709256237}
+  - component: {fileID: 162796801291979539}
+  - component: {fileID: 3657326355121176362}
+  - component: {fileID: 4652147038755289220}
   m_Layer: 0
   m_Name: propeller_2
   m_TagString: Untagged
@@ -88,7 +88,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6056281616285507594
+--- !u!114 &162796801291979539
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1267488449559438}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea1f39417dad3ad98887a4632f9cb0a6, type: 3}
+  m_Script: {fileID: 11500000, guid: b92668194914aee59b548360f0d7e6d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: propeller2_link
@@ -108,11 +108,11 @@ MonoBehaviour:
   yaw: 0
   reverse: 0
   rpm: 0
-  RPMMax: 1e+10
+  RPMMax: 100000
   RPMToForceMultiplier: 5
-  torque_up: 1
-  baseLinkArticulationBody: {fileID: 0}
---- !u!114 &7393092729205747640
+  hoverdefault: 1
+  baseLinkArticulationBody: {fileID: 3179540796430959622}
+--- !u!114 &3657326355121176362
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -121,11 +121,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1267488449559438}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1511f256931c33032b1263b1c7820105, type: 3}
+  m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop2_fb
---- !u!114 &7158390194709256237
+  topic: core/prop_2/feedback
+  frequency: 10
+--- !u!114 &4652147038755289220
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -134,11 +135,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1267488449559438}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6be18ad43342c33e790bfa946922d289, type: 3}
+  m_Script: {fileID: 11500000, guid: c429a099bc8d99179a44603b0781227c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop2_cmd
-  expectedFrequency: 10
+  topic: core/prop_2/cmd
+  expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
 --- !u!1 &1469583607899678
@@ -150,7 +151,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4800906380731054}
-  - component: {fileID: 114929170922410112}
   m_Layer: 0
   m_Name: Quadrotor
   m_TagString: Untagged
@@ -172,43 +172,11 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4907183174741664}
-  - {fileID: 4678159799818649431}
   - {fileID: 8597457138550415401}
   - {fileID: 6650294322077738963}
   - {fileID: 3051417882854025666}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114929170922410112
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1469583607899678}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c685f926a25ae4bdab54c98a47fc7436, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  altitude_controller:
-    Kp: 20
-    Ki: 0
-    Kd: 0
-  pitch_controller:
-    Kp: 0.3
-    Ki: 0.1
-    Kd: 0.2
-  roll_controller:
-    Kp: 0.3
-    Ki: 0.1
-    Kd: 0.2
-  yaw_controller:
-    Kp: 3
-    Ki: 0
-    Kd: 0
-  target_altitude: 5
-  linear_velocity: {x: 0, y: 0, z: 0}
-  angular_velocity: {x: 0, y: 0, z: 0}
 --- !u!1 &1648915923807604
 GameObject:
   m_ObjectHideFlags: 0
@@ -225,6 +193,7 @@ GameObject:
   - component: {fileID: 4189383651776858490}
   - component: {fileID: 4980747270019049236}
   - component: {fileID: 5733111437508559920}
+  - component: {fileID: 7994356781671983527}
   m_Layer: 0
   m_Name: camera
   m_TagString: MainCamera
@@ -410,6 +379,138 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 0
+--- !u!114 &7994356781671983527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1648915923807604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
+  clearColorMode: 0
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 0
+  SMAAQuality: 2
+  dithering: 0
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 1
+  taaSharpenMode: 0
+  taaRingingReduction: 0
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 0
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 5770166122053453
+      data2: 13799030890350739480
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 0
+      data2: 0
+  defaultFrameSettings: 0
 --- !u!1 &1693589302521042
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,9 +609,9 @@ GameObject:
   - component: {fileID: 4529089676032114}
   - component: {fileID: 33718972003965226}
   - component: {fileID: 23025199409806802}
-  - component: {fileID: 6734260909957156460}
-  - component: {fileID: 1625002166874355300}
-  - component: {fileID: 1378068402947984107}
+  - component: {fileID: 6803712460084105767}
+  - component: {fileID: 7853213438659321280}
+  - component: {fileID: 3447326158202569815}
   m_Layer: 0
   m_Name: propeller_3
   m_TagString: Untagged
@@ -585,7 +686,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6734260909957156460
+--- !u!114 &6803712460084105767
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -594,7 +695,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1840569289547034}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea1f39417dad3ad98887a4632f9cb0a6, type: 3}
+  m_Script: {fileID: 11500000, guid: b92668194914aee59b548360f0d7e6d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: propeller3_link
@@ -605,11 +706,11 @@ MonoBehaviour:
   yaw: 0
   reverse: 0
   rpm: 0
-  RPMMax: 1e+10
+  RPMMax: 100000
   RPMToForceMultiplier: 5
-  torque_up: 0
-  baseLinkArticulationBody: {fileID: 0}
---- !u!114 &1625002166874355300
+  hoverdefault: 1
+  baseLinkArticulationBody: {fileID: 3179540796430959622}
+--- !u!114 &7853213438659321280
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -618,11 +719,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1840569289547034}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1511f256931c33032b1263b1c7820105, type: 3}
+  m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop3_fb
---- !u!114 &1378068402947984107
+  topic: core/prop_3/feedback
+  frequency: 10
+--- !u!114 &3447326158202569815
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -631,11 +733,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1840569289547034}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6be18ad43342c33e790bfa946922d289, type: 3}
+  m_Script: {fileID: 11500000, guid: c429a099bc8d99179a44603b0781227c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop3_cmd
-  expectedFrequency: 10
+  topic: core/prop_3/cmd
+  expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
 --- !u!1 &1941850069509544
@@ -649,9 +751,9 @@ GameObject:
   - component: {fileID: 4614207949718832}
   - component: {fileID: 33533956198474646}
   - component: {fileID: 23970249473931932}
-  - component: {fileID: 5002718042608726844}
-  - component: {fileID: 6856956685784002446}
-  - component: {fileID: 4947147897246004854}
+  - component: {fileID: 6152973690314448317}
+  - component: {fileID: 7651963327394340505}
+  - component: {fileID: 8072892641558167324}
   m_Layer: 0
   m_Name: propeller_1
   m_TagString: Untagged
@@ -726,7 +828,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &5002718042608726844
+--- !u!114 &6152973690314448317
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -735,7 +837,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1941850069509544}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea1f39417dad3ad98887a4632f9cb0a6, type: 3}
+  m_Script: {fileID: 11500000, guid: b92668194914aee59b548360f0d7e6d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: propeller1_link
@@ -746,11 +848,11 @@ MonoBehaviour:
   yaw: 0
   reverse: 0
   rpm: 0
-  RPMMax: 1e+10
+  RPMMax: 100000
   RPMToForceMultiplier: 5
-  torque_up: 0
-  baseLinkArticulationBody: {fileID: 0}
---- !u!114 &6856956685784002446
+  hoverdefault: 1
+  baseLinkArticulationBody: {fileID: 3179540796430959622}
+--- !u!114 &7651963327394340505
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -759,11 +861,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1941850069509544}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1511f256931c33032b1263b1c7820105, type: 3}
+  m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop1_fb
---- !u!114 &4947147897246004854
+  topic: core/prop_1/feedback
+  frequency: 10
+--- !u!114 &8072892641558167324
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -772,11 +875,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1941850069509544}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6be18ad43342c33e790bfa946922d289, type: 3}
+  m_Script: {fileID: 11500000, guid: c429a099bc8d99179a44603b0781227c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop1_cmd
-  expectedFrequency: 10
+  topic: core/prop_1/cmd
+  expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
 --- !u!1 &1946588258884440
@@ -790,6 +893,7 @@ GameObject:
   - component: {fileID: 4787999160045060}
   - component: {fileID: 20438430716707438}
   - component: {fileID: 114498224980487218}
+  - component: {fileID: 5952294319931921763}
   m_Layer: 0
   m_Name: ThirdPersonCamera
   m_TagString: Untagged
@@ -875,6 +979,138 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bb2a72507487485d9465442ac5ca807, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5952294319931921763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946588258884440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
+  clearColorMode: 0
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 0
+  SMAAQuality: 2
+  dithering: 0
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 1
+  taaSharpenMode: 0
+  taaRingingReduction: 0
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 0
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 5770166122053453
+      data2: 13799030890350739480
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 0
+      data2: 0
+  defaultFrameSettings: 0
 --- !u!1 &1971563020570084
 GameObject:
   m_ObjectHideFlags: 0
@@ -886,9 +1122,9 @@ GameObject:
   - component: {fileID: 4662283196533844}
   - component: {fileID: 33883574644757642}
   - component: {fileID: 23496682094479914}
-  - component: {fileID: 4026567287202730727}
-  - component: {fileID: 405071742256551103}
-  - component: {fileID: 8884321742186412082}
+  - component: {fileID: 4729502975915603663}
+  - component: {fileID: 2215589600718411196}
+  - component: {fileID: 1992350392436928981}
   m_Layer: 0
   m_Name: propeller_4
   m_TagString: Untagged
@@ -963,7 +1199,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4026567287202730727
+--- !u!114 &4729502975915603663
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -972,7 +1208,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1971563020570084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea1f39417dad3ad98887a4632f9cb0a6, type: 3}
+  m_Script: {fileID: 11500000, guid: b92668194914aee59b548360f0d7e6d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: propeller4_link
@@ -983,11 +1219,11 @@ MonoBehaviour:
   yaw: 0
   reverse: 0
   rpm: 0
-  RPMMax: 1e+10
+  RPMMax: 100000
   RPMToForceMultiplier: 5
-  torque_up: 1
-  baseLinkArticulationBody: {fileID: 0}
---- !u!114 &405071742256551103
+  hoverdefault: 1
+  baseLinkArticulationBody: {fileID: 3179540796430959622}
+--- !u!114 &2215589600718411196
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -996,11 +1232,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1971563020570084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1511f256931c33032b1263b1c7820105, type: 3}
+  m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop4_fb
---- !u!114 &8884321742186412082
+  topic: core/prop_4/feedback
+  frequency: 10
+--- !u!114 &1992350392436928981
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1009,11 +1246,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1971563020570084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6be18ad43342c33e790bfa946922d289, type: 3}
+  m_Script: {fileID: 11500000, guid: c429a099bc8d99179a44603b0781227c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: /prop4_cmd
-  expectedFrequency: 10
+  topic: core/prop_4/cmd
+  expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
 --- !u!1 &83281821845207248
@@ -1119,8 +1356,8 @@ ArticulationBody:
   m_GameObject: {fileID: 442405396130980130}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0, y: 0, z: 0.31500244}
+  m_Mass: 1
+  m_ParentAnchorPosition: {x: 0, y: 0, z: 0.315}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -1958,7 +2195,7 @@ ArticulationBody:
   m_GameObject: {fileID: 3671306606353544230}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 0.0000001
+  m_Mass: 1
   m_ParentAnchorPosition: {x: 0.315, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -2576,8 +2813,8 @@ ArticulationBody:
   m_GameObject: {fileID: 5670822847514138771}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.31500244}
+  m_Mass: 1
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.315}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -2726,7 +2963,7 @@ ArticulationBody:
   m_GameObject: {fileID: 5789630594197784529}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 0.0000001
+  m_Mass: 1
   m_ParentAnchorPosition: {x: -0.315, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -3843,76 +4080,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46398bc5d6905ad429a6d2d973afe002, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &8215694481941764088
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4678159799818649431}
-  - component: {fileID: 1441199173387600058}
-  - component: {fileID: 6084315075997596775}
-  m_Layer: 0
-  m_Name: DroneKeyboardController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4678159799818649431
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8215694481941764088}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.09498978, y: -0.006898403, z: -0.02101326}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4800906380731054}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1441199173387600058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8215694481941764088}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36d6f76809a8f7684ac8996de9c93248, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  droneController: {fileID: 114929170922410112}
-  speed: 5
-  rotationSpeed: 100
---- !u!114 &6084315075997596775
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8215694481941764088}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39f7f6061004bf3519817953f4f52586, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  letROSTakeTheWheel: 1
-  propellerFLGo: {fileID: 1941850069509544}
-  propellerFRGo: {fileID: 1267488449559438}
-  propellerRLGo: {fileID: 1971563020570084}
-  propellerRRGo: {fileID: 1840569289547034}
-  rollRpms: 0.1
-  moveRpms: 800
-  rotationSpeed: 100
-  useBothRpms: 0
-  bothRpms: 0
 --- !u!1 &8448910502640532496
 GameObject:
   m_ObjectHideFlags: 0
