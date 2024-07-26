@@ -37,7 +37,7 @@ namespace VehicleComponents.Sensors
                 linearAcceleration = deltaLinearAcceleration / (float)deltaTime;
             }
             
-            angularVelocity = -1f * ab.angularVelocity;
+            angularVelocity = ab.transform.InverseTransformVector(-1f * ab.angularVelocity);
             eulerAngles = ab.transform.rotation.eulerAngles;
             orientation = Quaternion.Euler(eulerAngles);
 

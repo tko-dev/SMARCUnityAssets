@@ -412,7 +412,7 @@ namespace VehicleComponents.Actuators
         public double rpm;
         public float RPMMax = 100000;
         public float RPMToForceMultiplier = 5;
-        private float c_tau_f = 8.004e-2f;
+        private float c_tau_f = 8.004e-4f;
         public bool torque_up = true;
         private GameObject propellerModel; // Reference to the propeller model for visual rotation
         [SerializeField] private ArticulationBody baseLinkArticulationBody; // Reference to the base_link ArticulationBody
@@ -516,7 +516,7 @@ namespace VehicleComponents.Actuators
             float requiredRPM = (requiredForce / (RPMToForceMultiplier * 4)) * 1000;
 
             // Set the initial RPM to each propeller
-            SetRpm(requiredRPM);
+            SetRpm(0);
         }
     }
 }
