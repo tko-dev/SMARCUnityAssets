@@ -30,8 +30,8 @@ namespace VehicleComponents.ROS.Subscribers
                 prop.SetRpm(0);
                 return;
             }
-            Debug.Log("rpm from rostopic: " + ROSMsg);
-            if(ROSMsg.rpm != 0) prop.SetRpm(ROSMsg.rpm);
+
+            prop.SetRpm(ROSMsg.rpm);
         }
     }
 }
