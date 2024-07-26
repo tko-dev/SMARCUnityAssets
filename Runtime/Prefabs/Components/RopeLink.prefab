@@ -547,6 +547,7 @@ GameObject:
   - component: {fileID: 4447885801482707029}
   - component: {fileID: 4234441313039161486}
   - component: {fileID: 10039788946428091}
+  - component: {fileID: 1080205937504706963}
   m_Layer: 6
   m_Name: RopeLink
   m_TagString: rope
@@ -680,3 +681,16 @@ MonoBehaviour:
   SegmentLength: 0.1
   RopeLength: 2
   numSegments: 22
+--- !u!114 &1080205937504706963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8527497976637253487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fba5fd74d37a6cf4284698624eb8f6aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsBaseLink: 0
