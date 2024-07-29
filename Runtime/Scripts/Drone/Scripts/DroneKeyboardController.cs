@@ -12,7 +12,7 @@ namespace GameUI
         public DroneController droneController;
 
         public float speed = 5.0f;
-        public float rotationSpeed = 5f;
+        public float rotationSpeed = 50f;
 
         void Update() {
             Vector3 linearVelocity = Vector3.zero;
