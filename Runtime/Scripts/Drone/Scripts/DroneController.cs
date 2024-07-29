@@ -68,7 +68,7 @@ namespace DroneControlScripts
 		void ComputeForcesTorque() {
 
 			// 1/4 of the gravity of compensated by each of the propellers
-			for(int i = 0 ; i < 4 ; ++i)
+			for(int i = 0 ; i < NumPropellers ; ++i)
 				propellers_forces[i] = quadcopterAB.mass * Physics.gravity.magnitude/(float)NumPropellers;
 			
 
@@ -79,7 +79,7 @@ namespace DroneControlScripts
 			// the velocity is measured along the vertical axis in the world coordinates
 			// not the local vertical axis of the rigidbody
 			float command_altitude = altitude_controller.Update(linear_velocity.y - vel_in_world.y, Time.fixedDeltaTime);
-			for (int i = 0; i < 4; ++i)
+			for (int i = 0; i < NumPropellers; ++i)
 				propellers_forces [i] += command_altitude /(float)NumPropellers;
 
 
@@ -104,7 +104,7 @@ namespace DroneControlScripts
 			propellers_forces[3] -= command_roll/(float)NumPropellers;
 
 			// Clamp the forces to prevent negative values
-			for (int i = 0; i < 4; ++i)
+			for (int i = 0; i < NumPropellers; ++i)
 				if (propellers_forces [i] < 0.0f)
 					propellers_forces [i] = 0.0f;
 			//propellers_forces [i] = Mathf.Clamp (propellers_forces [i], 0.0f, max_throttle);
@@ -120,7 +120,7 @@ namespace DroneControlScripts
 			
 			Vector3 propellerUp, propellerPos;
 			float maxForce = 0.0f;
-			for (int i = 0; i < 4; ++i) {
+			for (int i = 0; i < NumPropellers; ++i) {
 				propellerUp = propellers [i].transform.forward;
 				propellerPos = propellers [i].transform.position;
 				quadcopterAB.AddForceAtPosition (propellers_forces[i] * propellerUp, propellerPos);
@@ -131,20 +131,21 @@ namespace DroneControlScripts
 			}
 
 
-			for (int i = 0; i < 4; ++i) {
+			for (int i = 0; i < NumPropellers; ++i) {
 				propellerUp = propellers [i].transform.forward;
 				propellerPos = propellers [i].transform.position;
 				Debug.DrawRay (propellerPos, propellers_forces [i] / maxForce * propellerUp, Color.red);
 			}
-			quadcopterAB.AddTorque (torque * quadcopterAB.transform.up);
+			quadcopterAB.AddTorque (torque/100f * quadcopterAB.transform.up);
 			//Debug.Log (quadcopterRB.transform.up + " " + propellers [0].transform.up);
 		}
 
 		void RotateFans() {
-			propellers_act[0].transform.Rotate(100 * propellers_forces [0] * Vector3.forward * Time.deltaTime, Space.Self);
-			propellers_act[1].transform.Rotate(-100 * propellers_forces [1] * Vector3.forward * Time.deltaTime, Space.Self);
-			propellers_act[2].transform.Rotate(-100 * propellers_forces [2] * Vector3.forward * Time.deltaTime, Space.Self);
-			propellers_act[3].transform.Rotate(100 * propellers_forces [3] * Vector3.forward * Time.deltaTime, Space.Self);
+			for (int i = 0; i < NumPropellers; ++i)
+            {
+                Vector3 rotationDirection = (i % 2 == 0) ? Vector3.forward : -Vector3.forward;
+                propellers_act[i].transform.Rotate(100 * propellers_forces[i] * rotationDirection * Time.deltaTime, Space.Self);
+            }
 
 		}
 	}
