@@ -110,6 +110,7 @@ MonoBehaviour:
   rpm: 0
   RPMMax: 100000
   RPMToForceMultiplier: 5
+  NumPropellers: 4
   hoverdefault: 1
   torque_req: 1
   torque_up: 1
@@ -144,6 +145,7 @@ MonoBehaviour:
   expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &1469583607899678
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,6 +712,7 @@ MonoBehaviour:
   rpm: 0
   RPMMax: 100000
   RPMToForceMultiplier: 5
+  NumPropellers: 4
   hoverdefault: 1
   torque_req: 1
   torque_up: 0
@@ -744,6 +747,7 @@ MonoBehaviour:
   expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &1941850069509544
 GameObject:
   m_ObjectHideFlags: 0
@@ -854,6 +858,7 @@ MonoBehaviour:
   rpm: 0
   RPMMax: 100000
   RPMToForceMultiplier: 5
+  NumPropellers: 4
   hoverdefault: 1
   torque_req: 1
   torque_up: 0
@@ -888,6 +893,7 @@ MonoBehaviour:
   expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &1946588258884440
 GameObject:
   m_ObjectHideFlags: 0
@@ -1227,6 +1233,7 @@ MonoBehaviour:
   rpm: 0
   RPMMax: 100000
   RPMToForceMultiplier: 5
+  NumPropellers: 4
   hoverdefault: 1
   torque_req: 1
   torque_up: 1
@@ -1261,6 +1268,7 @@ MonoBehaviour:
   expectedFrequency: -1
   resetting: 0
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &83281821845207248
 GameObject:
   m_ObjectHideFlags: 0
@@ -2405,7 +2413,7 @@ ArticulationBody:
   m_GameObject: {fileID: 3939394929759449381}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 4.34
+  m_Mass: 5
   m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -2445,11 +2453,11 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0
-  m_AngularDamping: 0
+  m_LinearDamping: 1.5
+  m_AngularDamping: 1
   m_JointFriction: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 0.082, y: 0.1377, z: 0.082}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
