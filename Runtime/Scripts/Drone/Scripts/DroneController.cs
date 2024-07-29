@@ -137,6 +137,7 @@ namespace DroneControlScripts
 				Debug.DrawRay (propellerPos, propellers_forces [i] / maxForce * propellerUp, Color.red);
 			}
 			quadcopterAB.AddTorque (torque/100f * quadcopterAB.transform.up);
+			if(quadcopterAB.GetAccumulatedTorque().magnitude > 0) Debug.Log("the torque applied is : " + quadcopterAB.GetAccumulatedTorque() );
 			//Debug.Log (quadcopterRB.transform.up + " " + propellers [0].transform.up);
 		}
 
@@ -146,7 +147,6 @@ namespace DroneControlScripts
                 Vector3 rotationDirection = (i % 2 == 0) ? Vector3.forward : -Vector3.forward;
                 propellers_act[i].transform.Rotate(100 * propellers_forces[i] * rotationDirection * Time.deltaTime, Space.Self);
             }
-
 		}
 	}
 }
