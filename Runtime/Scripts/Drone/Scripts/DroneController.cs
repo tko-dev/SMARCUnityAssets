@@ -14,7 +14,7 @@ namespace DroneControlScripts
 		public PIDController roll_controller;
 		public PIDController yaw_controller;
 
-		public float target_altitude = 1.0f;
+		//public float target_altitude = 1.0f;
 
 		public Vector3 linear_velocity;
 		public Vector3 angular_velocity;
@@ -74,12 +74,6 @@ namespace DroneControlScripts
 
 			Vector3 vel_in_world = quadcopterAB.velocity;
 			Vector3 vel_in_body = transform.InverseTransformDirection (vel_in_world);
-
-			// Add/Decrease throttle to reach the target altitude
-			//this.target_altitude += Time.fixedDeltaTime * linear_velocity.y;
-			//float command_altitude = altitude_controller.Update(target_altitude - quadcopterRB.position.y, Time.fixedDeltaTime);
-			//for (int i = 0; i < 4; ++i)
-			//	propellers_forces [i] += command_altitude /(float)NumPropellers;
 
 			// Add/Decrease the throttle to keep a target vertical velocity
 			// the velocity is measured along the vertical axis in the world coordinates
