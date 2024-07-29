@@ -83,12 +83,13 @@ namespace VehicleComponents.Actuators
 
             // Visualize the applied force
             Debug.DrawRay(parentArticulationBody.transform.position, ((float)(rpm-2129)/10)*transform.forward, Color.red);
-
+          
             // Apply torque to simulate the propeller's rotation
             int torque_sign = torque_up ? 1 : -1;
             float torque = torque_sign * c_tau_f * force;
             Vector3 torqueVector = torque * transform.forward;
             parentArticulationBody.AddTorque(torqueVector, ForceMode.Force);
+            Debug.Log("the torque on propeller is" + parentArticulationBody.GetAccumulatedTorque());
 
             // Rotate the propeller model based on RPM
             RotatePropeller(torque_sign);
