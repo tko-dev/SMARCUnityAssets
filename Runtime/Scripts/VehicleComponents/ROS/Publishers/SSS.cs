@@ -4,11 +4,13 @@ using Unity.Robotics.Core; //Clock
 using RosMessageTypes.Smarc;
 
 using SensorSSS = VehicleComponents.Sensors.SideScanSonar;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorSSS))]
-    class SSS: SensorPublisher<SidescanMsg, SensorSSS>
+    class SSS: ROSPublisher<SidescanMsg, SensorSSS>
     { 
         void Start()
         {

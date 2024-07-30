@@ -4,11 +4,13 @@ using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 using SensorIMU = VehicleComponents.Sensors.IMU;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorIMU))]
-    class Odometry: SensorPublisher<OdometryMsg, SensorIMU>
+    class Odometry: ROSPublisher<OdometryMsg, SensorIMU>
     { 
         [Tooltip("If false, orientation is in ENU in ROS.")]
         public bool useNED = false;

@@ -11,7 +11,6 @@ namespace VehicleComponents.ROS.Publishers
         where RosMsgType: ROSMessage, new()
     {
         ROSConnection ros;
-        double lastTime;
 
         // Subclasses should be able to access the
         // ROSMsg to be able to update it.
@@ -23,14 +22,6 @@ namespace VehicleComponents.ROS.Publishers
         public float frequency = 10f;
         float period => 1.0f/frequency;
 
-        void OnValidate()
-        {
-            if(period < Time.fixedDeltaTime)
-            {
-                Debug.LogWarning($"Actuator publish frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting actuator period to Unity's fixedDeltaTime!");
-                frequency = 1f/Time.fixedDeltaTime;
-            }
-        }
 
         void Awake()
         {
@@ -42,6 +33,8 @@ namespace VehicleComponents.ROS.Publishers
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<RosMsgType>(topic);
             lastTime = Clock.NowTimeInSeconds;
+
+            InvokeRepeating("Publish", 1f, period);
         }
 
         public virtual void UpdateMessage()
@@ -49,11 +42,8 @@ namespace VehicleComponents.ROS.Publishers
             Debug.Log($"The ActuatorPublisher with topic {topic} did not override the UpdateMessage method!");
         }
 
-        void FixedUpdate()
+        void Publish()
         {
-            var deltaTime = Clock.NowTimeInSeconds - lastTime;
-            if(deltaTime < period) return;
-            
             UpdateMessage();
             ros.Publish(topic, ROSMsg);
             lastTime = Clock.NowTimeInSeconds;

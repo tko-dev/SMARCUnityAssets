@@ -3,11 +3,12 @@ using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 
 using SensorBattery = VehicleComponents.Sensors.Battery;
+using VehicleComponents.ROS.Core;
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorBattery))]
-    class Battery: SensorPublisher<BatteryStateMsg, SensorBattery>
+    class Battery: ROSPublisher<BatteryStateMsg, SensorBattery>
     {
         public override void UpdateMessage()
         {
