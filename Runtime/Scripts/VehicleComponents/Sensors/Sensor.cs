@@ -7,9 +7,9 @@ namespace VehicleComponents.Sensors
 {
     public interface ISensor
     {
-        public float Frequency();
         public bool HasNewData();
     }
+
 
     public class Sensor: LinkAttachment, ISensor
     {
@@ -29,11 +29,6 @@ namespace VehicleComponents.Sensors
             }
         }
 
-
-        public float Frequency()
-        {
-            return frequency;
-        }
 
         public bool HasNewData()
         {
