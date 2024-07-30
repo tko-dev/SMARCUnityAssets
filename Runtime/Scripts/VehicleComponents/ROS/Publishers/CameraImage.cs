@@ -2,12 +2,13 @@ using UnityEngine;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 
+using VehicleComponents.ROS.Core;
 using CameraImageSensor = VehicleComponents.Sensors.CameraImage;
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(CameraImageSensor))]
-    class CameraImage: SensorPublisher<ImageMsg, CameraImageSensor>
+    class CameraImage: ROSPublisher<ImageMsg, CameraImageSensor>
     {
         void Start()
         {

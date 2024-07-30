@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils = DefaultNamespace.Utils;
 
+using VehicleComponents.ROS.Core;
+
 namespace VehicleComponents.Actuators
 {
-    public class Propeller: LinkAttachment
+    public class Propeller: LinkAttachment, IROSPublishable
     {
         [Header("Propeller")]
         public bool reverse = false;
@@ -27,6 +29,11 @@ namespace VehicleComponents.Actuators
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,
                                                    ForceMode.Force);
+        }
+
+        public bool HasNewData()
+        {
+            return true;
         }
         
         //TODO: Ensure RPM feedback in???

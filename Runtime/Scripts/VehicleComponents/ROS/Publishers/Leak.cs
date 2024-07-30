@@ -4,11 +4,13 @@ using Unity.Robotics.Core; //Clock
 using RosMessageTypes.Smarc;
 
 using SensorLeak = VehicleComponents.Sensors.Leak;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorLeak))]
-    class Leak: SensorPublisher<LeakMsg, SensorLeak>
+    class Leak: ROSPublisher<LeakMsg, SensorLeak>
     { 
         
         public override void UpdateMessage()

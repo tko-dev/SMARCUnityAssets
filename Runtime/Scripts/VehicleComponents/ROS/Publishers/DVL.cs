@@ -6,11 +6,13 @@ using RosMessageTypes.Smarc;
 using RosMessageTypes.Std;
 
 using SensorDVL = VehicleComponents.Sensors.DVL;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorDVL))]
-    class DVL: SensorPublisher<DVLMsg, SensorDVL>
+    class DVL: ROSPublisher<DVLMsg, SensorDVL>
     { 
 
         DVLBeamMsg[] beamMsgs;

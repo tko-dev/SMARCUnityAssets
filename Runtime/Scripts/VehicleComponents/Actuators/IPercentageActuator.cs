@@ -1,6 +1,8 @@
+using VehicleComponents.ROS.Core;
+
 namespace VehicleComponents.Actuators
 {
-    public interface IPercentageActuator
+    public interface IPercentageActuator : IROSPublishable
     {
         public void SetPercentage(float newValue);
         public float GetResetValue();

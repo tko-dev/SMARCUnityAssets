@@ -4,12 +4,13 @@ using UnityEngine;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 
+using VehicleComponents.ROS.Core;
 using CameraImageSensor = VehicleComponents.Sensors.CameraImage;
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(CameraImageSensor))]
-    class CameraImageCompressed: SensorPublisher<CompressedImageMsg, CameraImageSensor>
+    class CameraImageCompressed: ROSPublisher<CompressedImageMsg, CameraImageSensor>
     {
         [Header("Compressed Image")]
         [Tooltip("Jpg compression quality. 1=lowest quality")]

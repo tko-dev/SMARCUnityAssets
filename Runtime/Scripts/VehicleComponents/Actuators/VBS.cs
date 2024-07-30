@@ -45,6 +45,11 @@ namespace VehicleComponents.Actuators
             return (1 - (articulationBody.jointPosition[0]-_minimumPos)  / (_maximumPos - _minimumPos)) * 100;
         }
 
+        public bool HasNewData()
+        {
+            return true;
+        }
+
         public void FixedUpdate()
         {
             articulationBody.mass = 0.300f + _initialMass * GetCurrentValue() / 100; // Piston weight + water weight

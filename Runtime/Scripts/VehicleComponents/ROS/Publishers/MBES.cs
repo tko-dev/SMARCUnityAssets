@@ -4,11 +4,13 @@ using Unity.Robotics.Core; //Clock
 using System; //Bit converter
 
 using SensorMBES = VehicleComponents.Sensors.Sonar;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorMBES))]
-    class MBES: SensorPublisher<PointCloud2Msg, SensorMBES>
+    class MBES: ROSPublisher<PointCloud2Msg, SensorMBES>
     { 
         public string frame_id="map_gt";
         void Start()

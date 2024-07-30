@@ -4,25 +4,22 @@ using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector;
 using ROSMessage = Unity.Robotics.ROSTCPConnector.MessageGeneration.Message;
 
-using Sensor = VehicleComponents.Sensors.Sensor;
-using ISensor = VehicleComponents.Sensors.ISensor;
 
-namespace VehicleComponents.ROS.Publishers
+namespace VehicleComponents.ROS.Core
 {
-    [RequireComponent(typeof(Sensor))]
-    public class SensorPublisher<RosMsgType, SensorType> : MonoBehaviour
+    [RequireComponent(typeof(IROSPublishable))]
+    public class ROSPublisher<RosMsgType, PublishableType> : MonoBehaviour
         where RosMsgType: ROSMessage, new()
-        where SensorType: ISensor
+        where PublishableType: IROSPublishable
     {
         ROSConnection ros;
-        float frequency = 10f;
+        public float frequency = 10f;
         float period => 1.0f/frequency;
-        double lastTime;
 
         // Subclasses should be able to access these
         // to get data from the sensor and put it in
         // ROSMsg as needed.
-        protected SensorType sensor;
+        protected PublishableType sensor;
         protected RosMsgType ROSMsg;
 
         [Header("ROS Publisher")]
@@ -31,27 +28,18 @@ namespace VehicleComponents.ROS.Publishers
         [Tooltip("If true, we will publish regardless, even if the underlying sensor says no data.")]
         public bool ignoreSensorState = false;
 
-        void OnValidate()
-        {
-            if(period < Time.fixedDeltaTime)
-            {
-                Debug.LogWarning($"SensorPublisher frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting period to Unity's fixedDeltaTime!");
-                frequency = 1f/Time.fixedDeltaTime;
-            }
-        }
-
         void Awake()
         {
             // We namespace the topics with the root name
             if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
 
-            sensor = GetComponent<SensorType>();
-            frequency = sensor.Frequency();
+            sensor = GetComponent<PublishableType>();
             ROSMsg = new RosMsgType();
 
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<RosMsgType>(topic);
-            lastTime = Clock.NowTimeInSeconds;
+
+            InvokeRepeating("Publish", 1f, period);
         }
 
         public virtual void UpdateMessage()
@@ -59,20 +47,17 @@ namespace VehicleComponents.ROS.Publishers
             Debug.Log($"The SensorPublisher with topic {topic} did not override the UpdateMessage method!");
         }
 
-        void FixedUpdate()
+        void Publish()
         {
-            var deltaTime = Clock.NowTimeInSeconds - lastTime;
-            if(deltaTime < period) return;
-            
             // If the underlying sensor does not have new data
             // do not publish anything.
             if(sensor.HasNewData() || ignoreSensorState)
             {
                 UpdateMessage();
                 ros.Publish(topic, ROSMsg);
-                lastTime = Clock.NowTimeInSeconds;
             }
         }
+
     }
 
 }

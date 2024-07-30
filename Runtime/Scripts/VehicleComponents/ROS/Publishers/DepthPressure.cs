@@ -3,11 +3,13 @@ using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 
 using SensorPressure = VehicleComponents.Sensors.DepthPressure;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorPressure))]
-    class DepthPressure: SensorPublisher<FluidPressureMsg, SensorPressure>
+    class DepthPressure: ROSPublisher<FluidPressureMsg, SensorPressure>
     { 
         void Start()
         {
