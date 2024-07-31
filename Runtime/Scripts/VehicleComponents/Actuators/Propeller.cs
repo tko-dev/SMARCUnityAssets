@@ -13,7 +13,7 @@ namespace VehicleComponents.Actuators
         public bool reverse = false;
         public double rpm;
         public float RPMMax = 100000;
-        private float RPMToForceMultiplier = 0.005f;
+        private float RPMToForceMultiplier = 5f;
         public float NumPropellers = 4f;
 
         [Header("Drone Propeller")]
@@ -59,7 +59,7 @@ namespace VehicleComponents.Actuators
             // Visualize the applied force
             
             int direction = reverse? -1 : 1;
-            //parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
+            parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
             
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,
