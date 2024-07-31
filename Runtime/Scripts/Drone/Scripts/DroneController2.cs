@@ -12,9 +12,9 @@ public class DroneController2 : MonoBehaviour {
 	private float[] propellers_forces;
     private float[] propellers_torques;
     Vector<double> x_w;
-    Vector<double> v_a;
+    Vector<double> v_w;
     Matrix<double> R_wa;
-    Vector<double> W_a;
+    Vector<double> W_w;
     Matrix<double> R_sb_d_prev;
     Vector<double> W_b_d_prev;
     int times = 0;
@@ -61,11 +61,11 @@ public class DroneController2 : MonoBehaviour {
         
         // States
         x_w = DenseVector.OfArray(new double[] { transform.position.x , transform.position.z, transform.position.y });
-        v_a = DenseVector.OfArray(new double[] { base_link_ab.velocity.x, base_link_ab.velocity.z, base_link_ab.velocity.y });
+        v_w = DenseVector.OfArray(new double[] { base_link_ab.velocity.x, base_link_ab.velocity.z, base_link_ab.velocity.y });
         R_wa = DenseMatrix.OfArray(new double[,] { { transform.right.x, transform.forward.x, transform.up.x },
-                                                { transform.right.z, transform.forward.z, transform.up.z },
-                                                { transform.right.y, transform.forward.y, transform.up.y } });
-        W_a = -1f*DenseVector.OfArray(new double[] { base_link_ab.angularVelocity.x, base_link_ab.angularVelocity.z, base_link_ab.angularVelocity.y });
+                                                   { transform.right.z, transform.forward.z, transform.up.z },
+                                                   { transform.right.y, transform.forward.y, transform.up.y } });
+        W_w = -1f*DenseVector.OfArray(new double[] { base_link_ab.angularVelocity.x, base_link_ab.angularVelocity.z, base_link_ab.angularVelocity.y });
 
         // Transformations
         Matrix<double> R_ws = DenseMatrix.OfArray(new double[,] { { 0, 1, 0 },
@@ -75,14 +75,15 @@ public class DroneController2 : MonoBehaviour {
         Matrix<double> R_sw = R_ws.Transpose();
         Matrix<double> R_sb = R_sw*R_wa*R_ab;
         Matrix<double> R_sa = R_sw*R_wa;
-        Matrix<double> R_ba = R_ab.Transpose();
+        Matrix<double> R_bs = R_sb.Transpose();
+        Matrix<double> R_bw = R_bs*R_sw;
 
         Vector<double> x_s = R_sw*x_w;
-        Vector<double> v_s = R_sa*v_a;
-        Vector<double> W_b = R_ba*W_a;
+        Vector<double> v_s = R_sw*v_w;
+        Vector<double> W_b = R_bw*W_w;
         
         // Desired states
-        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 10 });
+        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 0.2, 1000, 10 });
         Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });
         Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });
         Vector<double> b1d = DenseVector.OfArray(new double[] { 1, 0, 0 });
@@ -115,11 +116,16 @@ public class DroneController2 : MonoBehaviour {
         // Convert to propeller forces
         Matrix<double> T = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 }, { 0, -d, 0, d }, { d, 0, -d, 0 }, { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } });
         Vector<double> F = T.Inverse() * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
+        //Issue probably has something to do with the mapping to propeller forces
 
         if (times < 2) {
             times++;
             F = DenseVector.OfArray(new double[] { 0, 0, 0, 0 });
-        } // maybe try to print dt
+        } else {
+            //Debug.Log(-base_link_ab.angularVelocity.y);
+            //Debug.Log(pid);
+            Debug.Log(W_b[0]);
+        }
 
         // Set propeller forces and torques
         propellers_forces[0] = (float)F[0];
@@ -131,9 +137,6 @@ public class DroneController2 : MonoBehaviour {
         propellers_torques[1] = c_tau_f*propellers_forces[1];
         propellers_torques[2] = -c_tau_f*propellers_forces[2];
         propellers_torques[3] = c_tau_f*propellers_forces[3];
-
-        // print R_wa
-        Debug.Log(R_wa);
 	}
 
 	void ApplyForcesTorque() {
