@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -669,7 +669,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.048000053, y: -0.0069999695, z: 0.636}
+  m_ParentAnchorPosition: {x: 0.048000053, y: -0.007, z: 0.636}
   m_ParentAnchorRotation: {x: 0.91263145, y: -0.12432796, z: 0.38585383, w: -0.052568883}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -800,7 +800,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.000000059604645, y: 0.0710001, z: 0.52800006}
+  m_ParentAnchorPosition: {x: 0.000000059604645, y: 0.071, z: 0.52800006}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071069, w: 0.7071069}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -1911,7 +1911,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.000000059604645, y: 0.07800007, z: -0.4020001}
+  m_ParentAnchorPosition: {x: -0.000000059604645, y: 0.078, z: -0.4020001}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071069, w: 0.7071069}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -2337,8 +2337,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -2463,8 +2463,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -3527,6 +3527,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5064574992145508278}
   - component: {fileID: 894145098984237501}
+  - component: {fileID: 7725108180348716914}
   m_Layer: 0
   m_Name: 3rd Person Cam
   m_TagString: Untagged
@@ -3600,6 +3601,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &7725108180348716914
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4070900498547781252}
+  m_Enabled: 0
 --- !u!1 &4083127372822263617
 GameObject:
   m_ObjectHideFlags: 0
@@ -3798,8 +3807,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -4226,8 +4235,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -4705,8 +4714,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -4973,7 +4982,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.024999946, y: 0.05699992, z: -0.5030002}
+  m_ParentAnchorPosition: {x: -0.024999946, y: 0.057, z: -0.5030002}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071069, w: 0.7071069}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -5236,7 +5245,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.3
-  m_ParentAnchorPosition: {x: 0.00000008195639, y: -0.012500048, z: -0.27299997}
+  m_ParentAnchorPosition: {x: 0.00000008195639, y: -0.0125, z: -0.27299997}
   m_ParentAnchorRotation: {x: 0, y: 0.7071068, z: 0, w: -0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0.70710677, z: 0, w: -0.70710677}
@@ -5504,7 +5513,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.000000029802322, y: -0.062999964, z: 0.573}
+  m_ParentAnchorPosition: {x: -0.000000029802322, y: -0.063, z: 0.573}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071069, w: 0.7071069}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -5712,8 +5721,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -5927,8 +5936,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -6064,7 +6073,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.00000008940697, y: 0.0020000935, z: 0.45999995}
+  m_ParentAnchorPosition: {x: 0.00000008940697, y: 0.002, z: 0.45999995}
   m_ParentAnchorRotation: {x: 0, y: 0, z: -0.70710945, w: 0.7071043}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -6428,7 +6437,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.00000011175871, y: -0.036000013, z: 0.23999995}
+  m_ParentAnchorPosition: {x: 0.00000011175871, y: -0.036, z: 0.23999995}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071069, w: 0.7071069}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -6631,8 +6640,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -6757,8 +6766,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 812475576104893903}
+  drawForces: 0
   depthBeforeSubmerged: 0.03
-  addGravity: 0
   volumeObject: {fileID: 1696784349372826049}
   volumeMesh: {fileID: 3581559400158153300, guid: 7e8ff01e28df7ed5490aa97dd3ed55a5, type: 3}
   automaticCenterOfGravity: 0
@@ -7598,7 +7607,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.04799989, y: -0.0069999695, z: 0.636}
+  m_ParentAnchorPosition: {x: -0.04799989, y: -0.007, z: 0.636}
   m_ParentAnchorRotation: {x: 0.38585132, y: -0.052561805, z: 0.9126326, w: -0.12433091}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -7863,7 +7872,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.000000059604645, y: -0.052000046, z: 0.46150002}
+  m_ParentAnchorPosition: {x: 0.000000059604645, y: -0.052, z: 0.46150002}
   m_ParentAnchorRotation: {x: -0.49997786, y: 0.49997422, z: -0.500026, w: 0.5000224}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
@@ -8362,6 +8371,22 @@ PrefabInstance:
     - target: {fileID: 498906796929473786, guid: 291054a015d1f5af39631330ea79023b, type: 3}
       propertyPath: m_Name
       value: SAMActuators
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388736631394618474, guid: 291054a015d1f5af39631330ea79023b, type: 3}
+      propertyPath: torque_req
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388736631394618474, guid: 291054a015d1f5af39631330ea79023b, type: 3}
+      propertyPath: hoverdefault
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6295752470259329549, guid: 291054a015d1f5af39631330ea79023b, type: 3}
+      propertyPath: torque_req
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6295752470259329549, guid: 291054a015d1f5af39631330ea79023b, type: 3}
+      propertyPath: hoverdefault
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7879141990814986661, guid: 291054a015d1f5af39631330ea79023b, type: 3}
       propertyPath: m_LocalPosition.x
