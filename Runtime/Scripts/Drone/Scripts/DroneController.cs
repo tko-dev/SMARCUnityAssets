@@ -55,7 +55,6 @@ namespace DroneControlScripts
 		void FixedUpdate () {
 			ComputeForcesTorque ();
 			ApplyForcesTorque ();
-			RotateFans();
 		}
 
 		public void UpdateVelocities(Vector3 linear_velocity, Vector3 angular_velocity) {
@@ -140,13 +139,5 @@ namespace DroneControlScripts
 			//Debug.Log (quadcopterRB.transform.up + " " + propellers [0].transform.up);
 		}
 
-		void RotateFans() {
-			for (int i = 0; i < NumPropellers; ++i)
-            {
-                Vector3 rotationDirection = (i % 2 == 0) ? Vector3.forward : -Vector3.forward;
-                propellers_act[i].transform.Rotate(100 * propellers_forces[i] * rotationDirection * Time.deltaTime, Space.Self);
-            }
-
-		}
 	}
 }
