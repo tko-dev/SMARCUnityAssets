@@ -4,22 +4,24 @@ using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 using SensorIMU = VehicleComponents.Sensors.IMU;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorIMU))]
-    class Odometry: SensorPublisher<OdometryMsg, SensorIMU>
+    class Odometry: ROSPublisher<OdometryMsg, SensorIMU>
     { 
         [Tooltip("If false, orientation is in ENU in ROS.")]
         public bool useNED = false;
 
-        void Start()
+        protected override void InitializePublication()
         {
             ROSMsg.header.frame_id = "map_gt";
             ROSMsg.child_frame_id = sensor.linkName;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
 

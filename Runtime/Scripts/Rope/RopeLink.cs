@@ -21,8 +21,10 @@ namespace Rope
 
         [Tooltip("Diameter of the rope in meters")]
         public float RopeDiameter = 0.01f;
+        [Tooltip("Diameter of the collision objects for the rope. The bigger the more stable the physics are.")]
+        public float RopeCollisionDiameter = 0.1f;
         [Tooltip("How long each segment of the rope will be. Smaller = more realistic but harder to simulate.")]
-        [Range(0.01f, 1f)]
+        [Range(0.1f, 1f)]
         public float SegmentLength = 0.1f;
 
         [Tooltip("How long the entire rope should be. Rounded to SegmentLength. Ignored if this is not the root of the rope.")]
@@ -34,7 +36,7 @@ namespace Rope
 
         void OnValidate()
         {
-            numSegments = (int)(RopeLength / SegmentLength);
+            numSegments = (int)(RopeLength / (SegmentLength-RopeDiameter));
             if(numSegments > 30) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
 
             // scale and locate all the little bits and bobs that make up
@@ -43,11 +45,11 @@ namespace Rope
             body = GetComponent<ArticulationBody>();
             capsule = GetComponent<CapsuleCollider>();
 
-            capsule.radius = RopeDiameter/2;
-            capsule.height = SegmentLength;
+            capsule.radius = RopeCollisionDiameter/2;
+            capsule.height = SegmentLength+RopeCollisionDiameter; // we want the collision to overlap with the child's
 
-            var frontSpherePos = new Vector3(0,0, SegmentLength/2 - RopeDiameter/2);
-            var backSpherePos = new Vector3(0,0, -(SegmentLength/2 - RopeDiameter/2));
+            var frontSpherePos = new Vector3(0,0, SegmentLength/2 - RopeDiameter/4);
+            var backSpherePos = new Vector3(0,0, -(SegmentLength/2 - RopeDiameter/4));
 
             body.anchorPosition = backSpherePos;
 
@@ -65,7 +67,7 @@ namespace Rope
             var visualScale = new Vector3(RopeDiameter, RopeDiameter, RopeDiameter);
             frontVis_tf.localScale = visualScale;
             backVis_tf.localScale = visualScale;
-            middleVis_tf.localScale = new Vector3(RopeDiameter, (SegmentLength/2)-(RopeDiameter/2), RopeDiameter);
+            middleVis_tf.localScale = new Vector3(RopeDiameter, (SegmentLength/2)-(RopeDiameter/4), RopeDiameter);
 
             frontFP_sphereCollider = frontFP_tf.GetComponent<SphereCollider>();
             backFP_sphereCollider = backFP_tf.GetComponent<SphereCollider>();

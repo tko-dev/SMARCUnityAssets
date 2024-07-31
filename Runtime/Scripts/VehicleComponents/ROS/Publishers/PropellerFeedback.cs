@@ -3,14 +3,15 @@ using RosMessageTypes.Smarc;
 using Unity.Robotics.Core; // Clock
 
 using Propeller = VehicleComponents.Actuators.Propeller;
+using VehicleComponents.ROS.Core;
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(Propeller))]
-    public class PropellerFeedback: ActuatorPublisher<ThrusterFeedbackMsg>
+    public class PropellerFeedback: ROSPublisher<ThrusterFeedbackMsg, Propeller>
     {
         Propeller prop;
-        void Start()
+        protected override void InitializePublication()
         {
             prop = GetComponent<Propeller>();
             if(prop == null)
@@ -20,7 +21,7 @@ namespace VehicleComponents.ROS.Publishers
             }
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             if(prop == null) return;
 

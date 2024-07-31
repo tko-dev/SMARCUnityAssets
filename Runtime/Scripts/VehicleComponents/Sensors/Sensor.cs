@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils = DefaultNamespace.Utils;
 
+using VehicleComponents.ROS.Core;
+
 namespace VehicleComponents.Sensors
 {
-    public interface ISensor
-    {
-        public float Frequency();
-        public bool HasNewData();
-    }
 
-    public class Sensor: LinkAttachment, ISensor
+    public class Sensor: LinkAttachment, IROSPublishable
     {
         [Header("Sensor")]
         public float frequency = 10f;
@@ -29,11 +26,6 @@ namespace VehicleComponents.Sensors
             }
         }
 
-
-        public float Frequency()
-        {
-            return frequency;
-        }
 
         public bool HasNewData()
         {

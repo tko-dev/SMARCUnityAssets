@@ -3,11 +3,13 @@ using RosMessageTypes.Geographic;
 using Unity.Robotics.Core; //Clock
 
 using SensorGPS = VehicleComponents.Sensors.GPS;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorGPS))]
-    class GeoPoint: SensorPublisher<GeoPointMsg, SensorGPS>
+    class GeoPoint: ROSPublisher<GeoPointMsg, SensorGPS>
     { 
         public double lat, lon;
         double easting, northing;
@@ -17,11 +19,12 @@ namespace VehicleComponents.ROS.Publishers
             ignoreSensorState = true;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {        
             (easting, northing, lat, lon) = sensor.GetUTMLatLon();
             ROSMsg.latitude = lat;
             ROSMsg.longitude = lon;
         }
+        protected override void InitializePublication(){}
     }
 }

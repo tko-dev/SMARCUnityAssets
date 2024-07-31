@@ -38,9 +38,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils = DefaultNamespace.Utils;
 
+using VehicleComponents.ROS.Core;
+
 namespace VehicleComponents.Actuators
 {
-    public class Propeller: LinkAttachment
+    public class Propeller: LinkAttachment, IROSPublishable
     {
         [Header("Propeller")]
         public bool reverse = false;
@@ -120,6 +122,11 @@ namespace VehicleComponents.Actuators
 
             // Set the initial RPM to each propeller
             SetRpm(requiredRPM);
+        }
+
+        public bool HasNewData()
+        {
+            return true;
         }
         
         //TODO: Ensure RPM feedback in???

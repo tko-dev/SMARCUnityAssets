@@ -13,7 +13,8 @@ namespace VehicleComponents.ROS.Subscribers
     public class PercentageCommand : ActuatorSubscriber<PercentStampedMsg>
     {    
         IPercentageActuator act;
-        void Start()
+        
+        void Awake()
         {
             act = GetComponent<IPercentageActuator>();
             if(act == null)
@@ -23,7 +24,7 @@ namespace VehicleComponents.ROS.Subscribers
             }
         }
 
-        public override void UpdateVehicle(bool reset)
+        protected override void UpdateVehicle(bool reset)
         {
             if(act == null) return;
             if(reset) act.SetPercentage(act.GetResetValue());

@@ -3,15 +3,16 @@ using RosMessageTypes.Sam;
 using Unity.Robotics.Core; // Clock
 
 using IPercentageActuator = VehicleComponents.Actuators.IPercentageActuator;
+using VehicleComponents.ROS.Core;
 
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(IPercentageActuator))]
-    public class PercentageFeedback: ActuatorPublisher<PercentStampedMsg>
+    public class PercentageFeedback: ROSPublisher<PercentStampedMsg, IPercentageActuator>
     {
         IPercentageActuator act;
-        void Start()
+        protected override void InitializePublication()
         {
             act = GetComponent<IPercentageActuator>();
             if(act == null)
@@ -21,7 +22,7 @@ namespace VehicleComponents.ROS.Publishers
             }
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             if(act == null) return;
             ROSMsg.value = (float)act.GetCurrentValue();
