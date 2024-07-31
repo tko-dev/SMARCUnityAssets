@@ -17,14 +17,8 @@ namespace GameUI
 
         bool mouseDown = false;
 
-
         public float rollRpms = 0.1f;
         public float moveRpms = 50f;
-
-        // [Header("Mouse control")] [Tooltip("Use these when you dont want to press down for 10 minutes")]
-        // public bool useBothRpms = false;
-
-        //public float bothRpms = 0f;
 
         void Awake()
         {
@@ -37,64 +31,45 @@ namespace GameUI
         void Update()
         {
 
-            // if (useBothRpms)
-            // {
-            //     frontProp.SetRpm(bothRpms);
-            //     backProp.SetRpm(bothRpms);
-            // }
-
-            // Ignore inputs while the right mouse
-            // button is held down. Since this is used for camera controls.
-            // There is no "while button down" check, so we DIY.
-            // if(Input.GetMouseButtonDown(1)) mouseDown = true;
-            // if(Input.GetMouseButtonUp(1)) mouseDown = false;
-            // if(mouseDown) return;
-
             if (Input.GetKeyDown("i"))
             {
-                backrightProp.SetRpm(backrightProp.rpm * 1.05);
-                backleftProp.SetRpm(backleftProp.rpm * 1.05);
+                backrightProp.SetRpm(backrightProp.defaulthoverrpm * 1.05);
+                backleftProp.SetRpm(backleftProp.defaulthoverrpm * 1.05);
             }
 
             if (Input.GetKeyDown("k"))
             {
-                backrightProp.SetRpm(backrightProp.rpm*0.95);
-                backleftProp.SetRpm(backleftProp.rpm*0.95);
+                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm * 1.05);
+                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm * 1.05);
             }
 
             if (Input.GetKeyDown("j"))
             {
-                frontrightProp.SetRpm(frontrightProp.rpm *1.05);
-                backrightProp.SetRpm(backrightProp.rpm*1.05);
+                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm *1.05);
+                backrightProp.SetRpm(backrightProp.defaulthoverrpm*1.05);
             }
 
             if (Input.GetKeyDown("l"))
             {
-                frontrightProp.SetRpm(frontrightProp.rpm*0.95);
-                backrightProp.SetRpm(backrightProp.rpm*0.95);
+                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm *1.05);
+                backleftProp.SetRpm(backleftProp.defaulthoverrpm*1.05);
             }
 
             if (Input.GetKeyDown("o"))
             {
-                frontrightProp.SetRpm(+moveRpms);
-                backrightProp.SetRpm(+moveRpms);
-                frontleftProp.SetRpm(+moveRpms);
-                backleftProp.SetRpm(+moveRpms);
+                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm*1.05);
+                backrightProp.SetRpm(backrightProp.defaulthoverrpm*1.05);
+                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm*1.05);
+                backleftProp.SetRpm(backleftProp.defaulthoverrpm*1.05);
             }
 
             if (Input.GetKeyDown("p"))
             {
-                frontrightProp.SetRpm(-moveRpms);
-                backrightProp.SetRpm(-moveRpms);
-                frontleftProp.SetRpm(-moveRpms);
-                backleftProp.SetRpm(-moveRpms);
+                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm/1.05);
+                backrightProp.SetRpm(backrightProp.defaulthoverrpm/1.05);
+                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm/1.05);
+                backleftProp.SetRpm(backleftProp.defaulthoverrpm/1.05);
             }
-
-            // if (Input.GetKeyUp("up") || Input.GetKeyUp("down") || Input.GetKeyUp("q") || Input.GetKeyUp("e"))
-            // {
-            //     frontProp.SetRpm(0);
-            //     backProp.SetRpm(0);
-            // }
         }
     }
 }

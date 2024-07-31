@@ -56,6 +56,7 @@ namespace VehicleComponents.Actuators
         public bool torque_req = true;
         [Tooltip("direction of torque")]
         public bool torque_up = true;
+        public double defaulthoverrpm;
 
         [SerializeField] private ArticulationBody baseLinkArticulationBody;
         private float c_tau_f = 8.004e-2f;
@@ -114,6 +115,7 @@ namespace VehicleComponents.Actuators
 
             // Calculate the required RPM for each propeller
             float  requiredRPM = (requiredForce/(NumPropellers* RPMToForceMultiplier)) ;
+            this.defaulthoverrpm = requiredRPM;
 
             // Set the initial RPM to each propeller
             SetRpm(requiredRPM);
