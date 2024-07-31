@@ -8,9 +8,9 @@ namespace GameUI
     public class NewDroneKeyboardControl : KeyboardController
     {
 
+        public GameObject frontleftPropGo;
         public GameObject frontrightPropGo;
         public GameObject backrightPropGo;
-        public GameObject frontleftPropGo;
         public GameObject backleftPropGo;
 
         Propeller frontrightProp, frontleftProp, backrightProp, backleftProp;
@@ -28,10 +28,9 @@ namespace GameUI
 
         void Awake()
         {
-            
+            frontleftProp = frontleftPropGo.GetComponent<Propeller>();
             frontrightProp = frontrightPropGo.GetComponent<Propeller>();
             backrightProp = backrightPropGo.GetComponent<Propeller>();
-            frontleftProp = frontleftPropGo.GetComponent<Propeller>();
             backleftProp = backleftPropGo.GetComponent<Propeller>();
         }
 
@@ -59,20 +58,20 @@ namespace GameUI
 
             if (Input.GetKeyDown("k"))
             {
-                backrightProp.SetRpm(backrightProp.rpm-moveRpms);
-                backleftProp.SetRpm(backleftProp.rpm-moveRpms);
+                backrightProp.SetRpm(backrightProp.rpm*0.95);
+                backleftProp.SetRpm(backleftProp.rpm*0.95);
             }
 
             if (Input.GetKeyDown("j"))
             {
-                frontrightProp.SetRpm(frontrightProp.rpm-rollRpms);
-                backrightProp.SetRpm(backrightProp.rpm-rollRpms);
+                frontrightProp.SetRpm(frontrightProp.rpm *1.05);
+                backrightProp.SetRpm(backrightProp.rpm*1.05);
             }
 
             if (Input.GetKeyDown("l"))
             {
-                frontrightProp.SetRpm(frontrightProp.rpm+rollRpms);
-                backrightProp.SetRpm(backrightProp.rpm+rollRpms);
+                frontrightProp.SetRpm(frontrightProp.rpm*0.95);
+                backrightProp.SetRpm(backrightProp.rpm*0.95);
             }
 
             if (Input.GetKeyDown("o"))
