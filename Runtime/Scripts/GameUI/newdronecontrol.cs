@@ -30,11 +30,7 @@ namespace GameUI
 
         void Update()
         {
-            backrightProp.SetRpm(backrightProp.defaulthoverrpm);
-            backleftProp.SetRpm(backleftProp.defaulthoverrpm);
-            frontrightProp.SetRpm(frontrightProp.defaulthoverrpm);
-            frontleftProp.SetRpm(frontleftProp.defaulthoverrpm); 
-            
+
             if (Input.GetKeyDown("i"))
             {
                 backrightProp.SetRpm(backrightProp.defaulthoverrpm * 1.05);
@@ -74,6 +70,15 @@ namespace GameUI
                 frontleftProp.SetRpm(frontleftProp.defaulthoverrpm/1.05);
                 backleftProp.SetRpm(backleftProp.defaulthoverrpm/1.05);
             }
+            
+            if (Input.GetKeyUp("i") || Input.GetKeyUp("j") || Input.GetKeyUp("k") || Input.GetKeyUp("l") || Input.GetKeyUp("o") || Input.GetKeyUp("p"))
+            {
+                backrightProp.SetRpm(backrightProp.defaulthoverrpm);
+                backleftProp.SetRpm(backleftProp.defaulthoverrpm);
+                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm);
+                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm); 
+            }
+
         }
     }
 }
