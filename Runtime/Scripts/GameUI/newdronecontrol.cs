@@ -30,7 +30,11 @@ namespace GameUI
 
         void Update()
         {
-
+            backrightProp.SetRpm(backrightProp.defaulthoverrpm);
+            backleftProp.SetRpm(backleftProp.defaulthoverrpm);
+            frontrightProp.SetRpm(frontrightProp.defaulthoverrpm);
+            frontleftProp.SetRpm(frontleftProp.defaulthoverrpm); 
+            
             if (Input.GetKeyDown("i"))
             {
                 backrightProp.SetRpm(backrightProp.defaulthoverrpm * 1.05);
