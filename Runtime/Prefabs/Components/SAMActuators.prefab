@@ -93,7 +93,13 @@ MonoBehaviour:
   reverse: 1
   rpm: 0
   RPMMax: 1000
-  RPMToForceMultiplier: 5
+  RPMToForceMultiplier: 0.005
+  NumPropellers: 4
+  HoverDefault: 0
+  ApplyTorque: 0
+  TorqueUp: 0
+  DefaultHoverRPM: 0
+  baseLinkArticulationBody: {fileID: 0}
 --- !u!114 &2967109067222843076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,8 +112,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: core/thruster2_fb
   frequency: 10
+  topic: core/thruster2_fb
+  ignoreSensorState: 0
 --- !u!114 &9190152339477900123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,6 +131,7 @@ MonoBehaviour:
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &2879045420304286706
 GameObject:
   m_ObjectHideFlags: 0
@@ -192,8 +200,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d3cd42937cc751eb3683ea7a6f3573, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: core/vbs_fb
   frequency: 10
+  topic: core/vbs_fb
+  ignoreSensorState: 0
 --- !u!114 &2231964782047557348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210,6 +219,7 @@ MonoBehaviour:
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &5487030688596474276
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,7 +275,13 @@ MonoBehaviour:
   reverse: 0
   rpm: 0
   RPMMax: 1000
-  RPMToForceMultiplier: 5
+  RPMToForceMultiplier: 0.005
+  NumPropellers: 4
+  HoverDefault: 0
+  ApplyTorque: 0
+  TorqueUp: 0
+  DefaultHoverRPM: 0
+  baseLinkArticulationBody: {fileID: 0}
 --- !u!114 &6427579228274047843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -278,8 +294,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: core/thruster1_fb
   frequency: 10
+  topic: core/thruster1_fb
+  ignoreSensorState: 0
 --- !u!114 &8433107569252019721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,6 +313,7 @@ MonoBehaviour:
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &6134472343779380878
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,8 +380,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d3cd42937cc751eb3683ea7a6f3573, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topic: core/lcg_fb
   frequency: 10
+  topic: core/lcg_fb
+  ignoreSensorState: 0
 --- !u!114 &8895723212842834944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -380,6 +399,7 @@ MonoBehaviour:
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
 --- !u!1 &6492752199017079265
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,6 +470,7 @@ MonoBehaviour:
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
   angleChoice: 0
 --- !u!1 &6784644159264955759
 GameObject:
@@ -521,6 +542,7 @@ MonoBehaviour:
   expectedFrequency: 2
   resetting: 1
   receivedFrequency: 0
+  ReceivedFirstMessage: 0
   angleChoice: 1
 --- !u!1 &7554311176727221456
 GameObject:
