@@ -33,7 +33,8 @@ namespace VehicleComponents.ROS.Subscribers
         protected RosMsgType ROSMsg;
         double lastTime;
 
-        void Awake()
+
+        void Start()
         {
             if(topic == null)
             {
@@ -61,7 +62,7 @@ namespace VehicleComponents.ROS.Subscribers
             lastTime = Clock.NowTimeInSeconds;
         }
 
-        public virtual void UpdateVehicle(bool reset)
+        protected virtual void UpdateVehicle(bool reset)
         {
             Debug.Log($"The ActuatorSubscriber with topic {topic} did not override the UpdateVehicle method!");
         }
@@ -69,6 +70,8 @@ namespace VehicleComponents.ROS.Subscribers
 
         void FixedUpdate()
         {
+            if(topic == null) return;
+            
             if(expectedFrequency > 0)
             {
                 double deltaTime = Clock.NowTimeInSeconds - lastTime;
