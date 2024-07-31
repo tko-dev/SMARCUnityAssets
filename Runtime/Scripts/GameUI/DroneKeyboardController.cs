@@ -18,6 +18,9 @@ namespace GameUI
         [Tooltip("Difference in RPM between sides of the drone when moving around")]
         public float RPMDifferenceRatio = 0.25f;
 
+        bool mouseDown = false;
+
+
         void Awake()
         {
             frontleftProp = frontleftPropGo.GetComponent<Propeller>();
@@ -28,6 +31,9 @@ namespace GameUI
 
         void Update()
         {
+            if(Input.GetMouseButtonDown(1)) mouseDown = true;
+            if(Input.GetMouseButtonUp(1)) mouseDown = false;
+            if(mouseDown) return;
 
             if (Input.GetKeyDown("i"))
             {
