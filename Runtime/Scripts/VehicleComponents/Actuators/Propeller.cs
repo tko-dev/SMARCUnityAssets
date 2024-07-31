@@ -1,38 +1,3 @@
-// using System.Collections;
-// using System.Collections.Generic;
-// using UnityEngine;
-// using Utils = DefaultNamespace.Utils;
-
-// namespace VehicleComponents.Actuators
-// {
-//     public class Propeller: LinkAttachment
-//     {
-//         [Header("Propeller")]
-//         public bool reverse = false;
-//         public double rpm;
-//         public float RPMMax = 1000;
-//         public float RPMToForceMultiplier = 5;
-        
-//         public void SetRpm(double rpm)
-//         {
-//             this.rpm = Mathf.Clamp((float)rpm, -RPMMax, RPMMax);
-//         }
-
-//         void FixedUpdate()
-//         {
-//             var r = rpm / 1000 * RPMToForceMultiplier;
-      
-//             int direction = reverse? -1 : 1;
-//             parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
-//             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
-//                                                    parentArticulationBody.transform.position,
-//                                                    ForceMode.Force);
-//         }
-        
-//         //TODO: Ensure RPM feedback in???
-//     }
-// }
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -53,12 +18,12 @@ namespace VehicleComponents.Actuators
 
         [Header("Drone Propeller")]
         [Tooltip("Tick it for Drone and off for SAM/ROV")]
-        public bool hoverdefault = true;
+        public bool HoverDefault = false;
         [Tooltip("should there be a torque")]
-        public bool torque_req = true;
+        public bool ApplyTorque = false;
         [Tooltip("direction of torque")]
-        public bool torque_up = true;
-        public double defaulthoverrpm;
+        public bool TorqueUp = false;
+        public double DefaultHoverRPM;
 
         [SerializeField] private ArticulationBody baseLinkArticulationBody;
         private float c_tau_f = 8.004e-2f;
@@ -83,13 +48,13 @@ namespace VehicleComponents.Actuators
                     baseLinkArticulationBody = articulationBody;
                 }
             }
-            if(hoverdefault) InitializeRPMToStayAfloat();
+            if(HoverDefault) InitializeRPMToStayAfloat();
         }
 
         void FixedUpdate()
         {
             var r = (float)rpm * RPMToForceMultiplier;
-            if(hoverdefault) Debug.Log("the value of 4xr is: " + r*4 );
+            if(HoverDefault) Debug.Log("the value of 4xr is: " + r*4 );
 
             // Visualize the applied force
             
@@ -100,9 +65,9 @@ namespace VehicleComponents.Actuators
                                                    parentArticulationBody.transform.position,
                                                    ForceMode.Force);
             //manual torqueaddition
-            if  (torque_req)   
+            if  (ApplyTorque)   
             {
-                int torque_sign = torque_up ? 1 : -1;
+                int torque_sign = TorqueUp ? 1 : -1;
                 float torque = torque_sign * c_tau_f * (float)r;
                 Vector3 torqueVector = torque * transform.forward;
                 parentArticulationBody.AddTorque(torqueVector, ForceMode.Force);
@@ -116,8 +81,9 @@ namespace VehicleComponents.Actuators
             Debug.Log("Required force to stay afloat: " + requiredForce);
 
             // Calculate the required RPM for each propeller
-            float  requiredRPM = (requiredForce/(NumPropellers* RPMToForceMultiplier)) ;
-            this.defaulthoverrpm = requiredRPM;
+            float requiredForcePerProp = requiredForce/NumPropellers;
+            float requiredRPM = requiredForcePerProp / RPMToForceMultiplier;
+            this.DefaultHoverRPM = requiredRPM;
 
             // Set the initial RPM to each propeller
             SetRpm(requiredRPM);
