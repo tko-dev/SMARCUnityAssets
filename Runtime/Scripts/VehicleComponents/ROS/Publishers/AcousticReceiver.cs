@@ -24,17 +24,14 @@ namespace VehicleComponents.ROS.Publishers
         TX tx;
         StringStampedMsg ROSMsg;
 
-        void Awake()
-        {
-            if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
-            ros = ROSConnection.GetOrCreateInstance();
-            ros.RegisterPublisher<StringStampedMsg>(topic);
-
-            ROSMsg = new StringStampedMsg();
-        }
 
         void Start()
         {
+            if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
+            ROSMsg = new StringStampedMsg();
+            ros = ROSConnection.GetOrCreateInstance();
+            ros.RegisterPublisher<StringStampedMsg>(topic);
+
             tx = GetComponent<TX>();
             if(tx == null)
             {

@@ -21,7 +21,8 @@ namespace VehicleComponents.ROS.Subscribers
         [Tooltip("ThrusterAngles contains both vertical and horizontal angles. Pick one that applies to this hinge.")]
         public AngleChoice angleChoice = AngleChoice.vertical;
         Hinge hinge;
-        void Start()
+        
+        void Awake()
         {
             hinge = GetComponent<Hinge>();
             if(hinge == null)
@@ -31,7 +32,7 @@ namespace VehicleComponents.ROS.Subscribers
             }
         }
 
-        public override void UpdateVehicle(bool reset)
+        protected override void UpdateVehicle(bool reset)
         {
             if(hinge == null) return;
             if(reset)

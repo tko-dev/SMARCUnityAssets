@@ -3,14 +3,18 @@ using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 
 using SensorGPS = VehicleComponents.Sensors.GPS;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorGPS))]
-    class GPS: SensorPublisher<NavSatFixMsg, SensorGPS>
+    class GPS: ROSPublisher<NavSatFixMsg, SensorGPS>
     { 
 
-        public override void UpdateMessage()
+        protected override void InitializePublication(){}
+
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             if(sensor.fix) 
@@ -22,5 +26,7 @@ namespace VehicleComponents.ROS.Publishers
             }
             else ROSMsg.status.status = NavSatStatusMsg.STATUS_NO_FIX;
         }
+
+        
     }
 }
