@@ -137,7 +137,8 @@ namespace DroneControlScripts
 				Debug.DrawRay (propellerPos, propellers_forces [i] / maxForce * propellerUp, Color.red);
 			}
 			quadcopterAB.AddTorque (torque/100f * quadcopterAB.transform.up);
-			if(quadcopterAB.GetAccumulatedTorque().magnitude > 0) Debug.Log("the torque applied is : " + quadcopterAB.GetAccumulatedTorque() );
+			if((quadcopterAB.GetAccumulatedTorque()).magnitude > 0) Debug.Log("the torque applied is : " + quadcopterAB.GetAccumulatedTorque() );
+			if((quadcopterAB.GetAccumulatedForce()).magnitude > 0) {Debug.Log("the force applied is : " + quadcopterAB.GetAccumulatedForce() );}
 			//Debug.Log (quadcopterRB.transform.up + " " + propellers [0].transform.up);
 		}
 

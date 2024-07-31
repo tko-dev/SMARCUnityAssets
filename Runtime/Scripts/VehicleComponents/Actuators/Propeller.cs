@@ -46,7 +46,7 @@ namespace VehicleComponents.Actuators
         public bool reverse = false;
         public double rpm;
         public float RPMMax = 100000;
-        public float RPMToForceMultiplier = 0.005f;
+        private float RPMToForceMultiplier = 0.005f;
         public float NumPropellers = 4f;
 
         [Header("Drone Propeller")]
@@ -64,7 +64,7 @@ namespace VehicleComponents.Actuators
         public void SetRpm(double rpm)
         {
             this.rpm = Mathf.Clamp((float)rpm, -RPMMax, RPMMax);
-            if(hoverdefault) Debug.Log("setting rpm to: " + rpm);
+            //if(hoverdefault) Debug.Log("setting rpm to: " + rpm);
         }
         
         void Start()
@@ -76,7 +76,7 @@ namespace VehicleComponents.Actuators
                 ArticulationBody articulationBody = current.GetComponent<ArticulationBody>();
                 if (articulationBody != null && articulationBody.name == "base_link")
                 {
-                    Debug.Log("base_link articulation body found: " + articulationBody);
+                   // Debug.Log("base_link articulation body found: " + articulationBody);
                     baseLinkArticulationBody = articulationBody;
                 }
             }
@@ -85,13 +85,13 @@ namespace VehicleComponents.Actuators
 
         void FixedUpdate()
         {
-            var r = rpm * RPMToForceMultiplier;
-            if(hoverdefault) Debug.Log("the value of r is: " + r );
+            var r = (float)rpm * RPMToForceMultiplier;
+            if(hoverdefault) Debug.Log("the value of 4xr is: " + r*4 );
 
             // Visualize the applied force
             
             int direction = reverse? -1 : 1;
-            parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
+            //parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
             
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,
@@ -113,7 +113,7 @@ namespace VehicleComponents.Actuators
             Debug.Log("Required force to stay afloat: " + requiredForce);
 
             // Calculate the required RPM for each propeller
-            float  requiredRPM = (requiredForce/NumPropellers) * RPMToForceMultiplier;
+            float  requiredRPM = (requiredForce/(NumPropellers* RPMToForceMultiplier)) ;
 
             // Set the initial RPM to each propeller
             SetRpm(requiredRPM);
