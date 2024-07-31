@@ -33,50 +33,50 @@ namespace GameUI
 
             if (Input.GetKeyDown("i"))
             {
-                backrightProp.SetRpm(backrightProp.defaulthoverrpm * 1.05);
-                backleftProp.SetRpm(backleftProp.defaulthoverrpm * 1.05);
+                backrightProp.SetRpm(backrightProp.DefaultHoveringRPM * 1.05);
+                backleftProp.SetRpm(backleftProp.DefaultHoveringRPM * 1.05);
             }
 
             if (Input.GetKeyDown("k"))
             {
-                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm * 1.05);
-                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm * 1.05);
+                frontrightProp.SetRpm(frontrightProp.DefaultHoveringRPM * 1.05);
+                frontleftProp.SetRpm(frontleftProp.DefaultHoveringRPM * 1.05);
             }
 
             if (Input.GetKeyDown("j"))
             {
-                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm *1.05);
-                backrightProp.SetRpm(backrightProp.defaulthoverrpm*1.05);
+                frontrightProp.SetRpm(frontrightProp.DefaultHoveringRPM *1.05);
+                backrightProp.SetRpm(backrightProp.DefaultHoveringRPM*1.05);
             }
 
             if (Input.GetKeyDown("l"))
             {
-                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm *1.05);
-                backleftProp.SetRpm(backleftProp.defaulthoverrpm*1.05);
+                frontleftProp.SetRpm(frontleftProp.DefaultHoveringRPM *1.05);
+                backleftProp.SetRpm(backleftProp.DefaultHoveringRPM*1.05);
             }
 
             if (Input.GetKeyDown("o"))
             {
-                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm*1.05);
-                backrightProp.SetRpm(backrightProp.defaulthoverrpm*1.05);
-                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm*1.05);
-                backleftProp.SetRpm(backleftProp.defaulthoverrpm*1.05);
+                frontrightProp.SetRpm(frontrightProp.DefaultHoveringRPM*1.05);
+                backrightProp.SetRpm(backrightProp.DefaultHoveringRPM*1.05);
+                frontleftProp.SetRpm(frontleftProp.DefaultHoveringRPM*1.05);
+                backleftProp.SetRpm(backleftProp.DefaultHoveringRPM*1.05);
             }
 
             if (Input.GetKeyDown("p"))
             {
-                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm/1.05);
-                backrightProp.SetRpm(backrightProp.defaulthoverrpm/1.05);
-                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm/1.05);
-                backleftProp.SetRpm(backleftProp.defaulthoverrpm/1.05);
+                frontrightProp.SetRpm(frontrightProp.DefaultHoveringRPM/1.05);
+                backrightProp.SetRpm(backrightProp.DefaultHoveringRPM/1.05);
+                frontleftProp.SetRpm(frontleftProp.DefaultHoveringRPM/1.05);
+                backleftProp.SetRpm(backleftProp.DefaultHoveringRPM/1.05);
             }
             
             if (Input.GetKeyUp("i") || Input.GetKeyUp("j") || Input.GetKeyUp("k") || Input.GetKeyUp("l") || Input.GetKeyUp("o") || Input.GetKeyUp("p"))
             {
-                backrightProp.SetRpm(backrightProp.defaulthoverrpm);
-                backleftProp.SetRpm(backleftProp.defaulthoverrpm);
-                frontrightProp.SetRpm(frontrightProp.defaulthoverrpm);
-                frontleftProp.SetRpm(frontleftProp.defaulthoverrpm); 
+                backrightProp.SetRpm(backrightProp.DefaultHoveringRPM);
+                backleftProp.SetRpm(backleftProp.DefaultHoveringRPM);
+                frontrightProp.SetRpm(frontrightProp.DefaultHoveringRPM);
+                frontleftProp.SetRpm(frontleftProp.DefaultHoveringRPM); 
             }
 
         }
