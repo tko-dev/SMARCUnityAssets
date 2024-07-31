@@ -17,13 +17,13 @@ namespace VehicleComponents.ROS.Publishers
         [Range(1,100)]
         public int quality = 75;
 
-        void Start()
+        protected override void InitializePublication()
         {
             ROSMsg.format = "rgb8;jpeg compressed rgb8";
             ROSMsg.header.frame_id = sensor.linkName;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             ROSMsg.data = ImageConversion.EncodeToJPG(sensor.image, quality);

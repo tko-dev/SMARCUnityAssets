@@ -11,7 +11,7 @@ namespace VehicleComponents.ROS.Publishers
     public class PropellerFeedback: ROSPublisher<ThrusterFeedbackMsg, Propeller>
     {
         Propeller prop;
-        void Start()
+        protected override void InitializePublication()
         {
             prop = GetComponent<Propeller>();
             if(prop == null)
@@ -21,7 +21,7 @@ namespace VehicleComponents.ROS.Publishers
             }
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             if(prop == null) return;
 

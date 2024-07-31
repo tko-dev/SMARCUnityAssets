@@ -13,7 +13,7 @@ namespace VehicleComponents.ROS.Publishers
     class MBES: ROSPublisher<PointCloud2Msg, SensorMBES>
     { 
         public string frame_id="map_gt";
-        void Start()
+        protected override void InitializePublication()
         {
             ROSMsg.header.frame_id = frame_id;
 
@@ -55,7 +55,7 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.fields[3].count = 1;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             for(int i=0; i<sensor.sonarHits.Length; i++)

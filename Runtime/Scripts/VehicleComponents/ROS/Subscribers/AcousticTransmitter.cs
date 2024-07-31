@@ -21,18 +21,15 @@ namespace VehicleComponents.ROS.Subscribers
 
         TX tx;
         StringStampedMsg ROSMsg;
-
-        void Awake()
+        
+        void Start()
         {
             if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
             ros = ROSConnection.GetOrCreateInstance();
             ros.Subscribe<StringStampedMsg>(topic, UpdateMessage);
 
             ROSMsg = new StringStampedMsg();
-        }
-        
-        void Start()
-        {
+
             tx = GetComponent<TX>();
             if(tx == null)
             {

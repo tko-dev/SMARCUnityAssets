@@ -25,7 +25,7 @@ namespace VehicleComponents.ROS.Publishers
         public float fxp=1;
         public float fyp=1, cxp=1, cyp=1, Tx=1, Ty=1;
 
-        void Start()
+        protected override void InitializePublication()
         {
             ROSMsg.distortion_model = "plumb_bob";
             ROSMsg.D = new double[5];
@@ -36,7 +36,7 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.header.frame_id = sensor.linkName;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);   
 

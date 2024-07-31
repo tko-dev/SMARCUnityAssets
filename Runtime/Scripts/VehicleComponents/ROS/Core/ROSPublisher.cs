@@ -28,7 +28,7 @@ namespace VehicleComponents.ROS.Core
         [Tooltip("If true, we will publish regardless, even if the underlying sensor says no data.")]
         public bool ignoreSensorState = false;
 
-        void Awake()
+        void Start()
         {
             // We namespace the topics with the root name
             if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
@@ -39,12 +39,19 @@ namespace VehicleComponents.ROS.Core
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<RosMsgType>(topic);
 
+            InitializePublication();
+
             InvokeRepeating("Publish", 1f, period);
         }
 
-        public virtual void UpdateMessage()
+        protected virtual void UpdateMessage()
         {
-            Debug.Log($"The SensorPublisher with topic {topic} did not override the UpdateMessage method!");
+            Debug.Log($"The ROSPublisher with topic {topic} did not override the UpdateMessage method!");
+        }
+
+        protected virtual void InitializePublication()
+        {
+            Debug.Log($"The ROSPublisher with topic {topic} did not override the Initialize method!");
         }
 
         void Publish()

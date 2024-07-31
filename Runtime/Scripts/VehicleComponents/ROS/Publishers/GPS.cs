@@ -12,7 +12,9 @@ namespace VehicleComponents.ROS.Publishers
     class GPS: ROSPublisher<NavSatFixMsg, SensorGPS>
     { 
 
-        public override void UpdateMessage()
+        protected override void InitializePublication(){}
+
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             if(sensor.fix) 
@@ -23,5 +25,7 @@ namespace VehicleComponents.ROS.Publishers
             }
             else ROSMsg.status.status = NavSatStatusMsg.STATUS_NO_FIX;
         }
+
+        
     }
 }

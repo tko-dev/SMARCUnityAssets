@@ -19,11 +19,12 @@ namespace VehicleComponents.ROS.Publishers
             ignoreSensorState = true;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {        
             (easting, northing, lat, lon) = sensor.GetUTMLatLon();
             ROSMsg.latitude = lat;
             ROSMsg.longitude = lon;
         }
+        protected override void InitializePublication(){}
     }
 }
