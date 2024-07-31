@@ -12,8 +12,8 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(SensorLeak))]
     class Leak: ROSPublisher<LeakMsg, SensorLeak>
     { 
-        
-        public override void UpdateMessage()
+        protected override void InitializePublication(){}
+        protected override void UpdateMessage()
         {
             if(sensor.leaked)
             {

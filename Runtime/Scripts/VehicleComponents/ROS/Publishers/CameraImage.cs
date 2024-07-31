@@ -10,7 +10,7 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(CameraImageSensor))]
     class CameraImage: ROSPublisher<ImageMsg, CameraImageSensor>
     {
-        void Start()
+        protected override void InitializePublication()
         {
             var textureHeight = sensor.textureHeight;
             var textureWidth = sensor.textureWidth;
@@ -24,7 +24,7 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.header.frame_id = sensor.linkName;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             var img = sensor.image.GetRawTextureData<byte>();
             for(int i=0; i<img.Length; i++) ROSMsg.data[i] = img[i]; 
