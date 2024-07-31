@@ -6,16 +6,18 @@ using RosMessageTypes.Smarc;
 using RosMessageTypes.Std;
 
 using SensorDVL = VehicleComponents.Sensors.DVL;
+using VehicleComponents.ROS.Core;
+
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorDVL))]
-    class DVL: SensorPublisher<DVLMsg, SensorDVL>
+    class DVL: ROSPublisher<DVLMsg, SensorDVL>
     { 
 
         DVLBeamMsg[] beamMsgs;
 
-        void Start()
+        protected override void InitializePublication()
         {
             ROSMsg.header.frame_id = sensor.linkName;
             beamMsgs = new DVLBeamMsg[sensor.numBeams];
@@ -26,7 +28,7 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.beams = beamMsgs;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             

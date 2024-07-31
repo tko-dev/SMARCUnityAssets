@@ -12,7 +12,8 @@ namespace VehicleComponents.ROS.Subscribers
     public class PropellerCommand : ActuatorSubscriber<ThrusterRPMMsg>
     {        
         Propeller prop;
-        void Start()
+        
+        void Awake()
         {
             prop = GetComponent<Propeller>();
             if(prop == null)
@@ -22,7 +23,7 @@ namespace VehicleComponents.ROS.Subscribers
             }
         }
 
-        public override void UpdateVehicle(bool reset)
+        protected override void UpdateVehicle(bool reset)
         {
             if(prop == null) return;
             if(reset)

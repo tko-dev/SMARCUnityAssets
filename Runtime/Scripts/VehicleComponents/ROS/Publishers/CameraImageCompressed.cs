@@ -4,25 +4,26 @@ using UnityEngine;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 
+using VehicleComponents.ROS.Core;
 using CameraImageSensor = VehicleComponents.Sensors.CameraImage;
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(CameraImageSensor))]
-    class CameraImageCompressed: SensorPublisher<CompressedImageMsg, CameraImageSensor>
+    class CameraImageCompressed: ROSPublisher<CompressedImageMsg, CameraImageSensor>
     {
         [Header("Compressed Image")]
         [Tooltip("Jpg compression quality. 1=lowest quality")]
         [Range(1,100)]
         public int quality = 75;
 
-        void Start()
+        protected override void InitializePublication()
         {
             ROSMsg.format = "rgb8;jpeg compressed rgb8";
             ROSMsg.header.frame_id = sensor.linkName;
         }
 
-        public override void UpdateMessage()
+        protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             ROSMsg.data = ImageConversion.EncodeToJPG(sensor.image, quality);

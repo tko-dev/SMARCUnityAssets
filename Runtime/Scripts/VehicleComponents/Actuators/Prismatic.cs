@@ -38,6 +38,11 @@ namespace VehicleComponents.Actuators
             articulationBody.SetDriveTarget(ArticulationDriveAxis.X, Mathf.Lerp(_minimumPos, _maximumPos, percentage / 100));
         }
 
+        public bool HasNewData()
+        {
+            return true;
+        }
+
         
     }
 }

@@ -32,7 +32,7 @@ namespace VehicleComponents.ROS.Subscribers
         HashSet<string> initialized_utm_map_frames;
 
 
-        void Awake()
+        void Start()
         {
             ros = ROSConnection.GetOrCreateInstance();
             ros.Subscribe<TFMessageMsg>(topic, UpdateMessage);
