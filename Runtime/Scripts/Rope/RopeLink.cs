@@ -82,6 +82,17 @@ namespace Rope
             backFP.depthBeforeSubmerged = RopeDiameter/5;
         }
 
+        void Awake()
+        {
+            // Ignore other ropes!
+            // Instead of using layers, this is a bit more portable
+            var ropeTagged = GameObject.FindGameObjectsWithTag("rope");
+            foreach(GameObject rope in ropeTagged)
+            {
+                Physics.IgnoreCollision(rope.GetComponent<Collider>(), capsule);
+            }
+        }
+
         public void SpawnRope()
         {
             SpawnChild(numSegments-1);

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1072381918643874274}
   - component: {fileID: 2323260471486542397}
   - component: {fileID: 8333310060384494646}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5878197480763068343}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +128,7 @@ GameObject:
   - component: {fileID: 1330680881955517944}
   - component: {fileID: 1291504851522364808}
   - component: {fileID: 8236880431910735832}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 5318667478105785325}
   - component: {fileID: 7791353921457315705}
   - component: {fileID: 4876152612544120068}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ForcePoint_B
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -337,7 +337,7 @@ GameObject:
   - component: {fileID: 8603847845976021564}
   - component: {fileID: 5475171379688012121}
   - component: {fileID: 4433857822070472517}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Middle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -422,7 +422,7 @@ GameObject:
   - component: {fileID: 6430226332961413082}
   - component: {fileID: 4660306551167620851}
   - component: {fileID: 5890788663254625585}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: ForcePoint_F
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -548,7 +548,7 @@ GameObject:
   - component: {fileID: 4234441313039161486}
   - component: {fileID: 10039788946428091}
   - component: {fileID: 1080205937504706963}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: RopeLink
   m_TagString: rope
   m_Icon: {fileID: 0}
@@ -595,7 +595,7 @@ CapsuleCollider:
   m_Radius: 0.05
   m_Height: 0.2
   m_Direction: 2
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.04, z: 0}
 --- !u!171741748 &4234441313039161486
 ArticulationBody:
   m_ObjectHideFlags: 0
@@ -616,7 +616,7 @@ ArticulationBody:
   m_LinearY: 2
   m_LinearZ: 2
   m_SwingY: 2
-  m_SwingZ: 2
+  m_SwingZ: 0
   m_Twist: 2
   m_XDrive:
     lowerLimit: 0
