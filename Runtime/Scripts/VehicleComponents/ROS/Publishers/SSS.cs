@@ -22,6 +22,10 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
             ROSMsg.port_channel = sensor.portBuckets;
             ROSMsg.starboard_channel = sensor.strbBuckets;
+            ROSMsg.port_channel_angle_high = sensor.portBucketsAngleHigh;
+            ROSMsg.port_channel_angle_low = sensor.portBucketsAngleLow;
+            ROSMsg.starboard_channel_angle_high = sensor.strbBucketsAngleHigh;
+            ROSMsg.starboard_channel_angle_low = sensor.strbBucketsAngleLow;
         }
     }
 }
