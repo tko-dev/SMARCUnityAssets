@@ -47,7 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -2336,7 +2337,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -2462,7 +2464,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -3806,7 +3809,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -4234,7 +4238,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -4713,7 +4718,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -5720,7 +5726,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -5935,7 +5942,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -6639,7 +6647,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}
@@ -6765,7 +6774,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 812475576104893903}
+  ConnectedArticulationBody: {fileID: 812475576104893903}
+  ConnectedRigidbody: {fileID: 0}
   drawForces: 0
   depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 1696784349372826049}

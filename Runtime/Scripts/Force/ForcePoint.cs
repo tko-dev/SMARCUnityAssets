@@ -12,9 +12,66 @@ using UnityEngine.Serialization;
 // [RequireComponent(typeof(IForceModel))]
 namespace Force
 {
+
+    // Because Arti bodies and Rigid bodies dont share
+    // an ancestor, even though they share like 99% of the
+    // methods and semantics...
+    public class MixedBody
+    {
+        public ArticulationBody ab;
+        public Rigidbody rb;
+
+        public bool automaticCenterOfMass
+        {
+            get {return ab ? ab.automaticCenterOfMass : rb.automaticCenterOfMass; }
+            set {
+                if(ab != null) ab.automaticCenterOfMass = value;
+                else rb.automaticCenterOfMass = value;
+                }
+        }
+
+        public Vector3 centerOfMass
+        {
+            get {return ab ? ab.centerOfMass : rb.centerOfMass; }
+            set {
+                if(ab != null) ab.centerOfMass = value;
+                else rb.centerOfMass = value;
+            }
+        }
+
+        public bool useGravity
+        {
+            get {return ab ? ab.useGravity : rb.useGravity; }
+            set {
+                if(ab != null) ab.useGravity = value;
+                else rb.useGravity = value;
+            }
+        }
+
+        public float mass
+        {
+            get {return ab ? ab.mass : rb.mass; }
+            set {
+                if(ab != null) ab.mass = value;
+                else rb.mass = value;
+            }
+        }
+
+        public void AddForceAtPosition(Vector3 force, Vector3 position, ForceMode mode = ForceMode.Force)
+        {
+            if(ab != null)
+                ab.AddForceAtPosition(force, position, mode);
+            else
+                rb.AddForceAtPosition(force, position, mode);
+        }
+    }
+
     public class ForcePoint : MonoBehaviour
     {
-        public ArticulationBody _body;
+        public ArticulationBody ConnectedArticulationBody;
+        public Rigidbody ConnectedRigidbody;
+
+        MixedBody _body;
 
         public bool drawForces = false;
         
@@ -53,6 +110,15 @@ namespace Force
 
         public void Awake()
         {
+            _body = new MixedBody();
+            
+            if(ConnectedArticulationBody == null && ConnectedRigidbody == null)
+                Debug.LogWarning($"{gameObject.name} requires at least one of ConnectedArticulationBody or ConnectedRigidBody to be set!");
+            
+            if(ConnectedArticulationBody != null) _body.ab = ConnectedArticulationBody;
+            if(ConnectedRigidbody!= null) _body.rb = ConnectedRigidbody;
+            
+            
             _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
             var forcePoints = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>();
             if (automaticCenterOfGravity)
