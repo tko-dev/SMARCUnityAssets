@@ -6,52 +6,93 @@ using Force; // ForcePoints
 
 namespace Rope
 {
-    [RequireComponent(typeof(ArticulationBody))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(ConfigurableJoint))]
     [RequireComponent(typeof(CapsuleCollider))]
     public class RopeLink : MonoBehaviour
     {
-        public GameObject RopeLinkPrefab;
-        public GameObject BuoyPrefab;
-
-        ArticulationBody body;
         CapsuleCollider capsule;
+        ConfigurableJoint joint;
+
         SphereCollider frontFP_sphereCollider, backFP_sphereCollider;
         Transform frontFP_tf, backFP_tf, frontVis_tf, backVis_tf, middleVis_tf;
         ForcePoint frontFP, backFP;
 
-        [Tooltip("Diameter of the rope in meters")]
-        public float RopeDiameter = 0.01f;
-        [Tooltip("Diameter of the collision objects for the rope. The bigger the more stable the physics are.")]
-        public float RopeCollisionDiameter = 0.1f;
-        [Tooltip("How long each segment of the rope will be. Smaller = more realistic but harder to simulate.")]
-        [Range(0.1f, 1f)]
-        public float SegmentLength = 0.1f;
-
-        [Tooltip("How long the entire rope should be. Rounded to SegmentLength. Ignored if this is not the root of the rope.")]
-        public float RopeLength = 1f;
-        public int numSegments;
-
         GameObject child;
 
+        float RopeDiameter;
+        float RopeCollisionDiameter;
+        float SegmentLength;
 
-        void OnValidate()
+
+        public void SetRopeSizes(float rd, float rcd, float sl)
         {
-            numSegments = (int)(RopeLength / (SegmentLength-RopeDiameter));
-            if(numSegments > 30) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
+            RopeDiameter = rd;
+            RopeCollisionDiameter = rcd;
+            SegmentLength = sl;
+            SetupBits();
+        }
+
+
+
+        SoftJointLimitSpring makeSJLS(float spring, float damper)
+        {
+            var sjls = new SoftJointLimitSpring();
+            sjls.damper = damper;
+            sjls.spring = spring;
+            return sjls;
+        }
+
+        JointDrive makeJD(float spring, float damper, float maximumForce)
+        {
+            var drive = new JointDrive();
+            drive.positionSpring = spring;
+            drive.positionDamper = damper;
+            drive.maximumForce = maximumForce;
+            return drive;
+        }
+
+
+        void SetupBits()
+        {
+            joint = GetComponent<ConfigurableJoint>();
+            capsule = GetComponent<CapsuleCollider>();
 
             // scale and locate all the little bits and bobs that make up
             // this rope segment depending on the parameters above.
             // Because settings these by hand is a pain.
-            body = GetComponent<ArticulationBody>();
-            capsule = GetComponent<CapsuleCollider>();
 
             capsule.radius = RopeCollisionDiameter/2;
             capsule.height = SegmentLength+RopeCollisionDiameter; // we want the collision to overlap with the child's
 
+            // center of rotation for front and back links
+            // also where we put things like force points
             var frontSpherePos = new Vector3(0,0, SegmentLength/2 - RopeDiameter/4);
             var backSpherePos = new Vector3(0,0, -(SegmentLength/2 - RopeDiameter/4));
 
-            body.anchorPosition = backSpherePos;
+            // This setup was found here
+            // https://forums.tigsource.com/index.php?topic=64389.msg1389271#msg1389271
+            // where there are vids demonstrating even KNOTS :D
+            joint.anchor = backSpherePos;
+            joint.enableCollision = false;
+            joint.enablePreprocessing = false;
+
+            joint.xMotion = ConfigurableJointMotion.Locked;
+            joint.yMotion = ConfigurableJointMotion.Locked;
+            joint.zMotion = ConfigurableJointMotion.Locked;
+
+            float spring = 0.1f;
+            float damper = 0.1f;
+            float maximumForce = 4f;
+
+            joint.angularXLimitSpring = makeSJLS(spring, damper);
+            joint.angularYZLimitSpring = makeSJLS(spring, damper);
+            joint.xDrive = makeJD(spring, damper, maximumForce);
+            joint.yDrive = makeJD(spring, damper, maximumForce);
+            joint.zDrive = makeJD(spring, damper, maximumForce);
+            joint.angularXDrive = makeJD(spring, damper, maximumForce);
+            joint.angularYZDrive = makeJD(spring, damper, maximumForce);
+            joint.slerpDrive = makeJD(spring, damper, maximumForce); 
 
             frontFP_tf = transform.Find("ForcePoint_F");
             backFP_tf = transform.Find("ForcePoint_B");
@@ -82,61 +123,6 @@ namespace Rope
             backFP.depthBeforeSubmerged = RopeDiameter/5;
         }
 
-        void Awake()
-        {
-            // Ignore other ropes!
-            // Instead of using layers, this is a bit more portable
-            var ropeTagged = GameObject.FindGameObjectsWithTag("rope");
-            foreach(GameObject rope in ropeTagged)
-            {
-                Physics.IgnoreCollision(rope.GetComponent<Collider>(), capsule);
-            }
-        }
-
-        public void SpawnRope()
-        {
-            SpawnChild(numSegments-1);
-        }
-
-        public void DestroyRope()
-        {
-            RopeLink rl;
-            for (var i=transform.childCount-1; i>=0; i--)
-            {
-                if (transform.GetChild(i).TryGetComponent<RopeLink>(out rl))
-                    DestroyImmediate(transform.GetChild(i).gameObject);
-            }
-        }
-
-        void InstantiateChild(GameObject childPrefab)
-        {
-            child = Instantiate(childPrefab);
-            child.transform.SetParent(this.transform);
-            child.transform.localPosition = new Vector3(0, 0, SegmentLength-RopeDiameter/2);
-            child.transform.rotation = this.transform.rotation;
-        }
-
-        void SpawnChild(int remainingSegments)
-        {
-            if(remainingSegments < 1)
-            {
-                // This is the last segment of the rope, spawn a buoy if given
-                if(BuoyPrefab == null) return;
-                InstantiateChild(BuoyPrefab);
-            }
-            else
-            {   
-                // Still got more to spawn
-                InstantiateChild(RopeLinkPrefab);
-
-                child.name = $"RopeLink_{remainingSegments}";
-
-                var rl = child.GetComponent<RopeLink>();
-                rl.SpawnChild(remainingSegments-1);
-                var ab = child.GetComponent<ArticulationBody>();
-                ab.swingZLock = ArticulationDofLock.LockedMotion;
-            }
-        }
         
     }
 

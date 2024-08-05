@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 831991884415309958}
   - component: {fileID: 7072808880889898729}
   - component: {fileID: 8670824655929185201}
-  - component: {fileID: 5229944933876419775}
+  - component: {fileID: 1867268253894489609}
   m_Layer: 0
   m_Name: ForcePoint
   m_TagString: Untagged
@@ -189,7 +189,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.03
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5229944933876419775
+--- !u!114 &1867268253894489609
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -198,17 +198,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1999536094807160593}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fbfbc551cbd068fa9a31696fe341399, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _body: {fileID: 5412323035531088602}
+  ConnectedArticulationBody: {fileID: 0}
+  ConnectedRigidbody: {fileID: 5412323035531088602}
   drawForces: 0
-  depthBeforeSubmerged: 0.01
+  depthBeforeSubmerged: 0.03
   volumeObject: {fileID: 0}
   volumeMesh: {fileID: 0}
   automaticCenterOfGravity: 0
   volume: 0.1
-  density: 1
+  density: 1.2
 --- !u!1 &4775934865341631663
 GameObject:
   m_ObjectHideFlags: 0
