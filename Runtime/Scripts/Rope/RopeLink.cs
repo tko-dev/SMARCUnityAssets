@@ -27,7 +27,6 @@ namespace Rope
         public float spring = 0.1f;
         public float damper = 0.1f;
         public float maximumForce = 1000f;
-        public float selfPushVelocity = -1f;
 
 
         public void SetRopeSizes(float rd, float rcd, float sl)
