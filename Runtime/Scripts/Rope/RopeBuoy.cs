@@ -9,22 +9,19 @@ namespace Rope
     [RequireComponent(typeof(Collider))]
     public class RopeBuoy : MonoBehaviour
     {
-        Joint joint;
+        FixedJoint joint;
 
-        void Awake()
-        {
-            joint = GetComponent<Joint>();
-        }
 
         void OnCollisionEnter(Collision collision)
         {
-            if(collision.gameObject.name == "Horizontal")
+            if(collision.gameObject.name.Contains("Horizontal"))
             {
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+                gameObject.AddComponent<FixedJoint>();
+                joint = gameObject.GetComponent<FixedJoint>();
+                joint.enablePreprocessing = false;
                 joint.connectedArticulationBody = collision.gameObject.GetComponent<ArticulationBody>();
-                transform.Find("ForcePoint").gameObject.SetActive(false);
             }
-            Debug.Log($"Colliding with:{collision.gameObject.name}");
         }
 
         

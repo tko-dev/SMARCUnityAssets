@@ -611,6 +611,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spring: 0.1
+  damper: 0.1
+  maximumForce: 50
 --- !u!114 &1080205937504706963
 MonoBehaviour:
   m_ObjectHideFlags: 0

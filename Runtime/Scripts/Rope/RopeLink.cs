@@ -13,16 +13,21 @@ namespace Rope
     {
         CapsuleCollider capsule;
         ConfigurableJoint joint;
+        Rigidbody rb;
 
         SphereCollider frontFP_sphereCollider, backFP_sphereCollider;
         Transform frontFP_tf, backFP_tf, frontVis_tf, backVis_tf, middleVis_tf;
         ForcePoint frontFP, backFP;
 
-        GameObject child;
-
         float RopeDiameter;
         float RopeCollisionDiameter;
         float SegmentLength;
+
+        [Header("Rope physics")]
+        public float spring = 0.1f;
+        public float damper = 0.1f;
+        public float maximumForce = 1000f;
+        public float selfPushVelocity = -1f;
 
 
         public void SetRopeSizes(float rd, float rcd, float sl)
@@ -52,23 +57,20 @@ namespace Rope
             return drive;
         }
 
+        (Vector3, Vector3) spherePositions()
+        {
+            float d = SegmentLength/2 - RopeDiameter/4;
+            return ( new Vector3(0,0,d), new Vector3(0,0,-d) );
+        }
 
-        void SetupBits()
+
+        public void SetupJoint()
         {
             joint = GetComponent<ConfigurableJoint>();
-            capsule = GetComponent<CapsuleCollider>();
-
-            // scale and locate all the little bits and bobs that make up
-            // this rope segment depending on the parameters above.
-            // Because settings these by hand is a pain.
-
-            capsule.radius = RopeCollisionDiameter/2;
-            capsule.height = SegmentLength+RopeCollisionDiameter; // we want the collision to overlap with the child's
 
             // center of rotation for front and back links
             // also where we put things like force points
-            var frontSpherePos = new Vector3(0,0, SegmentLength/2 - RopeDiameter/4);
-            var backSpherePos = new Vector3(0,0, -(SegmentLength/2 - RopeDiameter/4));
+            var (frontSpherePos, backSpherePos) = spherePositions();
 
             // This setup was found here
             // https://forums.tigsource.com/index.php?topic=64389.msg1389271#msg1389271
@@ -80,10 +82,7 @@ namespace Rope
             joint.xMotion = ConfigurableJointMotion.Locked;
             joint.yMotion = ConfigurableJointMotion.Locked;
             joint.zMotion = ConfigurableJointMotion.Locked;
-
-            float spring = 0.1f;
-            float damper = 0.1f;
-            float maximumForce = 4f;
+           
 
             joint.angularXLimitSpring = makeSJLS(spring, damper);
             joint.angularYZLimitSpring = makeSJLS(spring, damper);
@@ -93,6 +92,18 @@ namespace Rope
             joint.angularXDrive = makeJD(spring, damper, maximumForce);
             joint.angularYZDrive = makeJD(spring, damper, maximumForce);
             joint.slerpDrive = makeJD(spring, damper, maximumForce); 
+        }
+
+        void SetupBits()
+        {
+            // scale and locate all the little bits and bobs that make up
+            // this rope segment depending on the parameters above.
+            // Because settings these by hand is a pain.
+            var (frontSpherePos, backSpherePos) = spherePositions();
+
+            capsule = GetComponent<CapsuleCollider>();
+            capsule.radius = RopeCollisionDiameter/2;
+            capsule.height = SegmentLength+RopeCollisionDiameter; // we want the collision to overlap with the child's
 
             frontFP_tf = transform.Find("ForcePoint_F");
             backFP_tf = transform.Find("ForcePoint_B");
@@ -121,6 +132,22 @@ namespace Rope
 
             frontFP.depthBeforeSubmerged = RopeDiameter/5;
             backFP.depthBeforeSubmerged = RopeDiameter/5;
+        }
+
+        void Awake()
+        {
+            // disable self-collisions
+            rb = GetComponent<Rigidbody>();
+            var ropeTagged = GameObject.FindGameObjectsWithTag(gameObject.tag);
+            var ownC = GetComponent<Collider>();
+            foreach(var other in ropeTagged)
+            {
+                Collider c;
+                if(other.TryGetComponent(out c))
+                {
+                    Physics.IgnoreCollision(c, ownC);
+                }
+            }
         }
 
         
