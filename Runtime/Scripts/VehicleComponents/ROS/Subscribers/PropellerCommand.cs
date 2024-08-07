@@ -27,12 +27,12 @@ namespace VehicleComponents.ROS.Subscribers
         {
             if(prop == null) return;
             if(reset)
-            {
+            { 
                 prop.SetRpm(0);
                 return;
             }
+
             prop.SetRpm(ROSMsg.rpm);
         }
     }
 }
-
