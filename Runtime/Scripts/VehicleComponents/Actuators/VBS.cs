@@ -53,7 +53,6 @@ namespace VehicleComponents.Actuators
         public void FixedUpdate()
         {
             articulationBody.mass = 0.300f + _initialMass * GetCurrentValue() / 100; // Piston weight + water weight
-            Debug.Log(GetCurrentValue());
             articulationBody.SetDriveTarget(ArticulationDriveAxis.X, Mathf.Lerp(_maximumPos, _minimumPos, percentage / 100));
         }
     }

@@ -13,7 +13,7 @@ namespace VehicleComponents.Actuators
         public bool reverse = false;
         public double rpm;
         public float RPMMax = 100000;
-        private float RPMToForceMultiplier = 5f;
+        public float RPMToForceMultiplier = 5f;
         public float NumPropellers = 4f;
 
         [Header("Drone Propeller")]
@@ -54,7 +54,7 @@ namespace VehicleComponents.Actuators
         void FixedUpdate()
         {
             var r = (float)rpm * RPMToForceMultiplier;
-            if(HoverDefault) Debug.Log("the value of 4xr is: " + r*4 );
+            // if(HoverDefault) Debug.Log("the value of 4xr is: " + r*4 );
 
             // Visualize the applied force
             
@@ -64,8 +64,8 @@ namespace VehicleComponents.Actuators
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,
                                                    ForceMode.Force);
-            //manual torqueaddition
-            if  (ApplyTorque)   
+            // //manual torqueaddition
+            if(ApplyTorque)   
             {
                 int torque_sign = TorqueUp ? 1 : -1;
                 float torque = torque_sign * c_tau_f * (float)r;
