@@ -320,13 +320,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ConnectedArticulationBody: {fileID: 0}
   ConnectedRigidbody: {fileID: 2453692462447050752}
-  drawForces: 0
-  depthBeforeSubmerged: 0
+  drawForces: 1
+  depthBeforeSubmerged: 0.3
   volumeObject: {fileID: 0}
   volumeMesh: {fileID: 0}
   automaticCenterOfGravity: 0
   volume: 0.1
-  density: 1.2
+  WaterDensity: 997
 --- !u!1 &6502671150740987231
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,13 +530,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ConnectedArticulationBody: {fileID: 0}
   ConnectedRigidbody: {fileID: 2453692462447050752}
-  drawForces: 0
-  depthBeforeSubmerged: 0
+  drawForces: 1
+  depthBeforeSubmerged: 0.3
   volumeObject: {fileID: 0}
   volumeMesh: {fileID: 0}
   automaticCenterOfGravity: 0
   volume: 0.1
-  density: 1.2
+  WaterDensity: 997
 --- !u!1 &8527497976637253487
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,9 +611,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spring: 0.1
+  spring: 0.5
   damper: 0.1
-  maximumForce: 50
+  maximumForce: 1000
 --- !u!114 &1080205937504706963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,11 +635,11 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8527497976637253487}
   serializedVersion: 4
-  m_Mass: 0.05
-  m_Drag: 0.1
-  m_AngularDrag: 0.1
+  m_Mass: 0.1
+  m_Drag: 5
+  m_AngularDrag: 4
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 0.01, y: 0.01, z: 0.01}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
@@ -648,12 +648,12 @@ Rigidbody:
     serializedVersion: 2
     m_Bits: 0
   m_ImplicitCom: 0
-  m_ImplicitTensor: 0
-  m_UseGravity: 0
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!153 &3607058454141938631
 ConfigurableJoint:
   m_ObjectHideFlags: 0

@@ -88,7 +88,7 @@ namespace Force
 
         [Tooltip("If not zero, will be used for buoyancy calculations. If zero, the volumeObject/Mesh above will be used to calculate.")]
         public float volume;
-        public float density = 997; // kg/m3
+        public float WaterDensity = 997; // kg/m3
 
         private int _pointCount;
         private WaterQueryModel _waterModel;
@@ -153,7 +153,10 @@ namespace Force
                 //Apply buoyancy
                 float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged);
 
-                Vector3 buoyancyForce = volume * density * new Vector3(0, Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount, 0);
+                float verticalBuoyancyForce = (volume * WaterDensity * Math.Abs(Physics.gravity.y)) * displacementMultiplier / _pointCount;
+                // TODO reduce this force to only allow a max force that'd bring this object to the surface in one fixed update.
+                
+                Vector3 buoyancyForce =  new Vector3(0, verticalBuoyancyForce, 0);
                 _body.AddForceAtPosition(
                     buoyancyForce,
                     forcePointPosition,

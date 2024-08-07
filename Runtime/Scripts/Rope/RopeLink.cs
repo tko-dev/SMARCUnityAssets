@@ -129,8 +129,8 @@ namespace Rope
             frontFP = frontFP_tf.GetComponent<ForcePoint>();
             backFP = backFP_tf.GetComponent<ForcePoint>();
 
-            frontFP.depthBeforeSubmerged = RopeDiameter/5;
-            backFP.depthBeforeSubmerged = RopeDiameter/5;
+            frontFP.depthBeforeSubmerged = RopeDiameter/2;
+            backFP.depthBeforeSubmerged = RopeDiameter/2;
         }
 
         void Awake()

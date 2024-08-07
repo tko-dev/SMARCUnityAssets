@@ -20,7 +20,7 @@ namespace Rope
         [Tooltip("Diameter of the collision objects for the rope. The bigger the more stable the physics are.")]
         public float RopeCollisionDiameter = 0.1f;
         [Tooltip("How long each segment of the rope will be. Smaller = more realistic but harder to simulate.")]
-        [Range(0.1f, 1f)]
+        [Range(0.01f, 1f)]
         public float SegmentLength = 0.1f;
 
         [Tooltip("How long the entire rope should be. Rounded to SegmentLength. Ignored if this is not the root of the rope.")]

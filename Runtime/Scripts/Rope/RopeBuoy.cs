@@ -14,7 +14,8 @@ namespace Rope
 
         void OnCollisionEnter(Collision collision)
         {
-            if(collision.gameObject.name.Contains("Horizontal"))
+            RopeHook rh;
+            if(collision.gameObject.TryGetComponent(out rh))
             {
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
                 gameObject.AddComponent<FixedJoint>();
