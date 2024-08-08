@@ -13,7 +13,7 @@ namespace VehicleComponents.Sensors
         public float waveHeight;
         public bool storeDepth = false;
         public Vector3 dronePosition;
-        public Vector3 pressure;
+        
         private WaterQueryModel _waterModel;
         private string filePath;
         private bool headerWritten = false;
@@ -34,7 +34,10 @@ namespace VehicleComponents.Sensors
 
                 // Store x, y, z, time, and depth in CSV
                 AppendDataToCSV(transform.position.x, transform.position.y, transform.position.z, currentTime, depth);
+                return true; // Successfully stored data
             }
+
+            return false; // Depth data was not stored
         }
 
         private void AppendDataToCSV(float x, float y, float z, float time, float depth)
