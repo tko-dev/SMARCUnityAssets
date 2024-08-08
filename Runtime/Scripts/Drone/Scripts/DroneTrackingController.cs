@@ -16,6 +16,7 @@ public class DroneController2: MonoBehaviour {
     Matrix<double> R_sb_d_prev;
     Vector<double> W_b_d_prev;
     int times = 0;
+    Vector3 pid3;
 
 	// Use this for initialization
 	void Start() {
@@ -57,7 +58,7 @@ public class DroneController2: MonoBehaviour {
         double kx = 16*m;
         double kv = 5.6*m;
         double kR = 8.81;
-        double kW = 2.54*2;
+        double kW = 2.54;
         
         // States
         Vector<double> x_w = DenseVector.OfArray(new double[] { base_link.transform.position.x , base_link.transform.position.z, base_link.transform.position.y });
@@ -65,8 +66,11 @@ public class DroneController2: MonoBehaviour {
         Matrix<double> R_wa = DenseMatrix.OfArray(new double[,] { { base_link.transform.right.x, base_link.transform.forward.x, base_link.transform.up.x },
                                                                   { base_link.transform.right.z, base_link.transform.forward.z, base_link.transform.up.z },
                                                                   { base_link.transform.right.y, base_link.transform.forward.y, base_link.transform.up.y } });
-        //Vector<double> W_w = -1f*DenseVector.OfArray(new double[] { base_link_ab.angularVelocity.x, base_link_ab.angularVelocity.z, base_link_ab.angularVelocity.y });
-        Vector<double> W_a = _Vee(_Logm3(R_wa_prev.Transpose()*R_wa)/dt);
+        // Vector<double> W_w = -1f*DenseVector.OfArray(new double[] { base_link_ab.angularVelocity.x, base_link_ab.angularVelocity.z, base_link_ab.angularVelocity.y });
+        // Vector<double> W_a = _Vee(_Logm3(R_wa_prev.Transpose()*R_wa)/dt);
+        Vector3 W_unity = base_link.transform.InverseTransformDirection(base_link_ab.angularVelocity);
+        Vector<double> W_a = DenseVector.OfArray(new double[] { -W_unity.x, -W_unity.z, -W_unity.y });
+        // Debug.Log($"W: {W_unity}");
 
         // Transformations
         Matrix<double> R_ws = DenseMatrix.OfArray(new double[,] { { 0, 1, 0 },
@@ -84,10 +88,10 @@ public class DroneController2: MonoBehaviour {
         Vector<double> W_b = R_ab.Transpose()*W_a;
         
         // Desired states
-        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 1000, 5 });
+        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 0.0f, 0, 5 });
         Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });
         Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });
-        Vector<double> b1d = DenseVector.OfArray(new double[] { 1, 0, 0 });
+        Vector<double> b1d = DenseVector.OfArray(new double[] { 0, 1, 0 });
 
         // Control
         Vector<double> ex = x_s - x_s_d;
@@ -117,17 +121,18 @@ public class DroneController2: MonoBehaviour {
 
         // Convert to propeller forces
         Matrix<double> T = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 }, { 0, -d, 0, d }, { d, 0, -d, 0 }, { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } });
-        Vector<double> F = T.Inverse() * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
+        Vector<double> F = T.Inverse() * DenseVector.OfArray(new double[] { f, 0, 0, M[2] });
 
         if (times < 2) {
             times++;
             F = DenseVector.OfArray(new double[] { 0, 0, 0, 0 });
-        } else {
-            Debug.Log(x_w);
-            Vector<double> tmp_w = R_ws*pid;
-            Vector3 pid3 = new Vector3((float)tmp_w[0], (float)(tmp_w[2]-m*g), (float)tmp_w[1]);
-            Debug.DrawRay(base_link.transform.position, pid3, Color.blue);
         }
+
+        // Visualize
+        //Debug.Log(x_w);
+        Vector<double> tmp_w = R_ws*pid;
+        pid3 = new Vector3((float)tmp_w[0], (float)(tmp_w[2]-m*g), (float)tmp_w[1]);
+        //Debug.DrawRay(base_link.transform.position, pid3, Color.blue);
 
         // Set propeller forces and torques
         propellers_forces[0] = (float)F[0];
@@ -139,12 +144,23 @@ public class DroneController2: MonoBehaviour {
         propellers_torques[1] = c_tau_f*propellers_forces[1];
         propellers_torques[2] = -c_tau_f*propellers_forces[2];
         propellers_torques[3] = c_tau_f*propellers_forces[3];
+
+        // Vector3 F3 = base_link.transform.up * (float)f;
+        // Vector<double> Mw = -R_wa*M;
+        // Vector3 M3 = new Vector3((float)Mw[0], (float)Mw[2], (float)Mw[1]);
+        // base_link_ab.AddForce(F3);
+        // base_link_ab.AddTorque(M3);
+        
+        // Debug.DrawRay(base_link.transform.position, F3, Color.red);
+        // Debug.DrawRay(base_link.transform.position, M3, Color.blue);
 	}
 
 	void ApplyForcesTorque() {
 		for (int i = 0; i < 4; i++) {
             propellers[i].GetComponent<ArticulationBody>().AddForce(propellers_forces[i] * propellers[i].transform.forward);
             propellers[i].GetComponent<ArticulationBody>().AddTorque(propellers_torques[i] * propellers[i].transform.forward);
+
+            //base_link_ab.AddForceAtPosition(propellers_forces[i] * propellers[i].transform.forward, propellers[i].transform.position);
 
             Debug.DrawRay(propellers[i].transform.position, propellers[i].transform.forward * propellers_forces[i], Color.red);
         }
