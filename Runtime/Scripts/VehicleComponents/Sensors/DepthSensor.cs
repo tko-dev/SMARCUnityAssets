@@ -13,7 +13,7 @@ namespace VehicleComponents.Sensors
         public float waveHeight;
         public bool storeDepth = false;
         public Vector3 dronePosition;
-        public Vector3 pressure;
+        
         private WaterQueryModel _waterModel;
         private string filePath;
         private bool headerWritten = false;
