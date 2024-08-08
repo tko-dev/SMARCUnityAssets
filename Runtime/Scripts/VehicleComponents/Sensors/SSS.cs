@@ -30,7 +30,7 @@ namespace VehicleComponents.Sensors
         public float fwhmBeamAngleDeg = 60.0f;
         public bool gaussianProfile = false;
         public int maxRange = 100;
-        public int totalBeamCount = 4000;
+        public int totalBeamCount = 256;
         [Header("Noise")]
         public float multGain = 4;
         public bool useAdditiveNoise = true;
