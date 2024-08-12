@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using DefaultNamespace.Water;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEditor.EditorTools;
 
 // This is a very simple example of how we could compute a buoyancy force at variable points along the body.
 // Its not really accurate per se.
@@ -68,28 +69,36 @@ namespace Force
 
     public class ForcePoint : MonoBehaviour
     {
+        [Header("Connected Body")]
         public ArticulationBody ConnectedArticulationBody;
         public Rigidbody ConnectedRigidbody;
 
-        MixedBody _body;
 
-        public bool drawForces = false;
-        
-        public float depthBeforeSubmerged = 0.03f;
-        bool addGravity = false;
-
+        [Header("Buoyancy")]
         [Tooltip("GameObject that we will calculate the volume of. Set volume below to 0 to use.")]
         public GameObject volumeObject;
         [Tooltip("If the gameObject above has many meshes, set the one to use for volume calculations here.")]
         public Mesh volumeMesh;
-
-
-        public bool automaticCenterOfGravity = false;
-
         [Tooltip("If not zero, will be used for buoyancy calculations. If zero, the volumeObject/Mesh above will be used to calculate.")]
         public float volume;
         public float WaterDensity = 997; // kg/m3
+        public float depthBeforeSubmerged = 0.03f;
 
+
+        [Header("Gravity")]
+        [Tooltip("Do we over-ride the gravity of the connected body?")]
+        public bool addGravity = false;
+        [Tooltip("If true, calculates center of gravity from all the ForcePoints on the body and overrides the body's centerOfMass, otherwise the centerOfMass of the connected body is used.")]
+        public bool automaticCenterOfGravity = false;
+        [Tooltip("If not zero, will be used for gravity force. If zero, the connected body's mass will be used instead.")]
+        public float mass;
+
+
+        [Header("Debug")]
+        public bool drawForces = false;
+
+
+        private MixedBody _body;
         private int _pointCount;
         private WaterQueryModel _waterModel;
 
@@ -117,9 +126,17 @@ namespace Force
             
             if(ConnectedArticulationBody != null) _body.ab = ConnectedArticulationBody;
             if(ConnectedRigidbody!= null) _body.rb = ConnectedRigidbody;
+
+             // If the force point is doing the gravity, disable the body's own
+            if(addGravity)
+            {
+                _body.useGravity = false;
+                if(mass == 0) mass = _body.mass;
+            }
             
             
             _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+
             var forcePoints = transform.parent.gameObject.GetComponentsInChildren<ForcePoint>();
             if (automaticCenterOfGravity)
             {
@@ -129,7 +146,7 @@ namespace Force
             }
 
             _pointCount = forcePoints.Length;
-            addGravity = !_body.useGravity;
+           
             if (volumeMesh == null && volumeObject != null) volumeMesh = volumeObject.GetComponent<MeshFilter>().mesh;
             if (volume == 0 && volumeMesh != null) volume = MeshVolume.CalculateVolumeOfMesh(volumeMesh, volumeObject.transform.lossyScale);
         }
@@ -140,23 +157,23 @@ namespace Force
             var forcePointPosition = transform.position;
             if (addGravity)
             {
-                Vector3 gravityForce = _body.mass * Physics.gravity / _pointCount;
+                Vector3 gravityForce = mass * Physics.gravity / _pointCount;
                 _body.AddForceAtPosition(gravityForce, forcePointPosition, ForceMode.Force);
                 if(drawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+gravityForce, Color.red, 0.1f);
             }
 
 
             float waterSurfaceLevel = _waterModel.GetWaterLevelAt(forcePointPosition);
-            if (forcePointPosition.y < waterSurfaceLevel)
+            float depth = waterSurfaceLevel - forcePointPosition.y;
+            if (depth > 0f)
             {
                 //Underwater
                 //Apply buoyancy
-                float displacementMultiplier = Mathf.Clamp01((waterSurfaceLevel - forcePointPosition.y) / depthBeforeSubmerged);
+                float displacementMultiplier = Mathf.Clamp01(depth / depthBeforeSubmerged);
 
-                float verticalBuoyancyForce = (volume * WaterDensity * Math.Abs(Physics.gravity.y)) * displacementMultiplier / _pointCount;
-                // TODO reduce this force to only allow a max force that'd bring this object to the surface in one fixed update.
+                float verticalBuoyancyForce = volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount;
                 
-                Vector3 buoyancyForce =  new Vector3(0, verticalBuoyancyForce, 0);
+                var buoyancyForce =  new Vector3(0, verticalBuoyancyForce, 0);
                 _body.AddForceAtPosition(
                     buoyancyForce,
                     forcePointPosition,

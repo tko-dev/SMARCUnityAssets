@@ -7,14 +7,19 @@ namespace Rope
 {
     public class RopeContainer : MonoBehaviour
     {
+        [Header("Prefabs of the rope parts")]
         public GameObject RopeLinkPrefab;
         public GameObject BuoyPrefab;
 
+        [Header("Connected Bodies")]
+        [Tooltip("The base hull of the object this rope connects to. Used for setting the mass of the rope to make physics behave.")]
+        public GameObject BaseLink;
         [Tooltip("What should the first link in the rope connect to?")]
         public ArticulationBody ConnectedAB;
         public Rigidbody ConnectedRB;
 
 
+        [Header("Rope parameters")]
         [Tooltip("Diameter of the rope in meters")]
         public float RopeDiameter = 0.01f;
         [Tooltip("Diameter of the collision objects for the rope. The bigger the more stable the physics are.")]
@@ -22,7 +27,6 @@ namespace Rope
         [Tooltip("How long each segment of the rope will be. Smaller = more realistic but harder to simulate.")]
         [Range(0.01f, 1f)]
         public float SegmentLength = 0.1f;
-
         [Tooltip("How long the entire rope should be. Rounded to SegmentLength. Ignored if this is not the root of the rope.")]
         public float RopeLength = 1f;
         public int numSegments;
@@ -33,11 +37,12 @@ namespace Rope
             if(numSegments > 30) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
         }
 
-        GameObject InstantiateLink(GameObject prevLink, int num, GameObject prefab, bool buoy=false)
+        GameObject InstantiateLink(GameObject prevLink, int num, bool buoy=false)
         {
-            var link = Instantiate(prefab);
+            var link = Instantiate(RopeLinkPrefab);
             link.transform.SetParent(transform);
-            if(!buoy) link.name = $"RopeLink_{num}";
+            link.name = $"{link.name}_{num}";
+            if(buoy) link.name = $"{link.name}_buoy";
 
             var linkJoint = link.GetComponent<Joint>();
             if(prevLink != null)
@@ -57,9 +62,14 @@ namespace Rope
                 link.transform.rotation = transform.rotation;
             }
 
+            float mass = 1f;
+            if(BaseLink.TryGetComponent(out ArticulationBody BaseAB))
+                mass = BaseAB.mass;
+            if(BaseLink.TryGetComponent(out Rigidbody BaseRB))
+                mass = BaseRB.mass;
+
             var rl = link.GetComponent<RopeLink>();
-            if(!buoy) rl.SetRopeSizes(RopeDiameter, RopeCollisionDiameter, SegmentLength);
-            rl.SetupJoint();
+            rl.SetRopeParams(RopeDiameter, RopeCollisionDiameter, SegmentLength, mass, buoy);
 
             return link;
         }
@@ -69,15 +79,13 @@ namespace Rope
         {
             var links = new GameObject[numSegments];
 
-            links[0] = InstantiateLink(null, 0, RopeLinkPrefab);
+            links[0] = InstantiateLink(null, 0);
 
             for(int i=1; i < numSegments; i++)
             {
-                links[i] = InstantiateLink(links[i-1], i, RopeLinkPrefab);
+                var buoy = i+1 == numSegments;
+                links[i] = InstantiateLink(links[i-1], i, buoy);
             }
-
-            if(BuoyPrefab != null)
-                InstantiateLink(links[numSegments-1], numSegments, BuoyPrefab, true);
         }
 
         public void DestroyRope()

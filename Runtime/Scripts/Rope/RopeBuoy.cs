@@ -14,12 +14,10 @@ namespace Rope
 
         void OnCollisionEnter(Collision collision)
         {
-            RopeHook rh;
-            if(collision.gameObject.TryGetComponent(out rh))
+            if (collision.gameObject.TryGetComponent(out RopeHook rh))
             {
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
-                gameObject.AddComponent<FixedJoint>();
-                joint = gameObject.GetComponent<FixedJoint>();
+                joint = gameObject.AddComponent<FixedJoint>();
                 joint.enablePreprocessing = false;
                 joint.connectedArticulationBody = collision.gameObject.GetComponent<ArticulationBody>();
             }

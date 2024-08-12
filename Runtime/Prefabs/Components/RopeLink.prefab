@@ -320,13 +320,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ConnectedArticulationBody: {fileID: 0}
   ConnectedRigidbody: {fileID: 2453692462447050752}
-  drawForces: 1
-  depthBeforeSubmerged: 0.3
   volumeObject: {fileID: 0}
   volumeMesh: {fileID: 0}
-  automaticCenterOfGravity: 0
-  volume: 0.1
+  volume: 0.000001
   WaterDensity: 997
+  depthBeforeSubmerged: 0.3
+  addGravity: 0
+  automaticCenterOfGravity: 0
+  mass: 0
+  drawForces: 1
 --- !u!1 &6502671150740987231
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,13 +532,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ConnectedArticulationBody: {fileID: 0}
   ConnectedRigidbody: {fileID: 2453692462447050752}
-  drawForces: 1
-  depthBeforeSubmerged: 0.3
   volumeObject: {fileID: 0}
   volumeMesh: {fileID: 0}
-  automaticCenterOfGravity: 0
-  volume: 0.1
+  volume: 0.000001
   WaterDensity: 997
+  depthBeforeSubmerged: 0.3
+  addGravity: 0
+  automaticCenterOfGravity: 0
+  mass: 0
+  drawForces: 1
 --- !u!1 &8527497976637253487
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,9 +615,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spring: 0.5
-  damper: 0.1
-  maximumForce: 1000
+  spring: 0.05
+  damper: 0.05
+  maximumForce: 4
+  GramsPerMeter: 5
 --- !u!114 &1080205937504706963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,10 +641,10 @@ Rigidbody:
   m_GameObject: {fileID: 8527497976637253487}
   serializedVersion: 4
   m_Mass: 0.1
-  m_Drag: 5
-  m_AngularDrag: 4
+  m_Drag: 0.1
+  m_AngularDrag: 0.1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaTensor: {x: 0.01, y: 0.01, z: 0.01}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
@@ -648,8 +653,8 @@ Rigidbody:
     serializedVersion: 2
     m_Bits: 0
   m_ImplicitCom: 0
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_ImplicitTensor: 0
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -666,7 +671,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: -0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.00000023283064, y: 0.013099998, z: 0.06740022}
+  m_ConnectedAnchor: {x: 0, y: 0, z: 0}
   serializedVersion: 3
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 0
