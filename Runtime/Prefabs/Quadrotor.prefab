@@ -783,6 +783,10 @@ MonoBehaviour:
   waveHeight: 0
   storeDepth: 0
   dronePosition: {x: 0, y: 0, z: 0}
+  droneBody: {fileID: 0}
+  numDatapoints: 10000
+  dataStep: 100
+  gameobject: {fileID: 0}
 --- !u!1 &83281821845207248
 GameObject:
   m_ObjectHideFlags: 0
@@ -3186,8 +3190,6 @@ GameObject:
   - component: {fileID: 224679279176400423}
   - component: {fileID: 5801389130515422799}
   - component: {fileID: 3028423389840887398}
-  - component: {fileID: 6436046913579835026}
-  - component: {fileID: 7764497709830499047}
   m_Layer: 0
   m_Name: depthsensor_link
   m_TagString: Untagged
@@ -3234,7 +3236,7 @@ ArticulationBody:
   m_GameObject: {fileID: 6972682340607354351}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 0.0000001
   m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
@@ -3291,40 +3293,6 @@ ArticulationBody:
   m_Immovable: 0
   m_UseGravity: 1
   m_CollisionDetectionMode: 0
---- !u!114 &6436046913579835026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6972682340607354351}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7631001c063f69d4495bca90731abab2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  displayInertiaGizmo: 0
-  useUrdfData: 0
-  centerOfMass: {x: 0, y: 0, z: 0}
-  inertiaTensor: {x: 0, y: 0, z: 0}
-  inertiaTensorRotation: {x: 0, y: 0, z: 0, w: 0}
-  inertialAxisRotation: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7764497709830499047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6972682340607354351}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 074632cab556f5b408839af8574308df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  xAxis: 0
-  jointName: 
-  EffortLimit: 1000
-  VelocityLimit: 1000
 --- !u!1 &7076697144724768153
 GameObject:
   m_ObjectHideFlags: 0
