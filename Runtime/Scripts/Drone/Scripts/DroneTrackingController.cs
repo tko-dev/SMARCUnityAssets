@@ -50,7 +50,7 @@ public class DroneTrackingController: MonoBehaviour {
 
 	void ComputeRPMs() {
         // Parameters
-        double m = base_link_ab.mass;
+        double m = base_link_ab.mass + 0.026;
         double d = 0.315;
         Matrix<double> J = DenseMatrix.OfArray(new double[,] { { base_link_ab.inertiaTensor.x, 0, 0 }, { 0, base_link_ab.inertiaTensor.z, 0 }, { 0, 0, base_link_ab.inertiaTensor.y } });
         //Matrix<double> J = DenseMatrix.OfArray(new double[,] { {0.082, 0, 0}, {0, 0.082, 0}, {0, 0, 0.1377} });
@@ -97,14 +97,14 @@ public class DroneTrackingController: MonoBehaviour {
 
         // Vector<double> x_s = R_sw*x_w;
         // Vector<double> v_s = R_sw*v_w;
-        // Vector<double> W_b = R_ab.Transpose()*W_a;
+        // Vector<double> W_b = R_ab.Transpose()*W_a; // { ufo.transform.position.x, ufo.transform.position.z, ufo.transform.position.y });
         
         // Desired states
         float t = Time.time;
-        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { ufo.transform.position.x, ufo.transform.position.z, ufo.transform.position.y });//{ 0, t-15, Mathf.Pow(t-5, 2) });
-        Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });//{ 0, 1, 2*(t-5) });
-        Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });//{ 0, 0, 2 });
-        Vector<double> b1d = DenseVector.OfArray(new double[] { 1, 0, 0 });
+        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 6.4, 0.25*t-15, Math.Pow(0.25*t-5, 2) + 0.32 });
+        Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0.25, 0.5*(0.25*t-5) });
+        Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.125 });
+        Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
 
         // Control
         Vector<double> ex = x_s - x_s_d;
