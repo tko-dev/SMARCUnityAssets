@@ -10,6 +10,6 @@ public class UFO : MonoBehaviour {
 
     void FixedUpdate() {
         float t = Time.time;
-        transform.position = new Vector3(2*Mathf.Sin(t), 5, 2*Mathf.Cos(t) + 1000);
+        transform.position = new Vector3(2*Mathf.Cos(t), 5, 2*Mathf.Sin(2*t) + 1000);
     }
 }
