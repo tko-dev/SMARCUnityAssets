@@ -22,7 +22,7 @@ namespace Rope
 
         void Awake()
         {
-            var colliders = transform.Find("Colliders");
+            var colliders = transform.Find("Collisions");
             var count = colliders.transform.childCount;
             capsules = new CapsuleCollider[count];
             rads = new float[count];
