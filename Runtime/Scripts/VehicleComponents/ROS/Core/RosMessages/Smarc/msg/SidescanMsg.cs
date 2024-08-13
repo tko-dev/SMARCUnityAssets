@@ -26,6 +26,10 @@ namespace RosMessageTypes.Smarc
         //  Max travel time of outermost bins (s)
         public byte[] port_channel;
         public byte[] starboard_channel;
+        public byte[] port_channel_angle_high;
+        public byte[] port_channel_angle_low;
+        public byte[] starboard_channel_angle_high;
+        public byte[] starboard_channel_angle_low;
         public byte[] extra_channel;
 
         public SidescanMsg()
@@ -39,10 +43,14 @@ namespace RosMessageTypes.Smarc
             this.max_duration = 0.0f;
             this.port_channel = new byte[0];
             this.starboard_channel = new byte[0];
+            this.port_channel_angle_high = new byte[0];
+            this.port_channel_angle_low = new byte[0];
+            this.starboard_channel_angle_high = new byte[0];
+            this.starboard_channel_angle_low = new byte[0];
             this.extra_channel = new byte[0];
         }
 
-        public SidescanMsg(Std.HeaderMsg header, byte type, uint time, byte frequency_id, short gain, ushort decimation, float max_duration, byte[] port_channel, byte[] starboard_channel, byte[] extra_channel)
+        public SidescanMsg(Std.HeaderMsg header, byte type, uint time, byte frequency_id, short gain, ushort decimation, float max_duration, byte[] port_channel, byte[] starboard_channel, byte[] port_channel_angle_high, byte[] port_channel_angle_low, byte[] starboard_channel_angle_high, byte[] starboard_channel_angle_low, byte[] extra_channel)
         {
             this.header = header;
             this.type = type;
@@ -53,6 +61,10 @@ namespace RosMessageTypes.Smarc
             this.max_duration = max_duration;
             this.port_channel = port_channel;
             this.starboard_channel = starboard_channel;
+            this.port_channel_angle_high = port_channel_angle_high;
+            this.port_channel_angle_low = port_channel_angle_low;
+            this.starboard_channel_angle_high = starboard_channel_angle_high;
+            this.starboard_channel_angle_low = starboard_channel_angle_low;
             this.extra_channel = extra_channel;
         }
 
@@ -69,6 +81,10 @@ namespace RosMessageTypes.Smarc
             deserializer.Read(out this.max_duration);
             deserializer.Read(out this.port_channel, sizeof(byte), deserializer.ReadLength());
             deserializer.Read(out this.starboard_channel, sizeof(byte), deserializer.ReadLength());
+            deserializer.Read(out this.port_channel_angle_high, sizeof(byte), deserializer.ReadLength());
+            deserializer.Read(out this.port_channel_angle_low, sizeof(byte), deserializer.ReadLength());
+            deserializer.Read(out this.starboard_channel_angle_high, sizeof(byte), deserializer.ReadLength());
+            deserializer.Read(out this.starboard_channel_angle_low, sizeof(byte), deserializer.ReadLength());
             deserializer.Read(out this.extra_channel, sizeof(byte), deserializer.ReadLength());
         }
 
@@ -85,6 +101,14 @@ namespace RosMessageTypes.Smarc
             serializer.Write(this.port_channel);
             serializer.WriteLength(this.starboard_channel);
             serializer.Write(this.starboard_channel);
+            serializer.WriteLength(this.port_channel_angle_high);
+            serializer.Write(this.port_channel_angle_high);
+            serializer.WriteLength(this.port_channel_angle_low);
+            serializer.Write(this.port_channel_angle_low);
+            serializer.WriteLength(this.starboard_channel_angle_high);
+            serializer.Write(this.starboard_channel_angle_high);
+            serializer.WriteLength(this.starboard_channel_angle_low);
+            serializer.Write(this.starboard_channel_angle_low);
             serializer.WriteLength(this.extra_channel);
             serializer.Write(this.extra_channel);
         }
@@ -101,6 +125,10 @@ namespace RosMessageTypes.Smarc
             "\nmax_duration: " + max_duration.ToString() +
             "\nport_channel: " + System.String.Join(", ", port_channel.ToList()) +
             "\nstarboard_channel: " + System.String.Join(", ", starboard_channel.ToList()) +
+            "\nport_channel_angle_high: " + System.String.Join(", ", port_channel_angle_high.ToList()) +
+            "\nport_channel_angle_low: " + System.String.Join(", ", port_channel_angle_low.ToList()) +
+            "\nstarboard_channel_angle_high: " + System.String.Join(", ", starboard_channel_angle_high.ToList()) +
+            "\nstarboard_channel_angle_low: " + System.String.Join(", ", starboard_channel_angle_low.ToList()) +
             "\nextra_channel: " + System.String.Join(", ", extra_channel.ToList());
         }
 
