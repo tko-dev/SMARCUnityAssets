@@ -6,20 +6,20 @@ using Rope;
 
 namespace Editor.Scripts
 {
-    [CustomEditor(typeof(RopeLink))]
+    [CustomEditor(typeof(RopeContainer))]
     public class RopeGeneratorEditor : UnityEditor.Editor
     {
-        RopeLink rope;
+        RopeContainer container;
 
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-            rope = (RopeLink) target;
+            container = (RopeContainer) target;
 
             if(GUILayout.Button("(Re)Generate Rope"))
             {
-                rope.DestroyRope();
-                rope.SpawnRope();
+                container.DestroyRope();
+                container.SpawnRope();
             }
         }
     }
