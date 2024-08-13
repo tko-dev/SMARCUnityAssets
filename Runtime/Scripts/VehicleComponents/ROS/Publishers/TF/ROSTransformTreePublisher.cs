@@ -7,6 +7,7 @@ using RosMessageTypes.Tf2;
 using Unity.Robotics.Core;
 using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 using LinkAttachment = VehicleComponents.LinkAttachment;
@@ -18,19 +19,22 @@ namespace VehicleComponents.ROS.Publishers
         [SerializeField]
         List<string> m_GlobalFrameIds = new List<string> { "map" };
         TransformTreeNode m_TransformRoot;
-
-        [Header("TF Tree")]
         string prefix;
+        
+        [Header("TF Tree")]
         [Tooltip("Suffix to add to all published TF links.")]
         public string suffix = "_gt";
 
         public float frequency = 10f;
+        [Tooltip("Will be checked true if publishing tf did not happen.")]
+        public bool ErrorOnPublish = false;
         
         float period => 1.0f/frequency;
         double lastTime;
 
         ROSConnection ros;
         string topic = "/tf";
+
 
         void OnValidate()
         {
@@ -114,11 +118,21 @@ namespace VehicleComponents.ROS.Publishers
             }
 
             var ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
-            ros.Publish(topic, ROSMsg);
+            try
+            {
+                ros.Publish(topic, ROSMsg);
+                ErrorOnPublish = false;
+            }
+            catch(Exception)
+            {
+                ErrorOnPublish = true;
+                return;
+            }
         }
 
         void FixedUpdate()
         {
+            if(ros == null) return;
             var deltaTime = Clock.NowTimeInSeconds - lastTime;
             if(deltaTime < period) return;
             PublishMessage();
