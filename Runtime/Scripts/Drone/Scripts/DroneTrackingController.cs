@@ -4,29 +4,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using DefaultNamespace.LookUpTable;
+using VehicleComponents.Actuators;
 
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
-public class DroneController2: MonoBehaviour {
-	private GameObject[] propellers;
+public class DroneTrackingController: MonoBehaviour {
     public GameObject base_link;
+    public float computation_frequency = 100f;
+	private Propeller[] propellers;
     private ArticulationBody base_link_ab;
-	private float[] propellers_forces;
-    private float[] propellers_torques;
-    Matrix<double> R_wa_prev;
-    Matrix<double> R_sb_d_prev;
-    Vector<double> W_b_d_prev;
-    int times = 0;
-    Vector3 pid3;
+	private float[] propellers_rpms;
+    private Matrix<double> R_wa_prev;
+    private Matrix<double> R_sb_d_prev;
+    private Vector<double> W_b_d_prev;
+    private int times = 0;
+    private GameObject ufo;
 
 	// Use this for initialization
 	void Start() {
-		propellers = new GameObject[4];
-		propellers[0] = GameObject.Find("propeller1_link");
-		propellers[1] = GameObject.Find("propeller2_link");
-        propellers[2] = GameObject.Find("propeller3_link");
-        propellers[3] = GameObject.Find("propeller4_link");
+		propellers = new Propeller[4];
+		propellers[0] = GameObject.Find("propeller_FL").GetComponent<Propeller>();
+		propellers[1] = GameObject.Find("propeller_FR").GetComponent<Propeller>();
+        propellers[2] = GameObject.Find("propeller_BR").GetComponent<Propeller>();
+        propellers[3] = GameObject.Find("propeller_BL").GetComponent<Propeller>();
 
         base_link_ab = base_link.GetComponent<ArticulationBody>();
 
@@ -34,18 +35,20 @@ public class DroneController2: MonoBehaviour {
         R_sb_d_prev = DenseMatrix.OfArray(new double[,] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
         W_b_d_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
-		propellers_forces = new float[4];
-        propellers_torques = new float[4];
+		propellers_rpms = new float[] { 0, 0, 0, 0 };
+
+        ufo = GameObject.Find("UFO");
+
+        InvokeRepeating("ComputeRPMs", 0f, 1f/computation_frequency);
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate() {
-		ComputeForcesTorque();
-		ApplyForcesTorque();
-		// RotateFans();
+		// ComputeRPMs();
+        ApplyRPMs();
 	}
 
-	void ComputeForcesTorque() {
+	void ComputeRPMs() {
         // Parameters
         double m = base_link_ab.mass;
         double d = 0.315;
@@ -54,7 +57,7 @@ public class DroneController2: MonoBehaviour {
         float c_tau_f = 8.004e-4f;
         double g = 9.81;
         Vector<double> e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
-        double dt = (double)Time.fixedDeltaTime;
+        double dt = 1f/computation_frequency;
 
         // Gains
         double kx = 16*m;
@@ -98,7 +101,7 @@ public class DroneController2: MonoBehaviour {
         
         // Desired states
         float t = Time.time;
-        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 1000, 5 });//{ 0, t-15, Mathf.Pow(t-5, 2) });
+        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { ufo.transform.position.x, ufo.transform.position.z, ufo.transform.position.y });//{ 0, t-15, Mathf.Pow(t-5, 2) });
         Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });//{ 0, 1, 2*(t-5) });
         Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0 });//{ 0, 0, 2 });
         Vector<double> b1d = DenseVector.OfArray(new double[] { 1, 0, 0 });
@@ -137,30 +140,16 @@ public class DroneController2: MonoBehaviour {
             F = DenseVector.OfArray(new double[] { 0, 0, 0, 0 });
         }
 
-        // Visualize
-        //Debug.Log(x_w);
-        Vector<double> tmp_w = R_ws*pid;
-        pid3 = new Vector3((float)tmp_w[0], (float)(tmp_w[2]-m*g), (float)tmp_w[1]);
-        //Debug.DrawRay(base_link.transform.position, pid3, Color.blue);
-
-        // Set propeller forces and torques
-        propellers_forces[0] = (float)F[0];
-		propellers_forces[1] = (float)F[1];
-		propellers_forces[2] = (float)F[2];
-		propellers_forces[3] = (float)F[3];
-
-        propellers_torques[0] = -c_tau_f*propellers_forces[0];
-        propellers_torques[1] = c_tau_f*propellers_forces[1];
-        propellers_torques[2] = -c_tau_f*propellers_forces[2];
-        propellers_torques[3] = c_tau_f*propellers_forces[3];
+        // Set propeller rpms
+        propellers_rpms[0] = (float)F[0]/0.005f;
+        propellers_rpms[1] = (float)F[1]/0.005f;
+        propellers_rpms[2] = (float)F[2]/0.005f;
+        propellers_rpms[3] = (float)F[3]/0.005f;
 	}
 
-	void ApplyForcesTorque() {
+	void ApplyRPMs() {
 		for (int i = 0; i < 4; i++) {
-            propellers[i].GetComponent<ArticulationBody>().AddForce(propellers_forces[i] * propellers[i].transform.forward);
-            propellers[i].GetComponent<ArticulationBody>().AddTorque(propellers_torques[i] * propellers[i].transform.forward);
-
-            Debug.DrawRay(propellers[i].transform.position, propellers[i].transform.forward * propellers_forces[i], Color.red);
+            propellers[i].SetRpm(propellers_rpms[i]);
         }
 	}
 
@@ -206,11 +195,4 @@ public class DroneController2: MonoBehaviour {
 			return m_ret;
 		}
 	}
-
-	// void RotateFans() {
-	// 	propellers[0].transform.Rotate(100 * propellers_forces [0] * Vector3.forward * Time.deltaTime][Space.Self);
-	// 	propellers[1].transform.Rotate(-100 * propellers_forces [1] * Vector3.forward * Time.deltaTime][Space.Self);
-	// 	propellers[2].transform.Rotate(-100 * propellers_forces [2] * Vector3.forward * Time.deltaTime][Space.Self);
-	// 	propellers[3].transform.Rotate(100 * propellers_forces [3] * Vector3.forward * Time.deltaTime][Space.Self);
-	// }
 }
