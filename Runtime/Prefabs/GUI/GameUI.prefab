@@ -465,6 +465,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4273958688683381059}
   - component: {fileID: 4082945997291990955}
+  - component: {fileID: 6544239671466456919}
   m_Layer: 0
   m_Name: Overhead Camera
   m_TagString: Untagged
@@ -481,7 +482,7 @@ Transform:
   m_GameObject: {fileID: 1016469875554159842}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.19, y: 5.89, z: -9.47}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -520,7 +521,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 120
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -538,6 +539,23 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &6544239671466456919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016469875554159842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a1812601069c9759836a22b1bac7b7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  acceleration: 50
+  accSprintMultiplier: 4
+  lookSensitivity: 1
+  dampingCoefficient: 5
+  focusOnEnable: 0
 --- !u!1 &1253335522999653518
 GameObject:
   m_ObjectHideFlags: 0
@@ -2855,7 +2873,7 @@ GameObject:
   - component: {fileID: 5172412699416226396}
   - component: {fileID: 7221468012763391679}
   m_Layer: 0
-  m_Name: Flying Camera
+  m_Name: MainCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2869,13 +2887,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5630113466021586645}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.62, y: 0, z: -15.71}
+  m_LocalRotation: {x: 0.5225241, y: -0, z: -0, w: 0.8526246}
+  m_LocalPosition: {x: 4.494, y: 1.666, z: -10.867}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2405218354452670225}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 63.003, y: 0, z: 0}
 --- !u!20 &8683509775598288233
 Camera:
   m_ObjectHideFlags: 0
