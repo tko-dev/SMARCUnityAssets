@@ -294,6 +294,6 @@ so that we can generate a concrete urdf file to be imported in Unity-->
    <joint name="rope_joint" type="fixed">
     <parent link="base_link"/>
     <child link="rope_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.540 0.0 0.071"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.650 0.0 0.071"/>
   </joint>
 </robot>

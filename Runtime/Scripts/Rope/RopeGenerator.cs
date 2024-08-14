@@ -1,23 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.AI;
+using Utils = DefaultNamespace.Utils;
 
 namespace Rope
 {
-    public class RopeContainer : MonoBehaviour
+    public class RopeGenerator : MonoBehaviour
     {
-        [Header("Prefabs of the rope parts")]
+        [Header("Prefab of the rope parts")]
         public GameObject RopeLinkPrefab;
-        public GameObject BuoyPrefab;
 
-        [Header("Connected Bodies")]
-        [Tooltip("The base hull of the object this rope connects to. Used for setting the mass of the rope to make physics behave.")]
-        public GameObject BaseLink;
+        [Header("Connected Body")]
         [Tooltip("What should the first link in the rope connect to?")]
-        public ArticulationBody ConnectedAB;
-        public Rigidbody ConnectedRB;
-
+        public string ConnectedLinkName;
+    
 
         [Header("Rope parameters")]
         [Tooltip("Diameter of the rope in meters")]
@@ -31,16 +28,19 @@ namespace Rope
         public float RopeLength = 1f;
         public int numSegments;
 
+        GameObject ropeContainer, ropeLink, baseLink;
+        string containerName = "Rope";
+
         void OnValidate()
         {
             numSegments = (int)(RopeLength / (SegmentLength-RopeDiameter));
-            if(numSegments > 30) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
+            if(numSegments > 50) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
         }
 
         GameObject InstantiateLink(GameObject prevLink, int num, bool buoy=false)
         {
             var link = Instantiate(RopeLinkPrefab);
-            link.transform.SetParent(transform);
+            link.transform.SetParent(ropeContainer.transform);
             link.name = $"{link.name}_{num}";
             if(buoy) link.name = $"{link.name}_buoy";
 
@@ -54,18 +54,21 @@ namespace Rope
             }
             else
             {
-                if(ConnectedAB != null)
-                    linkJoint.connectedArticulationBody = ConnectedAB;
-                else
-                    linkJoint.connectedBody = ConnectedRB;
-                link.transform.localPosition = Vector3.zero;
-                link.transform.rotation = transform.rotation;
+                // First link in the chain, not connected to another link
+                // see what the parent has... and joint to it.
+                if(ropeLink.TryGetComponent<ArticulationBody>(out ArticulationBody ab))
+                    linkJoint.connectedArticulationBody = ab;
+                if(ropeLink.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                    linkJoint.connectedBody = rb;
+
+                link.transform.localPosition = new Vector3(0, 0, SegmentLength/2);
+                
             }
 
             float mass = 1f;
-            if(BaseLink.TryGetComponent(out ArticulationBody BaseAB))
+            if(baseLink.TryGetComponent(out ArticulationBody BaseAB))
                 mass = BaseAB.mass;
-            if(BaseLink.TryGetComponent(out Rigidbody BaseRB))
+            if(baseLink.TryGetComponent(out Rigidbody BaseRB))
                 mass = BaseRB.mass;
 
             var rl = link.GetComponent<RopeLink>();
@@ -77,6 +80,15 @@ namespace Rope
 
         public void SpawnRope()
         {
+            ropeLink = Utils.FindDeepChildWithName(transform.root.gameObject, ConnectedLinkName);
+            baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, "base_link");
+
+            if(ropeContainer == null)
+                ropeContainer = new GameObject(containerName);
+                ropeContainer.transform.SetParent(transform.root);
+                ropeContainer.transform.localPosition = ropeLink.transform.position;
+                ropeContainer.transform.rotation = ropeLink.transform.rotation;
+
             var links = new GameObject[numSegments];
 
             links[0] = InstantiateLink(null, 0);
@@ -90,9 +102,11 @@ namespace Rope
 
         public void DestroyRope()
         {
-            for(int i = transform.childCount - 1; i >= 0; i--)
+            while(true)
             {
-                DestroyImmediate(transform.GetChild(i).gameObject);
+                ropeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
+                if(ropeContainer == null) break;
+                DestroyImmediate(ropeContainer);
             }
         }
     }
