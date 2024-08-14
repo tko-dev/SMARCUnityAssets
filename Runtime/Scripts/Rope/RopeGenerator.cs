@@ -107,7 +107,7 @@ namespace Rope
             if(ropeContainer == null)
                 ropeContainer = new GameObject(containerName);
                 ropeContainer.transform.SetParent(transform.root);
-                ropeContainer.transform.localPosition = ropeLink.transform.position;
+                ropeContainer.transform.position = ropeLink.transform.position;
                 ropeContainer.transform.rotation = ropeLink.transform.rotation;
 
             var links = new GameObject[numSegments];
