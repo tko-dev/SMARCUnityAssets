@@ -179,10 +179,10 @@ namespace Rope
         void Awake()
         {
             // disable self-collisions
-            var ropeTagged = GameObject.FindGameObjectsWithTag(gameObject.tag);
+            var ropeLinks = FindObjectsByType<RopeLink>(FindObjectsSortMode.None);
             var ownC = GetComponent<Collider>();
-            foreach(var other in ropeTagged)
-                if (other.TryGetComponent(out Collider c))
+            foreach(var other in ropeLinks)
+                if (other.gameObject.TryGetComponent(out Collider c))
                     Physics.IgnoreCollision(c, ownC);
         }
 
