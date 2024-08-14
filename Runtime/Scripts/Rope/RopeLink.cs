@@ -20,29 +20,31 @@ namespace Rope
         float RopeDiameter;
         float RopeCollisionDiameter;
         float SegmentLength;
-        float RigidbodyMass;
-        float SegmentMass;
+        float SegmentRigidbodyMass;
+        float SegmentGravityMass;
+        float BuoyGravityMass;
 
         [Header("Rope physics")]
         [Tooltip("Stiffness properties of the rope (spring, damper, maxForce)")]
         public float spring = 0.1f;
         public float damper = 0.1f;
         public float maximumForce = 1000f;
-        [Tooltip("How heavy is this rope?")]
-        public float GramsPerMeter = 0.5f;
+        
 
 
         public void SetRopeParams(float ropeDiameter,
                                   float RopeCollisionDiameter,
                                   float SegmentLength,
-                                  float RigidbodyMass,
-                                  bool buoy)
+                                  float SegmentRigidbodyMass,
+                                  float SegmentGravityMass,
+                                  bool buoy,
+                                  float BuoyGravityMass)
         {
             RopeDiameter = ropeDiameter;
             this.RopeCollisionDiameter = RopeCollisionDiameter;
             this.SegmentLength = SegmentLength;
-            this.RigidbodyMass = RigidbodyMass;
-            SegmentMass = GramsPerMeter * 0.001f * SegmentLength;
+            this.SegmentRigidbodyMass = SegmentRigidbodyMass;
+            this.SegmentGravityMass = buoy? BuoyGravityMass : SegmentGravityMass;
             SetupBits();
             SetupJoint();
             if(buoy) SetupBalloon();
@@ -111,7 +113,7 @@ namespace Rope
             FP_sphereCollider.radius = RopeDiameter/2;
             var FP = FP_tf.GetComponent<ForcePoint>();
             FP.depthBeforeSubmerged = RopeDiameter;
-            FP.mass = SegmentMass;
+            FP.mass = SegmentGravityMass;
             FP.addGravity = true;
         }
 
@@ -150,7 +152,7 @@ namespace Rope
             // Mass is large in the RB for interactions, but gravity is small
             // for lifting.
             rb = GetComponent<Rigidbody>();
-            rb.mass = RigidbodyMass * 0.1f;
+            rb.mass = SegmentRigidbodyMass;
             rb.useGravity = false;
 
             SetupForcePoint(transform.Find("ForcePoint_F"), frontSpherePos);

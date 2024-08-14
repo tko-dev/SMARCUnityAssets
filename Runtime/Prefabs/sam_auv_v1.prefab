@@ -323,7 +323,7 @@ Transform:
   - {fileID: 2916020155247290328}
   - {fileID: 7774548356065433890}
   - {fileID: 189967037730074367}
-  m_Father: {fileID: 8883750902026420346}
+  m_Father: {fileID: 5239274575898139297}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7206311383517617818
 MonoBehaviour:
@@ -980,7 +980,7 @@ GameObject:
   - component: {fileID: 7094308715742057551}
   m_Layer: 0
   m_Name: sam_auv_v1
-  m_TagString: Untagged
+  m_TagString: robot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1053,9 +1053,11 @@ MonoBehaviour:
   RopeLinkPrefab: {fileID: 8527497976637253487, guid: eebb343a23cba1423be0f5ab11c20e78, type: 3}
   ConnectedLinkName: rope_link
   RopeDiameter: 0.01
+  RopeLength: 1
+  GramsPerMeter: 0.5
+  BuoyGrams: 1
   RopeCollisionDiameter: 0.1
   SegmentLength: 0.1
-  RopeLength: 1
   numSegments: 11
 --- !u!1 &1163357502922114015
 GameObject:
@@ -1883,50 +1885,6 @@ MonoBehaviour:
   jointName: imu_joint
   EffortLimit: 1000
   VelocityLimit: 1000
---- !u!1 &1982043849893540072
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8765349855319974596}
-  - component: {fileID: 4384904344317610375}
-  m_Layer: 0
-  m_Name: Plugins
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8765349855319974596
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1982043849893540072}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8883750902026420346}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4384904344317610375
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1982043849893540072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fae53a797b5479c43b9a3aeac7e35e5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2118915522717252917
 GameObject:
   m_ObjectHideFlags: 0
@@ -5181,7 +5139,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8883750902026420346}
+  - {fileID: 3567068247855063146}
   m_Father: {fileID: 1147570726954915425}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7185984208984731161
@@ -5490,56 +5448,6 @@ MonoBehaviour:
   jointName: thruster_pitch_joint
   EffortLimit: 1000
   VelocityLimit: 1000
---- !u!1 &7429503975385920972
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8883750902026420346}
-  - component: {fileID: 2614791031686991686}
-  m_Layer: 0
-  m_Name: sam_auv
-  m_TagString: robot
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8883750902026420346
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7429503975385920972}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8765349855319974596}
-  - {fileID: 3567068247855063146}
-  m_Father: {fileID: 5239274575898139297}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2614791031686991686
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7429503975385920972}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbf4c79288754864b8d522b69f4b52a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FilePath: 
-  chosenAxis: 0
-  currentOrientation: 0
-  collisionExceptions: []
 --- !u!1 &7936489217759003203
 GameObject:
   m_ObjectHideFlags: 0
