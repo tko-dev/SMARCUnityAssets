@@ -107,10 +107,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   originIsLatLon: 1
-  drawLineToReferencePoint: 1
+  drawLineToReferencePoint: 0
   lon: 17.596178
   lat: 58.811481
-  band: 
-  zone: 0
-  easting: 0
-  northing: 0
+  band: V
+  zone: 33
+  easting: 649947.1331677668
+  northing: 6521967.582881769
