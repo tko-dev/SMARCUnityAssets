@@ -22,6 +22,8 @@ namespace VehicleComponents.Sensors
         public float numDatapoints = 1000f;
         public float dataStep = 100f;
         public GameObject gameobject;
+        public int gridsize = 100;
+        public Vector3 firstPosition;
 
         void Start()
         {
@@ -46,6 +48,8 @@ namespace VehicleComponents.Sensors
             {
                 Debug.LogError("base_link ArticulationBody not found in the hierarchy!");
             }
+
+            firstPosition = droneBody.transform.position;
         }
 
         public override bool UpdateSensor(double deltaTime)
@@ -60,36 +64,20 @@ namespace VehicleComponents.Sensors
                     System.Random RNG = new System.Random();
 
                     // Get a random direction between 1 and 4
-                    int direction = RNG.Next(1, 5);
+                    int coord1 = RNG.Next(1, gridsize+1);
+                    int coord2 = RNG.Next(1, gridsize+1);
 
-                    // Calculate new position based on the random direction
-                    Vector3 newPosition = droneBody.transform.position;
+                    // Calculate new position based on the random position on grid
+                    // Vector3 newPosition = droneBody.transform.position;
 
-                    switch (direction)
-                    {
-                        case 1:
-                            newPosition += new Vector3(0.5f, 0, 0);  // Increase x by 0.5
-                            break;
-                        case 2:
-                            newPosition += new Vector3(-0.5f, 0, 0);  // Decrease x by 0.5
-                            break;
-                        case 3:
-                            newPosition += new Vector3(0, 0, 0.5f);  // Increase z by 0.5
-                            break;
-                        case 4:
-                            newPosition += new Vector3(0, 0, -0.5f);  // Decrease z by 0.5
-                            break;
-                        default:
-                            Debug.LogWarning("Unexpected direction value: " + direction);
-                            break;
-                    }
+                    Vector3 newPosition = firstPosition + new Vector3(0.5f*(float)coord1, 0, 0.5f*(float)coord2);
 
                     // Use TeleportRoot to move the ArticulationBody
                     droneBody.TeleportRoot(newPosition, droneBody.transform.rotation);
                     dronePosition = newPosition;
-
                     
                 }
+
                 else if (iterationCount >= numDatapoints)
                 {
                     storeDepth = false;  // Stop collecting data after reaching the desired number of datapoints

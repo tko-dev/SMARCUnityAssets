@@ -551,6 +551,7 @@ GameObject:
   - component: {fileID: 4787999160045060}
   - component: {fileID: 20438430716707438}
   - component: {fileID: 114498224980487218}
+  - component: {fileID: 3951838802402573009}
   m_Layer: 0
   m_Name: ThirdPersonCamera
   m_TagString: Untagged
@@ -636,6 +637,138 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bb2a72507487485d9465442ac5ca807, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3951838802402573009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946588258884440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
+  clearColorMode: 0
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 0
+  SMAAQuality: 2
+  dithering: 0
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 1
+  taaSharpenMode: 0
+  taaRingingReduction: 0
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 0
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 5770166122053453
+      data2: 13799030890350739480
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 0
+      data2: 0
+  defaultFrameSettings: 0
 --- !u!1 &1971563020570084
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,13 +915,16 @@ MonoBehaviour:
   yaw: 0
   frequency: 10
   hasNewData: 0
-  waveHeight: 0
+  depth: 0
   storeDepth: 0
   dronePosition: {x: 0, y: 0, z: 0}
+  _waterModel: {fileID: 0}
   droneBody: {fileID: 0}
   numDatapoints: 10000
   dataStep: 100
   gameobject: {fileID: 0}
+  gridsize: 100
+  firstPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &83281821845207248
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,8 +1027,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.00000031292439, y: 0, z: 0.31500012}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: 0.315}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
@@ -1477,8 +1613,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.0009999139, y: -0.178, z: 0.001000262}
-  m_ParentAnchorRotation: {x: 0.6532816, y: 0.6532816, z: -0.27059796, w: -0.27059796}
+  m_ParentAnchorPosition: {x: -0.001, y: -0.178, z: 0.001}
+  m_ParentAnchorRotation: {x: 0.65328157, y: 0.65328157, z: -0.27059793, w: -0.27059793}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -1690,6 +1826,7 @@ MonoBehaviour:
   - map
   suffix: _gt
   frequency: 50
+  ErrorOnPublish: 0
 --- !u!1 &1707507535447974862
 GameObject:
   m_ObjectHideFlags: 0
@@ -2116,8 +2253,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.31500012, y: 0, z: 0.00000035762787}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: 0.315, y: 0, z: 0}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
@@ -2229,6 +2366,7 @@ GameObject:
   - component: {fileID: 4844363478455440381}
   - component: {fileID: 3179540796430959622}
   - component: {fileID: 8208622406568007370}
+  - component: {fileID: 6952096810736312603}
   m_Layer: 0
   m_Name: base_link
   m_TagString: Untagged
@@ -2260,6 +2398,8 @@ Transform:
   - {fileID: 8705531295500384275}
   - {fileID: 4787999160045060}
   - {fileID: 224679279176400423}
+  - {fileID: 789580045639141990}
+  - {fileID: 2328022698096168879}
   m_Father: {fileID: 8597457138550415401}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4844363478455440381
@@ -2362,6 +2502,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.63, y: 0.12, z: 0.63}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6952096810736312603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3939394929759449381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 569a28ba88de7aae8a6b6959e01a77d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drone: {fileID: 3939394929759449381}
+  auv: {fileID: 0}
+  droneCamera: {fileID: 0}
+  hoverHeight: 10
+  rotationStep: 30
+  positionOffset: 1
+  numberOffsets: 8
 --- !u!1 &3948910949637794082
 GameObject:
   m_ObjectHideFlags: 0
@@ -3007,8 +3166,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.00000031292439, y: 0, z: -0.31500012}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.315}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
@@ -3121,8 +3280,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.31500012, y: 0, z: -0.00000035762787}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: -0.315, y: 0, z: 0}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
@@ -3351,7 +3510,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6231591086345626948}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0000004321337, y: -0.000000029802322, z: 1.4210855e-14, w: 1}
+  m_LocalRotation: {x: -0.0000004321337, y: -0.000000029802322, z: 1.4210855e-14,
+    w: 1}
   m_LocalPosition: {x: 0, y: -0.1437, z: -0.09739998}
   m_LocalScale: {x: 0.0028540287, y: 0.031469718, z: 0.0029966622}
   m_ConstrainProportionsScale: 0
@@ -3676,9 +3836,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4835051436542511100}
-  - {fileID: 8978121769285070496}
+  m_Children: []
   m_Father: {fileID: 135919806119038934}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5801389130515422799
@@ -3814,6 +3972,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2337372859405342469}
   - component: {fileID: 262200552079559857}
+  - component: {fileID: 7992913546886184162}
   m_Layer: 0
   m_Name: thirdpersoncam_link
   m_TagString: Untagged
