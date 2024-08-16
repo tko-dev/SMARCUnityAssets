@@ -4,6 +4,7 @@ using UnityEngine;
 
 using Force;
 using UnityEditor.EditorTools; // ForcePoints
+using Utils = DefaultNamespace.Utils;
 
 namespace Rope
 {
@@ -17,12 +18,14 @@ namespace Rope
         Rigidbody rb;
 
 
-        float RopeDiameter;
-        float RopeCollisionDiameter;
-        float SegmentLength;
-        float SegmentRigidbodyMass;
-        float SegmentGravityMass;
-        float BuoyGravityMass;
+        float ropeDiameter;
+        float ropeCollisionDiameter;
+        float segmentLength;
+        float segmentRigidbodyMass;
+        float segmentGravityMass;
+        float buoyGravityMass;
+        bool attached = false;
+
 
         [Header("Rope physics")]
         [Tooltip("Stiffness properties of the rope (spring, damper, maxForce)")]
@@ -31,23 +34,30 @@ namespace Rope
         public float maximumForce = 1000f;
         
 
+        [Header("Auto-set, do not touch")]
+        public GameObject firstRopeLinkObject;
+        public bool isBuoy = false;
 
         public void SetRopeParams(float ropeDiameter,
-                                  float RopeCollisionDiameter,
-                                  float SegmentLength,
-                                  float SegmentRigidbodyMass,
-                                  float SegmentGravityMass,
+                                  float ropeCollisionDiameter,
+                                  float segmentLength,
+                                  float segmentRigidbodyMass,
+                                  float segmentGravityMass,
                                   bool buoy,
-                                  float BuoyGravityMass)
+                                  float buoyGravityMass,
+                                  GameObject firstRopeLinkObject)
         {
-            RopeDiameter = ropeDiameter;
-            this.RopeCollisionDiameter = RopeCollisionDiameter;
-            this.SegmentLength = SegmentLength;
-            this.SegmentRigidbodyMass = SegmentRigidbodyMass;
-            this.SegmentGravityMass = buoy? BuoyGravityMass : SegmentGravityMass;
+            this.ropeDiameter = ropeDiameter;
+            this.ropeCollisionDiameter = ropeCollisionDiameter;
+            this.segmentLength = segmentLength;
+            this.segmentRigidbodyMass = segmentRigidbodyMass;
+            this.segmentGravityMass = buoy? buoyGravityMass : segmentGravityMass;
+            this.isBuoy = buoy;
+            this.firstRopeLinkObject = firstRopeLinkObject;
+
             SetupBits();
             SetupJoint();
-            if(buoy) SetupBalloon();
+            SetupBalloon();
         }
 
 
@@ -71,7 +81,7 @@ namespace Rope
 
         (Vector3, Vector3) spherePositions()
         {
-            float d = SegmentLength/2 - RopeDiameter/4;
+            float d = segmentLength/2 - ropeDiameter/4;
             return ( new Vector3(0,0,d), new Vector3(0,0,-d) );
         }
 
@@ -110,10 +120,10 @@ namespace Rope
         {
             FP_tf.localPosition = position;
             var FP_sphereCollider = FP_tf.GetComponent<SphereCollider>();
-            FP_sphereCollider.radius = RopeDiameter/2;
+            FP_sphereCollider.radius = ropeDiameter/2;
             var FP = FP_tf.GetComponent<ForcePoint>();
-            FP.depthBeforeSubmerged = RopeDiameter;
-            FP.mass = SegmentGravityMass;
+            FP.depthBeforeSubmerged = ropeDiameter;
+            FP.mass = segmentGravityMass;
             FP.addGravity = true;
         }
 
@@ -126,10 +136,10 @@ namespace Rope
             frontVis_tf.localPosition = frontSpherePos;
             backVis_tf.localPosition = backSpherePos;
 
-            var visualScale = new Vector3(RopeDiameter, RopeDiameter, RopeDiameter);
+            var visualScale = new Vector3(ropeDiameter, ropeDiameter, ropeDiameter);
             frontVis_tf.localScale = visualScale;
             backVis_tf.localScale = visualScale;
-            middleVis_tf.localScale = new Vector3(RopeDiameter, (SegmentLength/2)-(RopeDiameter/4), RopeDiameter);
+            middleVis_tf.localScale = new Vector3(ropeDiameter, (segmentLength/2)-(ropeDiameter/4), ropeDiameter);
         }
 
         void SetupBits()
@@ -140,8 +150,8 @@ namespace Rope
             var (frontSpherePos, backSpherePos) = spherePositions();
 
             capsule = GetComponent<CapsuleCollider>();
-            capsule.radius = RopeCollisionDiameter/2;
-            capsule.height = SegmentLength+RopeCollisionDiameter; // we want the collision to overlap with the child's
+            capsule.radius = ropeCollisionDiameter/2;
+            capsule.height = segmentLength+ropeCollisionDiameter; // we want the collision to overlap with the child's
 
             // Having the rope be _so tiny_ is problematic for
             // physics calculations.
@@ -152,7 +162,7 @@ namespace Rope
             // Mass is large in the RB for interactions, but gravity is small
             // for lifting.
             rb = GetComponent<Rigidbody>();
-            rb.mass = SegmentRigidbodyMass;
+            rb.mass = segmentRigidbodyMass;
             rb.useGravity = false;
 
             SetupForcePoint(transform.Find("ForcePoint_F"), frontSpherePos);
@@ -162,30 +172,59 @@ namespace Rope
 
         void SetupBalloon()
         {
+            if(!isBuoy) return;
+
             // Add a visual sphere to the rope as the buoy balloon
             var visuals = transform.Find("Visuals");
             Transform sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere).transform;
             sphere.SetParent(visuals);
-            sphere.localPosition = new Vector3(0, RopeDiameter, 0);
-            var rad = SegmentLength-RopeDiameter;
+            sphere.localPosition = new Vector3(0, ropeDiameter, 0);
+            var rad = segmentLength-ropeDiameter;
             var scale = new Vector3(rad, rad, rad);
             sphere.localScale = scale;
             // and make it collidable
             var collider = sphere.GetComponent<SphereCollider>();
             collider.radius = rad;
-            // then add the RopeBuoy component to this object. This will
-            // add a fixed joint when needed to attach to a hook.
-            gameObject.AddComponent<RopeBuoy>();
         }
 
         void Awake()
         {
+            rb = GetComponent<Rigidbody>();
+
             // disable self-collisions
             var ropeLinks = FindObjectsByType<RopeLink>(FindObjectsSortMode.None);
             var ownC = GetComponent<Collider>();
             foreach(var other in ropeLinks)
                 if (other.gameObject.TryGetComponent(out Collider c))
                     Physics.IgnoreCollision(c, ownC);
+        }
+
+        void OnCollisionEnter(Collision collision)
+        {
+            if(!isBuoy) return;
+            if(attached) return;
+            
+            if (collision.gameObject.TryGetComponent(out RopeHook rh))
+            {
+                Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+
+                var fixedJoint = gameObject.AddComponent<FixedJoint>();
+                fixedJoint.enablePreprocessing = false;
+                var hookAB = collision.gameObject.GetComponent<ArticulationBody>();
+                fixedJoint.connectedArticulationBody = hookAB;
+                var hookBaseLinkGO = Utils.FindDeepChildWithName(hookAB.transform.root.gameObject, "base_link");
+                var hookBaseLinkAB = hookBaseLinkGO.GetComponent<ArticulationBody>();
+                fixedJoint.connectedMassScale = 0.1f * (hookBaseLinkAB.mass / rb.mass);
+
+                // Set up the first rope link in the chain to have the same "joint pulling force"
+                // as the base link itself so the base link can be pulled around without exploding the rope!
+                var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
+                var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.transform.root.gameObject, "base_link");
+                var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
+                firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;
+
+                attached = true;
+            }
         }
 
         

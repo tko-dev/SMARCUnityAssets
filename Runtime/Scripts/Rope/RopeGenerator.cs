@@ -43,7 +43,7 @@ namespace Rope
             if(numSegments > 50) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
         }
 
-        GameObject InstantiateLink(GameObject prevLink, int num, bool buoy=false)
+        GameObject InstantiateLink(GameObject prevLink, int num, bool buoy, GameObject firstLinkObj)
         {
             var link = Instantiate(RopeLinkPrefab);
             link.transform.SetParent(ropeContainer.transform);
@@ -89,11 +89,20 @@ namespace Rope
                 segmentRBMass = BaseRB.mass * massRatio;
 
             // this is the mass we'll use for gravity.
-            var IdealMassPerSegment = GramsPerMeter * 0.001f * SegmentLength;
-            segmentRBMass = Mathf.Max(IdealMassPerSegment, segmentRBMass);
+            var idealMassPerSegment = GramsPerMeter * 0.001f * SegmentLength;
+            segmentRBMass = Mathf.Max(idealMassPerSegment, segmentRBMass);
 
             var rl = link.GetComponent<RopeLink>();
-            rl.SetRopeParams(RopeDiameter, RopeCollisionDiameter, SegmentLength, segmentRBMass, IdealMassPerSegment, buoy, BuoyGrams*0.001f);
+            rl.SetRopeParams(
+                RopeDiameter,
+                RopeCollisionDiameter,
+                SegmentLength,
+                segmentRBMass,
+                idealMassPerSegment,
+                buoy,
+                BuoyGrams*0.001f,
+                firstLinkObj
+                );
 
             return link;
         }
@@ -112,12 +121,12 @@ namespace Rope
 
             var links = new GameObject[numSegments];
 
-            links[0] = InstantiateLink(null, 0);
+            links[0] = InstantiateLink(null, 0, false, null);
 
             for(int i=1; i < numSegments; i++)
             {
                 var buoy = (i+1 == numSegments) && (BuoyGrams > 0);
-                links[i] = InstantiateLink(links[i-1], i, buoy);
+                links[i] = InstantiateLink(links[i-1], i, buoy, links[0]);
             }
         }
 
