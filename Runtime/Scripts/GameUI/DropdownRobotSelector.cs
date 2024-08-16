@@ -29,6 +29,8 @@ namespace GameUI
             // Get all the #robot tagged objects in the scene
             // then we'll use their root name in the list
             var robots = GameObject.FindGameObjectsWithTag("robot");
+            if(robots.Length <= 0) return;
+            
             foreach(var robot in robots)
             {
                 dropdown.options.Add(new TMP_Dropdown.OptionData(){text=robot.transform.root.name});
