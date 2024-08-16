@@ -599,10 +599,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0
+  m_Radius: 0.01
   m_Height: 0
   m_Direction: 2
-  m_Center: {x: 0, y: 0.04, z: 0}
+  m_Center: {x: 0, y: 0.01, z: 0}
 --- !u!114 &10039788946428091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -615,9 +615,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spring: 0.001
-  damper: 0.001
-  maximumForce: 4
+  spring: 0.5
+  damper: 0.5
+  maximumForce: 5000
+  firstRopeLinkObject: {fileID: 0}
+  isBuoy: 0
 --- !u!114 &1080205937504706963
 MonoBehaviour:
   m_ObjectHideFlags: 0

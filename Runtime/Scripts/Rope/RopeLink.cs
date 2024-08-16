@@ -13,18 +13,9 @@ namespace Rope
     [RequireComponent(typeof(CapsuleCollider))]
     public class RopeLink : MonoBehaviour
     {
-        CapsuleCollider capsule;
-        ConfigurableJoint joint;
-        Rigidbody rb;
+        
 
 
-        float ropeDiameter;
-        float ropeCollisionDiameter;
-        float segmentLength;
-        float segmentRigidbodyMass;
-        float segmentGravityMass;
-        float buoyGravityMass;
-        bool attached = false;
 
 
         [Header("Rope physics")]
@@ -37,13 +28,24 @@ namespace Rope
         [Header("Auto-set, do not touch")]
         public GameObject firstRopeLinkObject;
         public bool isBuoy = false;
+        float ropeDiameter;
+        float ropeCollisionDiameter;
+        float segmentLength;
+        float segmentRigidbodyMass;
+        public float segmentGravityMass;
+        bool attached = false;
+        bool bypassedRope = false; 
+        CapsuleCollider capsule;
+        public ConfigurableJoint ropeJoint;
+        Rigidbody rb;
+
 
         public void SetRopeParams(float ropeDiameter,
                                   float ropeCollisionDiameter,
                                   float segmentLength,
                                   float segmentRigidbodyMass,
                                   float segmentGravityMass,
-                                  bool buoy,
+                                  bool isBuoy,
                                   float buoyGravityMass,
                                   GameObject firstRopeLinkObject)
         {
@@ -51,12 +53,16 @@ namespace Rope
             this.ropeCollisionDiameter = ropeCollisionDiameter;
             this.segmentLength = segmentLength;
             this.segmentRigidbodyMass = segmentRigidbodyMass;
-            this.segmentGravityMass = buoy? buoyGravityMass : segmentGravityMass;
-            this.isBuoy = buoy;
+            this.segmentGravityMass = isBuoy? buoyGravityMass : segmentGravityMass;
+            this.isBuoy = isBuoy;
             this.firstRopeLinkObject = firstRopeLinkObject;
 
             SetupBits();
-            SetupJoint();
+            // center of rotation for front and back links
+            // also where we put things like force points
+            var (frontSpherePos, backSpherePos) = spherePositions();
+            ropeJoint = GetComponent<ConfigurableJoint>();
+            SetupConfigJoint(ropeJoint, backSpherePos);
             SetupBalloon();
         }
 
@@ -86,18 +92,12 @@ namespace Rope
         }
 
 
-        void SetupJoint()
+        void SetupConfigJoint(ConfigurableJoint joint, Vector3 anchorPosition)
         {
-            joint = GetComponent<ConfigurableJoint>();
-
-            // center of rotation for front and back links
-            // also where we put things like force points
-            var (frontSpherePos, backSpherePos) = spherePositions();
-
             // This setup was found here
             // https://forums.tigsource.com/index.php?topic=64389.msg1389271#msg1389271
             // where there are vids demonstrating even KNOTS :D
-            joint.anchor = backSpherePos;
+            joint.anchor = anchorPosition;
             joint.enableCollision = false;
             joint.enablePreprocessing = false;
 
@@ -151,6 +151,7 @@ namespace Rope
 
             capsule = GetComponent<CapsuleCollider>();
             capsule.radius = ropeCollisionDiameter/2;
+            capsule.center = new Vector3(0, ropeCollisionDiameter/2-ropeDiameter/2, 0);
             capsule.height = segmentLength+ropeCollisionDiameter; // we want the collision to overlap with the child's
 
             // Having the rope be _so tiny_ is problematic for
@@ -208,13 +209,15 @@ namespace Rope
             {
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 
-                var fixedJoint = gameObject.AddComponent<FixedJoint>();
-                fixedJoint.enablePreprocessing = false;
+                var frontConfigJoint = gameObject.AddComponent<ConfigurableJoint>();
+                var (frontSpherePos, backSpherePos) = spherePositions();
+                SetupConfigJoint(frontConfigJoint, frontSpherePos);
+
                 var hookAB = collision.gameObject.GetComponent<ArticulationBody>();
-                fixedJoint.connectedArticulationBody = hookAB;
+                frontConfigJoint.connectedArticulationBody = hookAB;
                 var hookBaseLinkGO = Utils.FindDeepChildWithName(hookAB.transform.root.gameObject, "base_link");
                 var hookBaseLinkAB = hookBaseLinkGO.GetComponent<ArticulationBody>();
-                fixedJoint.connectedMassScale = 0.1f * (hookBaseLinkAB.mass / rb.mass);
+                frontConfigJoint.connectedMassScale = 0.1f * (hookBaseLinkAB.mass / rb.mass);
 
                 // Set up the first rope link in the chain to have the same "joint pulling force"
                 // as the base link itself so the base link can be pulled around without exploding the rope!
@@ -222,10 +225,62 @@ namespace Rope
                 var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.transform.root.gameObject, "base_link");
                 var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
                 firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;
+                
+                // Set the rope joint to break when the rope is carrying the entire robot.
+                // This should happen when the rope is _tight_, meaning the distance between hook
+                // and robot is equal (or almost) to the rope length.
+                // At that point, we can replace the entire rope with a single linkage
+                // and discard the rope entirely.
+                // This should make the physics of the drone-rope-auv system more stable
+                // and closer to theoretical control papers about suspended load control.
+                // But since we still need 2 rigid bodies to connected 2 articulation body systems,
+                // we will keep the first and last parts of the rope as part of the AB-RB-RB-AB chain.
+                ropeJoint.breakForce = 2;
 
                 attached = true;
             }
         }
+
+        void OnJointBreak(float breakForce)
+        {
+            Debug.Log($"Broke at {breakForce}N");
+            if(!attached)
+            {
+                Debug.Log($"{gameObject.name}: Rope broke before it was attached?!");
+                return;
+            }
+            // the rope breaking means its tight and carrying something.
+            // so we replace the middle links of the rope with a STICK
+            // to make the physics more stable!
+
+            // first, nuke the middle siblings between the first ropelink and this buoy
+            var parent = transform.parent;
+            for(int i=parent.childCount-1; i>0; i--)
+            {
+                // reverse loop because we're gonna remove things from the collection
+                var child = parent.GetChild(i);
+                if(child.name == gameObject.name) continue;
+                if(child.name == firstRopeLinkObject.name) continue;
+                // its a middle sibling. murder.
+                Destroy(child.gameObject);
+            }
+
+            // first, we gotta re-create the joint that just broke.
+            ropeJoint = gameObject.AddComponent<ConfigurableJoint>();
+            var (frontSpherePos, backSpherePos) = spherePositions();
+            SetupConfigJoint(ropeJoint, backSpherePos);
+            // then, connect this ropelinks back-joint to the first ropelink
+            ropeJoint.connectedBody = firstRopeLinkObject.GetComponent<Rigidbody>();
+            bypassedRope = true;
+        }
+
+        void OnDrawGizmos()
+        {
+            if(!bypassedRope) return;
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawLine(transform.position, firstRopeLinkObject.transform.position);
+        }
+
 
         
     }
