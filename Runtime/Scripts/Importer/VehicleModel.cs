@@ -172,7 +172,8 @@ namespace Importer
 
             var point = transform.gameObject.AddComponent<ForcePoint>();
             point.volumeObject = loadedRobot.transform.Find(volumeObjectTransformPath).gameObject;
-            point._body = loadedRobot.transform.Find("base_link").GetComponent<ArticulationBody>();
+            point.ConnectedArticulationBody = loadedRobot.transform.Find("base_link").GetComponent<ArticulationBody>();
+            point.ConnectedRigidbody = loadedRobot.transform.Find("base_link").GetComponent<Rigidbody>();
         }
     }
 
@@ -220,9 +221,13 @@ namespace Importer
                     articulationBody.SetDriveDamping(drive.axis, drive.damping);
                     articulationBody.SetDriveStiffness(drive.axis, drive.stiffness);
                 });
-                articulationBody.inertiaTensor = inertiaTensor;
+               
                 articulationBody.inertiaTensorRotation = inertiaTensorRotation;
-                articulationBody.automaticInertiaTensor = automaticInertiaTensor;
+                if (articulationBody.automaticInertiaTensor && !automaticInertiaTensor)
+                {
+                    articulationBody.inertiaTensor = inertiaTensor;
+                    articulationBody.automaticInertiaTensor = automaticInertiaTensor;
+                }
                 articulationBody.centerOfMass = centerOfMass;
                 articulationBody.automaticCenterOfMass = automaticCenterOfMass;
                 articulationBody.linearDamping = linearDamping;

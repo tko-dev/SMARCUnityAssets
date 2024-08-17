@@ -51,6 +51,7 @@ namespace VehicleComponents.ROS.Publishers
 
         void CreateMsg()
         {
+            if(gpsRef == null) return;
             string utm_zone_band = $"utm_{gpsRef.zone}_{gpsRef.band}";
             // this is the position of unity-world in utm coordinates
             double lat, lon, originEasting, originNorthing;
