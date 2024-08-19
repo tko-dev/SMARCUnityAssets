@@ -47,6 +47,7 @@ namespace Rope
 
         GameObject connectedLink, baseLink;
         readonly string containerName = "Rope";
+        readonly string baseLinkName = "base_link";
 
         void OnValidate()
         {
@@ -59,7 +60,6 @@ namespace Rope
             link.transform.SetParent(RopeContainer.transform);
             link.name = $"{link.name}_{num}";
             if(buoy) link.name = $"{link.name}_buoy";
-
 
             var linkJoint = link.GetComponent<Joint>();
             if(prevLink != null)
@@ -98,7 +98,7 @@ namespace Rope
         public void SpawnRope()
         {
             connectedLink = Utils.FindDeepChildWithName(transform.root.gameObject, ConnectedLinkName);
-            baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, "base_link");
+            baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, baseLinkName);
 
             if(RopeContainer == null)
             {
@@ -136,9 +136,36 @@ namespace Rope
             }
         }
 
+        public void ReplaceRopeWithStick(GameObject connectedHookGO)
+        {
+            // the rope breaking means its tight and carrying something.
+            // so we replace the entire rope with a STICK
+            // to make the physics more stable!
+            // Reverse loop because we're gonna remove things from the collection
+            var container = RopeContainer.transform;
+            for(int i=container.childCount-1; i>=0; i--)
+                Destroy(container.GetChild(i).gameObject);
+
+            // Now that all the rope is gone, create a new RopeLink object
+            // but, at this point, we shall have ONE segment that is as long as the rope
+            SegmentLength = RopeLength;
+            var stick = InstantiateLink(null, 0, false);
+            // this stick is already connected to the base_link
+            // but now it also needs to connect to the hook's connection point
+            // var frontJoint = stick.AddComponent<ConfigurableJoint>();
+            var stickRopeLink = stick.GetComponent<RopeLink>();
+            // we took the hook object from the ropelink that broke earlier.
+            // since to break, it first had to attach, at which point it knew
+            // the object to attach to.
+            // See RopeLink::OnCollisionEnter then RopeLink::OnJointBreak
+            stickRopeLink.ConnectToHook(connectedHookGO, breakable:false);
+        }
+
         void Awake()
         {
             if(RopeContainer == null) RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
+            if(connectedLink == null) connectedLink = Utils.FindDeepChildWithName(transform.root.gameObject, ConnectedLinkName);
+            if(baseLink == null) baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, baseLinkName);
         }
 
     }
