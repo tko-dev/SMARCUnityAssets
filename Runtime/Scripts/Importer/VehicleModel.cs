@@ -221,9 +221,13 @@ namespace Importer
                     articulationBody.SetDriveDamping(drive.axis, drive.damping);
                     articulationBody.SetDriveStiffness(drive.axis, drive.stiffness);
                 });
-                articulationBody.inertiaTensor = inertiaTensor;
+               
                 articulationBody.inertiaTensorRotation = inertiaTensorRotation;
-                articulationBody.automaticInertiaTensor = automaticInertiaTensor;
+                if (articulationBody.automaticInertiaTensor && !automaticInertiaTensor)
+                {
+                    articulationBody.inertiaTensor = inertiaTensor;
+                    articulationBody.automaticInertiaTensor = automaticInertiaTensor;
+                }
                 articulationBody.centerOfMass = centerOfMass;
                 articulationBody.automaticCenterOfMass = automaticCenterOfMass;
                 articulationBody.linearDamping = linearDamping;

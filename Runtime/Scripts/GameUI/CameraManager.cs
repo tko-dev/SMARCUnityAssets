@@ -26,7 +26,11 @@ namespace GameUI
             {
                 // dont mess with sensor cameras
                 if(c.gameObject.TryGetComponent<Sensor>(out Sensor s)) continue;
+                // disable all cams by default. we will enable one later.
                 c.enabled = false;
+                // disable all audiolisteners. we got no audio. we wont enable these.
+                if(c.gameObject.TryGetComponent<AudioListener>(out AudioListener al)) al.enabled=false;
+                
                 string objectPath = Utils.GetGameObjectPath(c.gameObject);
                 string ddText = $"{c.transform.root.name}/{c.name}";
                 ddTextToObjectPath.Add(ddText, objectPath);

@@ -6,15 +6,15 @@ using Rope;
 
 namespace Editor.Scripts
 {
-    [CustomEditor(typeof(RopeContainer))]
+    [CustomEditor(typeof(RopeGenerator))]
     public class RopeGeneratorEditor : UnityEditor.Editor
     {
-        RopeContainer container;
+        RopeGenerator container;
 
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
-            container = (RopeContainer) target;
+            container = (RopeGenerator) target;
 
             if(GUILayout.Button("(Re)Generate Rope"))
             {
