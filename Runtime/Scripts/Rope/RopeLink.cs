@@ -21,7 +21,7 @@ namespace Rope
         public float maximumForce = 1000f;
         
 
-        [Header("Auto-set, do not touch")]
+        [Header("Auto-set by generator")]
         [SerializeField] RopeGenerator generator;
         [SerializeField] bool isBuoy = false;
         [SerializeField] float ropeDiameter;
@@ -30,7 +30,6 @@ namespace Rope
         [SerializeField] float segmentRigidbodyMass;
         [SerializeField] float segmentGravityMass;
         bool attached = false;
-        bool bypassedRope = false; 
         GameObject connectedHookGO;
 
         CapsuleCollider capsule;
