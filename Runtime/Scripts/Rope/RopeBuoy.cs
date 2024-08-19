@@ -10,12 +10,14 @@ namespace Rope
     public class RopeBuoy : MonoBehaviour
     {
         FixedJoint joint;
+        public bool contact = false;
 
 
         void OnCollisionEnter(Collision collision)
         {
             if (collision.gameObject.TryGetComponent(out RopeHook rh))
             {
+                contact = true;
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
                 joint = gameObject.AddComponent<FixedJoint>();
                 joint.enablePreprocessing = false;
