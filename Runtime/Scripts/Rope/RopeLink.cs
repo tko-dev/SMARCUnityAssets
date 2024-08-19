@@ -26,41 +26,34 @@ namespace Rope
         
 
         [Header("Auto-set, do not touch")]
-        public GameObject firstRopeLinkObject;
-        public bool isBuoy = false;
+        RopeGenerator generator;
+        bool isBuoy = false;
         float ropeDiameter;
         float ropeCollisionDiameter;
         float segmentLength;
         float segmentRigidbodyMass;
-        public float segmentGravityMass;
+        float segmentGravityMass;
         bool attached = false;
         bool bypassedRope = false; 
         CapsuleCollider capsule;
-        public ConfigurableJoint ropeJoint;
+        ConfigurableJoint ropeJoint;
         Rigidbody rb;
 
-
-        public void SetRopeParams(float ropeDiameter,
-                                  float ropeCollisionDiameter,
-                                  float segmentLength,
-                                  float segmentRigidbodyMass,
-                                  float segmentGravityMass,
-                                  bool isBuoy,
-                                  float buoyGravityMass,
-                                  GameObject firstRopeLinkObject)
+        public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
         {
-            this.ropeDiameter = ropeDiameter;
-            this.ropeCollisionDiameter = ropeCollisionDiameter;
-            this.segmentLength = segmentLength;
-            this.segmentRigidbodyMass = segmentRigidbodyMass;
-            this.segmentGravityMass = isBuoy? buoyGravityMass : segmentGravityMass;
+            generator = ropeGenerator;
+            ropeDiameter = generator.RopeDiameter;
+            ropeCollisionDiameter = generator.RopeCollisionDiameter;
+            segmentLength = generator.SegmentLength;
+            segmentRigidbodyMass = generator.SegmentRBMass;
+            segmentGravityMass = isBuoy? generator.BuoyGrams * 0.001f : generator.IdealMassPerSegment;
+
             this.isBuoy = isBuoy;
-            this.firstRopeLinkObject = firstRopeLinkObject;
 
             SetupBits();
             // center of rotation for front and back links
             // also where we put things like force points
-            var (frontSpherePos, backSpherePos) = spherePositions();
+            var (frontSpherePos, backSpherePos) = SpherePositions();
             ropeJoint = GetComponent<ConfigurableJoint>();
             SetupConfigJoint(ropeJoint, backSpherePos);
             SetupBalloon();
@@ -68,24 +61,28 @@ namespace Rope
 
 
 
-        SoftJointLimitSpring makeSJLS(float spring, float damper)
+        SoftJointLimitSpring MakeSJLS(float spring, float damper)
         {
-            var sjls = new SoftJointLimitSpring();
-            sjls.damper = damper;
-            sjls.spring = spring;
+            var sjls = new SoftJointLimitSpring
+            {
+                damper = damper,
+                spring = spring
+            };
             return sjls;
         }
 
-        JointDrive makeJD(float spring, float damper, float maximumForce)
+        JointDrive MakeJD(float spring, float damper, float maximumForce)
         {
-            var drive = new JointDrive();
-            drive.positionSpring = spring;
-            drive.positionDamper = damper;
-            drive.maximumForce = maximumForce;
+            var drive = new JointDrive
+            {
+                positionSpring = spring,
+                positionDamper = damper,
+                maximumForce = maximumForce
+            };
             return drive;
         }
 
-        (Vector3, Vector3) spherePositions()
+        (Vector3, Vector3) SpherePositions()
         {
             float d = segmentLength/2 - ropeDiameter/4;
             return ( new Vector3(0,0,d), new Vector3(0,0,-d) );
@@ -106,14 +103,14 @@ namespace Rope
             joint.zMotion = ConfigurableJointMotion.Locked;
            
 
-            joint.angularXLimitSpring = makeSJLS(spring, damper);
-            joint.angularYZLimitSpring = makeSJLS(spring, damper);
-            joint.xDrive = makeJD(spring, damper, maximumForce);
-            joint.yDrive = makeJD(spring, damper, maximumForce);
-            joint.zDrive = makeJD(spring, damper, maximumForce);
-            joint.angularXDrive = makeJD(spring, damper, maximumForce);
-            joint.angularYZDrive = makeJD(spring, damper, maximumForce);
-            joint.slerpDrive = makeJD(spring, damper, maximumForce); 
+            joint.angularXLimitSpring = MakeSJLS(spring, damper);
+            joint.angularYZLimitSpring = MakeSJLS(spring, damper);
+            joint.xDrive = MakeJD(spring, damper, maximumForce);
+            joint.yDrive = MakeJD(spring, damper, maximumForce);
+            joint.zDrive = MakeJD(spring, damper, maximumForce);
+            joint.angularXDrive = MakeJD(spring, damper, maximumForce);
+            joint.angularYZDrive = MakeJD(spring, damper, maximumForce);
+            joint.slerpDrive = MakeJD(spring, damper, maximumForce); 
         }
 
         void SetupForcePoint(Transform FP_tf, Vector3 position)
@@ -147,7 +144,7 @@ namespace Rope
             // scale and locate all the little bits and bobs that make up
             // this rope segment depending on the parameters above.
             // Because settings these by hand is a pain.
-            var (frontSpherePos, backSpherePos) = spherePositions();
+            var (frontSpherePos, backSpherePos) = SpherePositions();
 
             capsule = GetComponent<CapsuleCollider>();
             capsule.radius = ropeCollisionDiameter/2;
@@ -210,7 +207,7 @@ namespace Rope
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 
                 var frontConfigJoint = gameObject.AddComponent<ConfigurableJoint>();
-                var (frontSpherePos, backSpherePos) = spherePositions();
+                var (frontSpherePos, backSpherePos) = SpherePositions();
                 SetupConfigJoint(frontConfigJoint, frontSpherePos);
 
                 var hookAB = collision.gameObject.GetComponent<ArticulationBody>();
@@ -221,6 +218,7 @@ namespace Rope
 
                 // Set up the first rope link in the chain to have the same "joint pulling force"
                 // as the base link itself so the base link can be pulled around without exploding the rope!
+                var firstRopeLinkObject = generator.RopeLinkObjects[0];
                 var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
                 var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.transform.root.gameObject, "base_link");
                 var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
@@ -255,6 +253,7 @@ namespace Rope
 
             // first, nuke the middle siblings between the first ropelink and this buoy
             var parent = transform.parent;
+            var firstRopeLinkObject = generator.RopeLinkObjects[0];
             for(int i=parent.childCount-1; i>0; i--)
             {
                 // reverse loop because we're gonna remove things from the collection
@@ -267,7 +266,7 @@ namespace Rope
 
             // first, we gotta re-create the joint that just broke.
             ropeJoint = gameObject.AddComponent<ConfigurableJoint>();
-            var (frontSpherePos, backSpherePos) = spherePositions();
+            var (frontSpherePos, backSpherePos) = SpherePositions();
             SetupConfigJoint(ropeJoint, backSpherePos);
             // then, connect this ropelinks back-joint to the first ropelink
             ropeJoint.connectedBody = firstRopeLinkObject.GetComponent<Rigidbody>();
@@ -278,7 +277,7 @@ namespace Rope
         {
             if(!bypassedRope) return;
             Gizmos.color = Color.magenta;
-            Gizmos.DrawLine(transform.position, firstRopeLinkObject.transform.position);
+            Gizmos.DrawLine(transform.position, generator.RopeLinkObjects[0].transform.position);
         }
 
 

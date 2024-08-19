@@ -32,18 +32,26 @@ namespace Rope
         [Tooltip("How long each segment of the rope will be. Smaller = more realistic but harder to simulate.")]
         [Range(0.01f, 1f)]
         public float SegmentLength = 0.1f;
-        public int numSegments;
+        public int NumSegments => (int)(RopeLength / (SegmentLength-RopeDiameter));
+        public float SegmentRBMass = 1f;
+        [Tooltip("Mass of each segment compared to the base_link the rope is connected to. For physics stability! The larger the more stable...")]
+        public float SegmentMassRatio = 0.01f;
+        [Tooltip("This is the mass we'll use for gravity for each segment. In KGs")]
+        public float IdealMassPerSegment => GramsPerMeter * 0.001f * SegmentLength;
+        [Tooltip("All the rope links we generate will go in here.")]
+        public GameObject[] RopeLinkObjects;
 
-        GameObject ropeContainer, ropeLink, baseLink;
+
+
+        GameObject ropeContainer, connectedLink, baseLink;
         string containerName = "Rope";
 
         void OnValidate()
         {
-            numSegments = (int)(RopeLength / (SegmentLength-RopeDiameter));
-            if(numSegments > 50) Debug.LogWarning($"There will be {numSegments} rope segments generated on game Start, might be too many?");
+            if(NumSegments > 50) Debug.LogWarning($"There will be {NumSegments} rope segments generated on game Start, might be too many?");
         }
 
-        GameObject InstantiateLink(GameObject prevLink, int num, bool buoy, GameObject firstLinkObj)
+        GameObject InstantiateLink(GameObject prevLink, int num, bool buoy)
         {
             var link = Instantiate(RopeLinkPrefab);
             link.transform.SetParent(ropeContainer.transform);
@@ -63,9 +71,9 @@ namespace Rope
             {
                 // First link in the chain, not connected to another link
                 // see what the parent has... and joint to it.
-                if(ropeLink.TryGetComponent<ArticulationBody>(out ArticulationBody ab))
+                if(connectedLink.TryGetComponent<ArticulationBody>(out ArticulationBody ab))
                     linkJoint.connectedArticulationBody = ab;
-                if(ropeLink.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                if(connectedLink.TryGetComponent<Rigidbody>(out Rigidbody rb))
                     linkJoint.connectedBody = rb;
 
                 link.transform.localPosition = new Vector3(0, 0, SegmentLength/2);
@@ -79,54 +87,42 @@ namespace Rope
 
             }
 
-            // mass for each link so that the bodies can interact nicely
-            // this mass wont be used for gravity!
-            float segmentRBMass = 1f;
-            float massRatio = 0.01f;
-            if(baseLink.TryGetComponent(out ArticulationBody BaseAB))
-                segmentRBMass = BaseAB.mass * massRatio;
-            if(baseLink.TryGetComponent(out Rigidbody BaseRB))
-                segmentRBMass = BaseRB.mass * massRatio;
-
-            // this is the mass we'll use for gravity.
-            var idealMassPerSegment = GramsPerMeter * 0.001f * SegmentLength;
-            segmentRBMass = Mathf.Max(idealMassPerSegment, segmentRBMass);
-
             var rl = link.GetComponent<RopeLink>();
-            rl.SetRopeParams(
-                RopeDiameter,
-                RopeCollisionDiameter,
-                SegmentLength,
-                segmentRBMass,
-                idealMassPerSegment,
-                buoy,
-                BuoyGrams*0.001f,
-                firstLinkObj
-                );
-
+            rl.SetRopeParams(this, buoy);
             return link;
         }
 
 
         public void SpawnRope()
         {
-            ropeLink = Utils.FindDeepChildWithName(transform.root.gameObject, ConnectedLinkName);
+            connectedLink = Utils.FindDeepChildWithName(transform.root.gameObject, ConnectedLinkName);
             baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, "base_link");
 
             if(ropeContainer == null)
+            {
                 ropeContainer = new GameObject(containerName);
                 ropeContainer.transform.SetParent(transform.root);
-                ropeContainer.transform.position = ropeLink.transform.position;
-                ropeContainer.transform.rotation = ropeLink.transform.rotation;
+                ropeContainer.transform.position = connectedLink.transform.position;
+                ropeContainer.transform.rotation = connectedLink.transform.rotation;
+            }
+            
+            // mass for each link so that the bodies can interact nicely
+            // this mass wont be used for gravity!
+            if(baseLink.TryGetComponent(out ArticulationBody BaseAB))
+                SegmentRBMass = BaseAB.mass * SegmentMassRatio;
+            if(baseLink.TryGetComponent(out Rigidbody BaseRB))
+                SegmentRBMass = BaseRB.mass * SegmentMassRatio;
 
-            var links = new GameObject[numSegments];
+            SegmentRBMass = Mathf.Max(IdealMassPerSegment, SegmentRBMass);
 
-            links[0] = InstantiateLink(null, 0, false, null);
+            RopeLinkObjects = new GameObject[NumSegments];
 
-            for(int i=1; i < numSegments; i++)
+            RopeLinkObjects[0] = InstantiateLink(null, 0, false);
+
+            for(int i=1; i < NumSegments; i++)
             {
-                var buoy = (i+1 == numSegments) && (BuoyGrams > 0);
-                links[i] = InstantiateLink(links[i-1], i, buoy, links[0]);
+                var buoy = (i+1 == NumSegments) && (BuoyGrams > 0);
+                RopeLinkObjects[i] = InstantiateLink(RopeLinkObjects[i-1], i, buoy);
             }
         }
 
@@ -139,5 +135,6 @@ namespace Rope
                 DestroyImmediate(ropeContainer);
             }
         }
+
     }
 }
