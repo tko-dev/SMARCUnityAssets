@@ -5,6 +5,7 @@ using UnityEngine;
 using Force;
 using UnityEditor.EditorTools; // ForcePoints
 using Utils = DefaultNamespace.Utils;
+using System;
 
 namespace Rope
 {
@@ -13,11 +14,6 @@ namespace Rope
     [RequireComponent(typeof(CapsuleCollider))]
     public class RopeLink : MonoBehaviour
     {
-        
-
-
-
-
         [Header("Rope physics")]
         [Tooltip("Stiffness properties of the rope (spring, damper, maxForce)")]
         public float spring = 0.1f;
@@ -26,15 +22,16 @@ namespace Rope
         
 
         [Header("Auto-set, do not touch")]
-        RopeGenerator generator;
-        bool isBuoy = false;
-        float ropeDiameter;
-        float ropeCollisionDiameter;
-        float segmentLength;
-        float segmentRigidbodyMass;
-        float segmentGravityMass;
+        [SerializeField] RopeGenerator generator;
+        [SerializeField] bool isBuoy = false;
+        [SerializeField] float ropeDiameter;
+        [SerializeField] float ropeCollisionDiameter;
+        [SerializeField] float segmentLength;
+        [SerializeField] float segmentRigidbodyMass;
+        [SerializeField] float segmentGravityMass;
         bool attached = false;
         bool bypassedRope = false; 
+
         CapsuleCollider capsule;
         ConfigurableJoint ropeJoint;
         Rigidbody rb;
@@ -188,6 +185,7 @@ namespace Rope
         void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            ropeJoint = GetComponent<ConfigurableJoint>();
 
             // disable self-collisions
             var ropeLinks = FindObjectsByType<RopeLink>(FindObjectsSortMode.None);
@@ -206,11 +204,22 @@ namespace Rope
             {
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 
+                var hookGO = collision.gameObject;
                 var frontConfigJoint = gameObject.AddComponent<ConfigurableJoint>();
                 var (frontSpherePos, backSpherePos) = SpherePositions();
                 SetupConfigJoint(frontConfigJoint, frontSpherePos);
 
-                var hookAB = collision.gameObject.GetComponent<ArticulationBody>();
+                try
+                {
+                    frontConfigJoint.autoConfigureConnectedAnchor = false;
+                    frontConfigJoint.connectedAnchor = hookGO.transform.Find("ConnectionPoint").localPosition;
+                }
+                catch(Exception)
+                {
+                    Debug.Log("Hook object did not have a ConnectionPoint child, connecting where we touched...");
+                }
+
+                var hookAB = hookGO.GetComponent<ArticulationBody>();
                 frontConfigJoint.connectedArticulationBody = hookAB;
                 var hookBaseLinkGO = Utils.FindDeepChildWithName(hookAB.transform.root.gameObject, "base_link");
                 var hookBaseLinkAB = hookBaseLinkGO.GetComponent<ArticulationBody>();
@@ -218,9 +227,9 @@ namespace Rope
 
                 // Set up the first rope link in the chain to have the same "joint pulling force"
                 // as the base link itself so the base link can be pulled around without exploding the rope!
-                var firstRopeLinkObject = generator.RopeLinkObjects[0];
+                var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
                 var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
-                var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.transform.root.gameObject, "base_link");
+                var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.root.gameObject, "base_link");
                 var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
                 firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;
                 
@@ -231,8 +240,9 @@ namespace Rope
                 // and discard the rope entirely.
                 // This should make the physics of the drone-rope-auv system more stable
                 // and closer to theoretical control papers about suspended load control.
-                // But since we still need 2 rigid bodies to connected 2 articulation body systems,
+                // But since we still need 2 rigid bodies to connect 2 articulation body systems,
                 // we will keep the first and last parts of the rope as part of the AB-RB-RB-AB chain.
+                // See OnJointBreak!
                 ropeJoint.breakForce = 2;
 
                 attached = true;
@@ -252,24 +262,23 @@ namespace Rope
             // to make the physics more stable!
 
             // first, nuke the middle siblings between the first ropelink and this buoy
-            var parent = transform.parent;
-            var firstRopeLinkObject = generator.RopeLinkObjects[0];
-            for(int i=parent.childCount-1; i>0; i--)
+            var container = generator.RopeContainer.transform;
+            for(int i=container.childCount-1; i>0; i--)
             {
                 // reverse loop because we're gonna remove things from the collection
-                var child = parent.GetChild(i);
+                var child = container.GetChild(i);
                 if(child.name == gameObject.name) continue;
-                if(child.name == firstRopeLinkObject.name) continue;
+                if(child.name == container.GetChild(0).name) continue;
                 // its a middle sibling. murder.
                 Destroy(child.gameObject);
             }
 
-            // first, we gotta re-create the joint that just broke.
+            // then, re-create the joint that just broke.
             ropeJoint = gameObject.AddComponent<ConfigurableJoint>();
             var (frontSpherePos, backSpherePos) = SpherePositions();
             SetupConfigJoint(ropeJoint, backSpherePos);
             // then, connect this ropelinks back-joint to the first ropelink
-            ropeJoint.connectedBody = firstRopeLinkObject.GetComponent<Rigidbody>();
+            ropeJoint.connectedBody = container.GetChild(0).GetComponent<Rigidbody>();
             bypassedRope = true;
         }
 
@@ -277,7 +286,7 @@ namespace Rope
         {
             if(!bypassedRope) return;
             Gizmos.color = Color.magenta;
-            Gizmos.DrawLine(transform.position, generator.RopeLinkObjects[0].transform.position);
+            Gizmos.DrawLine(transform.position, generator.RopeContainer.transform.GetChild(0).position);
         }
 
 

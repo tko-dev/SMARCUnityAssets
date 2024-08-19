@@ -1405,6 +1405,7 @@ Transform:
   m_Children:
   - {fileID: 5199594788109437205}
   - {fileID: 1836742747641675404}
+  - {fileID: 8014252713575311509}
   m_Father: {fileID: 135919806119038934}
   m_LocalEulerAnglesHint: {x: 0, y: 225, z: 0}
 --- !u!171741748 &5056598351236704870
@@ -4129,6 +4130,37 @@ MonoBehaviour:
   frequency: 10
   topic: /drone/gps
   ignoreSensorState: 0
+--- !u!1 &8652262788701672293
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8014252713575311509}
+  m_Layer: 0
+  m_Name: ConnectionPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8014252713575311509
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8652262788701672293}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.1494, z: -0.0462}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2328022698096168879}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8734656206787643278
 GameObject:
   m_ObjectHideFlags: 0
