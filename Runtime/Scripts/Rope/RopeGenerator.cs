@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils = DefaultNamespace.Utils;
@@ -13,7 +14,7 @@ namespace Rope
 
         [Header("Connected Body")]
         [Tooltip("What should the first link in the rope connect to?")]
-        public string ConnectedLinkName;
+        public string VehicleConnectionName;
     
 
         [Header("Rope parameters")]
@@ -34,6 +35,9 @@ namespace Rope
         public float SegmentLength = 0.1f;
         [Tooltip("Mass of each segment compared to the base_link the rope is connected to. For physics stability! The larger the more stable...")]
         public float SegmentMassRatio = 0.01f;
+        [Tooltip("Rope will be replaced by a stick when its end-to-end distance is >= than RopeLength*this")]
+        [Range(0.9f, 1f)]
+        public float RopeReplacementTolerance = 0.95f;
 
 
         [Header("Auto-calculated, no touchy in editor!")]
@@ -45,7 +49,7 @@ namespace Rope
         public GameObject RopeContainer;
 
 
-        GameObject connectedLink, baseLink;
+        GameObject vehicleBaseLinkConnection, baseLink;
         readonly string containerName = "Rope";
         readonly string baseLinkName = "base_link";
 
@@ -73,12 +77,13 @@ namespace Rope
             {
                 // First link in the chain, not connected to another link
                 // see what the parent has... and joint to it.
-                if(connectedLink.TryGetComponent<ArticulationBody>(out ArticulationBody ab))
+                if(vehicleBaseLinkConnection.TryGetComponent<ArticulationBody>(out ArticulationBody ab))
                     linkJoint.connectedArticulationBody = ab;
-                if(connectedLink.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                if(vehicleBaseLinkConnection.TryGetComponent<Rigidbody>(out Rigidbody rb))
                     linkJoint.connectedBody = rb;
 
                 link.transform.localPosition = new Vector3(0, 0, SegmentLength/2);
+                link.transform.rotation = vehicleBaseLinkConnection.transform.rotation;
 
                 // make the first link not collide with its attached base link
                 if(baseLink.TryGetComponent<Collider>(out Collider baseCollider))
@@ -97,15 +102,15 @@ namespace Rope
 
         public void SpawnRope()
         {
-            connectedLink = Utils.FindDeepChildWithName(transform.root.gameObject, ConnectedLinkName);
+            vehicleBaseLinkConnection = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleConnectionName);
             baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, baseLinkName);
 
             if(RopeContainer == null)
             {
                 RopeContainer = new GameObject(containerName);
                 RopeContainer.transform.SetParent(transform.root);
-                RopeContainer.transform.position = connectedLink.transform.position;
-                RopeContainer.transform.rotation = connectedLink.transform.rotation;
+                RopeContainer.transform.position = vehicleBaseLinkConnection.transform.position;
+                RopeContainer.transform.rotation = vehicleBaseLinkConnection.transform.rotation;
             }
             
             // mass for each link so that the bodies can interact nicely
@@ -150,9 +155,18 @@ namespace Rope
             // but, at this point, we shall have ONE segment that is as long as the rope
             SegmentLength = RopeLength;
             var stick = InstantiateLink(null, 0, false);
+            // the default way these are instantiated does not fit this use case though
+            // so we gotta orient and position this stick to match the current pose of
+            // the hook connection and vehicle connection.
+            // otherwise the joint will just throw both rapidly in different directions :D
+            var connectionPoint = connectedHookGO.transform.Find("ConnectionPoint");
+            var middlePos = (connectionPoint.position + vehicleBaseLinkConnection.transform.position)/2;
+            stick.transform.position = middlePos;
+            stick.transform.LookAt(connectionPoint);
+            
+
             // this stick is already connected to the base_link
             // but now it also needs to connect to the hook's connection point
-            // var frontJoint = stick.AddComponent<ConfigurableJoint>();
             var stickRopeLink = stick.GetComponent<RopeLink>();
             // we took the hook object from the ropelink that broke earlier.
             // since to break, it first had to attach, at which point it knew
@@ -164,7 +178,7 @@ namespace Rope
         void Awake()
         {
             if(RopeContainer == null) RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
-            if(connectedLink == null) connectedLink = Utils.FindDeepChildWithName(transform.root.gameObject, ConnectedLinkName);
+            if(vehicleBaseLinkConnection == null) vehicleBaseLinkConnection = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleConnectionName);
             if(baseLink == null) baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, baseLinkName);
         }
 

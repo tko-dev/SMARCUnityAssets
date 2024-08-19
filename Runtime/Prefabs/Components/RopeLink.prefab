@@ -615,11 +615,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spring: 0.5
-  damper: 0.5
+  spring: 0.1
+  damper: 0.1
   maximumForce: 5000
-  firstRopeLinkObject: {fileID: 0}
+  generator: {fileID: 0}
   isBuoy: 0
+  ropeDiameter: 0
+  ropeCollisionDiameter: 0
+  segmentLength: 0
+  segmentRigidbodyMass: 0
+  segmentGravityMass: 0
 --- !u!114 &1080205937504706963
 MonoBehaviour:
   m_ObjectHideFlags: 0

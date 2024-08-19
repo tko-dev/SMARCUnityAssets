@@ -33,8 +33,10 @@ namespace Rope
         GameObject connectedHookGO;
 
         CapsuleCollider capsule;
-        ConfigurableJoint ropeJoint;
+        ConfigurableJoint ropeJoint, hookJoint;
         Rigidbody rb;
+
+        readonly string baseLinkName = "base_link";
 
         public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
         {
@@ -182,29 +184,18 @@ namespace Rope
             collider.radius = rad;
         }
 
-        void Awake()
-        {
-            rb = GetComponent<Rigidbody>();
-            ropeJoint = GetComponent<ConfigurableJoint>();
-
-            // disable self-collisions
-            var ropeLinks = FindObjectsByType<RopeLink>(FindObjectsSortMode.None);
-            var ownC = GetComponent<Collider>();
-            foreach(var other in ropeLinks)
-                if (other.gameObject.TryGetComponent(out Collider c))
-                    Physics.IgnoreCollision(c, ownC);
-        }
+        
 
         public void ConnectToHook(GameObject hookGO, bool breakable=true)
         {
-            var frontConfigJoint = gameObject.AddComponent<ConfigurableJoint>();
+            hookJoint = gameObject.AddComponent<ConfigurableJoint>();
             var (frontSpherePos, backSpherePos) = SpherePositions();
-            SetupConfigJoint(frontConfigJoint, frontSpherePos);
+            SetupConfigJoint(hookJoint, frontSpherePos);
 
             try
             {
-                frontConfigJoint.autoConfigureConnectedAnchor = false;
-                frontConfigJoint.connectedAnchor = hookGO.transform.Find("ConnectionPoint").localPosition;
+                hookJoint.autoConfigureConnectedAnchor = false;
+                hookJoint.connectedAnchor = hookGO.transform.Find("ConnectionPoint").localPosition;
             }
             catch(Exception)
             {
@@ -212,10 +203,10 @@ namespace Rope
             }
 
             var hookAB = hookGO.GetComponent<ArticulationBody>();
-            frontConfigJoint.connectedArticulationBody = hookAB;
-            var hookBaseLinkGO = Utils.FindDeepChildWithName(hookAB.transform.root.gameObject, "base_link");
+            hookJoint.connectedArticulationBody = hookAB;
+            var hookBaseLinkGO = Utils.FindDeepChildWithName(hookAB.transform.root.gameObject, baseLinkName);
             var hookBaseLinkAB = hookBaseLinkGO.GetComponent<ArticulationBody>();
-            frontConfigJoint.connectedMassScale = 0.1f * (hookBaseLinkAB.mass / rb.mass);
+            hookJoint.connectedMassScale = 0.1f * (hookBaseLinkAB.mass / rb.mass);
 
             // Set the joint to break when the rope is carrying the entire robot.
             // This should happen when the rope is _tight_, meaning the distance between hook
@@ -225,7 +216,7 @@ namespace Rope
             // This should make the physics of the drone-rope-auv system more stable
             // and closer to theoretical control papers about suspended load control.
             // See OnJointBreak and RopeGenerator::ReplaceRopeWithStick
-            if(breakable) frontConfigJoint.breakForce = 2;
+            if(breakable) hookJoint.breakForce = 2;
             attached = true;
         }
 
@@ -240,29 +231,60 @@ namespace Rope
 
                 connectedHookGO = collision.gameObject;
                 // this joint is meant to break when the rope is toight
-                ConnectToHook(connectedHookGO, breakable:true);
+                ConnectToHook(connectedHookGO, breakable:false);
                 
                 // Set up the first rope link in the chain to have the same "joint pulling force"
                 // as the base link itself so the base link can be pulled around without exploding the rope!
                 var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
                 var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
-                var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.root.gameObject, "base_link");
+                var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.root.gameObject, baseLinkName);
                 var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
                 firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;                
             }
         }
 
-        void OnJointBreak(float breakForce)
+        void Awake()
         {
-            Debug.Log($"Broke at {breakForce}N");
-            if(!attached)
-            {
-                Debug.Log($"{gameObject.name}: Rope broke before it was attached?!");
-                return;
-            }
-            generator.ReplaceRopeWithStick(connectedHookGO);
+            rb = GetComponent<Rigidbody>();
+            ropeJoint = GetComponent<ConfigurableJoint>();
+
+            // disable self-collisions
+            var ropeLinks = FindObjectsByType<RopeLink>(FindObjectsSortMode.None);
+            var ownC = GetComponent<Collider>();
+            foreach(var other in ropeLinks)
+                if (other.gameObject.TryGetComponent(out Collider c))
+                    Physics.IgnoreCollision(c, ownC);
         }
 
+        void FixedUpdate()
+        {
+            if(!isBuoy) return;
+            if(!attached) return;
+            // if its a buoy rope bit, and attached to a hook
+            // check if the distance from the front join of buoy
+            // to back-joint of first link is about equal to rope length
+            // that means the rope is tight.
+            // then we can replace the rope with a stick to make it more stable in sim.
+            var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
+            var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
+            var vehicleJointPos = firstJoint.transform.position + firstJoint.anchor;
+            var hookJointPos = transform.position + hookJoint.anchor;
+            var directLength = Vector3.Distance(vehicleJointPos, hookJointPos);
+            if(directLength >= generator.RopeLength * generator.RopeReplacementTolerance)
+            {
+                generator.ReplaceRopeWithStick(connectedHookGO);
+                Debug.Log($"Rope length reached {directLength}m and got replaced!");
+            }
+        }
+
+        void OnDrawGizmos()
+        {
+            if(!attached) return;
+            Gizmos.color = Color.red;
+            var vehicleJointPos = transform.position + ropeJoint.anchor;
+            var hookJointPos = transform.position + hookJoint.anchor;
+            Gizmos.DrawLine(vehicleJointPos, hookJointPos);
+        }
         
     }
 
