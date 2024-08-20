@@ -309,7 +309,7 @@ namespace Rope
             var vehicleJointPos = firstJoint.transform.position + firstJoint.anchor;
             var hookJointPos = transform.position + hookJoint.anchor;
             var directLength = Vector3.Distance(vehicleJointPos, hookJointPos);
-            if(directLength >= generator.RopeLength * generator.RopeReplacementAccuracy)
+            if(Mathf.Abs(directLength-generator.RopeLength) <= generator.RopeReplacementAccuracy)
             {
                 generator.ReplaceRopeWithStick(connectedHookGO);
                 Debug.Log($"Rope length reached {directLength}m and got replaced!");

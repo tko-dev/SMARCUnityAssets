@@ -35,9 +35,9 @@ namespace Rope
         public float SegmentLength = 0.1f;
         [Tooltip("Mass of each segment compared to the base_link the rope is connected to. For physics stability! The larger the more stable...")]
         public float SegmentMassRatio = 0.01f;
-        [Tooltip("Rope will be replaced by a stick when its end-to-end distance is >= than RopeLength*this")]
-        [Range(0.9f, 1f)]
-        public float RopeReplacementAccuracy = 0.95f;
+        [Tooltip("Rope will be replaced by a stick when its end-to-end distance is this close to RopeLength")]
+        [Range(0f, 0.05f)]
+        public float RopeReplacementAccuracy = 0.02f;
 
 
         [HideInInspector] public float SegmentRBMass = 1f;
