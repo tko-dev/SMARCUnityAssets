@@ -12,19 +12,22 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 public class DroneLoadController: MonoBehaviour {
     public GameObject base_link;
-    public float computation_frequency = 100f;
+    public GameObject rope_link;
+    public float computation_frequency = 50f;
+    public bool follow_sphere = false;
 	private Propeller[] propellers;
     private ArticulationBody base_link_ab;
 	private float[] propellers_rpms;
     private Matrix<double> R_sb_d_prev;
     private Matrix<double> R_sb_c_prev;
     private Vector<double> W_b_d_prev;
+    private Vector<double> W_b_c_prev;
     private Vector<double> q_c_prev;
     private Vector<double> q_c_dot_prev;
-    private int times = 0;
+    private int times1 = 0;
+    private int times2 = 0;
     private GameObject ufo;
     private RopeBuoy buoy;
-    public GameObject rope_link;
     private ArticulationBody rope_link_ab;
 
     // Quadrotor parameters
@@ -64,13 +67,14 @@ public class DroneLoadController: MonoBehaviour {
         R_sb_d_prev = DenseMatrix.OfArray(new double[,] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
         R_sb_c_prev = DenseMatrix.OfArray(new double[,] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
         W_b_d_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        W_b_c_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
         q_c_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
         q_c_dot_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
 		propellers_rpms = new float[] { 0, 0, 0, 0 };
 
         ufo = GameObject.Find("UFO");
-        buoy = GameObject.Find("RopeLink(Clone)_21_buoy").GetComponent<RopeBuoy>();
+        buoy = GameObject.Find("RopeLink(Clone)_10_buoy").GetComponent<RopeBuoy>();
         rope_link_ab = rope_link.GetComponent<ArticulationBody>();
         
         // Quadrotor parameters
@@ -81,7 +85,7 @@ public class DroneLoadController: MonoBehaviour {
 
         // Load parameters
         mL = 12.012 + 2.7 + 0.3;
-        l = 2;
+        l = 1 + 0.32;
 
         // Simulation parameters
         g = 9.81;
@@ -138,8 +142,7 @@ public class DroneLoadController: MonoBehaviour {
             Matrix<double> R_bw = R_bs*R_sw;
 
             // Desired states
-            Vector<double> xL_s_d = R_sw*DenseVector.OfArray(new double[] { 4.3, -10, Math.Pow(0.5*t-5, 2) + 0.32 });
-            //Debug.Log($"idk: {t} {ToUnity(xL_s)} {ToUnity(xL_s_d)}");
+            Vector<double> xL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0.65, Math.Pow(0.5*t-5, 2) });
             Vector<double> vL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5*t-5 });
             Vector<double> aL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5 });
             Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
@@ -152,7 +155,7 @@ public class DroneLoadController: MonoBehaviour {
             Vector<double> q_c = -A/A.Norm(2);
             Vector<double> q_c_dot = (q_c - q_c_prev)/dt;
             Vector<double> q_c_ddot = (q_c_dot - q_c_dot_prev)/dt;
-            Debug.DrawRay(ToUnity(xQ_s), ToUnity(-(mQ+mL)*(aL_s_d + g*e3)), Color.red);
+            // Debug.DrawRay(ToUnity(xQ_s), ToUnity(-(mQ+mL)*(aL_s_d + g*e3)), Color.red);
 
             Vector<double> eq = _Hat(q)*_Hat(q)*q_c;
             Vector<double> eq_dot = q_dot - _Cross(_Cross(q_c, q_c_dot), q);
@@ -165,30 +168,36 @@ public class DroneLoadController: MonoBehaviour {
             // Debug.DrawRay(ToUnity(xQ_s), ToUnity(-F_pd), Color.blue);
             // Debug.DrawRay(ToUnity(xQ_s), ToUnity(-F_ff), Color.yellow);
             Vector<double> b3c = F_total/F_total.Norm(2);
-            Debug.DrawRay(ToUnity(xQ_s), ToUnity(b3c), Color.blue);
             Vector<double> b1c = -_Cross(b3c, _Cross(b3c, b1d))/_Cross(b3c, b1d).Norm(2);
             Vector<double> b2c = _Cross(b3c, b1c);
             Matrix<double> R_sb_c = DenseMatrix.OfArray(new double[,] { { b1c[0], b2c[0], b3c[0] },
                                                                         { b1c[1], b2c[1], b3c[1] },
                                                                         { b1c[2], b2c[2], b3c[2] } });
+            Debug.DrawRay(ToUnity(xQ_s), ToUnity(b1c), Color.red);
+            Debug.DrawRay(ToUnity(xQ_s), ToUnity(b2c), Color.green);
+            Debug.DrawRay(ToUnity(xQ_s), ToUnity(b3c), Color.blue);
         
-            Vector<double> W_b_d = _Vee(_Logm3(R_sb_c_prev.Transpose()*R_sb_c)/dt);
-            Vector<double> W_b_d_dot = (W_b_d - W_b_d_prev)/dt;
+            Matrix<double> R_sb_c_dot = (R_sb_c - R_sb_c_prev)/dt;
+            Vector<double> W_b_c = _Vee(R_sb_c.Transpose()*R_sb_c_dot);
+            Vector<double> W_b_c_dot = (W_b_c - W_b_c_prev)/dt;
 
             Vector<double> eR = 0.5*_Vee(R_sb_c.Transpose()*R_sb - R_sb.Transpose()*R_sb_c);
-            Vector<double> eW = W_b - R_sb.Transpose()*R_sb_c*W_b_d;
+            Vector<double> eW = W_b - R_sb.Transpose()*R_sb_c*W_b_c;
 
-            f = mQ*g;//F_total*(R_sb*e3);
-            M = DenseVector.OfArray(new double[] { 0, 0, 0 });//-kR*eR - kW*eW + _Cross(W_b, J*W_b) - J*(_Hat(W_b)*R_sb.Transpose()*R_sb_c*W_b_d - R_sb.Transpose()*R_sb_c*W_b_d_dot);
+            f = F_total*(R_sb*e3);
+            M = -kR*eR - kW*eW + _Cross(W_b, J*W_b) - J*(_Hat(W_b)*R_sb.Transpose()*R_sb_c*W_b_c - R_sb.Transpose()*R_sb_c*W_b_c_dot);
+            // M = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
             // Save previous values
             R_sb_c_prev = R_sb_c;
-            W_b_d_prev = W_b_d;
+            W_b_c_prev = W_b_c;
             q_c_prev = q_c;
             q_c_dot_prev = q_c_dot;
 
-            if (q_c_prev[0] == 0 && q_c_prev[1] == 0 && q_c_prev[2] == 0) {
-                times = 0;
+            if (times1 < 2) {
+                times1++;
+                f = 0;
+                M = DenseVector.OfArray(new double[] { 0, 0, 0 });
             }
 
         } else {
@@ -212,9 +221,9 @@ public class DroneLoadController: MonoBehaviour {
             Matrix<double> R_bw = R_bs*R_sw;
 
             // Desired states
-            float t = Time.time;
-            Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 6.4, 0.5*t-15, Math.Pow(0.5*t-5, 2) + 0.32 });
-            Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0.5, 0.5*t-5 });
+            Vector<double> buoy_w = R_ws*buoy.transform.position.To<NED>().ToDense();
+            Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { buoy_w[0], buoy_w[1], Math.Pow(0.5*t-5, 2) + 0.32 + buoy_w[2] });
+            Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5*t-5 });
             Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5 });
             Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
 
@@ -241,16 +250,17 @@ public class DroneLoadController: MonoBehaviour {
 
             R_sb_d_prev = R_sb_d;
             W_b_d_prev = W_b_d;
+
+            if (times2 < 2) {
+                times2++;
+                f = 0;
+                M = DenseVector.OfArray(new double[] { 0, 0, 0 });
+            }
         }
 
         // Convert to propeller forces
         Matrix<double> T = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 }, { 0, -d, 0, d }, { d, 0, -d, 0 }, { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } });
         Vector<double> F = T.Inverse() * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
-
-        if (times < 2) {
-            times++;
-            F = DenseVector.OfArray(new double[] { 0, 0, 0, 0 });
-        }
 
         // Debug.Log(F);
 
