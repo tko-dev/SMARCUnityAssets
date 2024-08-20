@@ -26,7 +26,7 @@ public class DroneLoadController: MonoBehaviour {
     private Vector<double> q_c_dot_prev;
     private int times1 = 0;
     private int times2 = 0;
-    private GameObject ufo;
+    // private GameObject sphere;
     private RopeBuoy buoy;
     private ArticulationBody rope_link_ab;
 
@@ -73,7 +73,7 @@ public class DroneLoadController: MonoBehaviour {
 
 		propellers_rpms = new float[] { 0, 0, 0, 0 };
 
-        ufo = GameObject.Find("UFO");
+        // sphere = GameObject.Find("Sphere");
         buoy = GameObject.Find("RopeLink(Clone)_10_buoy").GetComponent<RopeBuoy>();
         rope_link_ab = rope_link.GetComponent<ArticulationBody>();
         
@@ -115,7 +115,7 @@ public class DroneLoadController: MonoBehaviour {
         double f;
         Vector<double> M;
 
-        if (buoy.contact) {          
+        if (true) {          
             // Quadrotor states
             Vector<double> xQ_s = base_link.transform.position.To<NED>().ToDense();
             Vector<double> vQ_s = base_link_ab.velocity.To<NED>().ToDense();
@@ -128,7 +128,7 @@ public class DroneLoadController: MonoBehaviour {
             Vector<double> xL_s = rope_link.transform.position.To<NED>().ToDense();
             Vector<double> vL_s = rope_link_ab.velocity.To<NED>().ToDense();
             Vector<double> q = (xL_s - xQ_s)/(xL_s - xQ_s).Norm(2);
-            Vector<double> q_dot = der(xL_s - xQ_s, vL_s - vQ_s);
+            Vector<double> q_dot = unit_vector_derivative(xL_s - xQ_s, vL_s - vQ_s);
 
             // Transformations
             Matrix<double> R_ws = DenseMatrix.OfArray(new double[,] { { 0, 1, 0 },
@@ -142,9 +142,18 @@ public class DroneLoadController: MonoBehaviour {
             Matrix<double> R_bw = R_bs*R_sw;
 
             // Desired states
-            Vector<double> xL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0.65, Math.Pow(0.5*t-5, 2) });
+            Vector<double> xL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, Math.Pow(0.5*t-5, 2) });
             Vector<double> vL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5*t-5 });
             Vector<double> aL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5 });
+            // if (follow_sphere) {
+            //     xL_s_d = sphere.transform.position.To<NED>().ToDense();
+            //     vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });//sphere.GetComponent<ArticulationBody>().velocity.To<NED>().ToDense();
+            //     aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });//sphere.GetComponent<ArticulationBody>().acceleration.To<NED>().ToDense();
+            // } else {
+            //     xL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, Math.Pow(0.5*t-5, 2) });
+            //     vL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5*t-5 });
+            //     aL_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5 });
+            // }
             Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
 
             // Control
@@ -194,7 +203,7 @@ public class DroneLoadController: MonoBehaviour {
             q_c_prev = q_c;
             q_c_dot_prev = q_c_dot;
 
-            if (times1 < 2) {
+            if (times1 < 20) {
                 times1++;
                 f = 0;
                 M = DenseVector.OfArray(new double[] { 0, 0, 0 });
@@ -324,7 +333,7 @@ public class DroneLoadController: MonoBehaviour {
         return new Vector3((float)v[1], -1f*(float)v[2], (float)v[0]);
     }
 
-    static Vector<double> der(Vector<double> r, Vector<double> r_dot) {
+    static Vector<double> unit_vector_derivative(Vector<double> r, Vector<double> r_dot) {
         return r_dot/r.Norm(2) - Math.Pow(r.Norm(2), -3)*(r*r_dot)*r;
     }
 }
