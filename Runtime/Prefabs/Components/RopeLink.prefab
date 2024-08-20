@@ -599,10 +599,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0
+  m_Radius: 0.01
   m_Height: 0
   m_Direction: 2
-  m_Center: {x: 0, y: 0.04, z: 0}
+  m_Center: {x: 0, y: 0.01, z: 0}
 --- !u!114 &10039788946428091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -615,9 +615,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spring: 0.001
-  damper: 0.001
-  maximumForce: 4
+  spring: 0.1
+  damper: 0.1
+  maximumForce: 5000
+  generator: {fileID: 0}
+  isBuoy: 0
+  ropeDiameter: 0
+  ropeCollisionDiameter: 0
+  segmentLength: 0
+  segmentRigidbodyMass: 0
+  segmentGravityMass: 0
 --- !u!114 &1080205937504706963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -640,8 +647,8 @@ Rigidbody:
   m_GameObject: {fileID: 8527497976637253487}
   serializedVersion: 4
   m_Mass: 0.1
-  m_Drag: 0.01
-  m_AngularDrag: 0.01
+  m_Drag: 1
+  m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.01, y: 0.01, z: 0.01}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -652,7 +659,7 @@ Rigidbody:
     serializedVersion: 2
     m_Bits: 0
   m_ImplicitCom: 0
-  m_ImplicitTensor: 0
+  m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
