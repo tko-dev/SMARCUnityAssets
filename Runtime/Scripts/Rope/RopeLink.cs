@@ -21,19 +21,20 @@ namespace Rope
         public float maximumForce = 1000f;
         
 
-        [Header("Auto-set by generator")]
-        [SerializeField] RopeGenerator generator;
-        [SerializeField] bool isBuoy = false;
-        [SerializeField] float ropeDiameter;
-        [SerializeField] float ropeCollisionDiameter;
-        [SerializeField] float segmentLength;
-        [SerializeField] float segmentRigidbodyMass;
-        [SerializeField] float segmentGravityMass;
+        // we want these saved with the object (so you dont have to re-generate 100 times...),
+        // but not shown in editor since they are set by the RopeGenerator on creation.
+        [HideInInspector][SerializeField] RopeGenerator generator;
+        [HideInInspector][SerializeField] bool isBuoy = false;
+        [HideInInspector][SerializeField] float ropeDiameter;
+        [HideInInspector][SerializeField] float ropeCollisionDiameter;
+        [HideInInspector][SerializeField] float segmentLength;
+        [HideInInspector][SerializeField] float segmentRigidbodyMass;
+        [HideInInspector][SerializeField] float segmentGravityMass;
         bool attached = false;
         GameObject connectedHookGO;
 
         CapsuleCollider capsule;
-        ConfigurableJoint ropeJoint, hookJoint;
+        [HideInInspector] public ConfigurableJoint ropeJoint, hookJoint;
         Rigidbody rb;
 
         readonly string baseLinkName = "base_link";
@@ -94,6 +95,8 @@ namespace Rope
             // https://forums.tigsource.com/index.php?topic=64389.msg1389271#msg1389271
             // where there are vids demonstrating even KNOTS :D
             joint.anchor = anchorPosition;
+            joint.autoConfigureConnectedAnchor = false;
+            joint.connectedAnchor = -anchorPosition;
             joint.enableCollision = false;
             joint.enablePreprocessing = false;
 
@@ -184,7 +187,35 @@ namespace Rope
             collider.radius = rad;
         }
 
-        
+        public void SetupConnectionToOtherLink(Transform prevLink)
+        {
+            ropeJoint = GetComponent<ConfigurableJoint>();
+            var linkZ = prevLink.localPosition.z + (generator.SegmentLength-generator.RopeDiameter/2);
+            transform.localPosition = new Vector3(0, 0, linkZ);
+            transform.rotation = prevLink.rotation;
+            ropeJoint.connectedBody = prevLink.GetComponent<Rigidbody>();
+        }
+
+        public void SetupConnectionToVehicle(GameObject vehicleBaseLinkConnection, GameObject baseLink)
+        {
+            ropeJoint = GetComponent<ConfigurableJoint>();
+            // First link in the chain, not connected to another link
+            // see what the parent has... and joint to it.
+            if(vehicleBaseLinkConnection.TryGetComponent<ArticulationBody>(out ArticulationBody ab))
+                ropeJoint.connectedArticulationBody = ab;
+            if(vehicleBaseLinkConnection.TryGetComponent<Rigidbody>(out Rigidbody rb))
+                ropeJoint.connectedBody = rb;
+
+            transform.localPosition = new Vector3(0, 0, generator.SegmentLength/2);
+            transform.rotation = vehicleBaseLinkConnection.transform.rotation;
+
+            // make the first link not collide with its attached base link
+            if(baseLink.TryGetComponent<Collider>(out Collider baseCollider))
+            {
+                var linkCollider = GetComponent<Collider>();
+                Physics.IgnoreCollision(linkCollider, baseCollider);
+            }
+        }
 
         public void ConnectToHook(GameObject hookGO, bool breakable=true)
         {
@@ -220,6 +251,17 @@ namespace Rope
             attached = true;
         }
 
+        public void SetupBaselinkConnectedMassScale()
+        {
+            // Set up the first rope link in the chain to have the same "joint pulling force"
+            // as the base link itself so the base link can be pulled around without exploding the rope!
+            var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
+            var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
+            var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.root.gameObject, baseLinkName);
+            var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
+            firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;
+        }
+
         void OnCollisionEnter(Collision collision)
         {
             if(!isBuoy) return;
@@ -230,16 +272,10 @@ namespace Rope
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 
                 connectedHookGO = collision.gameObject;
-                // this joint is meant to break when the rope is toight
                 ConnectToHook(connectedHookGO, breakable:false);
-                
-                // Set up the first rope link in the chain to have the same "joint pulling force"
-                // as the base link itself so the base link can be pulled around without exploding the rope!
-                var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
-                var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
-                var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.root.gameObject, baseLinkName);
-                var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
-                firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;                
+
+                // also make the first ropelink able to pull the vehicle!
+                SetupBaselinkConnectedMassScale();
             }
         }
 
@@ -270,7 +306,7 @@ namespace Rope
             var vehicleJointPos = firstJoint.transform.position + firstJoint.anchor;
             var hookJointPos = transform.position + hookJoint.anchor;
             var directLength = Vector3.Distance(vehicleJointPos, hookJointPos);
-            if(directLength >= generator.RopeLength * generator.RopeReplacementTolerance)
+            if(directLength >= generator.RopeLength * generator.RopeReplacementAccuracy)
             {
                 generator.ReplaceRopeWithStick(connectedHookGO);
                 Debug.Log($"Rope length reached {directLength}m and got replaced!");
@@ -281,9 +317,8 @@ namespace Rope
         {
             if(!attached) return;
             Gizmos.color = Color.red;
-            var vehicleJointPos = transform.position + ropeJoint.anchor;
-            var hookJointPos = transform.position + hookJoint.anchor;
-            Gizmos.DrawLine(vehicleJointPos, hookJointPos);
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawLine(ropeJoint.anchor, hookJoint.anchor);
         }
         
     }
