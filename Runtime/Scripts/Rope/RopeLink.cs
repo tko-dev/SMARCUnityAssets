@@ -38,6 +38,7 @@ namespace Rope
         Rigidbody rb;
 
         readonly string baseLinkName = "base_link";
+        readonly string hookConnectionPointName = "ConnectionPoint";
 
         public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
         {
@@ -84,8 +85,7 @@ namespace Rope
 
         public (Vector3, Vector3) SpherePositions()
         {
-            float d = segmentLength/2 - ropeDiameter/4;
-            return ( new Vector3(0,0,d), new Vector3(0,0,-d) );
+            return ( new Vector3(0,0, segmentLength), new Vector3(0,0,0) );
         }
 
 
@@ -134,11 +134,12 @@ namespace Rope
 
             frontVis_tf.localPosition = frontSpherePos;
             backVis_tf.localPosition = backSpherePos;
+            middleVis_tf.localPosition = (backSpherePos+frontSpherePos)/2;
 
             var visualScale = new Vector3(ropeDiameter, ropeDiameter, ropeDiameter);
             frontVis_tf.localScale = visualScale;
             backVis_tf.localScale = visualScale;
-            middleVis_tf.localScale = new Vector3(ropeDiameter, (segmentLength/2)-(ropeDiameter/4), ropeDiameter);
+            middleVis_tf.localScale = new Vector3(ropeDiameter, segmentLength/2, ropeDiameter);
         }
 
         void SetupBits()
@@ -150,7 +151,7 @@ namespace Rope
 
             capsule = GetComponent<CapsuleCollider>();
             capsule.radius = ropeCollisionDiameter/2;
-            capsule.center = new Vector3(0, ropeCollisionDiameter/2-ropeDiameter/2, 0);
+            capsule.center = new Vector3(0, ropeCollisionDiameter/2-ropeDiameter/2, segmentLength/2);
             capsule.height = segmentLength+ropeCollisionDiameter; // we want the collision to overlap with the child's
 
             // Having the rope be _so tiny_ is problematic for
@@ -178,7 +179,7 @@ namespace Rope
             var visuals = transform.Find("Visuals");
             Transform sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere).transform;
             sphere.SetParent(visuals);
-            sphere.localPosition = new Vector3(0, ropeDiameter, 0);
+            sphere.localPosition = new Vector3(0, ropeDiameter, segmentLength);
             var rad = segmentLength-ropeDiameter;
             var scale = new Vector3(rad, rad, rad);
             sphere.localScale = scale;
@@ -187,13 +188,15 @@ namespace Rope
             collider.radius = rad;
         }
 
-        public void SetupConnectionToOtherLink(Transform prevLink)
+        public void SetupConnectionToPrevLink(Transform prevLink)
         {
             ropeJoint = GetComponent<ConfigurableJoint>();
-            var linkZ = prevLink.localPosition.z + (generator.SegmentLength-generator.RopeDiameter/2);
+            var linkZ = prevLink.localPosition.z + generator.SegmentLength;
             transform.localPosition = new Vector3(0, 0, linkZ);
             transform.rotation = prevLink.rotation;
+            ropeJoint.autoConfigureConnectedAnchor = false;
             ropeJoint.connectedBody = prevLink.GetComponent<Rigidbody>();
+            ropeJoint.connectedAnchor = ropeJoint.anchor + new Vector3(0, 0, segmentLength);
         }
 
         public void SetupConnectionToVehicle(GameObject vehicleBaseLinkConnection, GameObject baseLink)
@@ -226,7 +229,7 @@ namespace Rope
             try
             {
                 hookJoint.autoConfigureConnectedAnchor = false;
-                hookJoint.connectedAnchor = hookGO.transform.Find("ConnectionPoint").localPosition;
+                hookJoint.connectedAnchor = hookGO.transform.Find(hookConnectionPointName).localPosition;
             }
             catch(Exception)
             {
@@ -312,14 +315,7 @@ namespace Rope
                 Debug.Log($"Rope length reached {directLength}m and got replaced!");
             }
         }
-
-        void OnDrawGizmos()
-        {
-            if(!attached) return;
-            Gizmos.color = Color.red;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawLine(ropeJoint.anchor, hookJoint.anchor);
-        }
+        
         
     }
 

@@ -52,6 +52,7 @@ namespace Rope
         GameObject vehicleBaseLinkConnection, baseLink;
         readonly string containerName = "Rope";
         readonly string baseLinkName = "base_link";
+        readonly string hookConnectionPointName = "ConnectionPoint";
 
         void OnValidate()
         {
@@ -68,7 +69,7 @@ namespace Rope
             var rl = link.GetComponent<RopeLink>();
             rl.SetRopeParams(this, buoy);
 
-            if(prevLink != null) rl.SetupConnectionToOtherLink(prevLink);
+            if(prevLink != null) rl.SetupConnectionToPrevLink(prevLink);
             else rl.SetupConnectionToVehicle(vehicleBaseLinkConnection, baseLink);
             
             return link;
@@ -133,10 +134,8 @@ namespace Rope
             // InstantiateLink calls RopeLink::SetupConnectionToVehicle
             // where the rope link is created "going straigh out" from the baselink
             // but in this case we need the rope to be "looking at" the hook it is connected
-            var hookConnectionPoint = connectedHookGO.transform.Find("ConnectionPoint");
+            var hookConnectionPoint = connectedHookGO.transform.Find(hookConnectionPointName);
             stick.transform.LookAt(hookConnectionPoint.transform.position);
-            Debug.DrawLine(stick.transform.position, hookConnectionPoint.position, Color.cyan, 10f);
-            Debug.Break();
 
             // this baby has all the functions to set things up
             var stickRopeLink = stick.GetComponent<RopeLink>();      
@@ -146,7 +145,7 @@ namespace Rope
             // we took the hook object from the ropelink that broke earlier.
             // since to break, it first had to attach, at which point it knew
             // the object to attach to.
-            // See RopeLink::OnCollisionEnter then RopeLink::OnJointBreak
+            // See RopeLink::OnCollisionEnter then RopeLink::FixedUpdate
             stickRopeLink.ConnectToHook(connectedHookGO, breakable:false);
 
             // make the stick actually pull the vehicle!
