@@ -27,7 +27,7 @@ public class DroneLoadController: MonoBehaviour {
     private int times1 = 0;
     private int times2 = 0;
     // private GameObject sphere;
-    private RopeBuoy buoy;
+    private Transform buoy;
     private ArticulationBody rope_link_ab;
 
     // Quadrotor parameters
@@ -74,7 +74,9 @@ public class DroneLoadController: MonoBehaviour {
 		propellers_rpms = new float[] { 0, 0, 0, 0 };
 
         // sphere = GameObject.Find("Sphere");
-        buoy = GameObject.Find("RopeLink(Clone)_10_buoy").GetComponent<RopeBuoy>();
+        var rope = GameObject.Find("Rope");
+        buoy = rope.transform.GetChild(rope.transform.childCount-1);
+        // TODO: For now the position of the AUV is taken at the base of the rope
         rope_link_ab = rope_link.GetComponent<ArticulationBody>();
         
         // Quadrotor parameters
@@ -230,7 +232,7 @@ public class DroneLoadController: MonoBehaviour {
             Matrix<double> R_bw = R_bs*R_sw;
 
             // Desired states
-            Vector<double> buoy_w = R_ws*buoy.transform.position.To<NED>().ToDense();
+            Vector<double> buoy_w = R_ws*buoy.position.To<NED>().ToDense();
             Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { buoy_w[0], buoy_w[1], Math.Pow(0.5*t-5, 2) + 0.32 + buoy_w[2] });
             Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5*t-5 });
             Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.5 });
