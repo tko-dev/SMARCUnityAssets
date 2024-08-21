@@ -37,11 +37,6 @@ namespace Rope
         [Tooltip("Rope will be replaced by a stick when its end-to-end distance is this close to RopeLength")]
         [Range(0f, 0.05f)]
         public float RopeReplacementAccuracy = 0.02f;
-        [Tooltip("How _pullable_ objects connected to the rope ends are. 1 would make rope and object equally powerful. 0 would make the masses decide. 0.1 would make the rope pull as if it was 10% of the object's mass. Joints are fun :)")]
-        [Range(0f, 1f)]
-        public float RopePullRatio = 0.1f;
-        // TODO: This is very ad-hoc, maybe making this dynamically depend on the objects on the two
-        // ends of the rope would be accurate?
 
 
         [HideInInspector] public float SegmentRBMass = 1f;
@@ -63,7 +58,7 @@ namespace Rope
             if(NumSegments > 50) Debug.LogWarning($"There will be {NumSegments} rope segments generated on game Start, might be too many?");
         }
 
-        GameObject InstantiateLink(Transform prevLink, int num, bool buoy, bool makePullable = false)
+        GameObject InstantiateLink(Transform prevLink, int num, bool buoy)
         {
             var link = Instantiate(RopeLinkPrefab);
             link.transform.SetParent(RopeContainer.transform);
@@ -74,7 +69,7 @@ namespace Rope
             rl.SetRopeParams(this, buoy);
 
             if(prevLink != null) rl.SetupConnectionToPrevLink(prevLink);
-            else rl.SetupConnectionToVehicle(vehicleBaseLinkConnection, baseLink, setConnectedMassScale:makePullable);
+            else rl.SetupConnectionToVehicle(vehicleBaseLinkConnection, baseLink);
             
             return link;
         }
@@ -138,12 +133,13 @@ namespace Rope
             // two segments is still quite stable compared to 10s...
             SegmentLength = RopeLength/2;
 
-            var stickBase = InstantiateLink(null, 1000, buoy:false, makePullable:true);
+            var stickBase = InstantiateLink(null, 1000, buoy:false);
             // InstantiateLink calls RopeLink::SetupConnectionToVehicle
             // where the rope link is created "going straigh out" from the baselink
             // but in this case we need the rope to be "looking at" the hook it is connected
             var hookConnectionPoint = connectedHookGO.transform.Find(hookConnectionPointName);
             stickBase.transform.LookAt(hookConnectionPoint.transform.position);
+            var stickBaseRL = stickBase.GetComponent<RopeLink>();
 
             var stickTip = InstantiateLink(stickBase.transform, 1001, buoy:false);
             var stickTipRL = stickTip.GetComponent<RopeLink>();
@@ -152,7 +148,18 @@ namespace Rope
             // but now it also needs to connect to the hook's connection point
             // we took the hook object from the ropelink that called this method.
             // See RopeLink::OnCollisionEnter then RopeLink::FixedUpdate
-            stickTipRL.ConnectToHook(connectedHookGO, breakable:false);
+            stickTipRL.ConnectToHook(connectedHookGO);
+
+            // and finally, we set the mass scales of the rope pieces
+            // so that they pull the drone/auv proportional to auv/drone's mass.
+            var hookBaseLink = Utils.FindDeepChildWithName(connectedHookGO.transform.root.gameObject, baseLinkName);
+            var hookBaseLinkAB = hookBaseLink.GetComponent<ArticulationBody>();
+            var baseLinkAB = baseLink.GetComponent<ArticulationBody>();
+            var pullerOverPulledMassRatio = hookBaseLinkAB.mass / baseLinkAB.mass;
+            // divide by 2 because one is pulling the other is getting pulled more by this much
+            // mass ratio. Gotta share the force, not accumulate it.
+            stickBaseRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
+            stickTipRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
         }
 
         void Awake()

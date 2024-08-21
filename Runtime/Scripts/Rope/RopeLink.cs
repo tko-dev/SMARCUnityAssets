@@ -36,7 +36,6 @@ namespace Rope
         [HideInInspector] public ConfigurableJoint ropeJoint, hookJoint;
         Rigidbody rb;
 
-        readonly string baseLinkName = "base_link";
         readonly string hookConnectionPointName = "ConnectionPoint";
 
         public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
@@ -198,7 +197,9 @@ namespace Rope
             ropeJoint.connectedAnchor = ropeJoint.anchor + new Vector3(0, 0, segmentLength);
         }
 
-        public void SetupConnectionToVehicle(GameObject vehicleBaseLinkConnection, GameObject baseLink, bool setConnectedMassScale = false)
+        public void SetupConnectionToVehicle(
+            GameObject vehicleBaseLinkConnection,
+            GameObject baseLink)
         {
             // First link in the chain, not connected to another link
             ropeJoint = GetComponent<ConfigurableJoint>();
@@ -212,18 +213,10 @@ namespace Rope
             {
                 var linkCollider = GetComponent<Collider>();
                 Physics.IgnoreCollision(linkCollider, baseCollider);
-            }
-
-            // make the rope able to pull the connected vehicle
-            if(setConnectedMassScale)
-            {
-                var baselinkAB = baseLink.GetComponent<ArticulationBody>();
-                ropeJoint.connectedMassScale = generator.RopePullRatio * baselinkAB.mass / rb.mass;
-            }
-           
+            }           
         }
 
-        public void ConnectToHook(GameObject hookGO, bool breakable=true)
+        public void ConnectToHook(GameObject hookGO)
         {
             hookJoint = gameObject.AddComponent<ConfigurableJoint>();
             var (frontSpherePos, backSpherePos) = SpherePositions();
@@ -241,25 +234,22 @@ namespace Rope
 
             var hookAB = hookGO.GetComponent<ArticulationBody>();
             hookJoint.connectedArticulationBody = hookAB;
-            var hookBaseLinkGO = Utils.FindDeepChildWithName(hookAB.transform.root.gameObject, baseLinkName);
-            var hookBaseLinkAB = hookBaseLinkGO.GetComponent<ArticulationBody>();
-            hookJoint.connectedMassScale = generator.RopePullRatio * (hookBaseLinkAB.mass / rb.mass);
-
-            // Set the joint to break when the rope is carrying the entire robot.
-            // This should happen when the rope is _tight_, meaning the distance between hook
-            // and robot is equal (or almost) to the rope length.
-            // At that point, we can replace the entire rope with a single linkage
-            // and discard the rope entirely.
-            // This should make the physics of the drone-rope-auv system more stable
-            // and closer to theoretical control papers about suspended load control.
-            // See OnJointBreak and RopeGenerator::ReplaceRopeWithStick
-            if(breakable) hookJoint.breakForce = 2;
-
             attached = true;
         }
 
 
-        
+        public void SetMassScaleForPulling(float pullerOverPulledMassRatio)
+        {
+            if(attached)
+            {
+                hookJoint.massScale = pullerOverPulledMassRatio / rb.mass;
+            }
+            else
+            {
+                ropeJoint.connectedMassScale = pullerOverPulledMassRatio / rb.mass;
+            }
+        }
+
 
         void OnCollisionEnter(Collision collision)
         {
@@ -271,7 +261,7 @@ namespace Rope
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 
                 connectedHookGO = collision.gameObject;
-                ConnectToHook(connectedHookGO, breakable:false);
+                ConnectToHook(connectedHookGO);
                 // by default the rope is usually too light to actually pull the vehicle
                 // it is attached to.
                 // we dont change that here, but instead check if the rope is tight in
