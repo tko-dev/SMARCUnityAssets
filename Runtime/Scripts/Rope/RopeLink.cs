@@ -218,6 +218,9 @@ namespace Rope
                 var linkCollider = GetComponent<Collider>();
                 Physics.IgnoreCollision(linkCollider, baseCollider);
             }
+            // do not call SetupBaselinkConnectedMassScale(); here
+            // because we want the rope to be "dynamically invisible" to the
+            // thing its connected to in most cases.
         }
 
         public void ConnectToHook(GameObject hookGO, bool breakable=true)
@@ -251,6 +254,7 @@ namespace Rope
             // and closer to theoretical control papers about suspended load control.
             // See OnJointBreak and RopeGenerator::ReplaceRopeWithStick
             if(breakable) hookJoint.breakForce = 2;
+
             attached = true;
         }
 
@@ -259,10 +263,11 @@ namespace Rope
             // Set up the first rope link in the chain to have the same "joint pulling force"
             // as the base link itself so the base link can be pulled around without exploding the rope!
             var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
-            var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
+            var firstJoint = firstRopeLinkObject.GetComponent<ConfigurableJoint>();
             var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.root.gameObject, baseLinkName);
             var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
             firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;
+            Debug.Log($"Set {firstJoint.gameObject.name}'s CMS to {baselinkAB.mass} / {rb.mass} = {firstJoint.connectedMassScale}");
         }
 
         void OnCollisionEnter(Collision collision)
@@ -278,6 +283,11 @@ namespace Rope
                 ConnectToHook(connectedHookGO, breakable:false);
 
                 // also make the first ropelink able to pull the vehicle!
+                // since the rope is attached between two things now,
+                // we want it to be able to pull the original attached body
+                // usually the rope is significantly (10000x ish) lighter than
+                // the object its attached to, which causes joints to always pull
+                // the rope towards the object to satisfy joint constraints.
                 SetupBaselinkConnectedMassScale();
             }
         }
@@ -309,10 +319,10 @@ namespace Rope
             var vehicleJointPos = firstJoint.transform.position + firstJoint.anchor;
             var hookJointPos = transform.position + hookJoint.anchor;
             var directLength = Vector3.Distance(vehicleJointPos, hookJointPos);
-            if(directLength >= generator.RopeLength * generator.RopeReplacementAccuracy)
+            if(Mathf.Abs(directLength-generator.RopeLength) <= generator.RopeReplacementAccuracy)
             {
-                generator.ReplaceRopeWithStick(connectedHookGO);
                 Debug.Log($"Rope length reached {directLength}m and got replaced!");
+                generator.ReplaceRopeWithStick(connectedHookGO);
             }
         }
         

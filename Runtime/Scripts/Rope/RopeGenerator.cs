@@ -35,9 +35,9 @@ namespace Rope
         public float SegmentLength = 0.1f;
         [Tooltip("Mass of each segment compared to the base_link the rope is connected to. For physics stability! The larger the more stable...")]
         public float SegmentMassRatio = 0.01f;
-        [Tooltip("Rope will be replaced by a stick when its end-to-end distance is >= than RopeLength*this")]
-        [Range(0.9f, 1f)]
-        public float RopeReplacementAccuracy = 0.95f;
+        [Tooltip("Rope will be replaced by a stick when its end-to-end distance is this close to RopeLength")]
+        [Range(0f, 0.05f)]
+        public float RopeReplacementAccuracy = 0.02f;
 
 
         [HideInInspector] public float SegmentRBMass = 1f;
@@ -128,30 +128,34 @@ namespace Rope
                 Destroy(container.GetChild(i).gameObject);
 
             // Now that all the rope is gone, create a new RopeLink object
-            // but, at this point, we shall have ONE segment that is as long as the rope
-            SegmentLength = RopeLength;
-            var stick = InstantiateLink(null, 0, false);
+            // but, at this point, we shall have TWO segments that is as long as the rope
+            // why two? because one wouldnt allow the rope to bend _at all_, making
+            // any kind of "pick up and lower" maneuver's "lower" part very hard.
+            // two segments is still quite stable compared to 10s...
+            SegmentLength = RopeLength/2;
+
+            var stickBase = InstantiateLink(null, 0, false);
             // InstantiateLink calls RopeLink::SetupConnectionToVehicle
             // where the rope link is created "going straigh out" from the baselink
             // but in this case we need the rope to be "looking at" the hook it is connected
             var hookConnectionPoint = connectedHookGO.transform.Find(hookConnectionPointName);
-            stick.transform.LookAt(hookConnectionPoint.transform.position);
+            stickBase.transform.LookAt(hookConnectionPoint.transform.position);
 
             // this baby has all the functions to set things up
-            var stickRopeLink = stick.GetComponent<RopeLink>();      
-
-            // this stick is already connected to the base_link
-            // but now it also needs to connect to the hook's connection point
-            // we took the hook object from the ropelink that broke earlier.
-            // since to break, it first had to attach, at which point it knew
-            // the object to attach to.
-            // See RopeLink::OnCollisionEnter then RopeLink::FixedUpdate
-            stickRopeLink.ConnectToHook(connectedHookGO, breakable:false);
-
+            var stickBaseRL = stickBase.GetComponent<RopeLink>();
             // make the stick actually pull the vehicle!
             // since its mass is so small, unless we muck with scaling like this,
             // the stick wont be able to carry the vehicle without stretching the joint.
-            stickRopeLink.SetupBaselinkConnectedMassScale();
+            stickBaseRL.SetupBaselinkConnectedMassScale();
+
+            var stickTip = InstantiateLink(stickBase.transform, 1, false);
+            var stickTipRL = stickTip.GetComponent<RopeLink>();
+
+            // this stick is already connected to the base_link
+            // but now it also needs to connect to the hook's connection point
+            // we took the hook object from the ropelink that called this method.
+            // See RopeLink::OnCollisionEnter then RopeLink::FixedUpdate
+            stickTipRL.ConnectToHook(connectedHookGO, breakable:false);
         }
 
         void Awake()
