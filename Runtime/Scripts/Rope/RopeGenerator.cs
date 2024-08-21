@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.EditorTools;
 using UnityEngine;
-using UnityEngine.AI;
 using Utils = DefaultNamespace.Utils;
 
 namespace Rope
@@ -38,6 +37,11 @@ namespace Rope
         [Tooltip("Rope will be replaced by a stick when its end-to-end distance is this close to RopeLength")]
         [Range(0f, 0.05f)]
         public float RopeReplacementAccuracy = 0.02f;
+        [Tooltip("How _pullable_ objects connected to the rope ends are. 1 would make rope and object equally powerful. 0 would make the masses decide. 0.1 would make the rope pull as if it was 10% of the object's mass. Joints are fun :)")]
+        [Range(0f, 1f)]
+        public float RopePullRatio = 0.1f;
+        // TODO: This is very ad-hoc, maybe making this dynamically depend on the objects on the two
+        // ends of the rope would be accurate?
 
 
         [HideInInspector] public float SegmentRBMass = 1f;
@@ -59,7 +63,7 @@ namespace Rope
             if(NumSegments > 50) Debug.LogWarning($"There will be {NumSegments} rope segments generated on game Start, might be too many?");
         }
 
-        GameObject InstantiateLink(Transform prevLink, int num, bool buoy)
+        GameObject InstantiateLink(Transform prevLink, int num, bool buoy, bool makePullable = false)
         {
             var link = Instantiate(RopeLinkPrefab);
             link.transform.SetParent(RopeContainer.transform);
@@ -70,7 +74,7 @@ namespace Rope
             rl.SetRopeParams(this, buoy);
 
             if(prevLink != null) rl.SetupConnectionToPrevLink(prevLink);
-            else rl.SetupConnectionToVehicle(vehicleBaseLinkConnection, baseLink);
+            else rl.SetupConnectionToVehicle(vehicleBaseLinkConnection, baseLink, setConnectedMassScale:makePullable);
             
             return link;
         }
@@ -134,21 +138,14 @@ namespace Rope
             // two segments is still quite stable compared to 10s...
             SegmentLength = RopeLength/2;
 
-            var stickBase = InstantiateLink(null, 0, false);
+            var stickBase = InstantiateLink(null, 1000, buoy:false, makePullable:true);
             // InstantiateLink calls RopeLink::SetupConnectionToVehicle
             // where the rope link is created "going straigh out" from the baselink
             // but in this case we need the rope to be "looking at" the hook it is connected
             var hookConnectionPoint = connectedHookGO.transform.Find(hookConnectionPointName);
             stickBase.transform.LookAt(hookConnectionPoint.transform.position);
 
-            // this baby has all the functions to set things up
-            var stickBaseRL = stickBase.GetComponent<RopeLink>();
-            // make the stick actually pull the vehicle!
-            // since its mass is so small, unless we muck with scaling like this,
-            // the stick wont be able to carry the vehicle without stretching the joint.
-            stickBaseRL.SetupBaselinkConnectedMassScale();
-
-            var stickTip = InstantiateLink(stickBase.transform, 1, false);
+            var stickTip = InstantiateLink(stickBase.transform, 1001, buoy:false);
             var stickTipRL = stickTip.GetComponent<RopeLink>();
 
             // this stick is already connected to the base_link
