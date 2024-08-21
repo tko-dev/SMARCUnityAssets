@@ -1053,14 +1053,14 @@ MonoBehaviour:
   RopeLinkPrefab: {fileID: 8527497976637253487, guid: eebb343a23cba1423be0f5ab11c20e78, type: 3}
   VehicleConnectionName: rope_link
   RopeDiameter: 0.01
-  RopeLength: 1
+  RopeLength: 2
   GramsPerMeter: 0.5
   BuoyGrams: 1
   RopeCollisionDiameter: 0.1
   SegmentLength: 0.1
   SegmentMassRatio: 0.01
   RopeReplacementAccuracy: 0.02
-  SegmentRBMass: 1
+  SegmentRBMass: 0.12012
   RopeContainer: {fileID: 0}
 --- !u!1 &1163357502922114015
 GameObject:
