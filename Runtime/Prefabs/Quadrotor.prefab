@@ -54,7 +54,7 @@ MonoBehaviour:
   yaw: 0
   reverse: 0
   rpm: 0
-  RPMMax: 100000
+  RPMMax: 1e+20
   RPMToForceMultiplier: 0.005
   NumPropellers: 4
   HoverDefault: 1
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   base_link: {fileID: 3939394929759449381}
-  rope_link: {fileID: 5116112020095387679}
+  load_link: {fileID: 0}
   computation_frequency: 50
   follow_sphere: 0
 --- !u!1 &1648915923807604
@@ -423,7 +423,7 @@ MonoBehaviour:
   yaw: 0
   reverse: 1
   rpm: 0
-  RPMMax: 100000
+  RPMMax: 1e+20
   RPMToForceMultiplier: 0.005
   NumPropellers: 4
   HoverDefault: 1
@@ -517,7 +517,7 @@ MonoBehaviour:
   yaw: 0
   reverse: 1
   rpm: 0
-  RPMMax: 100000
+  RPMMax: 1e+20
   RPMToForceMultiplier: 0.005
   NumPropellers: 4
   HoverDefault: 1
@@ -707,7 +707,7 @@ MonoBehaviour:
   yaw: 0
   reverse: 0
   rpm: 0
-  RPMMax: 100000
+  RPMMax: 1e+20
   RPMToForceMultiplier: 0.005
   NumPropellers: 4
   HoverDefault: 1
@@ -2285,11 +2285,11 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.3
-  m_AngularDamping: 0.3
+  m_LinearDamping: 0
+  m_AngularDamping: 0
   m_JointFriction: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaTensor: {x: 0.082, y: 0.1377, z: 0.082}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
@@ -3247,7 +3247,7 @@ ArticulationBody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 0
   m_Immovable: 0
   m_UseGravity: 0
