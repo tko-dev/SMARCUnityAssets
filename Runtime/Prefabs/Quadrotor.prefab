@@ -104,6 +104,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4800906380731054}
   - component: {fileID: 8030836169684092610}
+  - component: {fileID: 8902112791058481484}
   m_Layer: 0
   m_Name: Quadrotor
   m_TagString: robot
@@ -148,6 +149,22 @@ MonoBehaviour:
   RPMDifferenceRatio: 1.5
   LiftingRPMDifferenceRatio: 200
   LiftingRPMRampUpSpeed: 5000
+--- !u!114 &8902112791058481484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469583607899678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dce2f56052cee050eb255beb97f3a150, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  base_link: {fileID: 3939394929759449381}
+  rope_link: {fileID: 5116112020095387679}
+  computation_frequency: 50
+  follow_sphere: 0
 --- !u!1 &1648915923807604
 GameObject:
   m_ObjectHideFlags: 0
@@ -832,8 +849,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.00000031292439, y: 0, z: 0.31500012}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: 0.315}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
@@ -1418,8 +1435,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.0009999139, y: -0.178, z: 0.001000262}
-  m_ParentAnchorRotation: {x: 0.6532816, y: 0.6532816, z: -0.27059796, w: -0.27059796}
+  m_ParentAnchorPosition: {x: -0.001, y: -0.178, z: 0.001}
+  m_ParentAnchorRotation: {x: 0.65328157, y: 0.65328157, z: -0.27059793, w: -0.27059793}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_MatchAnchors: 1
@@ -2058,8 +2075,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.31500012, y: 0, z: 0.00000035762787}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: 0.315, y: 0, z: 0}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
@@ -2951,8 +2968,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.00000031292439, y: 0, z: -0.31500012}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: 0, y: 0, z: -0.315}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
@@ -3065,8 +3082,8 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.31500012, y: 0, z: -0.00000035762787}
-  m_ParentAnchorRotation: {x: -0.000000029802322, y: -0.000000029802322, z: 0.7071068, w: 0.7071068}
+  m_ParentAnchorPosition: {x: -0.315, y: 0, z: 0}
+  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
   m_MatchAnchors: 1
