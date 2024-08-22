@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Force;
-using UnityEditor.EditorTools; // ForcePoints
 using Utils = DefaultNamespace.Utils;
 using System;
 
@@ -37,7 +36,6 @@ namespace Rope
         [HideInInspector] public ConfigurableJoint ropeJoint, hookJoint;
         Rigidbody rb;
 
-        readonly string baseLinkName = "base_link";
         readonly string hookConnectionPointName = "ConnectionPoint";
 
         public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
@@ -199,15 +197,13 @@ namespace Rope
             ropeJoint.connectedAnchor = ropeJoint.anchor + new Vector3(0, 0, segmentLength);
         }
 
-        public void SetupConnectionToVehicle(GameObject vehicleBaseLinkConnection, GameObject baseLink)
+        public void SetupConnectionToVehicle(
+            GameObject vehicleBaseLinkConnection,
+            GameObject baseLink)
         {
-            ropeJoint = GetComponent<ConfigurableJoint>();
             // First link in the chain, not connected to another link
-            // see what the parent has... and joint to it.
-            if(vehicleBaseLinkConnection.TryGetComponent<ArticulationBody>(out ArticulationBody ab))
-                ropeJoint.connectedArticulationBody = ab;
-            if(vehicleBaseLinkConnection.TryGetComponent<Rigidbody>(out Rigidbody rb))
-                ropeJoint.connectedBody = rb;
+            ropeJoint = GetComponent<ConfigurableJoint>();
+            ropeJoint.connectedArticulationBody = vehicleBaseLinkConnection.GetComponent<ArticulationBody>();
 
             transform.localPosition = new Vector3(0, 0, generator.SegmentLength/2);
             transform.rotation = vehicleBaseLinkConnection.transform.rotation;
@@ -217,13 +213,10 @@ namespace Rope
             {
                 var linkCollider = GetComponent<Collider>();
                 Physics.IgnoreCollision(linkCollider, baseCollider);
-            }
-            // do not call SetupBaselinkConnectedMassScale(); here
-            // because we want the rope to be "dynamically invisible" to the
-            // thing its connected to in most cases.
+            }           
         }
 
-        public void ConnectToHook(GameObject hookGO, bool breakable=true)
+        public void ConnectToHook(GameObject hookGO)
         {
             hookJoint = gameObject.AddComponent<ConfigurableJoint>();
             var (frontSpherePos, backSpherePos) = SpherePositions();
@@ -241,34 +234,22 @@ namespace Rope
 
             var hookAB = hookGO.GetComponent<ArticulationBody>();
             hookJoint.connectedArticulationBody = hookAB;
-            var hookBaseLinkGO = Utils.FindDeepChildWithName(hookAB.transform.root.gameObject, baseLinkName);
-            var hookBaseLinkAB = hookBaseLinkGO.GetComponent<ArticulationBody>();
-            hookJoint.connectedMassScale = 0.1f * (hookBaseLinkAB.mass / rb.mass);
-
-            // Set the joint to break when the rope is carrying the entire robot.
-            // This should happen when the rope is _tight_, meaning the distance between hook
-            // and robot is equal (or almost) to the rope length.
-            // At that point, we can replace the entire rope with a single linkage
-            // and discard the rope entirely.
-            // This should make the physics of the drone-rope-auv system more stable
-            // and closer to theoretical control papers about suspended load control.
-            // See OnJointBreak and RopeGenerator::ReplaceRopeWithStick
-            if(breakable) hookJoint.breakForce = 2;
-
             attached = true;
         }
 
-        public void SetupBaselinkConnectedMassScale()
+
+        public void SetMassScaleForPulling(float pullerOverPulledMassRatio)
         {
-            // Set up the first rope link in the chain to have the same "joint pulling force"
-            // as the base link itself so the base link can be pulled around without exploding the rope!
-            var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
-            var firstJoint = firstRopeLinkObject.GetComponent<ConfigurableJoint>();
-            var baseLinkGO = Utils.FindDeepChildWithName(firstRopeLinkObject.root.gameObject, baseLinkName);
-            var baselinkAB = baseLinkGO.GetComponent<ArticulationBody>();
-            firstJoint.connectedMassScale = baselinkAB.mass / rb.mass;
-            Debug.Log($"Set {firstJoint.gameObject.name}'s CMS to {baselinkAB.mass} / {rb.mass} = {firstJoint.connectedMassScale}");
+            if(attached)
+            {
+                hookJoint.massScale = pullerOverPulledMassRatio / rb.mass;
+            }
+            else
+            {
+                ropeJoint.connectedMassScale = pullerOverPulledMassRatio / rb.mass;
+            }
         }
+
 
         void OnCollisionEnter(Collision collision)
         {
@@ -280,15 +261,14 @@ namespace Rope
                 Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 
                 connectedHookGO = collision.gameObject;
-                ConnectToHook(connectedHookGO, breakable:false);
-
-                // also make the first ropelink able to pull the vehicle!
-                // since the rope is attached between two things now,
-                // we want it to be able to pull the original attached body
-                // usually the rope is significantly (10000x ish) lighter than
-                // the object its attached to, which causes joints to always pull
-                // the rope towards the object to satisfy joint constraints.
-                SetupBaselinkConnectedMassScale();
+                ConnectToHook(connectedHookGO);
+                // by default the rope is usually too light to actually pull the vehicle
+                // it is attached to.
+                // we dont change that here, but instead check if the rope is tight in
+                // FixedUpdate() and replace the rope with sticks (for physics stability) that
+                // _can_ pull the vehicle.
+                // The many-links version of the rope is basically only for visual goals like
+                // cameras identifying the rope and such.
             }
         }
 
