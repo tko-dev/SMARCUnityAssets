@@ -120,7 +120,7 @@ namespace VehicleComponents.Sensors
             // intensity of hit between 1-255
             // It is a function of
             // 1) The distance traveled by the beam -> distance
-            float hitDistIntensity = (sonar.max_distance - hit.distance) / sonar.max_distance;
+            float hitDistIntensity = (sonar.MaxRange - hit.distance) / sonar.MaxRange;
 
             // 2) The angle of hit -> angle between the ray and normal
             // the hit originated from transform position, and hit sonarHit
@@ -142,7 +142,7 @@ namespace VehicleComponents.Sensors
             if(intensity > 1) intensity=1;
             if(intensity < 0) intensity=0;
 
-            if(sonar.drawHits)
+            if(sonar.DrawHits)
             {
                 // Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
                 // Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
@@ -183,37 +183,65 @@ namespace VehicleComponents.Sensors
     }
 
 
+    public enum SonarType
+    {
+        FLS,
+        SSS,
+        MBES
+    }
+
 
     public class Sonar : Sensor
     {
 
         [Header("Sonar")]
-        public int beam_count = 500;
-        public float beam_breadth_deg = 90;
-        public float beam_fwhm_deg = 60;
-        public float max_distance = 100;
+        [Tooltip("Numer of rays cast per beam. Beam = A fan of rays.")]
+        public int NumRaysPerBeam = 500;
+        [Tooltip("Total opening angle of _each_ beam.")]
+        public float BeamBreadthDeg = 90;
+        [Tooltip("How many beams(fans) are in this arrangement of sonar. For FLS, they will be arranged left-to-right with fan opening in the forward axis. For SSS and MBES, they will be arranged left-to-right with fan opening also left-to-right.")]
+        public int NumBeams = 1;
+        public SonarType Type = SonarType.MBES;
+        [Tooltip("-3dB opening angle of each beam.")]
+        public float BeamBreadth3DecibelsDeg = 60;
+        [Tooltip("Angle from the forward-right plane (usually horizontal-ish) of the beam. For SSS, 180-(2*(tilt+BeamBreath)) = nadir. For FLS, just the tilt downwards.")]        
+        public float TiltAngleDeg = 15;
+        public float MaxRange = 100;
 
         // we use this one to keep the latest hit in memory and
         // accessible to outside easily.
-        public SonarHit[] sonarHits;
-        [Tooltip("Draw rays in the scene view as lines?")]
-        public bool drawRays = false;
-        [Tooltip("Just draw the hit points as 1m-long lines?")]
-        public bool drawHits = true;
-        private JobHandle handle;
+        [HideInInspector] public SonarHit[] SonarHits;
 
+        [Header("Visuals")]
+        [Tooltip("Draw rays in the scene view as lines?")]
+        public bool DrawRays = false;
+        [Tooltip("Just draw the hit points as 1m-long lines?")]
+        public bool DrawHits = true;
+        private Color rayColor;
+
+
+        // Unity job structure for long-term casting of rays.
+        private JobHandle handle;
         private NativeArray<RaycastHit> results;
         private NativeArray<RaycastCommand> commands;
 
-        private Color rayColor;
+        [HideInInspector] public int TotalRayCount => NumRaysPerBeam * NumBeams;
+        [HideInInspector] public float DegreesPerRayInBeam => BeamBreadthDeg/(NumRaysPerBeam-1);
 
-        public List<float> beamProfile;
+        [HideInInspector] public List<float> BeamProfile;
 
+
+        void OnValidate()
+        {
+            if(Type == SonarType.SSS) NumBeams = 2;
+            if(Type == SonarType.MBES) NumBeams = 1;
+            if(NumRaysPerBeam <= 0) NumRaysPerBeam = 1;
+        }
 
 
         public void Start()
         {
-            rayColor = Color.white; //Random.ColorHSV();
+            rayColor = Color.white;
             InitHits();
             InitBeamProfileSimple();
         }
@@ -222,10 +250,10 @@ namespace VehicleComponents.Sensors
         {
             // Initialize all the hits as empty so we can just update them later
             // rather than spamming new ones
-            sonarHits = new SonarHit[beam_count];
-            for(int i=0; i<beam_count; i++)
+            SonarHits = new SonarHit[TotalRayCount];
+            for(int i=0; i<TotalRayCount; i++)
             {
-                sonarHits[i] = new SonarHit(this);
+                SonarHits[i] = new SonarHit(this);
             }
         }
 
@@ -238,26 +266,33 @@ namespace VehicleComponents.Sensors
                 var gaussianIntensity = Mathf.Exp(-(Mathf.Pow(beamAngle - beamCenter, 2) / (2 * Mathf.Pow(sigma, 2))));
                 return gaussianIntensity;
             }
-            var angleStepDeg = beam_breadth_deg / (beam_count - 1.0f);
-            var fwhmSigma = beam_fwhm_deg / (2 * Mathf.Sqrt(2.0f * Mathf.Log(2.0f)));
-            beamProfile = new List<float>();
-            for(int i=0; i<beam_count; i++)
+            var angleStepDeg = BeamBreadthDeg / (NumRaysPerBeam - 1.0f);
+            var fwhmSigma = BeamBreadth3DecibelsDeg / (2 * Mathf.Sqrt(2.0f * Mathf.Log(2.0f)));
+            BeamProfile = new List<float>();
+            for(int i=0; i<NumRaysPerBeam; i++)
             {
-                var beamAngleDeg = -beam_breadth_deg / 2 + i * angleStepDeg;
+                var beamAngleDeg = -BeamBreadthDeg / 2 + i * angleStepDeg;
                 float intensity =
                     CalculateGaussianIntensity(beamAngle: beamAngleDeg, beamCenter: 0.0f, sigma: fwhmSigma);
-                beamProfile.Add(intensity);
+                BeamProfile.Add(intensity);
             }
         }
         
         public void InitBeamProfileSimple()
         {
             // Initialize simple beam profile
-            beamProfile = new List<float>();
-            for(int i=0; i<beam_count; i++)
+            BeamProfile = new List<float>();
+            for(int i=0; i<NumRaysPerBeam; i++)
             {
-                beamProfile.Add(1.0f);
+                BeamProfile.Add(1.0f);
             }
+        }
+
+        public static (int, int) BeamNumRayNumFromRayIndex(int i, int NumRaysPerBeam)
+        {
+                var rayNum = i % NumRaysPerBeam;
+                int beamNum = (int)i / (int)NumRaysPerBeam;
+                return (beamNum, rayNum);
         }
             
             
@@ -268,11 +303,18 @@ namespace VehicleComponents.Sensors
                 // Wait for the batch processing job to complete
                 handle.Complete();
 
-                for(int i=0; i<beam_count; i++)
+                for(int i=0; i < TotalRayCount; i++)
                 {
                     var hit = results[i];
-                    sonarHits[i].Update(hit, beamProfile[i]);
-                    if (drawRays && hit.point != Vector3.zero) Debug.DrawLine(transform.position, hit.point, rayColor);
+                    var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
+                    SonarHits[i].Update(hit, BeamProfile[rayNum]);  
+                    if (DrawRays && hit.point != Vector3.zero)
+                    {
+                        if(i < TotalRayCount / 2) rayColor = Color.blue;
+                        if(i >= TotalRayCount / 2) rayColor = Color.red;
+                        Debug.DrawLine(transform.position, hit.point, rayColor, 1f);
+                    }
+                    
                 }
 
 
@@ -282,19 +324,21 @@ namespace VehicleComponents.Sensors
             }
 
 
-            results = new NativeArray<RaycastHit>(beam_count, Allocator.Persistent);
-            commands = new NativeArray<RaycastCommand>(beam_count, Allocator.Persistent);
+            results = new NativeArray<RaycastHit>(TotalRayCount, Allocator.Persistent);
+            commands = new NativeArray<RaycastCommand>(TotalRayCount, Allocator.Persistent);
 
-            var transform1 = transform;
-            var setupJob = new SetupJob()
+            var setupJob = new SetupSonarRaycastJob()
             {
                 Commands = commands,
-                Origin = transform1.position,
-                Direction = -transform1.up,
-                Rotation_axis = transform1.forward,
-                Max_distance = max_distance,
-                Beam_breath_deg = beam_breadth_deg,
-                Beam_count = beam_count
+                NumRaysPerBeam = this.NumRaysPerBeam,
+                SonarUp = transform.up,
+                SonarForward = transform.forward,
+                SonarPosition = transform.position,
+                Type = this.Type,
+                DegreesPerRayInBeam = this.DegreesPerRayInBeam,
+                BeamBreadthDeg = this.BeamBreadthDeg,
+                MaxRange = this.MaxRange,
+                TiltAngleDeg = this.TiltAngleDeg
             };
 
             JobHandle deps = setupJob.Schedule(commands.Length, 10, default(JobHandle));
@@ -303,24 +347,52 @@ namespace VehicleComponents.Sensors
             return true;
         }
 
-
         [BurstCompile]
-        struct SetupJob : IJobParallelFor
+
+        struct SetupSonarRaycastJob : IJobParallelFor
         {
             public NativeArray<RaycastCommand> Commands;
-            public Vector3 Origin;
-            public Vector3 Direction;
-            public Vector3 Rotation_axis;
-            public float Max_distance;
-            public float Beam_breath_deg;
-            public float Beam_count;
+            public int NumRaysPerBeam;
+            public Vector3 SonarUp;
+            public Vector3 SonarForward;
+            public Vector3 SonarPosition;
+            public SonarType Type;
+            public float DegreesPerRayInBeam;
+            public float BeamBreadthDeg;
+            public float MaxRange;
+            public float TiltAngleDeg;
 
             public void Execute(int i)
             {
-                var beamBreathDeg = -Beam_breath_deg / 2 + i * Beam_breath_deg / (Beam_count - 1);
-                Vector3 direction = Quaternion.AngleAxis(beamBreathDeg, Rotation_axis) * Direction;
-                Commands[i] = new RaycastCommand(Origin, direction, QueryParameters.Default, Max_distance);
+                var direction = new Vector3(0, 0, 1);
+                var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
+                if(Type == SonarType.FLS)
+                {
+
+                }
+                else
+                {
+                    // MBES or SSS
+                    // start a beam looking directly down
+                    var initalDirection = -SonarUp;
+                    // rotate it around the forward axis by its ray number in the beam
+                    // offset half-way so the middle is directly down.
+                    var angle = (rayNum * DegreesPerRayInBeam) - BeamBreadthDeg/2;
+                    direction = Quaternion.AngleAxis(angle, SonarForward) * initalDirection;
+                    if(Type == SonarType.SSS)
+                    {
+                        var side = (beamNum * 2)-1;
+                        var tiltAngleWithSide = side * (90-TiltAngleDeg);
+                        direction = Quaternion.AngleAxis(tiltAngleWithSide, SonarForward) * direction;
+                    }
+                }
+                
+                // var beamBreathDeg = -Beam_breath_deg / 2 + i * Beam_breath_deg / (Beam_count - 1);
+                // Vector3 direction = Quaternion.AngleAxis(beamBreathDeg, Rotation_axis) * Direction;
+                Commands[i] = new RaycastCommand(SonarPosition, direction, QueryParameters.Default, MaxRange);
             }
         }
     }
+
+
 }
