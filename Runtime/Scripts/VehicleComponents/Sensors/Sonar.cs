@@ -392,11 +392,11 @@ namespace VehicleComponents.Sensors
                     // so we start a ray forward first.
                     direction = SonarForward;
                     // then we rotate _that_ to the ray angle within the beam, around the side-axis
-                    // minus the tilt angle which is measured from the horizontal plane down
-                    direction = Quaternion.AngleAxis(rayAngle-TiltAngleDeg, SonarRight) * direction;
-                    // then we rotate it to the beam angle, around the UP axis first
-                    // var beamAngle = (beamNum * DegreesPerBeamInFLS) - FLSFOVDeg;
-                    // direction = Quaternion.AngleAxis(beamAngle, SonarUp) * direction;
+                    // plus the tilt angle which is measured from the horizontal plane down
+                    direction = Quaternion.AngleAxis(rayAngle+TiltAngleDeg, SonarRight) * direction;
+                    // then we rotate it to the beam angle, around the UP axis
+                    var beamAngle = (beamNum * DegreesPerBeamInFLS) - FLSFOVDeg/2;
+                    direction = Quaternion.AngleAxis(beamAngle, SonarUp) * direction;
                 }
                 else
                 {
