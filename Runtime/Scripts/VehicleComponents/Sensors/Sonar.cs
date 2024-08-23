@@ -201,12 +201,14 @@ namespace VehicleComponents.Sensors
         public float BeamBreadthDeg = 90;
         [Tooltip("How many beams(fans) are in this arrangement of sonar. For FLS, they will be arranged left-to-right with fan opening in the forward axis. For SSS and MBES, they will be arranged left-to-right with fan opening also left-to-right.")]
         public int NumBeams = 1;
+        public float MaxRange = 100;
         public SonarType Type = SonarType.MBES;
-        [Tooltip("-3dB opening angle of each beam.")]
+        [Tooltip("-3dB opening angle of each beam. For beam-pattern related return intensity calculations.")]
         public float BeamBreadth3DecibelsDeg = 60;
         [Tooltip("Angle from the forward-right plane (usually horizontal-ish) of the beam. For SSS, 180-(2*(tilt+BeamBreath)) = nadir. For FLS, just the tilt downwards.")]        
         public float TiltAngleDeg = 15;
-        public float MaxRange = 100;
+        [Tooltip("For FLS: FOV of the beams")]
+        public float FLSFOVDeg = 30;
 
         // we use this one to keep the latest hit in memory and
         // accessible to outside easily.
@@ -219,6 +221,9 @@ namespace VehicleComponents.Sensors
         public bool DrawHits = true;
         private Color rayColor;
 
+        [Header("Load")]
+        public float TimeShareInFixedUpdate;
+
 
         // Unity job structure for long-term casting of rays.
         private JobHandle handle;
@@ -227,6 +232,7 @@ namespace VehicleComponents.Sensors
 
         [HideInInspector] public int TotalRayCount => NumRaysPerBeam * NumBeams;
         [HideInInspector] public float DegreesPerRayInBeam => BeamBreadthDeg/(NumRaysPerBeam-1);
+        [HideInInspector] public float DegreesPerBeamInFLS => FLSFOVDeg/(NumBeams-1);
 
         [HideInInspector] public List<float> BeamProfile;
 
@@ -234,7 +240,11 @@ namespace VehicleComponents.Sensors
         void OnValidate()
         {
             if(Type == SonarType.SSS) NumBeams = 2;
-            if(Type == SonarType.MBES) NumBeams = 1;
+            if(Type == SonarType.MBES)
+            {
+                NumBeams = 1;  
+                TiltAngleDeg = -1;
+            } 
             if(NumRaysPerBeam <= 0) NumRaysPerBeam = 1;
         }
 
@@ -298,11 +308,13 @@ namespace VehicleComponents.Sensors
             
         public override bool UpdateSensor(double deltaTime)
         {
+            var t0 = Time.realtimeSinceStartup;
             if (results.Length > 0)
             {
                 // Wait for the batch processing job to complete
                 handle.Complete();
 
+                // TODO this should be done in parallel too...?
                 for(int i=0; i < TotalRayCount; i++)
                 {
                     var hit = results[i];
@@ -314,10 +326,8 @@ namespace VehicleComponents.Sensors
                         if(i >= TotalRayCount / 2) rayColor = Color.red;
                         Debug.DrawLine(transform.position, hit.point, rayColor, 1f);
                     }
-                    
                 }
-
-
+                
                 // Dispose the buffers
                 results.Dispose();
                 commands.Dispose();
@@ -330,65 +340,84 @@ namespace VehicleComponents.Sensors
             var setupJob = new SetupSonarRaycastJob()
             {
                 Commands = commands,
-                NumRaysPerBeam = this.NumRaysPerBeam,
+                NumRaysPerBeam = NumRaysPerBeam,
                 SonarUp = transform.up,
                 SonarForward = transform.forward,
+                SonarRight = transform.right,
                 SonarPosition = transform.position,
-                Type = this.Type,
-                DegreesPerRayInBeam = this.DegreesPerRayInBeam,
-                BeamBreadthDeg = this.BeamBreadthDeg,
-                MaxRange = this.MaxRange,
-                TiltAngleDeg = this.TiltAngleDeg
+                Type = Type,
+                DegreesPerRayInBeam = DegreesPerRayInBeam,
+                BeamBreadthDeg = BeamBreadthDeg,
+                MaxRange = MaxRange,
+                TiltAngleDeg = TiltAngleDeg,
+                FLSFOVDeg = FLSFOVDeg,
+                DegreesPerBeamInFLS = DegreesPerBeamInFLS
             };
 
             JobHandle deps = setupJob.Schedule(commands.Length, 10, default(JobHandle));
             handle = RaycastCommand.ScheduleBatch(commands, results, 20, deps);
 
+            var t1 = Time.realtimeSinceStartup;
+            TimeShareInFixedUpdate = (t1-t0)/Time.fixedDeltaTime;
+            if(TimeShareInFixedUpdate > 0.5f) Debug.LogWarning($"Sonar in {transform.root.name}/{transform.name} took more than half the time in a fixedUpdate!");
+
             return true;
         }
 
         [BurstCompile]
-
         struct SetupSonarRaycastJob : IJobParallelFor
         {
             public NativeArray<RaycastCommand> Commands;
             public int NumRaysPerBeam;
             public Vector3 SonarUp;
             public Vector3 SonarForward;
+            public Vector3 SonarRight;
             public Vector3 SonarPosition;
             public SonarType Type;
             public float DegreesPerRayInBeam;
             public float BeamBreadthDeg;
             public float MaxRange;
             public float TiltAngleDeg;
+            public float FLSFOVDeg;
+            public float DegreesPerBeamInFLS;
 
             public void Execute(int i)
             {
                 var direction = new Vector3(0, 0, 1);
                 var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
+                var rayAngle = (rayNum * DegreesPerRayInBeam) - BeamBreadthDeg/2;
                 if(Type == SonarType.FLS)
                 {
-
+                    // FLS beams are defined as vertical fans, sweeping side-to-side
+                    // so we start a ray forward first.
+                    direction = SonarForward;
+                    // then we rotate _that_ to the ray angle within the beam, around the side-axis
+                    // minus the tilt angle which is measured from the horizontal plane down
+                    direction = Quaternion.AngleAxis(rayAngle-TiltAngleDeg, SonarRight) * direction;
+                    // then we rotate it to the beam angle, around the UP axis first
+                    // var beamAngle = (beamNum * DegreesPerBeamInFLS) - FLSFOVDeg;
+                    // direction = Quaternion.AngleAxis(beamAngle, SonarUp) * direction;
                 }
                 else
                 {
                     // MBES or SSS
                     // start a beam looking directly down
-                    var initalDirection = -SonarUp;
+                    direction = -SonarUp;
                     // rotate it around the forward axis by its ray number in the beam
                     // offset half-way so the middle is directly down.
-                    var angle = (rayNum * DegreesPerRayInBeam) - BeamBreadthDeg/2;
-                    direction = Quaternion.AngleAxis(angle, SonarForward) * initalDirection;
+                    direction = Quaternion.AngleAxis(rayAngle, SonarForward) * direction;
                     if(Type == SonarType.SSS)
                     {
-                        var side = (beamNum * 2)-1;
+                        // SSS usually has 2 beams, port and starboard
+                        // their position is measured from the horizontal axis towards the vertical axis
+                        // called the tilt angle, so we need to further rotate the rays accordingly
+                        var side = (beamNum * 2)-1; // port or starboard
                         var tiltAngleWithSide = side * (90-TiltAngleDeg);
                         direction = Quaternion.AngleAxis(tiltAngleWithSide, SonarForward) * direction;
                     }
                 }
                 
-                // var beamBreathDeg = -Beam_breath_deg / 2 + i * Beam_breath_deg / (Beam_count - 1);
-                // Vector3 direction = Quaternion.AngleAxis(beamBreathDeg, Rotation_axis) * Direction;
+                // and finally, cast dem rays boi.
                 Commands[i] = new RaycastCommand(SonarPosition, direction, QueryParameters.Default, MaxRange);
             }
         }
