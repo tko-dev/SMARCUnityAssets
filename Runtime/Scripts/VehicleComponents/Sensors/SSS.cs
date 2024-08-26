@@ -96,12 +96,12 @@
 
 //             // First we gotta know what distance ranges each bucket needs to
 //             // have, we can ask the sonar object for its max distance;
-//             float max_distance = s.max_distance;
+//             float max_distance = s.MaxRange;
 //             float min_distance = 0;
 //             float bucketSize = (max_distance-min_distance)/numBucketsPerSide;
-//             var angleStepDeg = s.beam_breadth_deg / (s.beam_count - 1.0f);
+//             var angleStepDeg = s.BeamBreadthDeg / (s.NumRaysPerBeam - 1.0f);
 
-//             for(int i=0; i<s.beam_count; i++)
+//             for(int i=0; i<s.TotalRayCount; i++)
 //             {
 //                 SonarHit sh = s.sonarHits[i];
 //                 if (drawRays && sh.hit.point != Vector3.zero) Debug.DrawLine(s.transform.position, sh.hit.point, rayColor);

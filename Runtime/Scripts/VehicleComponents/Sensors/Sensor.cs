@@ -14,14 +14,14 @@ namespace VehicleComponents.Sensors
         public float frequency = 10f;
         public bool hasNewData = false;
 
-        private float period => 1.0f/frequency;
+        protected float period => 1.0f/frequency;
         private double lastTime;
 
         protected void OnValidate()
         {
             if(period < Time.fixedDeltaTime)
             {
-                Debug.LogWarning($"Sensor update frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting sensor period to Unity's fixedDeltaTime!");
+                Debug.LogWarning($"[{transform.name}] Sensor update frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting sensor period to Unity's fixedDeltaTime!");
                 frequency = 1f/Time.fixedDeltaTime;
             }
         }

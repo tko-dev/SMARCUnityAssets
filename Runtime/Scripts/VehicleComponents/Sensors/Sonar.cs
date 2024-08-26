@@ -1,20 +1,25 @@
 using System; //Bit converter
+using UnityEngine;
+
 using System.Linq;
 using System.Collections.Generic;
+
 using Unity.Burst;
-using UnityEngine;
 using Unity.Collections;
 using Unity.Jobs;
-using Random = UnityEngine.Random;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
+
+using Random = UnityEngine.Random;
+using NormalDistribution = DefaultNamespace.NormalDistribution;
+
 
 namespace VehicleComponents.Sensors
 {
     public class SonarHit
     {
-        public RaycastHit hit;
-        public float intensity;
-        public int label;
+        public RaycastHit Hit;
+        public float ReturnIntensity;
+        public int MaterialLabel;
         Sonar sonar;
 
         public static readonly Dictionary<string, float> simpleMaterialReflectivity = new Dictionary<string, float>()
@@ -38,17 +43,17 @@ namespace VehicleComponents.Sensors
 
         public SonarHit(Sonar sonar)
         {
-            intensity = -1;
-            label = 0;
+            ReturnIntensity = -1;
+            MaterialLabel = 0;
             this.sonar = sonar;
         }
 
         public void Update(RaycastHit hit, float beam_intensity)
         {
             
-            intensity = GetIntensity(beam_intensity);
-            label = GetMaterialLabel();
-            this.hit = hit;
+            ReturnIntensity = GetIntensity(beam_intensity);
+            MaterialLabel = GetMaterialLabel();
+            this.Hit = hit;
         }
 
 
@@ -56,16 +61,16 @@ namespace VehicleComponents.Sensors
         {
             // Return some default value for things that dont hit
             // 0 intensity = no hit
-            if(!(hit.collider))
+            if(!(Hit.collider))
             {
                 return 0f;
             }
-            if(!(hit.collider.material))
+            if(!(Hit.collider.material))
             {
                 return 0.5f;
             }
 
-            string name = hit.collider.material.name;
+            string name = Hit.collider.material.name;
             // name can have " (instance of)" added to it,
             // remove that...
             if(name.Contains("("))
@@ -88,17 +93,17 @@ namespace VehicleComponents.Sensors
         {
             // Return some default value for things that dont hit
             // 0 is default for no hit, hit w/o material, hit w/o named material no is materialLabels{}
-            if(!(hit.collider))
+            if(!(Hit.collider))
             {
                 return 0;
             }
             
-            if(!(hit.collider.material))
+            if(!(Hit.collider.material))
             {
                 return 0;
             }
 
-            string name = hit.collider.material.name;
+            string name = Hit.collider.material.name;
             // name can have " (instance of)" added to it,
             // remove that...
             if(name.Contains("("))
@@ -120,11 +125,11 @@ namespace VehicleComponents.Sensors
             // intensity of hit between 1-255
             // It is a function of
             // 1) The distance traveled by the beam -> distance
-            float hitDistIntensity = (sonar.MaxRange - hit.distance) / sonar.MaxRange;
+            float hitDistIntensity = (sonar.MaxRange - Hit.distance) / sonar.MaxRange;
 
             // 2) The angle of hit -> angle between the ray and normal
             // the hit originated from transform position, and hit sonarHit
-            float hitAngle = Vector3.Angle(sonar.transform.position - hit.point, hit.normal);
+            float hitAngle = Vector3.Angle(sonar.transform.position - Hit.point, Hit.normal);
             float hitAngleIntensity = Mathf.Abs(Mathf.Cos(hitAngle*Mathf.Deg2Rad));
 
             // 3) The properties of the point of hit -> material
@@ -149,7 +154,7 @@ namespace VehicleComponents.Sensors
                 // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
                 // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
                 Color c = new Color(intensity, 0f, 0f, 1f);
-                Debug.DrawRay(hit.point, Vector3.up, c, 1f);
+                Debug.DrawRay(Hit.point, Vector3.up, c, 1f);
                 // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
             }
             return intensity;
@@ -160,13 +165,13 @@ namespace VehicleComponents.Sensors
             // so first, we gotta convert the unity points to ros points
             // then x,y,z need to be byte-ified
             // then a fourth "intensity" needs to be created and byte-ified
-            var point = hit.point.To<ENU>();
+            var point = Hit.point.To<ENU>();
 
             var xb = BitConverter.GetBytes(point.x);
             var yb = BitConverter.GetBytes(point.y);
             var zb = BitConverter.GetBytes(point.z);
 
-            byte[] ib = {(byte)(intensity*255)};
+            byte[] ib = {(byte)(ReturnIntensity*255)};
 
             int totalBytes = xb.Length + yb.Length + zb.Length+ ib.Length;
             byte[] ret = new byte[totalBytes];
@@ -195,6 +200,7 @@ namespace VehicleComponents.Sensors
     {
 
         [Header("Sonar")]
+        public SonarType Type = SonarType.MBES;
         [Tooltip("Numer of rays cast per beam. Beam = A fan of rays.")]
         public int NumRaysPerBeam = 500;
         [Tooltip("Total opening angle of _each_ beam.")]
@@ -202,7 +208,6 @@ namespace VehicleComponents.Sensors
         [Tooltip("How many beams(fans) are in this arrangement of sonar. For FLS, they will be arranged left-to-right with fan opening in the forward axis. For SSS and MBES, they will be arranged left-to-right with fan opening also left-to-right.")]
         public int NumBeams = 1;
         public float MaxRange = 100;
-        public SonarType Type = SonarType.MBES;
         [Tooltip("-3dB opening angle of each beam. For beam-pattern related return intensity calculations.")]
         public float BeamBreadth3DecibelsDeg = 60;
         [Tooltip("Angle from the forward-right plane (usually horizontal-ish) of the beam. For SSS, 180-(2*(tilt+BeamBreath)) = nadir. For FLS, just the tilt downwards.")]        
@@ -210,16 +215,43 @@ namespace VehicleComponents.Sensors
         [Tooltip("For FLS: FOV of the beams")]
         public float FLSFOVDeg = 30;
 
-        // we use this one to keep the latest hit in memory and
+
+
+        [Header("SideScanSonar")]
+        [Tooltip("There might be fewer pixels(buckets) than rays being cast.")]
+        public int NumBucketsPerBeam = 1000;
+        [Tooltip("Is this a normal SSS or an interferometric one?")]
+        public bool isISSS = false;
+
+        
+        [Header("SSS-Noise")]
+        public float MultGain = 4;
+        public bool UseAdditiveNoise = true;
+        public float AddNoiseStd = 1;
+        public float AddNoiseMean = 0;
+
+        NormalDistribution additiveNormal;
+
+        //  The SideScan pixels
+        public byte[] Buckets;
+        [HideInInspector] public byte[] BucketsAngleHigh;
+        [HideInInspector] public byte[] BucketsAngleLow;
+        int totalBuckets => NumBucketsPerBeam * NumBeams;
+
+        // used for interferometric
+        ushort magicNumber = 20860;
+
+
+        // we use this one to keep the latest hits in memory and
         // accessible to outside easily.
         [HideInInspector] public SonarHit[] SonarHits;
 
         [Header("Visuals")]
         [Tooltip("Draw rays in the scene view as lines?")]
         public bool DrawRays = false;
+        private Color rayColor;
         [Tooltip("Just draw the hit points as 1m-long lines?")]
         public bool DrawHits = true;
-        private Color rayColor;
 
         [Header("Load")]
         public float TimeShareInFixedUpdate;
@@ -239,7 +271,6 @@ namespace VehicleComponents.Sensors
 
         new void OnValidate()
         {
-            base.OnValidate();
             if(Type == SonarType.SSS) NumBeams = 2;
             if(Type == SonarType.MBES)
             {
@@ -247,15 +278,34 @@ namespace VehicleComponents.Sensors
                 TiltAngleDeg = -1;
             } 
             if(NumRaysPerBeam <= 0) NumRaysPerBeam = 1;
+
+            if(period < Time.fixedDeltaTime)
+            {
+                Debug.LogWarning($"[{transform.name}] Sensor update frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting sensor period to Unity's fixedDeltaTime!");
+                frequency = 1f/Time.fixedDeltaTime;
+            }
         }
 
-
-        new void Awake()
+        void Start()
         {
-            base.Awake();
             rayColor = Color.white;
             InitHits();
             InitBeamProfileSimple();
+            if(Type == SonarType.SSS) InitSidescanBuckets();
+        }
+
+        void InitSidescanBuckets()
+        {
+            // Each bucket has a 1 byte intensity value 0-255
+            Buckets = new byte[totalBuckets];
+
+            // followed by 2 bytes angle value 0-65535 [-pi,0]
+            // angle is in radians, but we store it as a 16bit unsigned int
+            // so we can have a resolution of pi/65535, the magic number is 20860
+            BucketsAngleHigh = new byte[totalBuckets];
+            BucketsAngleLow = new byte[totalBuckets];
+
+            additiveNormal = new NormalDistribution(AddNoiseMean, AddNoiseStd);
         }
 
         void InitHits()
@@ -321,7 +371,7 @@ namespace VehicleComponents.Sensors
                 {
                     var hit = results[i];
                     var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
-                    SonarHits[i].Update(hit, BeamProfile[rayNum]);  
+                    SonarHits[i].Update(hit, BeamProfile[rayNum]);
                     if (DrawRays && hit.point != Vector3.zero)
                     {
                         if(i < TotalRayCount / 2) rayColor = Color.blue;
@@ -364,6 +414,72 @@ namespace VehicleComponents.Sensors
             if(TimeShareInFixedUpdate > 0.5f) Debug.LogWarning($"Sonar in {transform.root.name}/{transform.name} took more than half the time in a fixedUpdate!");
 
             return true;
+        }
+
+        void UpdateSidescan()
+        {
+            if(Type != SonarType.SSS) return;
+            
+            // 0-out, since maybe not the same buckets will be written to.
+            Array.Clear(Buckets, 0, Buckets.Length);
+            Array.Clear(BucketsAngleHigh, 0, BucketsAngleHigh.Length);
+            Array.Clear(BucketsAngleLow, 0, BucketsAngleLow.Length);
+
+            int[] cnt = new int[Buckets.Length];
+            float[] bucketsSum = new float[Buckets.Length];
+            float[] bucketsAngleHighSum = new float[Buckets.Length];
+            float[] bucketsAngleLowSum = new float[Buckets.Length];
+
+            // First we gotta know what distance ranges each bucket needs to
+            // have, we can ask the sonar object for its max distance;
+            float minDistance = 0;
+            float bucketSize = (MaxRange - minDistance) / NumBucketsPerBeam;
+            var angleStepDeg = BeamBreadthDeg / (NumRaysPerBeam - 1.0f);
+
+            for(int rayIndex = 0; rayIndex < TotalRayCount; rayIndex++)
+            {
+                // since buckets is a flat array...
+                var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(rayIndex, NumRaysPerBeam);
+                
+                var sh = SonarHits[rayIndex];
+
+                double addNoise = 0;
+                if(UseAdditiveNoise) addNoise = additiveNormal.Sample();
+
+                // discritize the ray distance into a bucket
+                float dis = (float)(sh.Hit.distance + addNoise);
+                if(dis<0) dis=0;
+                int bucketIndexInBeam = Mathf.FloorToInt((dis - minDistance)/bucketSize);
+                if(bucketIndexInBeam >= NumBucketsPerBeam || bucketIndexInBeam < 0) continue;
+                // bucketIndex is where in the specific bucket (usually port/strb 0/1)
+                // this ray falls, but we have a flat array of buckets, so gotta place those
+                // starboards further down the array
+                int bucketIndex = bucketIndexInBeam + beamNum*NumBucketsPerBeam;
+                // intensities are stored as floats in [0,1], but we want bytes in 0-255 range
+                bucketsSum[bucketIndex] += (sh.ReturnIntensity * 255 * MultGain);
+                
+                // These are done only if this is an interferometric sidescan
+                if(isISSS)
+                {
+                    //TODO
+                }
+
+                // count how many rays fell into this bucket
+                cnt[bucketIndex]++;
+            }
+
+            // finally, we can average the rays
+            for(int bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
+            {
+                if(cnt[bucketIndex] == 0) continue; // no rays in the bucket, left at 0 by default.
+                Buckets[bucketIndex] = (byte) (bucketsSum[bucketIndex]/cnt[bucketIndex]);
+
+                if(isISSS)
+                {
+                    //TODO
+                }
+            }
+
         }
 
         [BurstCompile]
