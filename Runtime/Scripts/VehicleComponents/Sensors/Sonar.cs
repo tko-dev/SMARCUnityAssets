@@ -237,8 +237,9 @@ namespace VehicleComponents.Sensors
         [HideInInspector] public List<float> BeamProfile;
 
 
-        void OnValidate()
+        new void OnValidate()
         {
+            base.OnValidate();
             if(Type == SonarType.SSS) NumBeams = 2;
             if(Type == SonarType.MBES)
             {
@@ -249,14 +250,15 @@ namespace VehicleComponents.Sensors
         }
 
 
-        public void Start()
+        new void Awake()
         {
+            base.Awake();
             rayColor = Color.white;
             InitHits();
             InitBeamProfileSimple();
         }
 
-        public void InitHits()
+        void InitHits()
         {
             // Initialize all the hits as empty so we can just update them later
             // rather than spamming new ones
@@ -267,7 +269,7 @@ namespace VehicleComponents.Sensors
             }
         }
 
-        public void InitBeamProfileGaussian()
+        void InitBeamProfileGaussian()
         {
             // Initialize the Gaussian beam profile
             // The Gaussian is specified be its full width half max (fwhm), 
@@ -288,7 +290,7 @@ namespace VehicleComponents.Sensors
             }
         }
         
-        public void InitBeamProfileSimple()
+        void InitBeamProfileSimple()
         {
             // Initialize simple beam profile
             BeamProfile = new List<float>();

@@ -24,7 +24,7 @@ namespace VehicleComponents
         protected ArticulationBody articulationBody;
         protected ArticulationBody parentArticulationBody;
 
-        void Awake()
+        protected void Awake()
         {
             Attach();
         }

@@ -28,7 +28,7 @@ namespace VehicleComponents.ROS.Core
         [Tooltip("If true, we will publish regardless, even if the underlying sensor says no data.")]
         public bool ignoreSensorState = false;
 
-        void Start()
+        protected void Start()
         {
             // We namespace the topics with the root name
             if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";

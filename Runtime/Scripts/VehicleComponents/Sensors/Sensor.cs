@@ -17,7 +17,7 @@ namespace VehicleComponents.Sensors
         private float period => 1.0f/frequency;
         private double lastTime;
 
-        void OnValidate()
+        protected void OnValidate()
         {
             if(period < Time.fixedDeltaTime)
             {
