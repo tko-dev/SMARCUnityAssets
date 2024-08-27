@@ -3,34 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utils = DefaultNamespace.Utils;
 
-using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector;
-
 using RosMessageTypes.Smarc; // StringStampedMsg
-using TX = VehicleComponents.Acoustics.Transceiver;
-using StringStamped = VehicleComponents.Acoustics.StringStamped;
 
-namespace VehicleComponents.ROS.Publishers
+using TX = VehicleComponents.Acoustics.Transceiver;
+
+namespace VehicleComponents.ROS.Subscribers
 {
 
     [RequireComponent(typeof(TX))]
-    public class AcousticReceiver : MonoBehaviour
-    {
+    public class AcousticTransmitter_Sub : MonoBehaviour
+    {       
         ROSConnection ros;
-        [Header("ROS Publisher")]
+        [Header("ROS Subscriber")]
         [Tooltip("The topic will be namespaced under the root objects name if the given topic does not start with '/'.")]
         public string topic;
 
         TX tx;
         StringStampedMsg ROSMsg;
-
-
+        
         void Start()
         {
             if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
-            ROSMsg = new StringStampedMsg();
             ros = ROSConnection.GetOrCreateInstance();
-            ros.RegisterPublisher<StringStampedMsg>(topic);
+            ros.Subscribe<StringStampedMsg>(topic, UpdateMessage);
+
+            ROSMsg = new StringStampedMsg();
 
             tx = GetComponent<TX>();
             if(tx == null)
@@ -40,17 +38,10 @@ namespace VehicleComponents.ROS.Publishers
             }
         }
 
-        void FixedUpdate()
+        void UpdateMessage(StringStampedMsg msg)
         {
-            StringStamped dp = tx.Read();
-            if(dp != null)
-            {
-                ROSMsg.data = dp.Data;
-                ROSMsg.time_sent = new TimeStamp(dp.TimeSent);
-                ROSMsg.time_received = new TimeStamp(dp.TimeReceived);
-                ros.Publish(topic, ROSMsg);
-            }
-            
+            tx.Write(msg.data);
         }
+
     }
 }

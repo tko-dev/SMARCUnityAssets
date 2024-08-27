@@ -8,7 +8,7 @@ using CameraImageSensor = VehicleComponents.Sensors.CameraImage;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(CameraImageSensor))]
-    class CameraImage: ROSPublisher<ImageMsg, CameraImageSensor>
+    class CameraImage_Pub: ROSPublisher<ImageMsg, CameraImageSensor>
     {
         protected override void InitializePublication()
         {

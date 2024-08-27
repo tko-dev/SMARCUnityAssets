@@ -11,7 +11,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SideScanSonar))]
-    class SSS: ROSPublisher<SidescanMsg, SideScanSonar>
+    class SSS_Pub: ROSPublisher<SidescanMsg, SideScanSonar>
     { 
         protected override void InitializePublication()
         {

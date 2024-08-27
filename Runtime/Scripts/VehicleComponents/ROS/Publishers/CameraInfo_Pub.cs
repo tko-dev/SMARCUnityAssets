@@ -9,7 +9,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(CameraImageSensor))]
-    class CameraInfo: ROSPublisher<CameraInfoMsg, CameraImageSensor>
+    class CameraInfo_Pub: ROSPublisher<CameraInfoMsg, CameraImageSensor>
     {
         [Header("Camera Info")]
         [Header("Camera distortion model params for plumb_bob")]

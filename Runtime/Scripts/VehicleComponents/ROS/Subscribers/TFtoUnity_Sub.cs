@@ -16,7 +16,7 @@ using GPSReferencePoint = VehicleComponents.Sensors.GPSReferencePoint;
 namespace VehicleComponents.ROS.Subscribers
 {
 
-    public class TFtoUnity: MonoBehaviour
+    public class TFtoUnity_Sub: MonoBehaviour
     {
         public bool drawLines = true;
         public bool createArrows = true;

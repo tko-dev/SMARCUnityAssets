@@ -10,7 +10,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(Sonar))]
-    class SonarPointCloud: ROSPublisher<PointCloud2Msg, Sonar>
+    class SonarPointCloud_Pub: ROSPublisher<PointCloud2Msg, Sonar>
     { 
         public string frame_id="map_gt";
         protected override void InitializePublication()
