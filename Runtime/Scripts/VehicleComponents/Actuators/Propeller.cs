@@ -77,13 +77,13 @@ namespace VehicleComponents.Actuators
         private void InitializeRPMToStayAfloat()
         {
             // Calculate the required force to counteract gravity
-            float requiredForce = (baseLinkArticulationBody.mass) * Physics.gravity.magnitude;
-            Debug.Log("Required force to stay afloat: " + requiredForce);
+            float requiredForce = baseLinkArticulationBody.mass * Physics.gravity.magnitude;
+            // Debug.Log("Required force to stay afloat: " + requiredForce);
 
             // Calculate the required RPM for each propeller
             float requiredForcePerProp = requiredForce/NumPropellers;
             float requiredRPM = requiredForcePerProp / RPMToForceMultiplier;
-            this.DefaultHoverRPM = requiredRPM;
+            DefaultHoverRPM = requiredRPM;
 
             // Set the initial RPM to each propeller
             SetRpm(requiredRPM);
@@ -94,6 +94,5 @@ namespace VehicleComponents.Actuators
             return true;
         }
         
-        //TODO: Ensure RPM feedback in???
     }
 }
