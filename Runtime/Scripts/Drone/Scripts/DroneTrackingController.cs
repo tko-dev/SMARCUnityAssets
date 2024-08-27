@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +20,11 @@ public class DroneTrackingController: MonoBehaviour {
     private Vector<double> W_b_d_prev;
     private int times = 0;
     private GameObject ufo;
+    public double desiredY = 10;
+    //public double desiredZ = -10;
+    public GameObject AUV_gameobject;
+    public double desiredDisplacement = 10;
+    private Vector3 perpendicularAUV = new Vector3();
 
 	// Use this for initialization
 	void Start() {
@@ -38,6 +43,8 @@ public class DroneTrackingController: MonoBehaviour {
 		propellers_rpms = new float[] { 0, 0, 0, 0 };
 
         ufo = GameObject.Find("UFO");
+
+        //perpendicularAUV = Vector3.Cross(AUV_gameobject.transform.forward, Vector3.up);
 
         InvokeRepeating("ComputeRPMs", 0f, 1f/computation_frequency);
 	}
@@ -99,11 +106,24 @@ public class DroneTrackingController: MonoBehaviour {
         // Vector<double> v_s = R_sw*v_w;
         // Vector<double> W_b = R_ab.Transpose()*W_a; // { ufo.transform.position.x, ufo.transform.position.z, ufo.transform.position.y });
         
-        // Desired states
-        float t = Time.time;
-        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 6.4, 0.25*t-15, Math.Pow(0.25*t-5, 2) + 0.32 });
-        Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0.25, 0.5*(0.25*t-5) });
-        Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.125 });
+        // // Desired states
+        float t = Time.time%60;
+        
+        // Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { 6.4, 0.25*t-15, Math.Pow(0.25*t-5, 2) + 0.32 });
+        // Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0.25, 0.5*(0.25*t-5) });
+        // Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0.125 });
+        // Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
+
+
+        
+        // Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { (0.25*t + AUV_gameobject.transform.position.x - desiredDisplacement), AUV_gameobject.transform.position.z, desiredY});
+        // Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0.25, 0, 0 });
+        // Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 0});
+        // Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
+
+        Vector<double> x_s_d = R_sw*DenseVector.OfArray(new double[] { (0.25*t + AUV_gameobject.transform.position.x - desiredDisplacement), AUV_gameobject.transform.position.z, desiredY/Math.Pow(desiredDisplacement,2)*Math.Pow(0.25*t-desiredDisplacement, 2)+5});
+        Vector<double> v_s_d = R_sw*DenseVector.OfArray(new double[] { 0.25, 0, desiredY/Math.Pow(desiredDisplacement,2)*2*(0.25*t-desiredDisplacement) });
+        Vector<double> a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, desiredY/Math.Pow(desiredDisplacement,2)*2*0.25});
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
 
         // Control
