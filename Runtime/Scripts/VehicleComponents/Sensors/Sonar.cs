@@ -210,7 +210,7 @@ namespace VehicleComponents.Sensors
         NormalDistribution additiveNormal;
 
         //  The SideScan pixels
-        public byte[] Buckets;
+        [HideInInspector] public byte[] Buckets;
         [HideInInspector] public byte[] BucketsAngleHigh;
         [HideInInspector] public byte[] BucketsAngleLow;
         int totalBuckets => NumBucketsPerBeam * NumBeams;
