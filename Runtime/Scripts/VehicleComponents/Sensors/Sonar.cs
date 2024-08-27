@@ -90,7 +90,7 @@ namespace VehicleComponents.Sensors
             if(!(Hit.collider.material)) return 0;
 
             string name = CleanUpMaterialName(Hit.collider.material.name);
-            
+
             // Return the label
             if(materialLabels.ContainsKey(name)) return materialLabels[name];
             // if the named material has ne specified label
@@ -333,6 +333,23 @@ namespace VehicleComponents.Sensors
                 int beamNum = (int)i / (int)NumRaysPerBeam;
                 return (beamNum, rayNum);
         }
+
+        void UpdateSonarHits(NativeArray<RaycastHit> results)
+        {
+            // TODO this should be done in parallel too...?
+            for(int i=0; i < TotalRayCount; i++)
+            {
+                var hit = results[i];
+                var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
+                SonarHits[i].Update(hit, BeamProfile[rayNum]);
+                if (DrawRays && hit.point != Vector3.zero)
+                {
+                    if(i < TotalRayCount / 2) rayColor = Color.blue;
+                    if(i >= TotalRayCount / 2) rayColor = Color.red;
+                    Debug.DrawLine(transform.position, hit.point, rayColor, 1f);
+                }
+            }
+        }
             
             
         public override bool UpdateSensor(double deltaTime)
@@ -344,23 +361,10 @@ namespace VehicleComponents.Sensors
                 handle.Complete();
 
                 // Update the sonarHit objects with the results of raycasts
-                // TODO this should be done in parallel too...?
-                for(int i=0; i < TotalRayCount; i++)
-                {
-                    var hit = results[i];
-                    var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
-                    SonarHits[i].Update(hit, BeamProfile[rayNum]);
-                    if (DrawRays && hit.point != Vector3.zero)
-                    {
-                        if(i < TotalRayCount / 2) rayColor = Color.blue;
-                        if(i >= TotalRayCount / 2) rayColor = Color.red;
-                        Debug.DrawLine(transform.position, hit.point, rayColor, 1f);
-                    }
-                }
-
+                UpdateSonarHits(results);
                 // if this is a sidescan, do some extra stuff
                 if(Type == SonarType.SSS) UpdateSidescan();
-                
+
                 // Dispose the buffers
                 results.Dispose();
                 commands.Dispose();
