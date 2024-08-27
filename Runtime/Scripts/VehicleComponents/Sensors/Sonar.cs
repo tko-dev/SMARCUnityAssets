@@ -56,33 +56,26 @@ namespace VehicleComponents.Sensors
             this.Hit = hit;
         }
 
+        static string CleanUpMaterialName(string name)
+        {
+            // name can have " (instance of)" added to it,
+            // remove that...
+            if(name.Contains("(")) return name.Split("(")[0].Trim();
+            return name;
+        }
+
 
         public float GetMaterialReflectivity()
         {
             // Return some default value for things that dont hit
             // 0 intensity = no hit
-            if(!(Hit.collider))
-            {
-                return 0f;
-            }
-            if(!(Hit.collider.material))
-            {
-                return 0.5f;
-            }
+            if(!(Hit.collider)) return 0f;
+            if(!(Hit.collider.material)) return 0.5f;
 
-            string name = Hit.collider.material.name;
-            // name can have " (instance of)" added to it,
-            // remove that...
-            if(name.Contains("("))
-            {
-                name = name.Split("(")[0].Trim();
-            }
+            string name = CleanUpMaterialName(Hit.collider.material.name);
 
             // if its a simple one, just return that
-            if(simpleMaterialReflectivity.ContainsKey(name))
-            {
-                return simpleMaterialReflectivity[name];
-            }
+            if(simpleMaterialReflectivity.ContainsKey(name)) return simpleMaterialReflectivity[name];
             // if its a complex material that we want a function for,
             // switch for it here?
             // TODO that switch lol
@@ -93,29 +86,13 @@ namespace VehicleComponents.Sensors
         {
             // Return some default value for things that dont hit
             // 0 is default for no hit, hit w/o material, hit w/o named material no is materialLabels{}
-            if(!(Hit.collider))
-            {
-                return 0;
-            }
+            if(!(Hit.collider)) return 0;
+            if(!(Hit.collider.material)) return 0;
+
+            string name = CleanUpMaterialName(Hit.collider.material.name);
             
-            if(!(Hit.collider.material))
-            {
-                return 0;
-            }
-
-            string name = Hit.collider.material.name;
-            // name can have " (instance of)" added to it,
-            // remove that...
-            if(name.Contains("("))
-            {
-                name = name.Split("(")[0].Trim();
-            }
-
             // Return the label
-            if(materialLabels.ContainsKey(name))
-            {
-                return materialLabels[name];
-            }
+            if(materialLabels.ContainsKey(name)) return materialLabels[name];
             // if the named material has ne specified label
             return 0;
         }
@@ -221,7 +198,7 @@ namespace VehicleComponents.Sensors
         [Tooltip("There might be fewer pixels(buckets) than rays being cast.")]
         public int NumBucketsPerBeam = 1000;
         [Tooltip("Is this a normal SSS or an interferometric one?")]
-        public bool isISSS = false;
+        public bool isInterferometric = false;
 
         
         [Header("SSS-Noise")]
@@ -463,7 +440,7 @@ namespace VehicleComponents.Sensors
                 bucketsSum[bucketIndex] += (sh.ReturnIntensity * 255 * MultGain);
                 
                 // These are done only if this is an interferometric sidescan
-                if(isISSS)
+                if(isInterferometric)
                 {
                     //TODO
                 }
@@ -478,7 +455,7 @@ namespace VehicleComponents.Sensors
                 if(cnt[bucketIndex] == 0) continue; // no rays in the bucket, left at 0 by default.
                 Buckets[bucketIndex] = (byte) (bucketsSum[bucketIndex]/cnt[bucketIndex]);
 
-                if(isISSS)
+                if(isInterferometric)
                 {
                     //TODO
                 }
