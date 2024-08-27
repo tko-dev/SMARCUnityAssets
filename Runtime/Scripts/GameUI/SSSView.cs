@@ -5,7 +5,7 @@ using UnityEngine;
 
 using SSS = VehicleComponents.Sensors.Sonar;
 
-namespace VehicleComponents.SensorViewers
+namespace GameUI
 {
     public class SSSView : MonoBehaviour
     {

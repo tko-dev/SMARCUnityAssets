@@ -366,6 +366,7 @@ namespace VehicleComponents.Sensors
                 // Wait for the batch processing job to complete
                 handle.Complete();
 
+                // Update the sonarHit objects with the results of raycasts
                 // TODO this should be done in parallel too...?
                 for(int i=0; i < TotalRayCount; i++)
                 {
@@ -379,6 +380,9 @@ namespace VehicleComponents.Sensors
                         Debug.DrawLine(transform.position, hit.point, rayColor, 1f);
                     }
                 }
+
+                // if this is a sidescan, do some extra stuff
+                if(Type == SonarType.SSS) UpdateSidescan();
                 
                 // Dispose the buffers
                 results.Dispose();
