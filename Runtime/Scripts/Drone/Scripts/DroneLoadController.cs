@@ -2,7 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Robotics.Core; //Clock
+using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
+using RosMessageTypes.Geometry;
+using RosMessageTypes.Std;
 using DefaultNamespace.LookUpTable;
 using VehicleComponents.Actuators;
 using Rope;
@@ -29,6 +33,20 @@ public class DroneLoadController: MonoBehaviour {
     private int times1 = 0;
     private int times2 = 0;
     private GameObject rope;
+
+    public double desiredY = 10;
+    public GameObject AUV_gameobject;
+    public double desiredDisplacement = 10;
+
+     private bool isCallbackReceived = false; 
+
+    // ROS Connector
+    private ROSConnection ros;
+    public string buoyPositionTopic = "/drone/georeferenced_point";
+    protected PointMsg callbackMsg;
+    
+    private Vector3 buoyPosition = Vector3.zero;
+
 
     // Quadrotor parameters
     double mQ;
@@ -91,8 +109,33 @@ public class DroneLoadController: MonoBehaviour {
         e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
         dt = 1f/computation_frequency;
 
+        // Initialize ROS
+        callbackMsg = new PointMsg();
+        ros = ROSConnection.GetOrCreateInstance();
+        // ros.Subscribe<PointMsg>(buoyPositionTopic, UpdateBuoyPosition);
+        ros.Subscribe<Float32MultiArrayMsg>("/drone/georeferenced_coordinates", ReceiveMessage);
         // InvokeRepeating("ComputeRPMs", 0f, dt);
 	}
+
+    private void ReceiveMessage(Float32MultiArrayMsg message)
+    {
+        // Process the Float32MultiArray message
+        Debug.Log("Received message with " + message.data.Length + " elements.");
+        foreach (var value in message.data)
+        {
+            Debug.Log("Value: " + value);
+        }
+    }
+
+    // void UpdateBuoyPosition(PointMsg pointMsg)
+    // {
+    //     callbackMsg = pointMsg;
+    //     // Update the buoy position from the ROS Point message
+    //     buoyPosition = new Vector3((float)callbackMsg.x, (float)callbackMsg.y, (float)callbackMsg.z);
+    //     // Set the callback flag to true
+    //     isCallbackReceived = true;
+    //     Debug.Log("recieved buoy estimate");
+    // }
 	
 	// Update is called once per frame
 	void FixedUpdate() {
@@ -105,7 +148,6 @@ public class DroneLoadController: MonoBehaviour {
 
         double f;
         Vector<double> M;
-
         if (false){//(rope.transform.childCount == 2) {          
             // Debug.Break();
             
@@ -135,15 +177,15 @@ public class DroneLoadController: MonoBehaviour {
             Vector<double> xL_s_d;//Math.Pow(0.5*t-5, 2) });
             Vector<double> vL_s_d;//0.5*t-5 });
             Vector<double> aL_s_d;//0.5 });
-            if (follow_tracking_target) {
-                xL_s_d = tracking_target_transform.position.To<ENU>().ToDense();
-                vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-                aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            } else {
-                xL_s_d = DenseVector.OfArray(new double[] { 0, 0, 5 });
-                vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-                aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            }
+            // if (follow_tracking_target) {
+            //     xL_s_d = tracking_target_transform.position.To<ENU>().ToDense();
+            //     vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+            //     aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+            // } else {
+            xL_s_d = DenseVector.OfArray(new double[] { 0, 0, 5 });
+            vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+            aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        // }
             // Figure 8:
             // { 0, 2*Math.Sin(t), 3*Math.Cos(0.5*t) + 25 }
             // { 0, 2*Math.Cos(t), -1.5*Math.Sin(0.5*t) }
@@ -243,11 +285,17 @@ public class DroneLoadController: MonoBehaviour {
             Vector<double> v_s_d;
             Vector<double> a_s_d;
 
-            if (follow_tracking_target) {
-                x_s_d = tracking_target_transform.position.To<NED>().ToDense();
-                v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-                a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            } else {
+            // if (follow_tracking_target) {
+            //     x_s_d = tracking_target_transform.position.To<NED>().ToDense();
+            //     v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+            //     a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+            // }
+            if (!isCallbackReceived) {
+                x_s_d = R_sw*DenseVector.OfArray(new double[] { (0.25*t + AUV_gameobject.transform.position.x - desiredDisplacement), AUV_gameobject.transform.position.z, desiredY/Math.Pow(desiredDisplacement,2)*Math.Pow(0.25*t-desiredDisplacement, 2)+5});
+                v_s_d = R_sw*DenseVector.OfArray(new double[] { 0.25, 0, desiredY/Math.Pow(desiredDisplacement,2)*2*(0.25*t-desiredDisplacement) });
+                a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, desiredY/Math.Pow(desiredDisplacement,2)*2*0.25});
+            } 
+            else {
                 x_s_d = R_sw*DenseVector.OfArray(new double[] { buoy_w[0], buoy_w[1], Math.Pow(t-4, 2)/16 + buoy_w[2] + 0.16 });
                 v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, (t-4)/8 });
                 a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 1/8 });
@@ -290,7 +338,7 @@ public class DroneLoadController: MonoBehaviour {
         Matrix<double> T = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 }, { 0, -d, 0, d }, { d, 0, -d, 0 }, { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } });
         Vector<double> F = T.Inverse() * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
 
-        Debug.Log($"f: {f}, M: {M}");
+        // Debug.Log($"f: {f}, M: {M}");
 
         // Set propeller rpms
         propellers_rpms[0] = (float)F[0]/0.005f;
