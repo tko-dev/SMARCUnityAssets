@@ -256,7 +256,7 @@ namespace VehicleComponents.Sensors
             } 
             if(NumRaysPerBeam <= 0) NumRaysPerBeam = 1;
 
-            if(period < Time.fixedDeltaTime)
+            if(Period < Time.fixedDeltaTime)
             {
                 Debug.LogWarning($"[{transform.name}] Sensor update frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting sensor period to Unity's fixedDeltaTime!");
                 frequency = 1f/Time.fixedDeltaTime;
@@ -486,11 +486,26 @@ namespace VehicleComponents.Sensors
 
             public void Execute(int i)
             {
-                var direction = new Vector3(0, 0, 1);
+                var direction = -SonarUp; // default down?
                 var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
-                var rayAngle = (rayNum * DegreesPerRayInBeam) - BeamBreadthDeg/2;
+                if(Type == SonarType.MBES)
+                {
+                    // MBES is just one beam looking down directly. Simplest.
+                    // start a beam looking directly down
+                    direction = -SonarUp;
+                    // we want 0 degrees in the center and then +-Breadth/2 on the sides.
+                    var rayAngle = (rayNum * DegreesPerRayInBeam) - BeamBreadthDeg/2;
+                    // rotate it around the forward axis by its ray number in the beam
+                    // offset half-way so the middle is directly down.
+                    direction = Quaternion.AngleAxis(rayAngle, SonarForward) * direction;
+                }
                 if(Type == SonarType.FLS)
                 {
+                    // FLS is MBES, but the first ray is not in the center, its at the edge and is tilted.
+                    // there are also >1 beams.
+
+                    // we want 0 degrees at the edge and BeamBreadt degrees at the other edge of the beam.
+                    var rayAngle = rayNum * DegreesPerRayInBeam;
                     // FLS beams are defined as vertical fans, sweeping side-to-side
                     // so we start a ray forward first.
                     direction = SonarForward;
@@ -501,23 +516,20 @@ namespace VehicleComponents.Sensors
                     var beamAngle = (beamNum * DegreesPerBeamInFLS) - FLSFOVDeg/2;
                     direction = Quaternion.AngleAxis(beamAngle, SonarUp) * direction;
                 }
-                else
+                if(Type == SonarType.SSS)
                 {
-                    // MBES or SSS
-                    // start a beam looking directly down
+                    // SSS usually has 2 beams, port and starboard
+                    // their position is measured from the horizontal axis towards the vertical axis
+                    // called the tilt angle, so we need to further rotate rays accordingly
+
+                    // start the ray looking down
                     direction = -SonarUp;
-                    // rotate it around the forward axis by its ray number in the beam
-                    // offset half-way so the middle is directly down.
+                    // spread the beam with 0 degeres in the middle and +/- half-breadth around it
+                    var rayAngle = rayNum * DegreesPerRayInBeam - BeamBreadthDeg/2;
+                    var side = (beamNum * 2)-1; // port or starboard, -1, +1
+                    // tilt it
+                    rayAngle += side*(90 - TiltAngleDeg - BeamBreadthDeg/2);
                     direction = Quaternion.AngleAxis(rayAngle, SonarForward) * direction;
-                    if(Type == SonarType.SSS)
-                    {
-                        // SSS usually has 2 beams, port and starboard
-                        // their position is measured from the horizontal axis towards the vertical axis
-                        // called the tilt angle, so we need to further rotate the rays accordingly
-                        var side = (beamNum * 2)-1; // port or starboard
-                        var tiltAngleWithSide = side * (90-TiltAngleDeg);
-                        direction = Quaternion.AngleAxis(tiltAngleWithSide, SonarForward) * direction;
-                    }
                 }
                 
                 // and finally, cast dem rays boi.
