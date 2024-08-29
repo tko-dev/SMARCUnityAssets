@@ -444,16 +444,14 @@ namespace VehicleComponents.Sensors
                 if(isInterferometric)
                 {
                     float beamAngleDeg;
-                    if (beamNum==0)   beamAngleDeg= (-TiltAngleDeg - rayIndex * angleStepDeg);
-                    else beamAngleDeg = ( -TiltAngleDeg - (TotalRayCount - rayIndex) * angleStepDeg)  ;
+                    if (beamNum==0) beamAngleDeg = -TiltAngleDeg - rayIndex * angleStepDeg;
+                    else beamAngleDeg = -TiltAngleDeg - (TotalRayCount - rayIndex) * angleStepDeg;
                     
                     ushort magicNumber = 20860;
                     ushort angle_uint16 = (ushort) ( (Mathf.PI+beamAngleDeg*Mathf.Deg2Rad) * magicNumber);
                     // followed by 2 bytes angle value 0-65535 [-pi,0]
                     // angle is in radians, but we store it as a 16bit unsigned int
                     // so we can have a resolution of pi/65535, the magic number is 20860
-                    // angle (unsigned int) / 20860 = angle+pi (radians)
-
 
                     // We want to have a 16 uint for the angle with high byte and low byte
                     // so we can have a resolution of pi/65535
@@ -475,9 +473,8 @@ namespace VehicleComponents.Sensors
 
                 if(isInterferometric)
                 {
-                BucketsAngleHigh[bucketIndex] = (byte) (bucketsAngleHighSum[bucketIndex]/cnt[bucketIndex]);
-                BucketsAngleLow[bucketIndex] = (byte) (bucketsAngleLowSum[bucketIndex]/cnt[bucketIndex]);
-
+                    BucketsAngleHigh[bucketIndex] = (byte) (bucketsAngleHighSum[bucketIndex]/cnt[bucketIndex]);
+                    BucketsAngleLow[bucketIndex] = (byte) (bucketsAngleLowSum[bucketIndex]/cnt[bucketIndex]);
                 }
             }
 
