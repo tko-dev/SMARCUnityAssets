@@ -150,16 +150,25 @@ namespace Rope
             // See RopeLink::OnCollisionEnter then RopeLink::FixedUpdate
             stickTipRL.ConnectToHook(connectedHookGO);
 
+            // This is not needed! Code left as lesson.
             // and finally, we set the mass scales of the rope pieces
             // so that they pull the drone/auv proportional to auv/drone's mass.
-            var hookBaseLink = Utils.FindDeepChildWithName(connectedHookGO.transform.root.gameObject, baseLinkName);
-            var hookBaseLinkAB = hookBaseLink.GetComponent<ArticulationBody>();
-            var baseLinkAB = baseLink.GetComponent<ArticulationBody>();
-            var pullerOverPulledMassRatio = hookBaseLinkAB.mass / baseLinkAB.mass;
+            // var hookBaseLink = Utils.FindDeepChildWithName(connectedHookGO.transform.root.gameObject, baseLinkName);
+            // var hookBaseLinkAB = hookBaseLink.GetComponent<ArticulationBody>();
+            // var baseLinkAB = baseLink.GetComponent<ArticulationBody>();
+            // var pullerOverPulledMassRatio = hookBaseLinkAB.mass / baseLinkAB.mass;
             // divide by 2 because one is pulling the other is getting pulled more by this much
             // mass ratio. Gotta share the force, not accumulate it.
-            stickBaseRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
-            stickTipRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
+            // stickBaseRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
+            // stickTipRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
+
+            // Disable collision between the stick and the hook so that we can attach the rope to he base links CoM.
+            var colliders = connectedHookGO.transform.root.gameObject.GetComponentsInChildren<Collider>();
+            foreach(var c in colliders)
+            {
+                Physics.IgnoreCollision(c, stickBase.GetComponent<Collider>());
+                Physics.IgnoreCollision(c, stickTip.GetComponent<Collider>());
+            }
         }
 
         void Awake()
