@@ -23,13 +23,13 @@ public class DroneLoadController: MonoBehaviour
     [Header("Tracking")]
     [Tooltip("An object to follow")]
     public Transform TrackingTargetTF;
-    // public bool FollowTrackingTarget = true;
     
     
     [Header("Load")]
     [Tooltip("The rope object that this drone is expected to get connected, maybe. Will be used to check for attachment state and such.")]
     public Transform Rope; // TODO remove this requirement.
-    public bool FollowRope = false;
+    [Tooltip("If true, instead of tracking the target object, drone will first track the buoy and when attached to it, make the LoadLinkTF track the target.")]
+    public bool AttackTheBuoy = false;
     [Tooltip("The position of where the load is attached to the rope. rope_link on SAM")]
     public Transform LoadLinkTF; // The position of the AUV is taken at the base of the rope
 
@@ -275,7 +275,7 @@ public class DroneLoadController: MonoBehaviour
         v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
         a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
-        if(FollowRope && Rope != null)
+        if(AttackTheBuoy && Rope != null)
         {
             Vector<double> buoy_w = R_ws*Rope.GetChild(Rope.childCount-1).position.To<NED>().ToDense();
             x_s_d = R_sw*DenseVector.OfArray(new double[] { buoy_w[0], buoy_w[1], Math.Pow(t-4, 2)/16 + buoy_w[2] + 0.16 });

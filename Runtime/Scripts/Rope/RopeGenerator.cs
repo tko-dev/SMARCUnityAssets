@@ -150,6 +150,7 @@ namespace Rope
             // See RopeLink::OnCollisionEnter then RopeLink::FixedUpdate
             stickTipRL.ConnectToHook(connectedHookGO);
 
+            // This is not needed! Code left as lesson.
             // and finally, we set the mass scales of the rope pieces
             // so that they pull the drone/auv proportional to auv/drone's mass.
             // var hookBaseLink = Utils.FindDeepChildWithName(connectedHookGO.transform.root.gameObject, baseLinkName);
