@@ -162,16 +162,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BaseLink: {fileID: 3939394929759449381}
-  LoadLink: {fileID: 0}
   ControlFrequency: 50
-  FollowTrackingTarget: 1
-  TrackingTargetTF: {fileID: 0}
   DistanceErrorCap: 10
+  TrackingTargetTF: {fileID: 6110627571383574328}
+  Rope: {fileID: 0}
+  FollowRope: 0
+  LoadLink: {fileID: 0}
   PropFR: {fileID: 4705432896303098}
   PropFL: {fileID: 4614207949718832}
   PropBR: {fileID: 4529089676032114}
   PropBL: {fileID: 4662283196533844}
-  Rope: {fileID: 0}
 --- !u!1 &1648915923807604
 GameObject:
   m_ObjectHideFlags: 0
@@ -3024,7 +3024,7 @@ Transform:
   m_GameObject: {fileID: 4818855960593909349}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.38272214, z: 0, w: 0.92386353}
-  m_LocalPosition: {x: -0.082, y: -0.061, z: -0.045}
+  m_LocalPosition: {x: -0.082, y: 5.249, z: -0.045}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

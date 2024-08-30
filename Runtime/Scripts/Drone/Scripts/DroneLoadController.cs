@@ -10,22 +10,32 @@ using Rope;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
-public class DroneLoadController: MonoBehaviour {
+public class DroneLoadController: MonoBehaviour 
+{
+    [Header("Basics")]
     [Tooltip("Baselink of the drone")]
     public GameObject BaseLink;
     [Tooltip("Load's connection point to the rope")]
-    public GameObject LoadLink; // The position of the AUV is taken at the base of the rope
     public float ControlFrequency = 50f;
-    public bool FollowTrackingTarget = true;
-    [Tooltip("An object to follow")]
-    public Transform TrackingTargetTF;
-    [Tooltip("The maximum distance error between the load and the target position")]
+    [Tooltip("The maximum distance error between the load and the target position, kind of controls the aggressiveness of the maneuvers.")]
     public float DistanceErrorCap = 10f;
 
-    [Tooltip("The four propellers of the drone that will be controlled.")]
-    public Transform PropFR, PropFL, PropBR, PropBL;
+    [Header("Tracking")]
+    [Tooltip("An object to follow")]
+    public Transform TrackingTargetTF;
+    // public bool FollowTrackingTarget = true;
+    
+    
+    [Header("Load")]
     [Tooltip("The rope object that this drone is expected to get connected, maybe.")]
     public Transform Rope;
+    public bool FollowRope = false;
+    public GameObject LoadLink; // The position of the AUV is taken at the base of the rope
+
+    [Header("Props")]
+    public Transform PropFR;
+    public Transform PropFL, PropBR, PropBL;
+    
 
 
 	Propeller[] propellers;
@@ -66,8 +76,6 @@ public class DroneLoadController: MonoBehaviour {
     double kq;
     double kw;
 
-    //TODO Some magic number?
-    float magicNumber = 0.005f;
 
 	// Use this for initialization
 	void Start() 
@@ -89,7 +97,7 @@ public class DroneLoadController: MonoBehaviour {
 
 		propellers_rpms = new float[] { 0, 0, 0, 0 };
 
-        load_link_ab = LoadLink.GetComponent<ArticulationBody>();
+        if(LoadLink != null) load_link_ab = LoadLink.GetComponent<ArticulationBody>();
         
         // Quadrotor parameters
         mQ = base_link_ab.mass;
@@ -97,17 +105,21 @@ public class DroneLoadController: MonoBehaviour {
         J = DenseMatrix.OfArray(new double[,] { { base_link_ab.inertiaTensor.x, 0, 0 }, { 0, base_link_ab.inertiaTensor.z, 0 }, { 0, 0, base_link_ab.inertiaTensor.y } });
         c_tau_f = 8.004e-4f;
 
-        // Use this load mass when load_link is on sam
-        ArticulationBody[] sam_ab_list = LoadLink.transform.root.gameObject.GetComponentsInChildren<ArticulationBody>();
         mL = 0;
-        foreach (ArticulationBody sam_ab in sam_ab_list) {
-            mL += sam_ab.mass;
+        // Use this load mass when load_link is on sam
+        if(LoadLink != null)
+        {
+            ArticulationBody[] sam_ab_list = LoadLink.transform.root.gameObject.GetComponentsInChildren<ArticulationBody>();
+            foreach (ArticulationBody sam_ab in sam_ab_list) 
+            {
+                mL += sam_ab.mass;
+            }
         }
         // mL = 15;
         // Rope length l is calculated dynamically
 
         // Simulation parameters
-        g = 9.81;
+        g = Physics.gravity.magnitude;
         e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
         dt = 1f/ControlFrequency;
 
@@ -154,22 +166,11 @@ public class DroneLoadController: MonoBehaviour {
         Vector<double> xL_s_d;//Math.Pow(0.5*t-5, 2) });
         Vector<double> vL_s_d;//0.5*t-5 });
         Vector<double> aL_s_d;//0.5 });
-        if (FollowTrackingTarget) 
-        {
-            xL_s_d = TrackingTargetTF.position.To<ENU>().ToDense();
-            vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        } 
-        else 
-        {
-            xL_s_d = DenseVector.OfArray(new double[] { 0, 0, 5 });
-            vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        }
-        // Figure 8:
-        // { 0, 2*Math.Sin(t), 3*Math.Cos(0.5*t) + 25 }
-        // { 0, 2*Math.Cos(t), -1.5*Math.Sin(0.5*t) }
-        // { 0, -2*Math.Sin(t), -0.75*Math.Cos(0.5*t) }
+
+        xL_s_d = TrackingTargetTF.position.To<ENU>().ToDense();
+        vL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        aL_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+
         
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, Math.Sqrt(2)/2, 0 });
 
@@ -265,23 +266,22 @@ public class DroneLoadController: MonoBehaviour {
         Matrix<double> R_bw = R_bs*R_sw;
 
         // Desired states
-        Vector<double> buoy_w = R_ws*Rope.GetChild(Rope.childCount-1).position.To<NED>().ToDense();
         Vector<double> x_s_d;
         Vector<double> v_s_d;
         Vector<double> a_s_d;
 
-        if (FollowTrackingTarget) 
+        x_s_d = TrackingTargetTF.position.To<NED>().ToDense();
+        v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+
+        if(FollowRope && Rope != null)
         {
-            x_s_d = TrackingTargetTF.position.To<NED>().ToDense();
-            v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        } 
-        else 
-        {
+            Vector<double> buoy_w = R_ws*Rope.GetChild(Rope.childCount-1).position.To<NED>().ToDense();
             x_s_d = R_sw*DenseVector.OfArray(new double[] { buoy_w[0], buoy_w[1], Math.Pow(t-4, 2)/16 + buoy_w[2] + 0.16 });
             v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, (t-4)/8 });
             a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 1/8 });
         }
+
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, Math.Sqrt(2)/2, 0 });
 
         // Control
@@ -326,8 +326,8 @@ public class DroneLoadController: MonoBehaviour {
         Vector<double> M;
 
         // If rope has been replaced (tension is high enough) use suspended load controller
-        if (Rope.childCount == 2) (f, M) = SuspendedLoadControl();
         // If we have not hooked the rope yet, use normal tracking controller
+        if (Rope != null && Rope.childCount == 2) (f, M) = SuspendedLoadControl();
         else (f, M) = TrackingControl();
 
         // Convert to propeller forces
@@ -337,19 +337,15 @@ public class DroneLoadController: MonoBehaviour {
         // Debug.Log($"f: {f}, M: {M}");
 
         // Set propeller rpms
-        propellers_rpms[0] = (float)F[0]/magicNumber;
-        propellers_rpms[1] = (float)F[1]/magicNumber;
-        propellers_rpms[2] = (float)F[2]/magicNumber;
-        propellers_rpms[3] = (float)F[3]/magicNumber;
+        for (int i = 0; i < propellers.Length; i++) 
+            propellers_rpms[i] = (float)F[i]/propellers[i].RPMToForceMultiplier;
 	}
 
 	void ApplyRPMs() 
     {
-		for (int i = 0; i < 4; i++) 
-        {
-            // TODO: try clamping rpms to zero
+        // TODO: try clamping rpms to zero
+		for (int i = 0; i < propellers.Length; i++) 
             propellers[i].SetRpm(propellers_rpms[i]);
-        }
 	}
 
     static Vector<double> _Cross(Vector<double> a, Vector<double> b) 
