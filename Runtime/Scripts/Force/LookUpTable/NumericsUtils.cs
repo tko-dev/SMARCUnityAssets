@@ -17,5 +17,9 @@ namespace DefaultNamespace.LookUpTable
             return Vector.Build.Dense(new[] { (double)vec.x, vec.y, vec.z });
         }
         
+        public static Vector<double> ToDense(this Vector3<ENU> vec)
+        {
+            return Vector.Build.Dense(new[] { (double)vec.x, vec.y, vec.z });
+        }
     }
 }
