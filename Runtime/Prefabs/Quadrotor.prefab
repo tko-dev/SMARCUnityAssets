@@ -167,7 +167,7 @@ MonoBehaviour:
   TrackingTargetTF: {fileID: 6110627571383574328}
   Rope: {fileID: 0}
   FollowRope: 0
-  LoadLink: {fileID: 0}
+  LoadLinkTF: {fileID: 0}
   PropFR: {fileID: 4705432896303098}
   PropFL: {fileID: 4614207949718832}
   PropBR: {fileID: 4529089676032114}
@@ -3024,7 +3024,7 @@ Transform:
   m_GameObject: {fileID: 4818855960593909349}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.38272214, z: 0, w: 0.92386353}
-  m_LocalPosition: {x: -0.082, y: 5.249, z: -0.045}
+  m_LocalPosition: {x: 0, y: 0.78, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

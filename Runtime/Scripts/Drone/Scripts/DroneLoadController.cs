@@ -27,10 +27,11 @@ public class DroneLoadController: MonoBehaviour
     
     
     [Header("Load")]
-    [Tooltip("The rope object that this drone is expected to get connected, maybe.")]
-    public Transform Rope;
+    [Tooltip("The rope object that this drone is expected to get connected, maybe. Will be used to check for attachment state and such.")]
+    public Transform Rope; // TODO remove this requirement.
     public bool FollowRope = false;
-    public GameObject LoadLink; // The position of the AUV is taken at the base of the rope
+    [Tooltip("The position of where the load is attached to the rope. rope_link on SAM")]
+    public Transform LoadLinkTF; // The position of the AUV is taken at the base of the rope
 
     [Header("Props")]
     public Transform PropFR;
@@ -97,7 +98,7 @@ public class DroneLoadController: MonoBehaviour
 
 		propellers_rpms = new float[] { 0, 0, 0, 0 };
 
-        if(LoadLink != null) load_link_ab = LoadLink.GetComponent<ArticulationBody>();
+        if(LoadLinkTF != null) load_link_ab = LoadLinkTF.GetComponent<ArticulationBody>();
         
         // Quadrotor parameters
         mQ = base_link_ab.mass;
@@ -107,9 +108,9 @@ public class DroneLoadController: MonoBehaviour
 
         mL = 0;
         // Use this load mass when load_link is on sam
-        if(LoadLink != null)
+        if(LoadLinkTF != null)
         {
-            ArticulationBody[] sam_ab_list = LoadLink.transform.root.gameObject.GetComponentsInChildren<ArticulationBody>();
+            ArticulationBody[] sam_ab_list = LoadLinkTF.root.gameObject.GetComponentsInChildren<ArticulationBody>();
             foreach (ArticulationBody sam_ab in sam_ab_list) 
             {
                 mL += sam_ab.mass;
@@ -156,7 +157,7 @@ public class DroneLoadController: MonoBehaviour
         Vector<double> W_b = -1f*(BaseLink.transform.InverseTransformDirection(base_link_ab.angularVelocity)).To<ENU>().ToDense();
 
         // Load states
-        Vector<double> xL_s = LoadLink.transform.position.To<ENU>().ToDense();
+        Vector<double> xL_s = LoadLinkTF.position.To<ENU>().ToDense();
         Vector<double> vL_s = load_link_ab.velocity.To<ENU>().ToDense();
         l = (xL_s - xQ_s).Norm(2);
         Vector<double> q = (xL_s - xQ_s)/l;
