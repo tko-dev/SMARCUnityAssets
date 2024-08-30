@@ -3,14 +3,14 @@ using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 using System; //Bit converter
 
-using SensorMBES = VehicleComponents.Sensors.Sonar;
+using Sonar = VehicleComponents.Sensors.Sonar;
 using VehicleComponents.ROS.Core;
 
 
 namespace VehicleComponents.ROS.Publishers
 {
-    [RequireComponent(typeof(SensorMBES))]
-    class MBES: ROSPublisher<PointCloud2Msg, SensorMBES>
+    [RequireComponent(typeof(Sonar))]
+    class SonarPointCloud_Pub: ROSPublisher<PointCloud2Msg, Sonar>
     { 
         public string frame_id="map_gt";
         protected override void InitializePublication()
@@ -18,7 +18,7 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.header.frame_id = frame_id;
 
             ROSMsg.height = 1; // just one long list of points
-            ROSMsg.width = (uint)sensor.beam_count;
+            ROSMsg.width = (uint)sensor.SonarHits.Length;
             ROSMsg.is_bigendian = false;
             ROSMsg.is_dense = true;
             // 3x 4bytes (float32 x,y,z) + 1x 1byte (uint8 intensity) = 13bytes
@@ -58,9 +58,9 @@ namespace VehicleComponents.ROS.Publishers
         protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
-            for(int i=0; i<sensor.sonarHits.Length; i++)
+            for(int i=0; i<sensor.SonarHits.Length; i++)
             {
-                byte[] pointByte = sensor.sonarHits[i].GetBytes();
+                byte[] pointByte = sensor.SonarHits[i].GetBytes();
                 Buffer.BlockCopy(pointByte, 0, ROSMsg.data, i*pointByte.Length, pointByte.Length);
             }
 

@@ -10,7 +10,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorIMU))]
-    class Odometry: ROSPublisher<OdometryMsg, SensorIMU>
+    class Odometry_Pub: ROSPublisher<OdometryMsg, SensorIMU>
     { 
         [Tooltip("If false, orientation is in ENU in ROS.")]
         public bool useNED = false;

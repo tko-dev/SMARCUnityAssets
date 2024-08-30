@@ -10,7 +10,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorLeak))]
-    class Leak: ROSPublisher<LeakMsg, SensorLeak>
+    class Leak_Pub: ROSPublisher<LeakMsg, SensorLeak>
     { 
         protected override void InitializePublication(){}
         protected override void UpdateMessage()

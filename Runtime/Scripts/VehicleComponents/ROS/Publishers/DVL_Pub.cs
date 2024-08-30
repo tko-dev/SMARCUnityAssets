@@ -12,7 +12,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorDVL))]
-    class DVL: ROSPublisher<DVLMsg, SensorDVL>
+    class DVL_Pub: ROSPublisher<DVLMsg, SensorDVL>
     { 
 
         DVLBeamMsg[] beamMsgs;

@@ -16,7 +16,7 @@ namespace VehicleComponents.ROS.Subscribers
         // they might have different ros msg types. So we can mass enable-disable them.
     }
 
-    public class ActuatorSubscriber<RosMsgType> : ActuatorSubscriber
+    public class Actuator_Sub<RosMsgType> : ActuatorSubscriber
     where RosMsgType: ROSMessage, new()
     {
         [Header("ROS Subscriber")]
