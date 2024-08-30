@@ -166,7 +166,7 @@ MonoBehaviour:
   DistanceErrorCap: 10
   TrackingTargetTF: {fileID: 6110627571383574328}
   Rope: {fileID: 0}
-  FollowRope: 0
+  AttackTheBuoy: 0
   LoadLinkTF: {fileID: 0}
   PropFR: {fileID: 4705432896303098}
   PropFL: {fileID: 4614207949718832}
