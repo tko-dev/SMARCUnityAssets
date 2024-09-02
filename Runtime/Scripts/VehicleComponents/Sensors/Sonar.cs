@@ -11,6 +11,7 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 using Random = UnityEngine.Random;
 using NormalDistribution = DefaultNamespace.NormalDistribution;
+using UnityEditor.Experimental.GraphView;
 
 
 namespace VehicleComponents.Sensors
@@ -223,7 +224,7 @@ namespace VehicleComponents.Sensors
         [Header("Visuals")]
         [Tooltip("Draw rays in the scene view as lines?")]
         public bool DrawRays = false;
-        private Color rayColor;
+        private Color rayColor = Color.white;
         [Tooltip("Just draw the hit points as 1m-long lines?")]
         public bool DrawHits = true;
 
@@ -260,9 +261,11 @@ namespace VehicleComponents.Sensors
             }
         }
 
-        void Start()
+        new void Awake()
         {
-            rayColor = Color.white;
+            // since we are over-writing the awake of LinkAttachment, we gotta
+            // attach ourselves here
+            Attach();
             InitHits();
             InitBeamProfileSimple();
             if(Type == SonarType.SSS) InitSidescanBuckets();

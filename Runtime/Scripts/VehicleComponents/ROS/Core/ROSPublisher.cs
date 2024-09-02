@@ -39,6 +39,7 @@ namespace VehicleComponents.ROS.Core
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<RosMsgType>(topic);
 
+            
             InitializePublication();
 
             InvokeRepeating("Publish", 1f, period);

@@ -29,7 +29,7 @@ namespace VehicleComponents
             Attach();
         }
 
-        void Attach()
+        protected void Attach()
         {
             // This object needs to dig down from the root
             // and find an object with the given name to become

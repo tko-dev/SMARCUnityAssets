@@ -18,7 +18,7 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.header.frame_id = frame_id;
 
             ROSMsg.height = 1; // just one long list of points
-            ROSMsg.width = (uint)sensor.SonarHits.Length;
+            ROSMsg.width = (uint)sensor.TotalRayCount;
             ROSMsg.is_bigendian = false;
             ROSMsg.is_dense = true;
             // 3x 4bytes (float32 x,y,z) + 1x 1byte (uint8 intensity) = 13bytes
