@@ -7,21 +7,21 @@ If you:
 - Just want a quick demo of the project
 
 I suggest starting with one of the pre-configured projects:
--  https://github.com/martkartasev/SMARCUnityHDRP
--  https://github.com/martkartasev/SMARCUnityStandard
+- [HDRP](https://github.com/smarc-project/SMARCUnityHDRP)
+  - Better graphical fidelity, heavier on the GPU.
+  - Includes the Unity Water Simulation, water is dynamic and waves exist.
+- [Standard](https://github.com/smarc-project/SMARCUnityStandard)
+  - Lesser graphical fidelity, but runs easier.
+  - Does not have Unity Water Simulation (water is a plane).
 
-HDRP Is our primary development pipeline, but we also support the Standard Built-In pipeline. 
-In general HDRP has more features, including the Unity Water simulation and better graphical fidelity, while Standard is more performant.
-The rest of the features are the same.
 
 ## Installation
-
-------
 
 We rely on a few non unity asset store packages, so follow the instructions below to install the package into your project.
 It might seem like a lot of things to do, but all of the operations can be done in the Unity editor and should not take more than a few minutes.
 
-We recommend using the the Editor Version **2023.1.13f1**.
+We recommend using the the Editor Version **2023.1.13f1**. 
+
 
 ### Install Packages for Unity from Github
 
@@ -68,5 +68,5 @@ Once all the dependencies are installed and configured, you can install this pac
 3. Enter the following URL and click `Add` button
 
 ```
-https://github.com/martkartasev/SMARCUnityAssets.git
+https://github.com/smarc-project/SMARCUnityAssets
 ```
