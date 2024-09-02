@@ -15,7 +15,7 @@ I suggest starting with one of the pre-configured projects:
   - Does not have Unity Water Simulation (water is a plane).
 
 
-## Installation
+## Installation for non-SMaRC projects
 
 We rely on a few non unity asset store packages, so follow the instructions below to install the package into your project.
 It might seem like a lot of things to do, but all of the operations can be done in the Unity editor and should not take more than a few minutes.
