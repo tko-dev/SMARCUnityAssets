@@ -172,8 +172,8 @@ namespace Importer
 
             var point = transform.gameObject.AddComponent<ForcePoint>();
             point.volumeObject = loadedRobot.transform.Find(volumeObjectTransformPath).gameObject;
-            point.ConnectedArticulationBody = loadedRobot.transform.Find("base_link").GetComponent<ArticulationBody>();
-            point.ConnectedRigidbody = loadedRobot.transform.Find("base_link").GetComponent<Rigidbody>();
+            point.ConnectedArticulationBody = loadedRobot.transform.GetComponent<ArticulationBody>();
+            point.ConnectedRigidbody = loadedRobot.transform.GetComponent<Rigidbody>();
         }
     }
 

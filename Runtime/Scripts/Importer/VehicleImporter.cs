@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Robotics.UrdfImporter;
+using UnityEditor;
 using UnityEngine;
 
 namespace Importer
@@ -35,6 +36,8 @@ namespace Importer
             var odomObject = new GameObject();
             odomObject.name = "odom";
             odomObject.transform.parent = transform;
+            odomObject.transform.localPosition = Vector3.zero;
+            odomObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
             ImportSettings settings = new ImportSettings
             {
@@ -50,18 +53,27 @@ namespace Importer
             yield return createRobot;
             var loadedRobot = createRobot.Current;
 
-            loadedRobot.transform.parent = odomObject.transform;
+            var baseLink = loadedRobot.transform.Find("base_link").gameObject;
+            baseLink.transform.parent = odomObject.transform;
 
-            saveData.articulationModels.ForEach(model => model.LoadOntoObject(loadedRobot));
-            saveData.forcePoints.ForEach(model => model.LoadOntoObject(loadedRobot));
-            saveData.colliders.ForEach(model => model.LoadOntoObject(loadedRobot));
+            saveData.articulationModels.ForEach(model => model.LoadOntoObject(baseLink));
+            saveData.forcePoints.ForEach(model => model.LoadOntoObject(baseLink));
+            saveData.colliders.ForEach(model => model.LoadOntoObject(baseLink));
 
-            odomObject.transform.localPosition = Vector3.zero;
-            loadedRobot.transform.localPosition = Vector3.zero;
-            loadedRobot.transform.localRotation = Quaternion.Euler(Vector3.zero);
-            odomObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            baseLink.transform.localPosition = Vector3.zero;
+            baseLink.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            
+            SetActiveObject(baseLink);
+            yield return createRobot; // Yield the enumerator to allow the activation to take effect.
+            DestroyImmediate(loadedRobot); // Destroy the unnecessary intermediate sam_auv gameObject after it has been unselected.
         }
 
+        public void SetActiveObject(GameObject gameObject)
+        {
+#if UNITY_EDITOR
+            Selection.activeObject = gameObject;
+#endif
+        }
 
         public static string ReadFileTextContent(string filename)
         {
