@@ -56,9 +56,9 @@ namespace Importer
             var baseLink = loadedRobot.transform.Find("base_link").gameObject;
             baseLink.transform.parent = odomObject.transform;
 
-            saveData.articulationModels.ForEach(model => model.LoadOntoObject(baseLink));
-            saveData.forcePoints.ForEach(model => model.LoadOntoObject(baseLink));
-            saveData.colliders.ForEach(model => model.LoadOntoObject(baseLink));
+            saveData.articulationModels.ForEach(model => model.LoadOntoObject(odomObject));
+            saveData.forcePoints.ForEach(model => model.LoadOntoObject(odomObject));
+            saveData.colliders.ForEach(model => model.LoadOntoObject(odomObject));
 
             baseLink.transform.localPosition = Vector3.zero;
             baseLink.transform.localRotation = Quaternion.Euler(Vector3.zero);

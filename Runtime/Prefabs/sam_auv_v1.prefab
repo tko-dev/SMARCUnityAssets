@@ -99,9 +99,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -670,9 +670,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: -0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -801,9 +801,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: -0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1015,7 +1015,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 618bab43988449a68c3f88b22fe6d005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToSave: {fileID: 459097933565788526}
+  objectToSave: {fileID: 7185973898438942457}
 --- !u!114 &2224742700551410537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1423,9 +1423,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1837,9 +1837,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3306,9 +3306,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: -0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3437,9 +3437,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: -0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -3568,9 +3568,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4121,9 +4121,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4644,9 +4644,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -4775,9 +4775,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: -0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -5892,9 +5892,9 @@ ArticulationBody:
     target: 0
     targetVelocity: 0
     driveType: 0
-  m_LinearDamping: 0.05
-  m_AngularDamping: 0.05
-  m_JointFriction: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0
+  m_JointFriction: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}

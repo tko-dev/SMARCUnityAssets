@@ -172,8 +172,8 @@ namespace Importer
 
             var point = transform.gameObject.AddComponent<ForcePoint>();
             point.volumeObject = loadedRobot.transform.Find(volumeObjectTransformPath).gameObject;
-            point.ConnectedArticulationBody = loadedRobot.transform.GetComponent<ArticulationBody>();
-            point.ConnectedRigidbody = loadedRobot.transform.GetComponent<Rigidbody>();
+            point.ConnectedArticulationBody = loadedRobot.transform.Find("base_link").GetComponent<ArticulationBody>();
+            point.ConnectedRigidbody = loadedRobot.transform.Find("base_link").GetComponent<Rigidbody>();
         }
     }
 
@@ -190,6 +190,7 @@ namespace Importer
         public Vector3 centerOfMass;
         public bool automaticInertiaTensor;
         public bool automaticCenterOfMass;
+        public float joinFriction;
 
         public static ArticulationModel WriteModel(ArticulationBody body, GameObject toStore = null)
         {
@@ -200,6 +201,7 @@ namespace Importer
             model.inertiaTensor = body.inertiaTensor;
             model.inertiaTensorRotation = body.inertiaTensorRotation;
             model.automaticInertiaTensor = body.automaticInertiaTensor;
+            model.joinFriction = body.jointFriction;
             model.automaticCenterOfMass = body.automaticCenterOfMass;
             model.centerOfMass = body.centerOfMass;
             model.drives.Add(DriveModel.WriteModel(body.xDrive, ArticulationDriveAxis.X));
@@ -232,6 +234,7 @@ namespace Importer
                 articulationBody.automaticCenterOfMass = automaticCenterOfMass;
                 articulationBody.linearDamping = linearDamping;
                 articulationBody.angularDamping = angularDamping;
+                articulationBody.jointFriction = joinFriction;
             }
             else
             {
