@@ -28,7 +28,7 @@ namespace VehicleComponents.ROS.Core
         [Tooltip("If true, we will publish regardless, even if the underlying sensor says no data.")]
         public bool ignoreSensorState = false;
 
-        void Start()
+        protected void Start()
         {
             // We namespace the topics with the root name
             if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
@@ -39,6 +39,7 @@ namespace VehicleComponents.ROS.Core
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<RosMsgType>(topic);
 
+            
             InitializePublication();
 
             InvokeRepeating("Publish", 1f, period);

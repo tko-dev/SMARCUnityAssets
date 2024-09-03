@@ -24,12 +24,12 @@ namespace VehicleComponents
         protected ArticulationBody articulationBody;
         protected ArticulationBody parentArticulationBody;
 
-        void Awake()
+        protected void Awake()
         {
             Attach();
         }
 
-        void Attach()
+        protected void Attach()
         {
             // This object needs to dig down from the root
             // and find an object with the given name to become

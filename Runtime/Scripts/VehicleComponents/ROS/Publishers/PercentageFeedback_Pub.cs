@@ -9,7 +9,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(IPercentageActuator))]
-    public class PercentageFeedback: ROSPublisher<PercentStampedMsg, IPercentageActuator>
+    public class PercentageFeedback_Pub: ROSPublisher<PercentStampedMsg, IPercentageActuator>
     {
         IPercentageActuator act;
         protected override void InitializePublication()

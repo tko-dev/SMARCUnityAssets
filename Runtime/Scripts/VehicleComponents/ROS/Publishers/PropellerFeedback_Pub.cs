@@ -8,7 +8,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(Propeller))]
-    public class PropellerFeedback: ROSPublisher<ThrusterFeedbackMsg, Propeller>
+    public class PropellerFeedback_Pub: ROSPublisher<ThrusterFeedbackMsg, Propeller>
     {
         Propeller prop;
         protected override void InitializePublication()

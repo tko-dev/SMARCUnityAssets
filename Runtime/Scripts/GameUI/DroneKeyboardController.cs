@@ -15,12 +15,10 @@ namespace GameUI
 
         Propeller frontrightProp, frontleftProp, backrightProp, backleftProp;
 
-        [Tooltip("Difference in RPM between sides of the drone when moving around")]
-        public float RPMDifferenceRatio = 0.25f;
-        [Tooltip("Y key uses this for all RPMs. Useful when you really wanna lift something.")]
-        public float LiftingRPMDifferenceRatio = 30f;
-        public float LiftingRPMRampUpSpeed = 100f;
-        float currentLiftingRPM;
+        [Tooltip("RPM to add to props when pressing IJKL")]
+        public float MotionRPM = 1500f;
+        [Tooltip("Extra RPMs to add when pressing space and IJKL")]
+        public float LiftingRPM = 1500f;
 
         bool mouseDown = false;
 
@@ -31,8 +29,6 @@ namespace GameUI
             frontrightProp = frontrightPropGo.GetComponent<Propeller>();
             backrightProp = backrightPropGo.GetComponent<Propeller>();
             backleftProp = backleftPropGo.GetComponent<Propeller>();
-
-            currentLiftingRPM = (float)backleftProp.DefaultHoverRPM;
         }
 
         void Update()
@@ -41,80 +37,66 @@ namespace GameUI
             if(Input.GetMouseButtonUp(1)) mouseDown = false;
             if(mouseDown) return;
 
-            float half = RPMDifferenceRatio/2f;
-            float less = RPMDifferenceRatio/8f;
+            var additionalRPM = MotionRPM;
+            var backright = backrightProp.DefaultHoverRPM;
+            var backleft = backleftProp.DefaultHoverRPM;
+            var frontright = frontrightProp.DefaultHoverRPM;
+            var frontleft = frontleftProp.DefaultHoverRPM;
 
-            if (Input.GetKeyDown("i"))
+            if(Input.GetKey(KeyCode.Space)) additionalRPM += LiftingRPM;
+
+            if (Input.GetKey("i"))
             {
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM * (1+half));
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM * (1+half));
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM * (1-half));
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM * (1-half));
+                backright += additionalRPM;
+                backleft += additionalRPM;
+                frontright -= additionalRPM;
+                frontleft -= additionalRPM;
             }
 
-            if (Input.GetKeyDown("k"))
+            if (Input.GetKey("k"))
             {
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM * (1+half));
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM * (1+half));
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM * (1-half));
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM * (1-half));
+                frontright += additionalRPM;
+                frontleft += additionalRPM;
+                backright -= additionalRPM;
+                backleft -= additionalRPM;
             }
 
-            if (Input.GetKeyDown("j"))
+            if (Input.GetKey("j"))
             {
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM *(1+half));
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM*(1+half));
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM *(1-half));
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM*(1-half));
+                frontright += additionalRPM;
+                backright += additionalRPM;
+                frontleft -= additionalRPM;
+                backleft -= additionalRPM;
             }
 
-            if (Input.GetKeyDown("l"))
+            if (Input.GetKey("l"))
             {
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM *(1+half));
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM*(1+half));
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM *(1-half));
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM*(1-half));
+                frontleft += additionalRPM;
+                backleft += additionalRPM;
+                frontright -= additionalRPM;
+                backright -= additionalRPM;
             }
 
-            if (Input.GetKeyDown("u"))
+            if (Input.GetKey("u"))
             {
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM*(1+less));
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM*(1+less));
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM*(1+less));
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM*(1+less));
-            }
+                frontleft += additionalRPM/4;
+                frontright += additionalRPM/4;
+                backleft += additionalRPM/4;
+                backright += additionalRPM/4;
+            }            
 
-            if (Input.GetKeyDown("y"))
+            if (Input.GetKey("n"))
             {
-                if(currentLiftingRPM < frontrightProp.DefaultHoverRPM*(1+LiftingRPMDifferenceRatio/4))
-                {
-                    currentLiftingRPM += LiftingRPMRampUpSpeed;
-                }
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM + currentLiftingRPM);
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM + currentLiftingRPM);
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM + currentLiftingRPM);
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM + currentLiftingRPM);
-            }
-            
-
-            if (Input.GetKeyDown("n"))
-            {
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM*(1-less));
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM*(1-less));
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM*(1-less));
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM*(1-less));
+                frontleft -= additionalRPM/4;
+                frontright -= additionalRPM/4;
+                backleft -= additionalRPM/4;
+                backright -= additionalRPM/4; 
             }
             
-            if (Input.GetKeyUp("i") || Input.GetKeyUp("j") || Input.GetKeyUp("k") || Input.GetKeyUp("l") || Input.GetKeyUp("u") || Input.GetKeyUp("n")
-            || Input.GetKeyUp("y"))
-            {
-                backrightProp.SetRpm(backrightProp.DefaultHoverRPM);
-                backleftProp.SetRpm(backleftProp.DefaultHoverRPM);
-                frontrightProp.SetRpm(frontrightProp.DefaultHoverRPM);
-                frontleftProp.SetRpm(frontleftProp.DefaultHoverRPM); 
-
-                currentLiftingRPM = (float)backrightProp.DefaultHoverRPM;
-            }
+            backrightProp.SetRpm(backright);
+            backleftProp.SetRpm(backleft);
+            frontrightProp.SetRpm(frontright);
+            frontleftProp.SetRpm(frontleft);
 
         }
     }

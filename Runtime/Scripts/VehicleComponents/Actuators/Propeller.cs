@@ -13,7 +13,7 @@ namespace VehicleComponents.Actuators
         public bool reverse = false;
         public double rpm;
         public float RPMMax = 100000;
-        public float RPMToForceMultiplier = 5f;
+        public float RPMToForceMultiplier = 0.005f;
         public float NumPropellers = 4f;
 
         [Header("Drone Propeller")]
@@ -26,7 +26,7 @@ namespace VehicleComponents.Actuators
         public double DefaultHoverRPM;
 
         [SerializeField] private ArticulationBody baseLinkArticulationBody;
-        private float c_tau_f = 8.004e-2f;
+        private float c_tau_f = 8.004e-4f;
         
         
         public void SetRpm(double rpm)
@@ -58,13 +58,13 @@ namespace VehicleComponents.Actuators
 
             // Visualize the applied force
             
-            int direction = reverse? -1 : 1;
-            parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
-            
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,
                                                    ForceMode.Force);
-            // //manual torqueaddition
+            
+            // Dont spin the props (which lets physics handle the torques and such) if we are applying manual
+            // torque. This is useful for drones or vehicles where numerical things are known
+            // and simulation is not wanted.
             if(ApplyTorque)   
             {
                 int torque_sign = TorqueUp ? 1 : -1;
@@ -72,18 +72,23 @@ namespace VehicleComponents.Actuators
                 Vector3 torqueVector = torque * transform.forward;
                 parentArticulationBody.AddTorque(torqueVector, ForceMode.Force);
             }
+            else
+            {
+                int direction = reverse? -1 : 1;
+                parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
+            }
         }
 
         private void InitializeRPMToStayAfloat()
         {
             // Calculate the required force to counteract gravity
-            float requiredForce = (baseLinkArticulationBody.mass) * Physics.gravity.magnitude;
-            Debug.Log("Required force to stay afloat: " + requiredForce);
+            float requiredForce = baseLinkArticulationBody.mass * Physics.gravity.magnitude;
+            // Debug.Log("Required force to stay afloat: " + requiredForce);
 
             // Calculate the required RPM for each propeller
             float requiredForcePerProp = requiredForce/NumPropellers;
             float requiredRPM = requiredForcePerProp / RPMToForceMultiplier;
-            this.DefaultHoverRPM = requiredRPM;
+            DefaultHoverRPM = requiredRPM;
 
             // Set the initial RPM to each propeller
             SetRpm(requiredRPM);
@@ -94,6 +99,5 @@ namespace VehicleComponents.Actuators
             return true;
         }
         
-        //TODO: Ensure RPM feedback in???
     }
 }
