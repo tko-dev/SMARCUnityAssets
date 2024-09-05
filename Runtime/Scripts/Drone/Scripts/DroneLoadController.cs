@@ -17,6 +17,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 public class DroneLoadController: MonoBehaviour {
     public GameObject base_link;
     public GameObject load_link; // TODO: For now the position of the AUV is taken at the base of the rope
+    public GameObject hook_link;
     public float computation_frequency = 50f;
     public bool follow_tracking_target = false;//
     public Transform tracking_target_transform;
@@ -46,6 +47,9 @@ public class DroneLoadController: MonoBehaviour {
     protected PointMsg callbackMsg;
     
     private Vector3 buoyPosition = Vector3.zero;
+    private Vector3 trajStart;
+    private int i = 0;
+    public float alpha = 0.12f;
 
 
     // Quadrotor parameters
@@ -63,6 +67,7 @@ public class DroneLoadController: MonoBehaviour {
     Vector<double> e3;
     double dt;
     float t;
+    float t_buoy;
 
     // Gains
     double kx;
@@ -74,6 +79,7 @@ public class DroneLoadController: MonoBehaviour {
 
 	// Use this for initialization
 	void Start() {
+        hook_link.SetActive(false);
 		propellers = new Propeller[4];
 		propellers[0] = GameObject.Find("propeller_FL").GetComponent<Propeller>();
 		propellers[1] = GameObject.Find("propeller_FR").GetComponent<Propeller>();
@@ -119,11 +125,21 @@ public class DroneLoadController: MonoBehaviour {
 
     private void ReceiveMessage(Float32MultiArrayMsg message)
     {
+        i++;
+        if(i==20){
+            // isCallbackReceived = true;
+            trajStart = base_link_ab.transform.position ;
+            t_buoy = Time.time;
+            // hook_link.SetActive(true);
+        }
+        if(!isCallbackReceived)
+        {
         // Process the Float32MultiArray message
         Debug.Log("Received message with " + message.data.Length + " elements.");
-        foreach (var value in message.data)
-        {
-            Debug.Log("Value: " + value);
+        Vector3 value = new Vector3(message.data[0], message.data[2], message.data[1]);
+        Debug.Log("Value: " + value);
+        buoyPosition = new Vector3((float)value.x, (float)value.y, (float)value.z);
+        Debug.DrawLine(value, base_link_ab.transform.position, Color.red);
         }
     }
 
@@ -296,9 +312,15 @@ public class DroneLoadController: MonoBehaviour {
                 a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, desiredY/Math.Pow(desiredDisplacement,2)*2*0.25});
             } 
             else {
-                x_s_d = R_sw*DenseVector.OfArray(new double[] { buoy_w[0], buoy_w[1], Math.Pow(t-4, 2)/16 + buoy_w[2] + 0.16 });
-                v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, (t-4)/8 });
-                a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 1/8 });
+                float t_dash = t - t_buoy;
+                Debug.Log("resetted time" + t_dash);
+                // x_s_d = R_sw*DenseVector.OfArray(new double[] { buoyPosition[0], buoyPosition[2], Math.Pow(t_dash-4, 2)/16 + buoyPosition[1] + 0.16 });
+                // v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, (t_dash-4)/8 });
+                // a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 1/8 });
+
+                x_s_d = R_sw*DenseVector.OfArray(new double[] { (alpha*t_dash + buoyPosition[0] - desiredDisplacement/3), buoyPosition[2], desiredY/2/Math.Pow(desiredDisplacement/3,2)*Math.Pow(alpha*t_dash-desiredDisplacement/3, 2)+0.4});
+                v_s_d = R_sw*DenseVector.OfArray(new double[] { alpha, 0, desiredY/2/Math.Pow(desiredDisplacement/3,2)*2*(alpha*t_dash-desiredDisplacement/3) });
+                a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, desiredY/2/Math.Pow(desiredDisplacement/3,2)*2*alpha});
             }
             Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });//
 
