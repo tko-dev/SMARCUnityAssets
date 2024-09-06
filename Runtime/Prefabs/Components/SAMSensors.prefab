@@ -1255,10 +1255,11 @@ MonoBehaviour:
   yaw: 0
   frequency: 10
   hasNewData: 0
-  dischargePercentPerMinute: 0.1
+  dischargePercentPerMinute: 0.4
   currentPercent: 95
-  maxVoltage: 12.5
-  currentVoltage: 12.5
+  maxVoltage: 25.2
+  minVoltage: 21
+  currentVoltage: 25
 --- !u!114 &1652844873199492828
 MonoBehaviour:
   m_ObjectHideFlags: 0
