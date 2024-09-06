@@ -331,7 +331,36 @@ Does not simulate anything.
 Can be "triggered" from the editor.
 
 #### Sonar
-Ping.
+We simulate sonars using many raycasts. 
+To keep the simulation running smoothly, these raycasts are done in parallel so thousands of rays can be used without slowing down the simulation.
+
+Most of the parameters and their semantics are shared between different types of sonars:
+
+SideScanSonar(SSS)                  |ForwardLookingSonar(FLS)
+:----------------------------------:|:---------------------------------------:
+![Sidescan](Media/SSS.png)          |![FLS](Media/FLS.png)
+
+- **Beam**: A beam is a cone (or a slice of one) shaped volume where sound travels. Red (Starboard) and blue (Port) bundles of lines are each a beam.
+- **Beam Breadth**: The opening angle of the conical beam. From one straight edge to the opposite one. The neon green angle on the red beam of SideScanSonar.
+- **Tilt**: The angle from the horizontal plane to the nearest part of a beam. Always positive. The cyan curve between the black horizontal plane and the red beam in both SSS and FLS images.
+- **FOV**: Field of View. The side-to-side angle around the vertical axis of many beams. Neon green
+- **Rays**: Raycasting vectors. Approximation of sound propagation. Usually in the order of hundereds per beam. Placed equidistantly within a beam. Individual red or blue lines.
+
+
+Non-obvious configurable parameters:
+![Sonar config](Media/SonarConfig.png)
+
+- **Type**: The type of sonar: Multi-beam echo-sounder(MBES), SideScanSonar (SSS) or Forward-looking sonar (FLS).
+- **Beam Breadth 3 Decibels Deg**: While the raycasts are done equidistantly, not all angles have the same return intensities. This is the -3dB return angle. Should be less than beam breadth.
+- **SideScanSonar**: These are used only if Type == SSS.
+  - **Num Buckets Per Beam**: While a SSS can use thousands of rays, it usually reports a fixed number of distance buckets. This is that fixed number. Rays will be consolidated by their hit distances into these buckets.
+  - **Is Interferometric**: If checked, the SSS will also report angles in addition to distances. This allows a point cloud to be generated.
+- **SSS-Noise**: These are used only if Type == SSS.
+  - **Mult Gain**: The return intensities of the rays will be multiplied by this gain.
+  - **Use Additive Noise**: If checked, noise will be added to the hit distances of the rays.
+    - **Add Noise Std/Mean**: The additive noise is sampled from a Normal distribution with this std. and mean.
+- **Visuals**: Draw the rays and hits if checked. This has a considerable impact to performance, so only enable if debugging or visualizing for a purpose. (The above images were created with this.)
+- **Load**: Ratio of time taken within one `Time.fixedDeltaTime` by the `FixedUpdate()` method of Sonar. If this value is above 1, simulation will become very sluggish.
 
 
 ### ROS
