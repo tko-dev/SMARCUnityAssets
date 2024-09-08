@@ -9,7 +9,7 @@ using Propeller = VehicleComponents.Actuators.Propeller;
 namespace VehicleComponents.ROS.Subscribers
 {
     [RequireComponent(typeof(Propeller))]
-    public class PropellerCommand : ActuatorSubscriber<ThrusterRPMMsg>
+    public class PropellerCTwistSubscriberommand_Sub : Actuator_Sub<ThrusterRPMMsg>
     {        
         Propeller prop;
         

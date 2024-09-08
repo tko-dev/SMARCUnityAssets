@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using SensorSSS = VehicleComponents.Sensors.SideScanSonar;
+using SSS = VehicleComponents.Sensors.Sonar;
 
-namespace VehicleComponents.SensorViewers
+namespace GameUI
 {
     public class SSSView : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace VehicleComponents.SensorViewers
         int textureHeight = 64;
         Texture2D texture;
 
-        SensorSSS sss;
+        SSS sss;
 
         [Header("Sidescan viewer")]
         public int viewX=0;
@@ -46,14 +46,14 @@ namespace VehicleComponents.SensorViewers
 
         void Start()
         {
-            sss = GetComponent<SensorSSS>();
-            textureWidth = sss.numBucketsPerSide * 2;
+            sss = GetComponent<SSS>();
+            textureWidth = sss.NumBucketsPerBeam * 2;
             textureHeight = 500;
             CreateNewTexture();
             line = new byte[textureWidth];
             image = new byte[textureWidth*textureHeight];
             flippedImage = new byte[image.Length];
-            reversePort = new byte[sss.numBucketsPerSide];
+            reversePort = new byte[sss.NumBucketsPerBeam];
         }
 
         void OnGUI()
@@ -66,22 +66,24 @@ namespace VehicleComponents.SensorViewers
             );
         }
 
-        void Update()
+        void FixedUpdate()
         {
             // First, create the current line
             // We want port(left) to be reversed so the nadir is in the middle
-            Buffer.BlockCopy(sss.portBuckets, 0, reversePort, 0, sss.numBucketsPerSide);
+            // Buffer.BlockCopy(sss.portBuckets, 0, reversePort, 0, sss.numBucketsPerSide);
+            Buffer.BlockCopy(sss.Buckets, 0, reversePort, 0, sss.NumBucketsPerBeam);
             Array.Reverse(reversePort, 0, reversePort.Length);
 
             // Finally put the two sides together into one line
             Buffer.BlockCopy(reversePort, 0, line, 0, reversePort.Length);
-            Buffer.BlockCopy(sss.strbBuckets, 0, line, sss.numBucketsPerSide, sss.numBucketsPerSide);
+            // Buffer.BlockCopy(sss.strbBuckets, 0, line, sss.numBucketsPerSide, sss.numBucketsPerSide);
+            Buffer.BlockCopy(sss.Buckets, sss.NumBucketsPerBeam, line, sss.NumBucketsPerBeam, sss.NumBucketsPerBeam);
 
             // Draw a dotted line in the middle
             byte t = 0;
             if((int)Time.time %2 == 0) t = (byte)255;
-            line[sss.numBucketsPerSide] = t;
-            line[sss.numBucketsPerSide+1] = t;
+            line[sss.NumBucketsPerBeam] = t;
+            line[sss.NumBucketsPerBeam+1] = t;
 
             // Scroll the current image by 1 pixel down
             // Since image is a flattened array, that means

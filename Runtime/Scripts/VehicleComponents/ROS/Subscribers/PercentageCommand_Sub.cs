@@ -10,7 +10,7 @@ namespace VehicleComponents.ROS.Subscribers
 {
 
     [RequireComponent(typeof(IPercentageActuator))]
-    public class PercentageCommand : ActuatorSubscriber<PercentStampedMsg>
+    public class PercentageCommand_Sub : Actuator_Sub<PercentStampedMsg>
     {    
         IPercentageActuator act;
         

@@ -10,7 +10,7 @@ using CameraImageSensor = VehicleComponents.Sensors.CameraImage;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(CameraImageSensor))]
-    class CameraImageCompressed: ROSPublisher<CompressedImageMsg, CameraImageSensor>
+    class CameraImageCompressed_Pub: ROSPublisher<CompressedImageMsg, CameraImageSensor>
     {
         [Header("Compressed Image")]
         [Tooltip("Jpg compression quality. 1=lowest quality")]

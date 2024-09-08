@@ -135,9 +135,9 @@ public class DroneLoadController: MonoBehaviour {
         if(!isCallbackReceived)
         {
         // Process the Float32MultiArray message
-        // Debug.Log("Received message with " + message.data.Length + " elements.");
+        Debug.Log("Received message with " + message.data.Length + " elements.");
         Vector3 value = new Vector3(message.data[0], message.data[2], message.data[1]);
-        // Debug.Log("Value: " + value);
+        Debug.Log("Value: " + value);
         buoyPosition = new Vector3((float)value.x, (float)value.y, (float)value.z);
         Debug.DrawLine(value, base_link_ab.transform.position, Color.red);
         }
@@ -313,7 +313,7 @@ public class DroneLoadController: MonoBehaviour {
             } 
             else {
                 float t_dash = t - t_buoy;
-                // Debug.Log("resetted time" + t_dash);
+                Debug.Log("resetted time" + t_dash);
                 // x_s_d = R_sw*DenseVector.OfArray(new double[] { buoyPosition[0], buoyPosition[2], Math.Pow(t_dash-4, 2)/16 + buoyPosition[1] + 0.16 });
                 // v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, (t_dash-4)/8 });
                 // a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 1/8 });

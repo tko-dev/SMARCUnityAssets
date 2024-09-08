@@ -9,7 +9,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorGPS))]
-    class GeoPoint: ROSPublisher<GeoPointMsg, SensorGPS>
+    class GeoPoint_Pub: ROSPublisher<GeoPointMsg, SensorGPS>
     { 
         public double lat, lon;
         double easting, northing;

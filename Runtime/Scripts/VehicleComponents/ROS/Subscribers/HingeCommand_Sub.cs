@@ -10,7 +10,7 @@ namespace VehicleComponents.ROS.Subscribers
 {
 
     [RequireComponent(typeof(Hinge))]
-    public class HingeCommand : ActuatorSubscriber<ThrusterAnglesMsg>
+    public class HingeCommand_Sub : Actuator_Sub<ThrusterAnglesMsg>
     {        
         public enum AngleChoice
         {

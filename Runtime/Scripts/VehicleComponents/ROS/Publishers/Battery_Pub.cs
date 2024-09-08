@@ -8,7 +8,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorBattery))]
-    class Battery: ROSPublisher<BatteryStateMsg, SensorBattery>
+    class Battery_Pub: ROSPublisher<BatteryStateMsg, SensorBattery>
     {
         protected override void UpdateMessage()
         {

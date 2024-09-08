@@ -9,7 +9,7 @@ using VehicleComponents.ROS.Core;
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorGPS))]
-    class GPS: ROSPublisher<NavSatFixMsg, SensorGPS>
+    class GPS_Pub: ROSPublisher<NavSatFixMsg, SensorGPS>
     { 
 
         protected override void InitializePublication(){}

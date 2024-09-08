@@ -58,19 +58,24 @@ namespace VehicleComponents.Actuators
 
             // Visualize the applied force
             
-            int direction = reverse? -1 : 1;
-            //parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
-            
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,
                                                    ForceMode.Force);
-            // //manual torqueaddition
+            
+            // Dont spin the props (which lets physics handle the torques and such) if we are applying manual
+            // torque. This is useful for drones or vehicles where numerical things are known
+            // and simulation is not wanted.
             if(ApplyTorque)   
             {
                 int torque_sign = TorqueUp ? 1 : -1;
                 float torque = torque_sign * c_tau_f * (float)r;
                 Vector3 torqueVector = torque * transform.forward;
                 parentArticulationBody.AddTorque(torqueVector, ForceMode.Force);
+            }
+            else
+            {
+                int direction = reverse? -1 : 1;
+                parentArticulationBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
             }
         }
 
