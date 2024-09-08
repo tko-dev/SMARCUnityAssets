@@ -35,15 +35,15 @@ namespace VehicleComponents.Sensors
             {
                 Vector3 deltaLinearAcceleration = localVelocity - lastVelocity;
                 linearAcceleration = deltaLinearAcceleration / (float)deltaTime;
-                linearAcceleration = deltaLinearAcceleration / 0.001f;
+                Debug.Log("deltaTime is " + deltaTime);
             }
             
             angularVelocity = ab.transform.InverseTransformVector(-1f * ab.angularVelocity);
             eulerAngles = ab.transform.rotation.eulerAngles;
             orientation = Quaternion.Euler(eulerAngles);
-
+            
             lastVelocity = localVelocity;
-
+            
             if (withGravity)
             {
                 // Find the global gravity in the local frame and add to the computed linear acceleration
