@@ -19,8 +19,7 @@
         - [Bottom echoes](#bottom-echoes)
         - [Configuration](#configuration)
     - [Actuators](#actuators)
-      - [Hinge](#hinge)
-      - [Prismatic](#prismatic)
+      - [Joints](#joints)
       - [VBS](#vbs)
       - [Propeller](#propeller)
     - [Sensors](#sensors)
@@ -245,20 +244,37 @@ We implement the following "shotgun" approach:
 
 ### Actuators
 Scripts that control articulation bodies using drives defined within.
-The main design is thus:
+See [Unity Articulation Bodies](https://docs.unity3d.com/Manual/class-ArticulationBody.html) documentation for details on how these work.
+
+The general idea:
 - Actuator script exposes a public method to set all of its relevant variables.
-- In `FixedUpdate()` the actuator sets the drive targets accordingly.
+- Some kind of controller (Keyboard, ROS, Internal, etc) calls these methods when relevant.
+- In `FixedUpdate()` the actuator sets the Arti. Body properties.
 
 > Optionally, actuators can implement `IROSPublishable` (See [IROSPublishable](#ros)) if they are expected to provide feedback to ROS.
 
-#### Hinge
-A simple hinge. Rotates the body around an axis with some force.
 
-#### Prismatic
-A piston. Moves the body along an axis.
+#### Joints
+These are all straight interfaces to the AB's drives.
+- **Hinge**: Rotates the body around an axis with some force in both directions.
+  - **Angle(Max)**: Current and maximum angles of the hinge.
+  - **Reverse**: Check to reverse direction.
+  ![Hinge](Media/Hinge.png)
+
+- **Prismatic**: A piston. Moves the body along an axis.
+  - **Percentage**: How much of the piston is extended.
+  - **Reset value**: The value to set when signalled "reset". Usually the result of a homing sequence on the real thing.
+  ![Prismatic](Media/Prismatic.png)
+
 
 #### VBS
-A tank that can fill up and empty itself to change its mass.
+A tank that can fill up and empty itself.
+Changes its AB's mass.
+![VBS](Media/VBS.png)
+- **Percentage**: How much of the tank is full.
+- **Reset value**: The value to set when signalled "reset". Usually the result of a homing sequence on the real thing.
+- **Max Volume_l**: Total fluid volume of the tank.
+- **Density**: Density of the fluid stored.
 
 #### Propeller
 A set of propeller blades.
@@ -281,29 +297,51 @@ AUV                                 |Drone
 
 ### Sensors
 
+![Sensor](Media/Sensor.png)
 - **Sensor**: The base class of most sensors. Handles the update frequencies.
+  - **Frequency:** Frequency of sensor updates. Limited to a period of Unity's `Time.fixedDeltaTime`. Reading the world faster than it changes produces duplicate readings. If faster sensors are desired, the physics update rate should be increased. See [Unity Simulation Time](https://docs.unity3d.com/ScriptReference/MonoBehaviour.FixedUpdate.html) for details.
+  - **Has New Data:** A boolean set by individual sensors to signal an outside component that the sensor has been updated with a new reading. Useful for sensors that output something only when they detect a change.
 - **Noise**: All sensors are perfect unless otherwise specified.
 
 #### Battery
-A simpe battery that discharges over time.
-Discharge rate is configurable.
+A simple battery that discharges over time.
+Discharge is linear between min and max voltages.
+
+![Battery](Media/Barrey.png)
+
+
 
 #### Camera Image
 A camera sensor that renders an attached Unity camera onto a texture.
 This texture can be displayed within Unity or published into ROS.
 
+![Camera Image](Media/CameraImage.png)
+- **Play mode preview**: The image can be displayed within Unity game window if the checkbox is checked. The location and size of the preview is configurable.
+
+
 #### DepthPressure
 Measures depth using water pressure.
 Uses [a water query](#water) to find real depth, then converts that to KPa.
-Can include atmospheric pressure if enabled in its config.
+
+![Pressure](Media/Pressure.png)
+- **Max Depth**: If the sensor is deeper than this, it will report the maximum depth it can.
+- **Include Atmo. Pressure**: If checked, the reported pressure will include 1Atm constant pressure.
+
 
 #### DVL
-Approximates a DVL with 4 beams.
+Approximates a DVL raycast beams.
 - Does a raycast for each beam.
-- If 3 rays hit, considers this a bottom lock.
+- If some number of rays hit, considers this a bottom lock.
 - If bottom lock
   - Reads velocity from the attached body.
   - Casts a 5th beam straight down for altitude.
+  - Reads the ranges of each ray.
+
+![DVL](Media/DVL.png)
+- **Num Beams**: The number of beams on the DVL can be configured. Most use 4.
+- **Min Hits To Report:** How many hitting rays do we consider to be a bottom lock.
+- **Angle From Vertical:** The angle of an imaginary line in the middle of all the beams from the vertical axis of the sensor.
+- **Rotation Offset**: The angle around the imaginary middle line of each beam. Use to arrange the beams. Where should the 1st beam be in relation to the sensor frame?
 
 
 #### GPS
@@ -313,6 +351,9 @@ Uses [a water query](#water) to determine submersion and does not update if subm
 Since Unity does not have a model of the globe, we must identify a position in Unity coordinates as a global position.
 GPS uses this reference point to calculate its relative position in UTM coordinates, then converts the UTM coordinates into Lat/Lon as its output.
 
+![GPS](Media/GPS.png)
+- **Fix**: Filled by the sensor when it is above water.
+
 ##### GPSReferencePoint
 Provides every GPS object in the Unity scene a global reference point.
 We usually attach this to geo-referenced objects, like a terrain scan with known coordinates.
@@ -320,15 +361,30 @@ The global position can be given in Lat/Lon or UTM coordinates.
 
 There must be exactly one such script in a scene.
 
+![GPSRef](Media/GPSRef.png)
+- **Origin is Lat Lon**: If checked, the Lat/Lon fields are used to calculate the UTM fields and vice-versa.
+- **Draw Line To Reference Point**: If checked, each GPS object will draw a line to the origin defined here. Can be useful to see sometimes.
+
+
 #### IMU
 A simple Inertial Measurement Unit that measures linear and agular velocities and accelerations of its attached body.
 Accesses the velocity fields of its attached body.
 Accelerations are calculated from ground truth velocity differences at every update.
 
+![IMU](Media/IMU.png)
+- **With Gravity**: If checked, IMU will add the gravity vector to its output.
+
+
+
 #### Leak
 A very simple boolean sensor.
 Does not simulate anything.
 Can be "triggered" from the editor.
+
+![Leak](Media/Leak.png)
+- **Leaked**: Check manually while the game is running to trigger.
+- **Count**: Number of updates (defined by Frequency field of Sensor) where "Leaked" was checked.
+
 
 #### Sonar
 We simulate sonars using many raycasts. 
