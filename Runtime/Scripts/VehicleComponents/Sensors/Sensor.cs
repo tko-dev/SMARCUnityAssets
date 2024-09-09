@@ -15,7 +15,7 @@ namespace VehicleComponents.Sensors
         public bool hasNewData = false;
 
         protected float Period => 1.0f/frequency;
-        private double lastTime;
+        float timeSinceLastUpdate = 0f;
 
         protected void OnValidate()
         {
@@ -33,15 +33,6 @@ namespace VehicleComponents.Sensors
         }
 
 
-        double NowTimeInSeconds()
-        {
-            // copy from TF2/Clock.cs.
-            // Why? Very little chance we'll implement a different thing
-            // but i want keep this script free of ros-related things.
-            double UnityUnscaledTimeSinceFrameStart = Time.realtimeSinceStartupAsDouble - Time.unscaledTimeAsDouble;
-            return Time.timeAsDouble + UnityUnscaledTimeSinceFrameStart * Time.timeScale;
-        }
-
         public virtual bool UpdateSensor(double deltaTime)
         {
             Debug.Log("This sensor needs to override UpdateSensor!");
@@ -50,10 +41,10 @@ namespace VehicleComponents.Sensors
 
         void FixedUpdate()
         {
-            var deltaTime = NowTimeInSeconds() - lastTime;
-            if(deltaTime < Period) return;
-            hasNewData = UpdateSensor(deltaTime);
-            lastTime = NowTimeInSeconds();
+            timeSinceLastUpdate += Time.fixedDeltaTime;
+            if(timeSinceLastUpdate < Period) return;
+            hasNewData = UpdateSensor(timeSinceLastUpdate);
+            timeSinceLastUpdate = 0f;
         }
 
     }
