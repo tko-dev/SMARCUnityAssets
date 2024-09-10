@@ -135,9 +135,9 @@ public class DroneLoadController: MonoBehaviour {
         if(!isCallbackReceived)
         {
         // Process the Float32MultiArray message
-        Debug.Log("Received message with " + message.data.Length + " elements.");
+        // Debug.Log("Received message with " + message.data.Length + " elements.");
         Vector3 value = new Vector3(message.data[0], message.data[2], message.data[1]);
-        Debug.Log("Value: " + value);
+        // Debug.Log("Value: " + value);
         buoyPosition = new Vector3((float)value.x, (float)value.y, (float)value.z);
         Debug.DrawLine(value, base_link_ab.transform.position, Color.red);
         }

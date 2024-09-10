@@ -36,6 +36,7 @@ namespace VehicleComponents.Sensors
                 Vector3 deltaLinearAcceleration = localVelocity - lastVelocity;
                 linearAcceleration = deltaLinearAcceleration / (float)deltaTime;
                 Debug.Log("deltaTime is " + deltaTime);
+                Debug.Log("calculated acc is " + linearAcceleration);
             }
             
             angularVelocity = ab.transform.InverseTransformVector(-1f * ab.angularVelocity);
