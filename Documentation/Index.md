@@ -420,22 +420,96 @@ Non-obvious configurable parameters:
 
 
 ### ROS
+We use a the [main-ros2 branch of the ROS-TCP-Endpoint](https://github.com/Unity-Technologies/ROS-TCP-Endpoint/tree/main-ros2) forked here: [ROS TCP Endpoint](https://github.com/KKalem/ROS-TCP-Endpoint) into the humble branch to match the rest of the repositories.
+
+More info can be found [here](https://github.com/Unity-Technologies/Unity-Robotics-Hub/blob/main/tutorials/pick_and_place/2_ros_tcp.md)
+
+The main configuration from the Unity side is the IP:Port settings, found under Robotics->Ros Settings in the Unity editor.
+
+![ROS Settings Window](Media/ROSSettings.png)
+
+- **Connect on Startup**: Check if you want Unity to attempt to connect to the Endpoint when you press play. If the Endpoint is not running, this will keep throwing warnings.
+- **Protocol**: Pick ROS2. While there is nothing stopping you from trying ROS2, all the messages we have distributed are for ROS2, meaning you would need to re-generate all the ROS messages yourself.
+- **ROS IP/Port**: If you are running Unity in the same machine as your Endpoint, the defaults of 127.0.0.1 and 10000 will work. If you are running the Endpoint on a VM or a different machine on the same network, you need to put that machine's IP:Port here.
+- **Show HUD**: If checked, shows the IP address and connection status in the game window. Might be obstrusive. Has no other effect.
+- **Keepalive, timeout, sleep times**: Network connection settings. Defaults are good.
+- **Listen for TF Messages**: Keep checked. Unless TF information in Unity is not desired.
+- **Unity Z Axis Direction**: Keep the default North. Z is forward in Unity, and also North. This coincides with X forward and North of ROS well.
 
 #### Core
+The core namespace includes things that require extensive knowledge of ROS itself, such as clocks, TimeStamps, Publisher class and ROS Messages.
+In most cases, you should not need to think about these beyond using them if you implement new subs/pubs.
+
+We have modified [the example found here](https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example/tree/main/Nav2SLAMExampleProject/Assets/Scripts) for Clock and TF.
 
 ##### RosMessages
-Where all the messages live.
+Where we keep all compiled C# versions of the ROS Messages in [smarc2/Messages](https://github.com/smarc-project/smarc2/tree/humble/messages).
+
+The compilation is done from Unity by following Robotics->Generate ROS Messages.
+
+![ROS Messages](Media/ROSMessages.png)
+
+- **ROS messaeg path**: Browse to where your ROS messages are defined. You can select a large parent folder as well. The window will show you the discovered ROS messages/services/actions that it can compile into C#. See the next image.
+- **Built message path**: This is a path within the _project_. Unfortunately you can not pick a path inside an assets package. So you will need to _move_ this folder's contents to `SMaRCUnityAssets/Runtime/Scripts/VehicleComponents/ROS/Core/RosMessages` after generating them!
+
+![ROS Messages listed](Media/ROSMessagesListed.png)
+
+- **Build msg**: Clicking this will compile the ROS message into C# in the selected folder. For example, for `CommsMessage.msg`, this will create `RosMessages/smarc_msgs/msg/CommsMessageMsg.cs` which can be used from a Unity script with `using RosMessageTypes.Smarc`.
 
 ##### Clock
-Tick tock
+Publishes the in-game clock since the game has started into the `/clock` topic. 
+
+Any simulation-interacting ROS node should be setting `use_sim_time=true` in their launch and access the time with `secs, nanosecs = node.get_clock().now().seconds_nanoseconds()`.
+
+The reason for publishing clock separately from system time is that the simulation could be faster or slower than real time, thus any node that relies on time must be aware of this discrepency.
 
 ##### ROSPublisher
-Base class of most publishers. Handles timing stuff.
+Base class of most publishers.
+Handling of publishing frequency, topic and namespacing is done here.
+
+![Publisher](Media/Publisher.png)
+
+- **Frequency**: Independent of the sensor that it is publishing and `Time.fixedDeltaTime`, the publisher can be set to an arbitrary frequency. While it won't stop you from publishing faster than the physics updates, this is probably not going to be useful.
+- **Topic**: If the topic does not start with `/`, then it is treated as relative, otherwise it is treated as absolute. If relative, then the name of the _root_ object will be prepended to this topic. For example if there is an object in the Unity object hierarchy `sam0/SAMSensors/Battery` with topic `core/battery` the final topic will be `/sam0/core/battery`.
+- **Ignore Sensor State**: If checked, the topic will be published at the given frequency and topic regardless of the sensor having any updated data. Uncheck if your sensor only produces a message when it has measured something new.
 
 #### Publishers
-`_Pub`
+These  publishers are named as `{SensorName}_Pub` to make it clear in the editor which is which.
+
+Publisher | Message type
+:----|----:
+AcoustiveReceiver_Pub | **smarc_msgs/StringStamped**
+Battery_Pub | sensor_msgs/BatteryState
+CameraImage_Pub | sensor_msgs/Image
+CameraImageCompressed_Pub | sensor_msgs/CompressedImage
+CameraInfo_Pub | sensor_msgs/CameraInfo
+DepthPressure_Pub | sensor_msgs/FluidPressure
+DVL_Pub | **smarc_msgs/DVL**
+GeoPoint_Pub | geographic_msgs/GeoPoint
+GPS_Pub | sensor_msgs/NavSatFix
+IMU_Pub | sensor_msgs/Imu
+Leak_Pub | **smarc_msgs/Leak**
+Odometry_Pub | nav_msgs/Odometry
+PercentageFeedback_Pub | **sam_msgs/PercentStamped**
+PropellerFeedback_Pub | **smarc_msgs/ThrusterFeedback**
+SonarPointCloud_Pub | sensor_msgs/PointCloud2
+SSS_Pub | **smarc_msgs/Sidescan**
+
+> Notice that there are some publishers that do not have a corresponding sensor, like `Odometry_Pub`. These are mostly there for convenience or ground truth information accessibility from ROS.
 
 ##### TF
+While the above publishers are all used by attaching to a game object with the corresponding sensor/actuator, the TF Tree is a little more involved.
+It **does not** extend the base `ROSPublisher` class.
+
+ROS Transform Tree Publisher can be attached to an otherwise empty game object under the desired robot.
+It is a `LinkAttachment` where the attached link (`odom`) in the image below will be the root of the tree published by this publisher.
+The script will travel down the object hierarchy and publish the relative poses of all object with a `URDF Link` component. 
+**Objects without this component are ignored by the TF Tree.**
+
+![TF](Media/TF.png)
+
+- **Suffix**: This string will be added to the end of _every single TF_ published by this. 
+- **Global Frame Ids**: Usually "map". The map frame in Unity refers to the origin of the simulation. Since Unity uses floats for its transforms, we can not set up a simulation in a global reference frame like UTM. Thus all simulations must be in a local map frame. To get around this limitation and still produce global positioning (like for example a GPS sensor) we use a [GPS Reference Point](#gpsreferencepoint).
 
 
 #### Subscribers
@@ -447,6 +521,9 @@ Lots of strings attached.
 
 ## Importer
 URDF into Unity, JSON out of Unity
+
+[URDF Importer docs](https://github.com/Unity-Technologies/URDF-Importer)
+
 
 ## Drone
 It flies.
