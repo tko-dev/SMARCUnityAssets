@@ -40,9 +40,11 @@
       - [Publishers](#publishers)
         - [TF](#tf)
       - [Subscribers](#subscribers)
+        - [Teleporter\_Sub](#teleporter_sub)
+        - [Actuator Subscriber](#actuator-subscriber)
   - [Rope](#rope)
   - [Importer](#importer)
-  - [Drone](#drone)
+  - [Quadrotor](#quadrotor)
   - [GameUI](#gameui)
 
 
@@ -513,11 +515,77 @@ The script will travel down the object hierarchy and publish the relative poses 
 
 
 #### Subscribers
-`_Sub`
+Similar to publishers, these are all suffixed `_Sub`.
+
+Subscriber | Message type
+:----|----:
+AcousticTransmitter_Sub|**smarc_msgs/StringStamped**
+HingeCommand_Sub|**sam_msgs/ThrusterAngles**
+PercentageCommand_Sub|**sam_msgs/PercentStamped**
+PropellerCommand_Sub|**smarc_msgs/ThrusterRPM**
+Teleporter_Sub|geometry_msgs/Pose
+TFtoUnity_Sub|tf2_msgs/TFMessage
+
+- TFtoUnity_Sub is explained more in the [GUI Section](#gameui).
+
+##### Teleporter_Sub
+This component will teleport the attached object according to a Pose from ROS. 
+Useful when you want to move an object around from ROS, either to modify a scene from ROS, or repeat an experiment or even use a Unity object as a simple way to visualize something in ROS.
+
+If the attached object is a body, it's velocities will be reset as well.
+
+If the attached object is an articulation body, only the root can be teleported.
+
+##### Actuator Subscriber
+Subscribers that control an actuator usually derive from this class, they are usually named `{actuatorName}Command_Sub`.
+
+![Subs](Media/Subscriber.png)
+- **Expected/Received Freq.**: The frequency of messages expected by the acutator to work properly. Some actuators reset if no command is given.
+- **Resetting**: Set by the subscriber when `ReceivedFreq < ExpectedFreq`. If resetting, the actuator that this subscriber controls is told to reset to its default value. See [actuators](#actuators).
+- **Received First Message**: Set by the subscriber when it has received at least one message.
 
 
 ## Rope
-Lots of strings attached.
+![RopeFancy](Media/RopeFancy.png)
+
+We simulate a rope using a chain of rigid bodies.
+Using rigid bodies instead of an articulation body allows us to connect two articulation body chains together with the rope at runtime, since new joints can be added to rigid bodies but not articulation bodies.
+![Rope](Media/Rope.png)
+
+To create a rope, you can use the rope generator. 
+
+This component
+- generates a rope that is attached to the robot by default.
+- can be added to any part of a robot.
+- sets the specific parameters of the generated rope.
+- can generate a buoy at the end of the rope.
+
+![RopeGen](Media/RopeGen.png)
+- **Rope Link Prefab**: The prefab that will be used for each link in the rope chain.
+- **Vehicle Connection Name**: Similar to a [link attachment](#linkattachment), the rope will be jointed to this part of the robot.
+- **Rope Diameter/Length**: Thickness and total length of the rope. The rope is generated straight.
+- **Grams Per Meter**: How heavy the rope is. Each link will be assigned a mass according to this.
+- **Buoy Grams**: How heavy a buoy at the end of the rope will be.
+- **Rope Collision Diameter**: Small things moving fast makes collision checks very difficult. To go around this limitation, we use a separate size for just the collisions. The collision geometry will be tangent to the visual geometry at the "bottom" and grow from there. This way if the rope is hanging somewhere, it looks visually accurate despite the collisions being unnaturally large.
+- **Segment Length**: Length of each rope link segment. The total length will be divided by this to determine the number of segments. Be aware that more segments usually means that the physics engine will explode when forces get bigger. 
+- **Segment Mass Ratio**: Mass ratio to assign to each segment. This is a hack within the joint system to allow very-small-mass objects (like a rope link with 5 miligrams of mass) to affect larger-mass objects when connected by joints. 1% seems to be a sweet spot.
+- **Rope Replacement Accuracy**: When the rope is tight, and the buoy is attached to something, the rope is replaced by exactly two links. 
+  - This allows the rope to carry larger forces without breaking physics or stretching much, since there will be exactly 3 joints after replacement instead of 10s of joints. 
+  - At the moment of replacement, rope can jerk the two connected objects around due to small differences in end points. This is the setting to determine how small those differences can be. 
+    - The bigger it is, the quicker and easier the rope is replaced, but it will jerk the connected objects. 
+    - The smaller it is, the more accurate the rope will be during replacement, but getting the rope to be that accurate while in motion is very difficult. 
+    - 2cm default seems to be a happy medium.
+- **(Re)Generate Rope**: This will create an object called `Rope` as a child of the object the component is attached to and place all the rope links in there. If the `Rope` object exists, it will delete it and re-create it with the currently set parameters.
+
+A replaced rope attached to a drone, carrying a SAM:
+![RopeLinks](Media/Rope2Links.png)
+![RopeCarry](Media/RopeCarry.png)
+
+A rope link prefab must contain this component:
+![RopeLink](Media/RopeLink.png)
+- **Spring/Damper/Max Force**: The rope links are connected by configurable joints with drives. These parameters control the spring system between each link. Playing with these parameters can make a rope stiffer or slacker.
+
+
 
 ## Importer
 URDF into Unity, JSON out of Unity
@@ -525,8 +593,44 @@ URDF into Unity, JSON out of Unity
 [URDF Importer docs](https://github.com/Unity-Technologies/URDF-Importer)
 
 
-## Drone
-It flies.
+## Quadrotor
+![Quad](Media/Drone.png)
+We have implemented a simple quadrotor drone, available as a prefab under `SMARCUnityAssets/Runtime/Prefabs/Quadrotor`.
+
+The drone has a keyboard controller:
+![DroneKB](Media/DroneKeyboard.png)
+- **Keys**: *I,J,K,L* for horizontal motion. *U,N* for up/down. *Space* for "Lifting mode" that makes the other keys apply a different RPM difference.
+- **XXX Prop Go**: The four propellers, probably never need to be touched.
+- **Motion RPM**: The RPMs to add/remove to hovering RPMs when moving normally.
+- **Lifting RPM**: Extra RPMs over the motion RPMs when pressing *Space* and a direction key.
+
+The drone also has a geometric tracking controller, implemented within Unity:
+![DroneController](Media/DroneController.png)
+- **Base Link**: Base link of the drone itself.
+- **Control Freq.**: Frequency of control inputs, set to `FixedUpdate()` frequency for best results.
+- **Distance Error Cap**: Limit the aggressiveness of the drone motion. The bigger this is, the more aggressively the drone will tilt to propel itself directly at the target.
+- **Tracking Target TF**: An object to track. This can be literally anything. The drone will control towards this object. By default the quadrotor prefab has a `DroneTarget` object that you can use. You can move this around in the editor while the game is running or move it any other way, like from ROS using [the teleporter](#teleporter_sub).
+- **Load**: This controller can also control for a suspended load.
+  - **Rope**: The rope object that the load is suspended with.
+  - **Attack The Buoy**: If checked, the drone will ignore Tracking Target TF above and instead go for the buoy of the rope.
+  - **Load Link TF**: The transform where the rope's base is attached. Usually a part of another robot.
+  
 
 ## GameUI
-Looks pretty? Sometimes.
+We have a very rudimentary UI for game mode, to change some settings easier while the sim is running.
+This is provided as a prefab under `SMARCUnityAssets/Runtime/Prefabs/GUI/GameUI`.
+
+![GUI](Media/UI.png)
+- This is designed for a 1080p game window. While it will work on other resolutions, it will probably look bad. You can set your game window to 1080p at the top bar.
+- **Panel**: Uncheck to hide the entire thing.
+- **Cam**: Cameras in the scene are listed here. You can change which one is rendered on the game window here.
+  - Cameras under `GameUI` have the same control scheme as Unity editor's cameras: *Right click* to look around. While holding *right click*, *WASD* to move around and *QE* to move up/down.
+- **TF**: If checked, and there is a ROS TF Publisher/Subscriber in the scene, it will be visualized as colored arrows in the game window.
+- **Robot Overlay**: If checked, objects tagged "#robot" will have their names displayed on the scene with small arrows, overlaid on their position on screen.
+- **Robot**: Objects tagged "#robot" will be listed here. The chosen one will have the following controls:
+  - **ROS/Unity**: Checking ROS will disable any keyboard controllers the robot might have to allow control through ROS while checking Unity will disable any [ActuatorSubscriber](#actuator-subscriber)s and enable the keyboard controllers. These two can not be checked at the same time.
+
+![Overlay](Media/overlay.png)
+- The names of the robots are displayed with yellow lines and background
+- The TF Tree of SAM is displayed with colored arrows.
+
