@@ -73,11 +73,14 @@ For buoyancy and water currents, queries the [Water](#water) model to check for 
 The more of these you put on a vehicle and the denser they are, the more accurate the forces will become.
 
 Example:
+
 ![ForcePoints](Media/ForcePoints.png)
+
 The force points are shown as magenta spheres. 
 They are children to the `base_link` object which contains a Body.
 
 ![ForcepointConfig](Media/ForcePointConfig.png)
+
 - Connected Body: Either an articulation body or a rigidbody can be assigned here. Usually the `base_link` of a robot.
 - Buoyancy
   - Volume Object: An object can be assigned to automatically assign the mesh from.
@@ -110,6 +113,7 @@ While in Standard the water surface is a plane at a fixed Y, in HDRP water surfa
 This is used for GPS fixes, pressure measurements, buoyancy forces and so on.
 
 HDRP Water:
+
 ![Waves](Media/HDRPWaves.png)
 
 ### SimpleWaterCurrent
@@ -118,6 +122,7 @@ Used to simulate currents within that volume.
 
 Two volumes with different currents, mixing in overlapping regions.
 Currents visualized with WaterCurrentVisualizer:
+
 ![Currents](Media/Currents.png)
 
 
@@ -152,8 +157,11 @@ These URDF files tend to change over the lifetime of a robot, a camera is moved 
 > See for example `Sonar.cs`.
 
 For example, a Battery object. Before play mode, it is under `sam_auv_v1/SAMSensor`:
+
 ![before play](Media/LinkAttachment_before.png)
+
 And at play mode, it is under `sam_auv_v1/odom/base_link/battery_link`:
+
 ![during play](Media/LinkAttachment_after.png)
 
 - Rotate For ROS Camera: The camera origin is different in Unity and in ROS.
@@ -231,7 +239,9 @@ We implement the following "shotgun" approach:
 > Note that this method uses a terrain object with a terrain collider as the source for its bottom and considers everything else as occlusions. Any bottom features that you expect echoes from should be part of the terrain and not separate objects.
 
 ##### Configuration
+
 ![TX](Media/TX.png)
+
 - Sound Velocity: Used for propagation delays.
 - Min Channel Radius: The minimum size of an opening to be considered occlusion-free between the source and target TXs. For sphere-casts, the radius of the sphere.
 - Enable Echoing: Toggles bottom and surface echoes.
@@ -258,21 +268,27 @@ The general idea:
 
 #### Joints
 These are all straight interfaces to the AB's drives.
+  
+![Hinge](Media/Hinge.png)
+  
 - **Hinge**: Rotates the body around an axis with some force in both directions.
   - **Angle(Max)**: Current and maximum angles of the hinge.
   - **Reverse**: Check to reverse direction.
-  ![Hinge](Media/Hinge.png)
+ 
+![Prismatic](Media/Prismatic.png)
 
 - **Prismatic**: A piston. Moves the body along an axis.
   - **Percentage**: How much of the piston is extended.
   - **Reset value**: The value to set when signalled "reset". Usually the result of a homing sequence on the real thing.
-  ![Prismatic](Media/Prismatic.png)
+
 
 
 #### VBS
 A tank that can fill up and empty itself.
 Changes its AB's mass.
+
 ![VBS](Media/VBS.png)
+
 - **Percentage**: How much of the tank is full.
 - **Reset value**: The value to set when signalled "reset". Usually the result of a homing sequence on the real thing.
 - **Max Volume_l**: Total fluid volume of the tank.
@@ -300,6 +316,7 @@ AUV                                 |Drone
 ### Sensors
 
 ![Sensor](Media/Sensor.png)
+
 - **Sensor**: The base class of most sensors. Handles the update frequencies.
   - **Frequency:** Frequency of sensor updates. Limited to a period of Unity's `Time.fixedDeltaTime`. Reading the world faster than it changes produces duplicate readings. If faster sensors are desired, the physics update rate should be increased. See [Unity Simulation Time](https://docs.unity3d.com/ScriptReference/MonoBehaviour.FixedUpdate.html) for details.
   - **Has New Data:** A boolean set by individual sensors to signal an outside component that the sensor has been updated with a new reading. Useful for sensors that output something only when they detect a change.
@@ -318,6 +335,7 @@ A camera sensor that renders an attached Unity camera onto a texture.
 This texture can be displayed within Unity or published into ROS.
 
 ![Camera Image](Media/CameraImage.png)
+
 - **Play mode preview**: The image can be displayed within Unity game window if the checkbox is checked. The location and size of the preview is configurable.
 
 
@@ -326,6 +344,7 @@ Measures depth using water pressure.
 Uses [a water query](#water) to find real depth, then converts that to KPa.
 
 ![Pressure](Media/Pressure.png)
+
 - **Max Depth**: If the sensor is deeper than this, it will report the maximum depth it can.
 - **Include Atmo. Pressure**: If checked, the reported pressure will include 1Atm constant pressure.
 
@@ -340,6 +359,7 @@ Approximates a DVL raycast beams.
   - Reads the ranges of each ray.
 
 ![DVL](Media/DVL.png)
+
 - **Num Beams**: The number of beams on the DVL can be configured. Most use 4.
 - **Min Hits To Report:** How many hitting rays do we consider to be a bottom lock.
 - **Angle From Vertical:** The angle of an imaginary line in the middle of all the beams from the vertical axis of the sensor.
@@ -354,6 +374,7 @@ Since Unity does not have a model of the globe, we must identify a position in U
 GPS uses this reference point to calculate its relative position in UTM coordinates, then converts the UTM coordinates into Lat/Lon as its output.
 
 ![GPS](Media/GPS.png)
+
 - **Fix**: Filled by the sensor when it is above water.
 
 ##### GPSReferencePoint
@@ -364,6 +385,7 @@ The global position can be given in Lat/Lon or UTM coordinates.
 There must be exactly one such script in a scene.
 
 ![GPSRef](Media/GPSRef.png)
+
 - **Origin is Lat Lon**: If checked, the Lat/Lon fields are used to calculate the UTM fields and vice-versa.
 - **Draw Line To Reference Point**: If checked, each GPS object will draw a line to the origin defined here. Can be useful to see sometimes.
 
@@ -374,6 +396,7 @@ Accesses the velocity fields of its attached body.
 Accelerations are calculated from ground truth velocity differences at every update.
 
 ![IMU](Media/IMU.png)
+
 - **With Gravity**: If checked, IMU will add the gravity vector to its output.
 
 
@@ -384,6 +407,7 @@ Does not simulate anything.
 Can be "triggered" from the editor.
 
 ![Leak](Media/Leak.png)
+
 - **Leaked**: Check manually while the game is running to trigger.
 - **Count**: Number of updates (defined by Frequency field of Sensor) where "Leaked" was checked.
 
@@ -406,6 +430,7 @@ SideScanSonar(SSS)                  |ForwardLookingSonar(FLS)
 
 
 Non-obvious configurable parameters:
+
 ![Sonar config](Media/SonarConfig.png)
 
 - **Type**: The type of sonar: Multi-beam echo-sounder(MBES), SideScanSonar (SSS) or Forward-looking sonar (FLS).
@@ -540,16 +565,19 @@ If the attached object is an articulation body, only the root can be teleported.
 Subscribers that control an actuator usually derive from this class, they are usually named `{actuatorName}Command_Sub`.
 
 ![Subs](Media/Subscriber.png)
+
 - **Expected/Received Freq.**: The frequency of messages expected by the acutator to work properly. Some actuators reset if no command is given.
 - **Resetting**: Set by the subscriber when `ReceivedFreq < ExpectedFreq`. If resetting, the actuator that this subscriber controls is told to reset to its default value. See [actuators](#actuators).
 - **Received First Message**: Set by the subscriber when it has received at least one message.
 
 
 ## Rope
+
 ![RopeFancy](Media/RopeFancy.png)
 
 We simulate a rope using a chain of rigid bodies.
 Using rigid bodies instead of an articulation body allows us to connect two articulation body chains together with the rope at runtime, since new joints can be added to rigid bodies but not articulation bodies.
+
 ![Rope](Media/Rope.png)
 
 To create a rope, you can use the rope generator. 
@@ -561,6 +589,7 @@ This component
 - can generate a buoy at the end of the rope.
 
 ![RopeGen](Media/RopeGen.png)
+
 - **Rope Link Prefab**: The prefab that will be used for each link in the rope chain.
 - **Vehicle Connection Name**: Similar to a [link attachment](#linkattachment), the rope will be jointed to this part of the robot.
 - **Rope Diameter/Length**: Thickness and total length of the rope. The rope is generated straight.
@@ -578,11 +607,15 @@ This component
 - **(Re)Generate Rope**: This will create an object called `Rope` as a child of the object the component is attached to and place all the rope links in there. If the `Rope` object exists, it will delete it and re-create it with the currently set parameters.
 
 A replaced rope attached to a drone, carrying a SAM:
+
 ![RopeLinks](Media/Rope2Links.png)
+
 ![RopeCarry](Media/RopeCarry.png)
 
 A rope link prefab must contain this component:
+
 ![RopeLink](Media/RopeLink.png)
+
 - **Spring/Damper/Max Force**: The rope links are connected by configurable joints with drives. These parameters control the spring system between each link. Playing with these parameters can make a rope stiffer or slacker.
 
 
@@ -595,17 +628,22 @@ URDF into Unity, JSON out of Unity
 
 ## Quadrotor
 ![Quad](Media/Drone.png)
+
 We have implemented a simple quadrotor drone, available as a prefab under `SMARCUnityAssets/Runtime/Prefabs/Quadrotor`.
 
 The drone has a keyboard controller:
+
 ![DroneKB](Media/DroneKeyboard.png)
+
 - **Keys**: *I,J,K,L* for horizontal motion. *U,N* for up/down. *Space* for "Lifting mode" that makes the other keys apply a different RPM difference.
 - **XXX Prop Go**: The four propellers, probably never need to be touched.
 - **Motion RPM**: The RPMs to add/remove to hovering RPMs when moving normally.
 - **Lifting RPM**: Extra RPMs over the motion RPMs when pressing *Space* and a direction key.
 
 The drone also has a geometric tracking controller, implemented within Unity:
+
 ![DroneController](Media/DroneController.png)
+
 - **Base Link**: Base link of the drone itself.
 - **Control Freq.**: Frequency of control inputs, set to `FixedUpdate()` frequency for best results.
 - **Distance Error Cap**: Limit the aggressiveness of the drone motion. The bigger this is, the more aggressively the drone will tilt to propel itself directly at the target.
@@ -621,6 +659,7 @@ We have a very rudimentary UI for game mode, to change some settings easier whil
 This is provided as a prefab under `SMARCUnityAssets/Runtime/Prefabs/GUI/GameUI`.
 
 ![GUI](Media/UI.png)
+
 - This is designed for a 1080p game window. While it will work on other resolutions, it will probably look bad. You can set your game window to 1080p at the top bar.
 - **Panel**: Uncheck to hide the entire thing.
 - **Cam**: Cameras in the scene are listed here. You can change which one is rendered on the game window here.
@@ -631,6 +670,7 @@ This is provided as a prefab under `SMARCUnityAssets/Runtime/Prefabs/GUI/GameUI`
   - **ROS/Unity**: Checking ROS will disable any keyboard controllers the robot might have to allow control through ROS while checking Unity will disable any [ActuatorSubscriber](#actuator-subscriber)s and enable the keyboard controllers. These two can not be checked at the same time.
 
 ![Overlay](Media/overlay.png)
+
 - The names of the robots are displayed with yellow lines and background
 - The TF Tree of SAM is displayed with colored arrows.
 
