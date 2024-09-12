@@ -19,8 +19,7 @@
         - [Bottom echoes](#bottom-echoes)
         - [Configuration](#configuration)
     - [Actuators](#actuators)
-      - [Hinge](#hinge)
-      - [Prismatic](#prismatic)
+      - [Joints](#joints)
       - [VBS](#vbs)
       - [Propeller](#propeller)
     - [Sensors](#sensors)
@@ -41,9 +40,11 @@
       - [Publishers](#publishers)
         - [TF](#tf)
       - [Subscribers](#subscribers)
+        - [Teleporter\_Sub](#teleporter_sub)
+        - [Actuator Subscriber](#actuator-subscriber)
   - [Rope](#rope)
   - [Importer](#importer)
-  - [Drone](#drone)
+  - [Quadrotor](#quadrotor)
   - [GameUI](#gameui)
 
 
@@ -72,11 +73,14 @@ For buoyancy and water currents, queries the [Water](#water) model to check for 
 The more of these you put on a vehicle and the denser they are, the more accurate the forces will become.
 
 Example:
+
 ![ForcePoints](Media/ForcePoints.png)
+
 The force points are shown as magenta spheres. 
 They are children to the `base_link` object which contains a Body.
 
 ![ForcepointConfig](Media/ForcePointConfig.png)
+
 - Connected Body: Either an articulation body or a rigidbody can be assigned here. Usually the `base_link` of a robot.
 - Buoyancy
   - Volume Object: An object can be assigned to automatically assign the mesh from.
@@ -109,6 +113,7 @@ While in Standard the water surface is a plane at a fixed Y, in HDRP water surfa
 This is used for GPS fixes, pressure measurements, buoyancy forces and so on.
 
 HDRP Water:
+
 ![Waves](Media/HDRPWaves.png)
 
 ### SimpleWaterCurrent
@@ -117,6 +122,7 @@ Used to simulate currents within that volume.
 
 Two volumes with different currents, mixing in overlapping regions.
 Currents visualized with WaterCurrentVisualizer:
+
 ![Currents](Media/Currents.png)
 
 
@@ -151,8 +157,11 @@ These URDF files tend to change over the lifetime of a robot, a camera is moved 
 > See for example `Sonar.cs`.
 
 For example, a Battery object. Before play mode, it is under `sam_auv_v1/SAMSensor`:
+
 ![before play](Media/LinkAttachment_before.png)
+
 And at play mode, it is under `sam_auv_v1/odom/base_link/battery_link`:
+
 ![during play](Media/LinkAttachment_after.png)
 
 - Rotate For ROS Camera: The camera origin is different in Unity and in ROS.
@@ -230,7 +239,9 @@ We implement the following "shotgun" approach:
 > Note that this method uses a terrain object with a terrain collider as the source for its bottom and considers everything else as occlusions. Any bottom features that you expect echoes from should be part of the terrain and not separate objects.
 
 ##### Configuration
+
 ![TX](Media/TX.png)
+
 - Sound Velocity: Used for propagation delays.
 - Min Channel Radius: The minimum size of an opening to be considered occlusion-free between the source and target TXs. For sphere-casts, the radius of the sphere.
 - Enable Echoing: Toggles bottom and surface echoes.
@@ -245,20 +256,43 @@ We implement the following "shotgun" approach:
 
 ### Actuators
 Scripts that control articulation bodies using drives defined within.
-The main design is thus:
+See [Unity Articulation Bodies](https://docs.unity3d.com/Manual/class-ArticulationBody.html) documentation for details on how these work.
+
+The general idea:
 - Actuator script exposes a public method to set all of its relevant variables.
-- In `FixedUpdate()` the actuator sets the drive targets accordingly.
+- Some kind of controller (Keyboard, ROS, Internal, etc) calls these methods when relevant.
+- In `FixedUpdate()` the actuator sets the Arti. Body properties.
 
 > Optionally, actuators can implement `IROSPublishable` (See [IROSPublishable](#ros)) if they are expected to provide feedback to ROS.
 
-#### Hinge
-A simple hinge. Rotates the body around an axis with some force.
 
-#### Prismatic
-A piston. Moves the body along an axis.
+#### Joints
+These are all straight interfaces to the AB's drives.
+  
+![Hinge](Media/Hinge.png)
+  
+- **Hinge**: Rotates the body around an axis with some force in both directions.
+  - **Angle(Max)**: Current and maximum angles of the hinge.
+  - **Reverse**: Check to reverse direction.
+ 
+![Prismatic](Media/Prismatic.png)
+
+- **Prismatic**: A piston. Moves the body along an axis.
+  - **Percentage**: How much of the piston is extended.
+  - **Reset value**: The value to set when signalled "reset". Usually the result of a homing sequence on the real thing.
+
+
 
 #### VBS
-A tank that can fill up and empty itself to change its mass.
+A tank that can fill up and empty itself.
+Changes its AB's mass.
+
+![VBS](Media/VBS.png)
+
+- **Percentage**: How much of the tank is full.
+- **Reset value**: The value to set when signalled "reset". Usually the result of a homing sequence on the real thing.
+- **Max Volume_l**: Total fluid volume of the tank.
+- **Density**: Density of the fluid stored.
 
 #### Propeller
 A set of propeller blades.
@@ -281,29 +315,55 @@ AUV                                 |Drone
 
 ### Sensors
 
+![Sensor](Media/Sensor.png)
+
 - **Sensor**: The base class of most sensors. Handles the update frequencies.
+  - **Frequency:** Frequency of sensor updates. Limited to a period of Unity's `Time.fixedDeltaTime`. Reading the world faster than it changes produces duplicate readings. If faster sensors are desired, the physics update rate should be increased. See [Unity Simulation Time](https://docs.unity3d.com/ScriptReference/MonoBehaviour.FixedUpdate.html) for details.
+  - **Has New Data:** A boolean set by individual sensors to signal an outside component that the sensor has been updated with a new reading. Useful for sensors that output something only when they detect a change.
 - **Noise**: All sensors are perfect unless otherwise specified.
 
 #### Battery
-A simpe battery that discharges over time.
-Discharge rate is configurable.
+A simple battery that discharges over time.
+Discharge is linear between min and max voltages.
+
+![Battery](Media/Barrey.png)
+
+
 
 #### Camera Image
 A camera sensor that renders an attached Unity camera onto a texture.
 This texture can be displayed within Unity or published into ROS.
 
+![Camera Image](Media/CameraImage.png)
+
+- **Play mode preview**: The image can be displayed within Unity game window if the checkbox is checked. The location and size of the preview is configurable.
+
+
 #### DepthPressure
 Measures depth using water pressure.
 Uses [a water query](#water) to find real depth, then converts that to KPa.
-Can include atmospheric pressure if enabled in its config.
+
+![Pressure](Media/Pressure.png)
+
+- **Max Depth**: If the sensor is deeper than this, it will report the maximum depth it can.
+- **Include Atmo. Pressure**: If checked, the reported pressure will include 1Atm constant pressure.
+
 
 #### DVL
-Approximates a DVL with 4 beams.
+Approximates a DVL raycast beams.
 - Does a raycast for each beam.
-- If 3 rays hit, considers this a bottom lock.
+- If some number of rays hit, considers this a bottom lock.
 - If bottom lock
   - Reads velocity from the attached body.
   - Casts a 5th beam straight down for altitude.
+  - Reads the ranges of each ray.
+
+![DVL](Media/DVL.png)
+
+- **Num Beams**: The number of beams on the DVL can be configured. Most use 4.
+- **Min Hits To Report:** How many hitting rays do we consider to be a bottom lock.
+- **Angle From Vertical:** The angle of an imaginary line in the middle of all the beams from the vertical axis of the sensor.
+- **Rotation Offset**: The angle around the imaginary middle line of each beam. Use to arrange the beams. Where should the 1st beam be in relation to the sensor frame?
 
 
 #### GPS
@@ -313,6 +373,10 @@ Uses [a water query](#water) to determine submersion and does not update if subm
 Since Unity does not have a model of the globe, we must identify a position in Unity coordinates as a global position.
 GPS uses this reference point to calculate its relative position in UTM coordinates, then converts the UTM coordinates into Lat/Lon as its output.
 
+![GPS](Media/GPS.png)
+
+- **Fix**: Filled by the sensor when it is above water.
+
 ##### GPSReferencePoint
 Provides every GPS object in the Unity scene a global reference point.
 We usually attach this to geo-referenced objects, like a terrain scan with known coordinates.
@@ -320,15 +384,33 @@ The global position can be given in Lat/Lon or UTM coordinates.
 
 There must be exactly one such script in a scene.
 
+![GPSRef](Media/GPSRef.png)
+
+- **Origin is Lat Lon**: If checked, the Lat/Lon fields are used to calculate the UTM fields and vice-versa.
+- **Draw Line To Reference Point**: If checked, each GPS object will draw a line to the origin defined here. Can be useful to see sometimes.
+
+
 #### IMU
 A simple Inertial Measurement Unit that measures linear and agular velocities and accelerations of its attached body.
 Accesses the velocity fields of its attached body.
 Accelerations are calculated from ground truth velocity differences at every update.
 
+![IMU](Media/IMU.png)
+
+- **With Gravity**: If checked, IMU will add the gravity vector to its output.
+
+
+
 #### Leak
 A very simple boolean sensor.
 Does not simulate anything.
 Can be "triggered" from the editor.
+
+![Leak](Media/Leak.png)
+
+- **Leaked**: Check manually while the game is running to trigger.
+- **Count**: Number of updates (defined by Frequency field of Sensor) where "Leaked" was checked.
+
 
 #### Sonar
 We simulate sonars using many raycasts. 
@@ -348,6 +430,7 @@ SideScanSonar(SSS)                  |ForwardLookingSonar(FLS)
 
 
 Non-obvious configurable parameters:
+
 ![Sonar config](Media/SonarConfig.png)
 
 - **Type**: The type of sonar: Multi-beam echo-sounder(MBES), SideScanSonar (SSS) or Forward-looking sonar (FLS).
@@ -364,36 +447,230 @@ Non-obvious configurable parameters:
 
 
 ### ROS
+We use a the [main-ros2 branch of the ROS-TCP-Endpoint](https://github.com/Unity-Technologies/ROS-TCP-Endpoint/tree/main-ros2) forked here: [ROS TCP Endpoint](https://github.com/KKalem/ROS-TCP-Endpoint) into the humble branch to match the rest of the repositories.
+
+More info can be found [here](https://github.com/Unity-Technologies/Unity-Robotics-Hub/blob/main/tutorials/pick_and_place/2_ros_tcp.md)
+
+The main configuration from the Unity side is the IP:Port settings, found under Robotics->Ros Settings in the Unity editor.
+
+![ROS Settings Window](Media/ROSSettings.png)
+
+- **Connect on Startup**: Check if you want Unity to attempt to connect to the Endpoint when you press play. If the Endpoint is not running, this will keep throwing warnings.
+- **Protocol**: Pick ROS2. While there is nothing stopping you from trying ROS2, all the messages we have distributed are for ROS2, meaning you would need to re-generate all the ROS messages yourself.
+- **ROS IP/Port**: If you are running Unity in the same machine as your Endpoint, the defaults of 127.0.0.1 and 10000 will work. If you are running the Endpoint on a VM or a different machine on the same network, you need to put that machine's IP:Port here.
+- **Show HUD**: If checked, shows the IP address and connection status in the game window. Might be obstrusive. Has no other effect.
+- **Keepalive, timeout, sleep times**: Network connection settings. Defaults are good.
+- **Listen for TF Messages**: Keep checked. Unless TF information in Unity is not desired.
+- **Unity Z Axis Direction**: Keep the default North. Z is forward in Unity, and also North. This coincides with X forward and North of ROS well.
 
 #### Core
+The core namespace includes things that require extensive knowledge of ROS itself, such as clocks, TimeStamps, Publisher class and ROS Messages.
+In most cases, you should not need to think about these beyond using them if you implement new subs/pubs.
+
+We have modified [the example found here](https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example/tree/main/Nav2SLAMExampleProject/Assets/Scripts) for Clock and TF.
 
 ##### RosMessages
-Where all the messages live.
+Where we keep all compiled C# versions of the ROS Messages in [smarc2/Messages](https://github.com/smarc-project/smarc2/tree/humble/messages).
+
+The compilation is done from Unity by following Robotics->Generate ROS Messages.
+
+![ROS Messages](Media/ROSMessages.png)
+
+- **ROS messaeg path**: Browse to where your ROS messages are defined. You can select a large parent folder as well. The window will show you the discovered ROS messages/services/actions that it can compile into C#. See the next image.
+- **Built message path**: This is a path within the _project_. Unfortunately you can not pick a path inside an assets package. So you will need to _move_ this folder's contents to `SMaRCUnityAssets/Runtime/Scripts/VehicleComponents/ROS/Core/RosMessages` after generating them!
+
+![ROS Messages listed](Media/ROSMessagesListed.png)
+
+- **Build msg**: Clicking this will compile the ROS message into C# in the selected folder. For example, for `CommsMessage.msg`, this will create `RosMessages/smarc_msgs/msg/CommsMessageMsg.cs` which can be used from a Unity script with `using RosMessageTypes.Smarc`.
 
 ##### Clock
-Tick tock
+Publishes the in-game clock since the game has started into the `/clock` topic. 
+
+Any simulation-interacting ROS node should be setting `use_sim_time=true` in their launch and access the time with `secs, nanosecs = node.get_clock().now().seconds_nanoseconds()`.
+
+The reason for publishing clock separately from system time is that the simulation could be faster or slower than real time, thus any node that relies on time must be aware of this discrepency.
 
 ##### ROSPublisher
-Base class of most publishers. Handles timing stuff.
+Base class of most publishers.
+Handling of publishing frequency, topic and namespacing is done here.
+
+![Publisher](Media/Publisher.png)
+
+- **Frequency**: Independent of the sensor that it is publishing and `Time.fixedDeltaTime`, the publisher can be set to an arbitrary frequency. While it won't stop you from publishing faster than the physics updates, this is probably not going to be useful.
+- **Topic**: If the topic does not start with `/`, then it is treated as relative, otherwise it is treated as absolute. If relative, then the name of the _root_ object will be prepended to this topic. For example if there is an object in the Unity object hierarchy `sam0/SAMSensors/Battery` with topic `core/battery` the final topic will be `/sam0/core/battery`.
+- **Ignore Sensor State**: If checked, the topic will be published at the given frequency and topic regardless of the sensor having any updated data. Uncheck if your sensor only produces a message when it has measured something new.
 
 #### Publishers
-`_Pub`
+These  publishers are named as `{SensorName}_Pub` to make it clear in the editor which is which.
+
+Publisher | Message type
+:----|----:
+AcoustiveReceiver_Pub | **smarc_msgs/StringStamped**
+Battery_Pub | sensor_msgs/BatteryState
+CameraImage_Pub | sensor_msgs/Image
+CameraImageCompressed_Pub | sensor_msgs/CompressedImage
+CameraInfo_Pub | sensor_msgs/CameraInfo
+DepthPressure_Pub | sensor_msgs/FluidPressure
+DVL_Pub | **smarc_msgs/DVL**
+GeoPoint_Pub | geographic_msgs/GeoPoint
+GPS_Pub | sensor_msgs/NavSatFix
+IMU_Pub | sensor_msgs/Imu
+Leak_Pub | **smarc_msgs/Leak**
+Odometry_Pub | nav_msgs/Odometry
+PercentageFeedback_Pub | **sam_msgs/PercentStamped**
+PropellerFeedback_Pub | **smarc_msgs/ThrusterFeedback**
+SonarPointCloud_Pub | sensor_msgs/PointCloud2
+SSS_Pub | **smarc_msgs/Sidescan**
+
+> Notice that there are some publishers that do not have a corresponding sensor, like `Odometry_Pub`. These are mostly there for convenience or ground truth information accessibility from ROS.
 
 ##### TF
+While the above publishers are all used by attaching to a game object with the corresponding sensor/actuator, the TF Tree is a little more involved.
+It **does not** extend the base `ROSPublisher` class.
+
+ROS Transform Tree Publisher can be attached to an otherwise empty game object under the desired robot.
+It is a `LinkAttachment` where the attached link (`odom`) in the image below will be the root of the tree published by this publisher.
+The script will travel down the object hierarchy and publish the relative poses of all object with a `URDF Link` component. 
+**Objects without this component are ignored by the TF Tree.**
+
+![TF](Media/TF.png)
+
+- **Suffix**: This string will be added to the end of _every single TF_ published by this. 
+- **Global Frame Ids**: Usually "map". The map frame in Unity refers to the origin of the simulation. Since Unity uses floats for its transforms, we can not set up a simulation in a global reference frame like UTM. Thus all simulations must be in a local map frame. To get around this limitation and still produce global positioning (like for example a GPS sensor) we use a [GPS Reference Point](#gpsreferencepoint).
 
 
 #### Subscribers
-`_Sub`
+Similar to publishers, these are all suffixed `_Sub`.
+
+Subscriber | Message type
+:----|----:
+AcousticTransmitter_Sub|**smarc_msgs/StringStamped**
+HingeCommand_Sub|**sam_msgs/ThrusterAngles**
+PercentageCommand_Sub|**sam_msgs/PercentStamped**
+PropellerCommand_Sub|**smarc_msgs/ThrusterRPM**
+Teleporter_Sub|geometry_msgs/Pose
+TFtoUnity_Sub|tf2_msgs/TFMessage
+
+- TFtoUnity_Sub is explained more in the [GUI Section](#gameui).
+
+##### Teleporter_Sub
+This component will teleport the attached object according to a Pose from ROS. 
+Useful when you want to move an object around from ROS, either to modify a scene from ROS, or repeat an experiment or even use a Unity object as a simple way to visualize something in ROS.
+
+If the attached object is a body, it's velocities will be reset as well.
+
+If the attached object is an articulation body, only the root can be teleported.
+
+##### Actuator Subscriber
+Subscribers that control an actuator usually derive from this class, they are usually named `{actuatorName}Command_Sub`.
+
+![Subs](Media/Subscriber.png)
+
+- **Expected/Received Freq.**: The frequency of messages expected by the acutator to work properly. Some actuators reset if no command is given.
+- **Resetting**: Set by the subscriber when `ReceivedFreq < ExpectedFreq`. If resetting, the actuator that this subscriber controls is told to reset to its default value. See [actuators](#actuators).
+- **Received First Message**: Set by the subscriber when it has received at least one message.
 
 
 ## Rope
-Lots of strings attached.
+
+![RopeFancy](Media/RopeFancy.png)
+
+We simulate a rope using a chain of rigid bodies.
+Using rigid bodies instead of an articulation body allows us to connect two articulation body chains together with the rope at runtime, since new joints can be added to rigid bodies but not articulation bodies.
+
+![Rope](Media/Rope.png)
+
+To create a rope, you can use the rope generator. 
+
+This component
+- generates a rope that is attached to the robot by default.
+- can be added to any part of a robot.
+- sets the specific parameters of the generated rope.
+- can generate a buoy at the end of the rope.
+
+![RopeGen](Media/RopeGen.png)
+
+- **Rope Link Prefab**: The prefab that will be used for each link in the rope chain.
+- **Vehicle Connection Name**: Similar to a [link attachment](#linkattachment), the rope will be jointed to this part of the robot.
+- **Rope Diameter/Length**: Thickness and total length of the rope. The rope is generated straight.
+- **Grams Per Meter**: How heavy the rope is. Each link will be assigned a mass according to this.
+- **Buoy Grams**: How heavy a buoy at the end of the rope will be.
+- **Rope Collision Diameter**: Small things moving fast makes collision checks very difficult. To go around this limitation, we use a separate size for just the collisions. The collision geometry will be tangent to the visual geometry at the "bottom" and grow from there. This way if the rope is hanging somewhere, it looks visually accurate despite the collisions being unnaturally large.
+- **Segment Length**: Length of each rope link segment. The total length will be divided by this to determine the number of segments. Be aware that more segments usually means that the physics engine will explode when forces get bigger. 
+- **Segment Mass Ratio**: Mass ratio to assign to each segment. This is a hack within the joint system to allow very-small-mass objects (like a rope link with 5 miligrams of mass) to affect larger-mass objects when connected by joints. 1% seems to be a sweet spot.
+- **Rope Replacement Accuracy**: When the rope is tight, and the buoy is attached to something, the rope is replaced by exactly two links. 
+  - This allows the rope to carry larger forces without breaking physics or stretching much, since there will be exactly 3 joints after replacement instead of 10s of joints. 
+  - At the moment of replacement, rope can jerk the two connected objects around due to small differences in end points. This is the setting to determine how small those differences can be. 
+    - The bigger it is, the quicker and easier the rope is replaced, but it will jerk the connected objects. 
+    - The smaller it is, the more accurate the rope will be during replacement, but getting the rope to be that accurate while in motion is very difficult. 
+    - 2cm default seems to be a happy medium.
+- **(Re)Generate Rope**: This will create an object called `Rope` as a child of the object the component is attached to and place all the rope links in there. If the `Rope` object exists, it will delete it and re-create it with the currently set parameters.
+
+A replaced rope attached to a drone, carrying a SAM:
+
+![RopeLinks](Media/Rope2Links.png)
+
+![RopeCarry](Media/RopeCarry.png)
+
+A rope link prefab must contain this component:
+
+![RopeLink](Media/RopeLink.png)
+
+- **Spring/Damper/Max Force**: The rope links are connected by configurable joints with drives. These parameters control the spring system between each link. Playing with these parameters can make a rope stiffer or slacker.
+
+
 
 ## Importer
 URDF into Unity, JSON out of Unity
 
-## Drone
-It flies.
+[URDF Importer docs](https://github.com/Unity-Technologies/URDF-Importer)
+
+
+## Quadrotor
+![Quad](Media/Drone.png)
+
+We have implemented a simple quadrotor drone, available as a prefab under `SMARCUnityAssets/Runtime/Prefabs/Quadrotor`.
+
+The drone has a keyboard controller:
+
+![DroneKB](Media/DroneKeyboard.png)
+
+- **Keys**: *I,J,K,L* for horizontal motion. *U,N* for up/down. *Space* for "Lifting mode" that makes the other keys apply a different RPM difference.
+- **XXX Prop Go**: The four propellers, probably never need to be touched.
+- **Motion RPM**: The RPMs to add/remove to hovering RPMs when moving normally.
+- **Lifting RPM**: Extra RPMs over the motion RPMs when pressing *Space* and a direction key.
+
+The drone also has a geometric tracking controller, implemented within Unity:
+
+![DroneController](Media/DroneController.png)
+
+- **Base Link**: Base link of the drone itself.
+- **Control Freq.**: Frequency of control inputs, set to `FixedUpdate()` frequency for best results.
+- **Distance Error Cap**: Limit the aggressiveness of the drone motion. The bigger this is, the more aggressively the drone will tilt to propel itself directly at the target.
+- **Tracking Target TF**: An object to track. This can be literally anything. The drone will control towards this object. By default the quadrotor prefab has a `DroneTarget` object that you can use. You can move this around in the editor while the game is running or move it any other way, like from ROS using [the teleporter](#teleporter_sub).
+- **Load**: This controller can also control for a suspended load.
+  - **Rope**: The rope object that the load is suspended with.
+  - **Attack The Buoy**: If checked, the drone will ignore Tracking Target TF above and instead go for the buoy of the rope.
+  - **Load Link TF**: The transform where the rope's base is attached. Usually a part of another robot.
+  
 
 ## GameUI
-Looks pretty? Sometimes.
+We have a very rudimentary UI for game mode, to change some settings easier while the sim is running.
+This is provided as a prefab under `SMARCUnityAssets/Runtime/Prefabs/GUI/GameUI`.
+
+![GUI](Media/UI.png)
+
+- This is designed for a 1080p game window. While it will work on other resolutions, it will probably look bad. You can set your game window to 1080p at the top bar.
+- **Panel**: Uncheck to hide the entire thing.
+- **Cam**: Cameras in the scene are listed here. You can change which one is rendered on the game window here.
+  - Cameras under `GameUI` have the same control scheme as Unity editor's cameras: *Right click* to look around. While holding *right click*, *WASD* to move around and *QE* to move up/down.
+- **TF**: If checked, and there is a ROS TF Publisher/Subscriber in the scene, it will be visualized as colored arrows in the game window.
+- **Robot Overlay**: If checked, objects tagged "#robot" will have their names displayed on the scene with small arrows, overlaid on their position on screen.
+- **Robot**: Objects tagged "#robot" will be listed here. The chosen one will have the following controls:
+  - **ROS/Unity**: Checking ROS will disable any keyboard controllers the robot might have to allow control through ROS while checking Unity will disable any [ActuatorSubscriber](#actuator-subscriber)s and enable the keyboard controllers. These two can not be checked at the same time.
+
+![Overlay](Media/overlay.png)
+
+- The names of the robots are displayed with yellow lines and background
+- The TF Tree of SAM is displayed with colored arrows.
+
