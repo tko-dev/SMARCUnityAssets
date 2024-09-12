@@ -1,56 +1,64 @@
-# SMaRC Unity Assets
 **Table of contents:**
-- [SMaRC Unity Assets](#smarc-unity-assets)
-  - [General Concepts and Phrases](#general-concepts-and-phrases)
-  - [Force](#force)
-    - [ForcePoint](#forcepoint)
-    - [(Something)ForceModel](#somethingforcemodel)
-  - [Water](#water)
-    - [SimpleWaterQueryModel](#simplewaterquerymodel)
-    - [SimpleWaterCurrent](#simplewatercurrent)
-  - [Vehicle Components](#vehicle-components)
-      - [Update rates](#update-rates)
-      - [LinkAttachment](#linkattachment)
-    - [Acoustics](#acoustics)
-      - [Transceiver(TX)](#transceivertx)
-        - [Occlusions](#occlusions)
-        - [Propagation speed](#propagation-speed)
-        - [Surface echoes](#surface-echoes)
-        - [Bottom echoes](#bottom-echoes)
-        - [Configuration](#configuration)
-    - [Actuators](#actuators)
-      - [Joints](#joints)
-      - [VBS](#vbs)
-      - [Propeller](#propeller)
-    - [Sensors](#sensors)
-      - [Battery](#battery)
-      - [Camera Image](#camera-image)
-      - [DepthPressure](#depthpressure)
-      - [DVL](#dvl)
-      - [GPS](#gps)
-        - [GPSReferencePoint](#gpsreferencepoint)
-      - [IMU](#imu)
-      - [Leak](#leak)
-      - [Sonar](#sonar)
-    - [ROS](#ros)
-      - [Core](#core)
-        - [RosMessages](#rosmessages)
-        - [Clock](#clock)
-        - [ROSPublisher](#rospublisher)
-      - [Publishers](#publishers)
-        - [TF](#tf)
-      - [Subscribers](#subscribers)
-        - [Teleporter\_Sub](#teleporter_sub)
-        - [Actuator Subscriber](#actuator-subscriber)
+- [General Concepts and Phrases](#general-concepts-and-phrases)
+- [Force](#force)
+  - [ForcePoint](#forcepoint)
+  - [(Something)ForceModel](#somethingforcemodel)
+- [Water](#water)
+  - [SimpleWaterQueryModel](#simplewaterquerymodel)
+  - [SimpleWaterCurrent](#simplewatercurrent)
+- [Vehicle Components](#vehicle-components)
+    - [Update rates](#update-rates)
+    - [LinkAttachment](#linkattachment)
+  - [Acoustics](#acoustics)
+    - [Transceiver(TX)](#transceivertx)
+      - [Occlusions](#occlusions)
+      - [Propagation speed](#propagation-speed)
+      - [Surface echoes](#surface-echoes)
+      - [Bottom echoes](#bottom-echoes)
+      - [Configuration](#configuration)
+  - [Actuators](#actuators)
+    - [Joints](#joints)
+    - [VBS](#vbs)
+    - [Propeller](#propeller)
+  - [Sensors](#sensors)
+    - [Battery](#battery)
+    - [Camera Image](#camera-image)
+    - [DepthPressure](#depthpressure)
+    - [DVL](#dvl)
+    - [GPS](#gps)
+      - [GPSReferencePoint](#gpsreferencepoint)
+    - [IMU](#imu)
+    - [Leak](#leak)
+    - [Sonar](#sonar)
+      - [Sonar Concepts](#sonar-concepts)
+      - [Sonar Configuration](#sonar-configuration)
+      - [Sonar Visualization](#sonar-visualization)
+  - [ROS](#ros)
+    - [Core](#core)
+      - [RosMessages](#rosmessages)
+      - [Clock](#clock)
+      - [ROSPublisher](#rospublisher)
+    - [Publishers](#publishers)
+      - [TF](#tf)
+    - [Subscribers](#subscribers)
+      - [Teleporter\_Sub](#teleporter_sub)
+      - [Actuator Subscriber](#actuator-subscriber)
+- [Utilities](#utilities)
   - [Rope](#rope)
   - [Importer](#importer)
+- [Prefabs](#prefabs)
+  - [SAM AUV](#sam-auv)
+    - [Keyboard Controller](#keyboard-controller)
+    - [ROS Controls](#ros-controls)
   - [Quadrotor](#quadrotor)
+    - [Keyboard controller](#keyboard-controller-1)
+    - [Geometric Tracking Controller](#geometric-tracking-controller)
   - [GameUI](#gameui)
 
 
 
 
-## General Concepts and Phrases
+# General Concepts and Phrases
 - **Body**: Refers to either an Articulation Body(AB), or a Rigidbody(RB) in Unity. 
 Since most of the time these two share the physical properties, we refer to them collectively as Bodies.
 
@@ -61,10 +69,10 @@ Since most of the time these two share the physical properties, we refer to them
 
 
 
-## Force
+# Force
 Simulation of water-related custom forces that are applied to Bodies. 
 
-### ForcePoint
+## ForcePoint
 A generalized massless point in space where external forces are applied.
 This script is usually attached to many GameObjects and made child of a Body. 
 Most commonly used for approximate buoyancy forces, water currents and gravity. 
@@ -94,7 +102,7 @@ They are children to the `base_link` object which contains a Body.
   - Mass: If gravity is to be applied, the mass of the entire object. The mass will also be distributed among the forcepoints, similarly to buoyancy forces.
 
 
-### (Something)ForceModel
+## (Something)ForceModel
 An analytical model of a vehicle. 
 Since Unity only provides a rigid body simulation, some physical modelling (like hydrodynamic forces, damping) must be done "manually". 
 These "ForceModel" scripts do just that and are specific to the vehicle they model, such as SAM and BlueROV.
@@ -102,11 +110,11 @@ These "ForceModel" scripts do just that and are specific to the vehicle they mod
 
 
 
-## Water
+# Water
 We do not simulate water as particles, but as vector fields and a surface.
 [ForcePoint](#forcepoint)s are used to apply the appropriate forces.
 
-### SimpleWaterQueryModel
+## SimpleWaterQueryModel
 Used to define an interface for any object within the Unity world to get the Y(height) value of the water surface at a given point.
 While in Standard the water surface is a plane at a fixed Y, in HDRP water surface is simulated with waves and thus has different heights at different times and locations.
 
@@ -116,7 +124,7 @@ HDRP Water:
 
 ![Waves](Media/HDRPWaves.png)
 
-### SimpleWaterCurrent
+## SimpleWaterCurrent
 A simple vector field within a volume that applies forces to any ForcePoints within it.
 Used to simulate currents within that volume.
 
@@ -127,7 +135,7 @@ Currents visualized with WaterCurrentVisualizer:
 
 
 
-## Vehicle Components
+# Vehicle Components
 These are the components that can be collected within a vehicle: usually sensors and actuators.
 Optionally with ROS connections.
 Most of them reflect real objects and some are abstractions.
@@ -136,12 +144,12 @@ Most of them reflect real objects and some are abstractions.
   - The structure part only contains geometry and Bodies, essentially reflecting a URDF file.
   - The functional parts are all agnostic to their poses, like a packaged real sensor, they can be mounted anywhere.
 
-#### Update rates
+### Update rates
 Unless specified separately, vehicle components that work with the physics engine (only few exceptions) use the `FixedUpdate()` method of Unity.
 This means that the update rate of all of them is limited to the physics update rate of Unity, meaning by default they can be updated at 50hz maximum.
 See [the unity documentation](https://docs.unity3d.com/ScriptReference/MonoBehaviour.FixedUpdate.html) for details.
 
-#### LinkAttachment
+### LinkAttachment
 A base class that most sensors and actuators extend. 
 
 In general, we aim to keep the _function_ of a component and its _pose_ separete from each other: Many robots are defined with URDF files which only define a geometric structure of where everything is and connected to what. 
@@ -170,10 +178,10 @@ Checking this box ON rotates the LinkAttachment object to match the ROS standard
 In general it is a better idea to modify the structure part of the robot (usually the URDF) instead of using this.
 
 
-### Acoustics
+## Acoustics
 Peer to peer acoustic communications.
 
-#### Transceiver(TX)
+### Transceiver(TX)
 Simulates both a receiver and a transmitter of acoustic signals at the package level. 
 The main way to interact with a transceiver are its `Read()` and `Write()` methods.
 - `Read()`: Returns a StringStamped object that was received first. Contains the data as a string, the time it was sent and the time it was received.
@@ -181,20 +189,20 @@ The main way to interact with a transceiver are its `Read()` and `Write()` metho
 
 We provide different levels of realism when simulating a transceiver:
 
-##### Occlusions
+#### Occlusions
 We make use of sphere-casting to determine occlusions.
 When a transceiver broadcasts, it performs a sphere-cast to _every_ other transceiver in the scene.
 If the cast is free of obstacles, we consider that path free.
 The required obstacle-free width can be configured.
 
-##### Propagation speed
+#### Propagation speed
 We use coroutines to simulate the propagation speed of sound.
 If the path is clear and the target is within range, a coroutine is started: The target's `Receive()` method is called after a delay depending on the distance between the source and target.
 This way, the delay can be timed accurately independently of simulation time steps.
 
 This simulates the arrival timing of any packages and can be used for triangulation purposes.
 
-##### Surface echoes
+#### Surface echoes
 The most common source of echoes comes from the surface.
 Since the physics involved in the production of echoes is too complex to be simulated at high rates, we approximate surface echoes as follows:
 
@@ -221,7 +229,7 @@ Since the physics involved in the production of echoes is too complex to be simu
 > This method allows us to use only 3 raycasts per pair to create surface echoes, so it can be enabled without much concern about performance.
 
 
-##### Bottom echoes
+#### Bottom echoes
 The second-most common source of echoes.
 Unlike surface echoes, a flat-bottom assumption is harder to justify for the bottom, since sheer walls, crevices, rocks and other similar non-smooth objects can create such echoes.
 
@@ -238,7 +246,7 @@ We implement the following "shotgun" approach:
 
 > Note that this method uses a terrain object with a terrain collider as the source for its bottom and considers everything else as occlusions. Any bottom features that you expect echoes from should be part of the terrain and not separate objects.
 
-##### Configuration
+#### Configuration
 
 ![TX](Media/TX.png)
 
@@ -254,7 +262,7 @@ We implement the following "shotgun" approach:
 - Draw Signal Lines: Toggle drawing debug lines for all the rays cast.
 
 
-### Actuators
+## Actuators
 Scripts that control articulation bodies using drives defined within.
 See [Unity Articulation Bodies](https://docs.unity3d.com/Manual/class-ArticulationBody.html) documentation for details on how these work.
 
@@ -266,7 +274,7 @@ The general idea:
 > Optionally, actuators can implement `IROSPublishable` (See [IROSPublishable](#ros)) if they are expected to provide feedback to ROS.
 
 
-#### Joints
+### Joints
 These are all straight interfaces to the AB's drives.
   
 ![Hinge](Media/Hinge.png)
@@ -283,7 +291,7 @@ These are all straight interfaces to the AB's drives.
 
 
 
-#### VBS
+### VBS
 A tank that can fill up and empty itself.
 Changes its AB's mass.
 
@@ -294,7 +302,7 @@ Changes its AB's mass.
 - **Max Volume_l**: Total fluid volume of the tank.
 - **Density**: Density of the fluid stored.
 
-#### Propeller
+### Propeller
 A set of propeller blades.
 Spins at a given RPM and applies torque and thrust.
 Can be used underwater and in the air for a drone.
@@ -313,7 +321,7 @@ AUV                                 |Drone
 
 
 
-### Sensors
+## Sensors
 
 ![Sensor](Media/Sensor.png)
 
@@ -322,7 +330,7 @@ AUV                                 |Drone
   - **Has New Data:** A boolean set by individual sensors to signal an outside component that the sensor has been updated with a new reading. Useful for sensors that output something only when they detect a change.
 - **Noise**: All sensors are perfect unless otherwise specified.
 
-#### Battery
+### Battery
 A simple battery that discharges over time.
 Discharge is linear between min and max voltages.
 
@@ -330,7 +338,7 @@ Discharge is linear between min and max voltages.
 
 
 
-#### Camera Image
+### Camera Image
 A camera sensor that renders an attached Unity camera onto a texture.
 This texture can be displayed within Unity or published into ROS.
 
@@ -339,7 +347,7 @@ This texture can be displayed within Unity or published into ROS.
 - **Play mode preview**: The image can be displayed within Unity game window if the checkbox is checked. The location and size of the preview is configurable.
 
 
-#### DepthPressure
+### DepthPressure
 Measures depth using water pressure.
 Uses [a water query](#water) to find real depth, then converts that to KPa.
 
@@ -349,7 +357,7 @@ Uses [a water query](#water) to find real depth, then converts that to KPa.
 - **Include Atmo. Pressure**: If checked, the reported pressure will include 1Atm constant pressure.
 
 
-#### DVL
+### DVL
 Approximates a DVL raycast beams.
 - Does a raycast for each beam.
 - If some number of rays hit, considers this a bottom lock.
@@ -366,7 +374,7 @@ Approximates a DVL raycast beams.
 - **Rotation Offset**: The angle around the imaginary middle line of each beam. Use to arrange the beams. Where should the 1st beam be in relation to the sensor frame?
 
 
-#### GPS
+### GPS
 A GPS antenna.
 Uses [a water query](#water) to determine submersion and does not update if submersed.
 
@@ -377,7 +385,7 @@ GPS uses this reference point to calculate its relative position in UTM coordina
 
 - **Fix**: Filled by the sensor when it is above water.
 
-##### GPSReferencePoint
+#### GPSReferencePoint
 Provides every GPS object in the Unity scene a global reference point.
 We usually attach this to geo-referenced objects, like a terrain scan with known coordinates.
 The global position can be given in Lat/Lon or UTM coordinates.
@@ -390,7 +398,7 @@ There must be exactly one such script in a scene.
 - **Draw Line To Reference Point**: If checked, each GPS object will draw a line to the origin defined here. Can be useful to see sometimes.
 
 
-#### IMU
+### IMU
 A simple Inertial Measurement Unit that measures linear and agular velocities and accelerations of its attached body.
 Accesses the velocity fields of its attached body.
 Accelerations are calculated from ground truth velocity differences at every update.
@@ -401,7 +409,7 @@ Accelerations are calculated from ground truth velocity differences at every upd
 
 
 
-#### Leak
+### Leak
 A very simple boolean sensor.
 Does not simulate anything.
 Can be "triggered" from the editor.
@@ -412,7 +420,7 @@ Can be "triggered" from the editor.
 - **Count**: Number of updates (defined by Frequency field of Sensor) where "Leaked" was checked.
 
 
-#### Sonar
+### Sonar
 We simulate sonars using many raycasts. 
 To keep the simulation running smoothly, these raycasts are done in parallel so thousands of rays can be used without slowing down the simulation.
 
@@ -422,18 +430,26 @@ SideScanSonar(SSS)                  |ForwardLookingSonar(FLS)
 :----------------------------------:|:---------------------------------------:
 ![Sidescan](Media/SSS.png)          |![FLS](Media/FLS.png)
 
-- **Beam**: A beam is a cone (or a slice of one) shaped volume where sound travels. Red (Starboard) and blue (Port) bundles of lines are each a beam.
-- **Beam Breadth**: The opening angle of the conical beam. From one straight edge to the opposite one. The neon green angle on the red beam of SideScanSonar.
-- **Tilt**: The angle from the horizontal plane to the nearest part of a beam. Always positive. The cyan curve between the black horizontal plane and the red beam in both SSS and FLS images.
-- **FOV**: Field of View. The side-to-side angle around the vertical axis of many beams. Neon green
+#### Sonar Concepts
+
+- **Type**: The type of sonar, one of
+  -  Multi-beam echo-sounder(**MBES**)
+     -  Emits a single beam of rays with a configurable breadth and reports back distances and angles to produce a point cloud of hits.
+  -  SideScanSonar (**SSS**)
+     -  Emits two beams at configurable tilt and breadth and reports back only distances hit.
+  -  Forward-looking sonar (**FLS**)
+     -  Emits many beams forward at configurable tilt, breadth and FOV and reports back distances and angles to produce a point cloud of hits.
+- **Beam**: A beam is a cone (or a slice of one) shaped volume where sound travels. Applicable to all sonar types. Red (Starboard) and blue (Port) bundles of lines are each a beam.
+- **Beam Breadth**: The opening angle of the conical beam. From one straight edge to the opposite one. All sonar types use this. The neon green angle on the red beam of SideScanSonar.
+- **Tilt**: The angle from the horizontal plane to the nearest part of a beam. Always positive. Usually used with MBES and SSS. The cyan curve between the black horizontal plane and the red beam in both SSS and FLS images.
+- **FOV**: Field of View. The side-to-side angle around the vertical axis of many beams. Usually used with an FLS. Neon green
 - **Rays**: Raycasting vectors. Approximation of sound propagation. Usually in the order of hundereds per beam. Placed equidistantly within a beam. Individual red or blue lines.
 
 
-Non-obvious configurable parameters:
+#### Sonar Configuration
 
 ![Sonar config](Media/SonarConfig.png)
 
-- **Type**: The type of sonar: Multi-beam echo-sounder(MBES), SideScanSonar (SSS) or Forward-looking sonar (FLS).
 - **Beam Breadth 3 Decibels Deg**: While the raycasts are done equidistantly, not all angles have the same return intensities. This is the -3dB return angle. Should be less than beam breadth.
 - **SideScanSonar**: These are used only if Type == SSS.
   - **Num Buckets Per Beam**: While a SSS can use thousands of rays, it usually reports a fixed number of distance buckets. This is that fixed number. Rays will be consolidated by their hit distances into these buckets.
@@ -442,11 +458,22 @@ Non-obvious configurable parameters:
   - **Mult Gain**: The return intensities of the rays will be multiplied by this gain.
   - **Use Additive Noise**: If checked, noise will be added to the hit distances of the rays.
     - **Add Noise Std/Mean**: The additive noise is sampled from a Normal distribution with this std. and mean.
-- **Visuals**: Draw the rays and hits if checked. This has a considerable impact to performance, so only enable if debugging or visualizing for a purpose. (The above images were created with this.)
 - **Load**: Ratio of time taken within one `Time.fixedDeltaTime` by the `FixedUpdate()` method of Sonar. If this value is above 1, simulation will become very sluggish.
 
+#### Sonar Visualization
 
-### ROS
+For all sonars, we can visualize the points that rays hit with colorful lines:
+
+![RayViz](Media/RayViz.png)
+
+Simply add the component `GameUI/RayViewer` to a sonar and check in its config what you want visualized:
+- Rays
+- Hits
+  - Rainbow or not
+
+
+
+## ROS
 We use a the [main-ros2 branch of the ROS-TCP-Endpoint](https://github.com/Unity-Technologies/ROS-TCP-Endpoint/tree/main-ros2) forked here: [ROS TCP Endpoint](https://github.com/KKalem/ROS-TCP-Endpoint) into the humble branch to match the rest of the repositories.
 
 More info can be found [here](https://github.com/Unity-Technologies/Unity-Robotics-Hub/blob/main/tutorials/pick_and_place/2_ros_tcp.md)
@@ -463,13 +490,13 @@ The main configuration from the Unity side is the IP:Port settings, found under 
 - **Listen for TF Messages**: Keep checked. Unless TF information in Unity is not desired.
 - **Unity Z Axis Direction**: Keep the default North. Z is forward in Unity, and also North. This coincides with X forward and North of ROS well.
 
-#### Core
+### Core
 The core namespace includes things that require extensive knowledge of ROS itself, such as clocks, TimeStamps, Publisher class and ROS Messages.
 In most cases, you should not need to think about these beyond using them if you implement new subs/pubs.
 
 We have modified [the example found here](https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example/tree/main/Nav2SLAMExampleProject/Assets/Scripts) for Clock and TF.
 
-##### RosMessages
+#### RosMessages
 Where we keep all compiled C# versions of the ROS Messages in [smarc2/Messages](https://github.com/smarc-project/smarc2/tree/humble/messages).
 
 The compilation is done from Unity by following Robotics->Generate ROS Messages.
@@ -483,14 +510,14 @@ The compilation is done from Unity by following Robotics->Generate ROS Messages.
 
 - **Build msg**: Clicking this will compile the ROS message into C# in the selected folder. For example, for `CommsMessage.msg`, this will create `RosMessages/smarc_msgs/msg/CommsMessageMsg.cs` which can be used from a Unity script with `using RosMessageTypes.Smarc`.
 
-##### Clock
+#### Clock
 Publishes the in-game clock since the game has started into the `/clock` topic. 
 
 Any simulation-interacting ROS node should be setting `use_sim_time=true` in their launch and access the time with `secs, nanosecs = node.get_clock().now().seconds_nanoseconds()`.
 
 The reason for publishing clock separately from system time is that the simulation could be faster or slower than real time, thus any node that relies on time must be aware of this discrepency.
 
-##### ROSPublisher
+#### ROSPublisher
 Base class of most publishers.
 Handling of publishing frequency, topic and namespacing is done here.
 
@@ -500,7 +527,7 @@ Handling of publishing frequency, topic and namespacing is done here.
 - **Topic**: If the topic does not start with `/`, then it is treated as relative, otherwise it is treated as absolute. If relative, then the name of the _root_ object will be prepended to this topic. For example if there is an object in the Unity object hierarchy `sam0/SAMSensors/Battery` with topic `core/battery` the final topic will be `/sam0/core/battery`.
 - **Ignore Sensor State**: If checked, the topic will be published at the given frequency and topic regardless of the sensor having any updated data. Uncheck if your sensor only produces a message when it has measured something new.
 
-#### Publishers
+### Publishers
 These  publishers are named as `{SensorName}_Pub` to make it clear in the editor which is which.
 
 Publisher | Message type
@@ -524,7 +551,7 @@ SSS_Pub | **smarc_msgs/Sidescan**
 
 > Notice that there are some publishers that do not have a corresponding sensor, like `Odometry_Pub`. These are mostly there for convenience or ground truth information accessibility from ROS.
 
-##### TF
+#### TF
 While the above publishers are all used by attaching to a game object with the corresponding sensor/actuator, the TF Tree is a little more involved.
 It **does not** extend the base `ROSPublisher` class.
 
@@ -539,7 +566,7 @@ The script will travel down the object hierarchy and publish the relative poses 
 - **Global Frame Ids**: Usually "map". The map frame in Unity refers to the origin of the simulation. Since Unity uses floats for its transforms, we can not set up a simulation in a global reference frame like UTM. Thus all simulations must be in a local map frame. To get around this limitation and still produce global positioning (like for example a GPS sensor) we use a [GPS Reference Point](#gpsreferencepoint).
 
 
-#### Subscribers
+### Subscribers
 Similar to publishers, these are all suffixed `_Sub`.
 
 Subscriber | Message type
@@ -553,7 +580,7 @@ TFtoUnity_Sub|tf2_msgs/TFMessage
 
 - TFtoUnity_Sub is explained more in the [GUI Section](#gameui).
 
-##### Teleporter_Sub
+#### Teleporter_Sub
 This component will teleport the attached object according to a Pose from ROS. 
 Useful when you want to move an object around from ROS, either to modify a scene from ROS, or repeat an experiment or even use a Unity object as a simple way to visualize something in ROS.
 
@@ -561,7 +588,7 @@ If the attached object is a body, it's velocities will be reset as well.
 
 If the attached object is an articulation body, only the root can be teleported.
 
-##### Actuator Subscriber
+#### Actuator Subscriber
 Subscribers that control an actuator usually derive from this class, they are usually named `{actuatorName}Command_Sub`.
 
 ![Subs](Media/Subscriber.png)
@@ -569,6 +596,13 @@ Subscribers that control an actuator usually derive from this class, they are us
 - **Expected/Received Freq.**: The frequency of messages expected by the acutator to work properly. Some actuators reset if no command is given.
 - **Resetting**: Set by the subscriber when `ReceivedFreq < ExpectedFreq`. If resetting, the actuator that this subscriber controls is told to reset to its default value. See [actuators](#actuators).
 - **Received First Message**: Set by the subscriber when it has received at least one message.
+
+
+
+
+# Utilities
+We have some useful things that make life easier when developing a vehicle or a scenario.
+These are mostly intended to be used by scene creators to produce prefabs and objects for later use and will likely will never have a game UI parallel.
 
 
 ## Rope
@@ -621,26 +655,63 @@ A rope link prefab must contain this component:
 
 
 ## Importer
+
 URDF into Unity, JSON out of Unity
+
+![Importer](Media/Importer.png)
 
 [URDF Importer docs](https://github.com/Unity-Technologies/URDF-Importer)
 
 
+
+
+
+
+# Prefabs
+
+## SAM AUV
+
+![SAM](Media/SAM.png)
+
+We have implemented the AUV that we have developed in the SMaRC Project in the simulator, available as a prefab under `SMARCUnityAssets/Runtime/Prefabs/sam_auv_v1`
+
+### Keyboard Controller
+
+![SAMKey](Media/SAMKeyboard.png)
+
+- **Keys**:
+  - **W,A,S,D** controls the thrust vector.
+  - **Up/Down arrows** controls thrust.
+  - **R,F,C** sets the VBS to 0%, 50%, 100% full respectively.
+  - **T,G,V** sets the LCG to 0%, 50%, 100% forward respectively.
+- **XXX Go**: No need to modify these unless you add sme new actuators that you'd like to control.
+
+### ROS Controls
+
+All of SAM's actuators and sensors have ROS subs/pubs implemented so SAM is completely controllable through ROS topics.
+The topics can be found in the [sam messages package of the smarc2 repository here](https://github.com/smarc-project/smarc2/blob/humble/messages/sam_msgs/msg/Topics.msg)
+
+
+
 ## Quadrotor
+
 ![Quad](Media/Drone.png)
 
 We have implemented a simple quadrotor drone, available as a prefab under `SMARCUnityAssets/Runtime/Prefabs/Quadrotor`.
 
-The drone has a keyboard controller:
+### Keyboard controller
 
 ![DroneKB](Media/DroneKeyboard.png)
 
-- **Keys**: *I,J,K,L* for horizontal motion. *U,N* for up/down. *Space* for "Lifting mode" that makes the other keys apply a different RPM difference.
+- **Keys**: 
+  - **I,J,K,L** for horizontal motion.
+  - **U,N** for up/down.
+  - **Space** for "Lifting mode" that makes the other keys apply a different RPM difference.
 - **XXX Prop Go**: The four propellers, probably never need to be touched.
 - **Motion RPM**: The RPMs to add/remove to hovering RPMs when moving normally.
 - **Lifting RPM**: Extra RPMs over the motion RPMs when pressing *Space* and a direction key.
 
-The drone also has a geometric tracking controller, implemented within Unity:
+### Geometric Tracking Controller
 
 ![DroneController](Media/DroneController.png)
 
