@@ -1124,6 +1124,7 @@ GameObject:
   - component: {fileID: 7483860395581452217}
   - component: {fileID: 21634888497921560}
   - component: {fileID: 354863042476642253}
+  - component: {fileID: 3228176653120183886}
   m_Layer: 0
   m_Name: SideScanSonar
   m_TagString: Untagged
@@ -1183,8 +1184,6 @@ MonoBehaviour:
   Buckets: 
   BucketsAngleHigh: 
   BucketsAngleLow: 
-  DrawRays: 0
-  DrawHits: 0
   TimeShareInFixedUpdate: 0
   BeamProfile: []
 --- !u!114 &354863042476642253
@@ -1202,6 +1201,21 @@ MonoBehaviour:
   frequency: 20
   topic: payload/sidescan
   ignoreSensorState: 0
+--- !u!114 &3228176653120183886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3921437329497999745}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 435e0ca92f45ace5794321756f92eaef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DrawRays: 0
+  DrawHits: 1
+  UseRainbow: 1
 --- !u!1 &4373050148477529303
 GameObject:
   m_ObjectHideFlags: 0
@@ -1838,6 +1852,7 @@ GameObject:
   - component: {fileID: 8183599049189183586}
   - component: {fileID: 8087944872502967189}
   - component: {fileID: 9136482354477442992}
+  - component: {fileID: 8349117715439265638}
   m_Layer: 0
   m_Name: MultiBeamSonar
   m_TagString: Untagged
@@ -1897,8 +1912,6 @@ MonoBehaviour:
   Buckets: 
   BucketsAngleHigh: 
   BucketsAngleLow: 
-  DrawRays: 0
-  DrawHits: 0
   TimeShareInFixedUpdate: 0
   BeamProfile: []
 --- !u!114 &9136482354477442992
@@ -1917,3 +1930,18 @@ MonoBehaviour:
   topic: mbes/map_gt/bathy_points
   ignoreSensorState: 0
   frame_id: map_gt
+--- !u!114 &8349117715439265638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8102226004099735351}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 435e0ca92f45ace5794321756f92eaef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DrawRays: 0
+  DrawHits: 1
+  UseRainbow: 1
