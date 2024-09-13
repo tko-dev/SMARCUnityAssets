@@ -423,6 +423,7 @@ namespace VehicleComponents.Acoustics
                 float txDepth = txWaterSurfaceLevel - tx.transform.position.y;
                 if(txDepth < 0) continue; // skip not-in-water
 
+
                 TransmitDirectPath(data, tx);
 
                 // if an echo is to happen...
@@ -468,12 +469,14 @@ namespace VehicleComponents.Acoustics
         {
             StringStamped dp = new StringStamped(data, Clock.NowTimeInSeconds);
             yield return new WaitForSeconds(delay);
+            dp.Received(dp.TimeSent + delay);
             tx.Receive(dp);
         }
 
         void Receive(StringStamped data)
         {
-            data.Received(Clock.NowTimeInSeconds);
+            // data.Received(Clock.NowTimeInSeconds);
+            var delay = data.TimeReceived - data.TimeSent;
             receiveQueue.Enqueue(data);
         }
 
