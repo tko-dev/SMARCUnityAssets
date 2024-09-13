@@ -178,6 +178,20 @@ so that we can generate a concrete urdf file to be imported in Unity-->
 	  <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>	  
     </inertial>
   </link>
+  <link name="front_transceiver_link">
+  <inertial>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      <mass value="0.00000001"/>
+	  <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>	  
+    </inertial>
+  </link>
+  <link name="aft_transceiver_link">
+  <inertial>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      <mass value="0.00000001"/>
+	  <inertia ixx="0.00000001" ixy="0.0" ixz="0.0" iyy="0.00000001" iyz="0.0" izz="0.00000001"/>	  
+    </inertial>
+  </link>
   
   <joint name="thruster_yaw_joint" type="revolute">
     <parent link="base_link"/>
@@ -295,5 +309,17 @@ so that we can generate a concrete urdf file to be imported in Unity-->
     <parent link="base_link"/>
     <child link="rope_link"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.650 0.0 0.071"/>
+  </joint>
+  </joint>
+   <joint name="front_transceiver_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_transceiver_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.7 0.0 0.0"/>
+  </joint>
+  </joint>
+   <joint name="aft_transceiver_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="aft_transceiver_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="-0.8 0.0 0.0"/>
   </joint>
 </robot>
