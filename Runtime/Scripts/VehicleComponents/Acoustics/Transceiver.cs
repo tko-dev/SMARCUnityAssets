@@ -475,8 +475,6 @@ namespace VehicleComponents.Acoustics
 
         void Receive(StringStamped data)
         {
-            // data.Received(Clock.NowTimeInSeconds);
-            var delay = data.TimeReceived - data.TimeSent;
             receiveQueue.Enqueue(data);
         }
 
