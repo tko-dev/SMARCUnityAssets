@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using DefaultNamespace; // ResetArticulationBody() extension
+
 using RosMessageTypes.Geometry;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry; 
 using Unity.Robotics.ROSTCPConnector;
@@ -17,6 +19,11 @@ namespace VehicleComponents.ROS.Subscribers
 
         ROSConnection ros;
 
+        ArticulationBody[] ABparts;
+        Rigidbody[] RBparts;
+
+        int immovableStage = 2;
+
         void OnValidate()
         {
             if(Target.TryGetComponent<ArticulationBody>(out ArticulationBody targetAb))
@@ -30,11 +37,15 @@ namespace VehicleComponents.ROS.Subscribers
 
             ros = ROSConnection.GetOrCreateInstance();
             ros.Subscribe<PoseMsg>(topic, UpdateMessage);
+
+            ABparts = Target.gameObject.GetComponentsInChildren<ArticulationBody>();
+            RBparts = Target.gameObject.GetComponentsInChildren<Rigidbody>();
         }
 
 
         void UpdateMessage(PoseMsg pose)
         {
+            immovableStage = 0;
             // if its an articulation body, we need to use a specific method
             // otherwise just setting local position/rotation is enough.
             var unityPosi = FLU.ConvertToRUF(
@@ -50,26 +61,52 @@ namespace VehicleComponents.ROS.Subscribers
                             (float)pose.orientation.z,
                             (float)pose.orientation.w));
 
-            if(Target.TryGetComponent<ArticulationBody>(out ArticulationBody targetAb))
+            ArticulationBody targetAb;
+            if(Target.TryGetComponent<ArticulationBody>(out targetAb))
             {
                 if(!targetAb.isRoot) return;
+                targetAb.immovable = true;
                 targetAb.TeleportRoot(unityPosi, unityOri);
-                targetAb.velocity = Vector3.zero;
-                targetAb.angularVelocity = Vector3.zero;
-                
             }
             else
             {
                 Target.localPosition = unityPosi;
                 Target.localRotation = unityOri;
-                if(Target.TryGetComponent<Rigidbody>(out Rigidbody targetRB))
-                {
-                    targetRB.velocity = Vector3.zero;
-                    targetRB.angularVelocity = Vector3.zero;
-                }
             }
 
 
+            foreach(var ab in ABparts)
+            {
+                ab.velocity = Vector3.zero;
+                ab.angularVelocity = Vector3.zero;
+                ab.ResetArticulationBody();
+            }
+
+            foreach(var rb in RBparts)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+
+        void FixedUpdate()
+        {
+            switch(immovableStage)
+            {
+                case 0:
+                    immovableStage = 1;
+                    break;
+                case 1:
+                    if(Target.TryGetComponent<ArticulationBody>(out ArticulationBody targetAb))
+                    {
+                        if(!targetAb.isRoot) return;
+                        targetAb.immovable = false;
+                    }
+                    immovableStage = 2;
+                    break;
+                case 2:
+                    break;
+            }
         }
     }
 }
