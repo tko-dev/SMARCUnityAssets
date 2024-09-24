@@ -22,7 +22,7 @@ namespace VehicleComponents.ROS.Subscribers
         ArticulationBody[] ABparts;
         Rigidbody[] RBparts;
 
-        int immovableStage = 0;
+        int immovableStage = 2;
 
         void OnValidate()
         {
