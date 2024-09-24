@@ -53,8 +53,8 @@ namespace VehicleComponents.Sensors
 
         public (double easting, double northing, double lat, double lon) GetUTMLatLonOfObject(GameObject o)
         {
-            var posDiff = o.transform.position - gameObject.transform.position;
-            if(drawLineToReferencePoint) Debug.DrawLine(o.transform.position, gameObject.transform.position);
+            var posDiff = o.transform.position - transform.position;
+            if(drawLineToReferencePoint) Debug.DrawLine(o.transform.position, transform.position);
             var xDiff = posDiff.x;
             var zDiff = posDiff.z;
             // +z = north
@@ -63,6 +63,16 @@ namespace VehicleComponents.Sensors
             var obj_northing = northing + zDiff;
             (var obj_lat, var obj_lon) = GetLatLonFromUTM(obj_easting, obj_northing);
             return (obj_easting, obj_northing, obj_lat, obj_lon);
+        }
+
+        public (float x, float z) GetUnityXZFromLatLon(double lat, double lon)
+        {
+            var latlon = new Coordinate(lat, lon);
+            var eastingDiff = latlon.UTM.Easting - easting;
+            var northingDiff = latlon.UTM.Northing - northing;
+            var unityX = transform.position.x + eastingDiff;
+            var unityZ = transform.position.z + northingDiff;
+            return ((float)unityX, (float)unityZ);
         }
     }
     

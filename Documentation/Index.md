@@ -42,6 +42,7 @@
       - [TF](#tf)
     - [Subscribers](#subscribers)
       - [Teleporter\_Sub](#teleporter_sub)
+      - [CurrentWP\_Sub](#currentwp_sub)
       - [Actuator Subscriber](#actuator-subscriber)
 - [Utilities](#utilities)
   - [Rope](#rope)
@@ -584,9 +585,23 @@ TFtoUnity_Sub|tf2_msgs/TFMessage
 This component will teleport the attached object according to a Pose from ROS. 
 Useful when you want to move an object around from ROS, either to modify a scene from ROS, or repeat an experiment or even use a Unity object as a simple way to visualize something in ROS.
 
-If the attached object is a body, it's velocities will be reset as well.
+All velocities of the object will be set to 0 after teleportation.
 
-If the attached object is an articulation body, only the root can be teleported.
+Nothing else is modified, such as Articulation drives, poses etc.
+
+
+#### CurrentWP_Sub
+A simple component AND prefab that displays a circle and line to visualize a waypoint in a robot might be moving towards.
+Updates visuals on every message.
+
+![Sub](Media/CurrentWP_Sub.png)
+
+- **PointingType**:
+  - Position: The position of the object will be changed to reflect the waypoint. You should add a visual element to the object for this to make sense.
+  - LineRenderer: A circle with radius `goal_tolerance` and center `lat,lon` and a line from 2m above water to the same center will be drawn in the world without moving the object around. See image below.
+
+![Linerenderer](Media/Current_WP_Viz.png)
+
 
 #### Actuator Subscriber
 Subscribers that control an actuator usually derive from this class, they are usually named `{actuatorName}Command_Sub`.
