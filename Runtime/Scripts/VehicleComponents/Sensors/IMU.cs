@@ -30,13 +30,14 @@ namespace VehicleComponents.Sensors
         public override bool UpdateSensor(double deltaTime)
         {
             var ab = articulationBody;
-            localVelocity = ab.transform.InverseTransformVector(ab.velocity);
+            // localVelocity = ab.transform.InverseTransformVector(ab.velocity);
+            localVelocity = ab.velocity;
             if (deltaTime > 0)
             {
                 Vector3 deltaLinearAcceleration = localVelocity - lastVelocity;
                 linearAcceleration = deltaLinearAcceleration / (float)deltaTime;
-                Debug.Log("deltaTime is " + deltaTime);
-                Debug.Log("calculated acc is " + linearAcceleration);
+                // Debug.Log("deltaTime in IMU is " + deltaTime);
+                Debug.Log("calculated acc in imu is " + linearAcceleration);
             }
             
             angularVelocity = ab.transform.InverseTransformVector(-1f * ab.angularVelocity);
