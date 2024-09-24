@@ -585,9 +585,9 @@ TFtoUnity_Sub|tf2_msgs/TFMessage
 This component will teleport the attached object according to a Pose from ROS. 
 Useful when you want to move an object around from ROS, either to modify a scene from ROS, or repeat an experiment or even use a Unity object as a simple way to visualize something in ROS.
 
-If the attached object is a body, it's velocities will be reset as well.
+All velocities of the object will be set to 0 after teleportation.
 
-If the attached object is an articulation body, only the root can be teleported.
+Nothing else is modified, such as Articulation drives, poses etc.
 
 
 #### CurrentWP_Sub
