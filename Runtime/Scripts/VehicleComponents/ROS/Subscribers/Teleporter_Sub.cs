@@ -45,7 +45,6 @@ namespace VehicleComponents.ROS.Subscribers
 
         void UpdateMessage(PoseMsg pose)
         {
-            immovableStage = 0;
             // if its an articulation body, we need to use a specific method
             // otherwise just setting local position/rotation is enough.
             var unityPosi = FLU.ConvertToRUF(
@@ -66,6 +65,7 @@ namespace VehicleComponents.ROS.Subscribers
             {
                 if(!targetAb.isRoot) return;
                 targetAb.immovable = true;
+                immovableStage = 0;
                 targetAb.TeleportRoot(unityPosi, unityOri);
             }
             else
