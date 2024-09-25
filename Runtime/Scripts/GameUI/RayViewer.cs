@@ -20,12 +20,16 @@ namespace GameUI
         [Tooltip("Use rainbow colormap for the hit points?")]
         public bool UseRainbow = false;
 
-        private Color rayColor = Color.white;
-        private Color hitColor = Color.red;
+        Color rayColor = Color.white;
+        Color hitColor = Color.red;
 
-        private float MaxZ = 0f;
-        private float MinZ = Mathf.Infinity;
+        float MaxZ = 0f;
+        float MinZ = Mathf.Infinity;
 
+        public Material RayMaterial;
+        public float RayThickness = 0.05f;
+        GameObject RayDrawer;
+        LineRenderer RaysLR;
 
 
         public static Color Rainbow(float progress)
@@ -63,22 +67,48 @@ namespace GameUI
         void Start()
         {
             sonar = GetComponent<Sonar>();
-            
-            
+            if(DrawRays)
+            {
+                RayDrawer = new GameObject("RayDrawer");
+                RayDrawer.transform.SetParent(transform);
+                RaysLR = RayDrawer.AddComponent<LineRenderer>();
+                RaysLR.material = RayMaterial;
+                RaysLR.startWidth = RayThickness;
+                RaysLR.endWidth = RayThickness;
+                RaysLR.receiveShadows = false;
+                RaysLR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+
+
         }
+
         void FixedUpdate()
         {
 
             if (DrawRays)
             {
-                for (int i=0; i<sonar.SonarHits.Length; i++)
+                RaysLR.enabled = true;
+                // the pattern is [sonar, hit0 hit1 sonar, hit2 hit3 sonar, hit4 hit5 sonar]
+                var positions = new List<Vector3>();
+                positions.Add(sonar.transform.position);
+                for (int i=0; i<sonar.SonarHits.Length; i+=2)
                 {
-                    if (sonar.SonarHits[i].Hit.point != Vector3.zero)
-                    {
-                        Debug.DrawLine(sonar.transform.position, sonar.SonarHits[i].Hit.point, rayColor, 1f);
-                    }
+                    var hit0 = sonar.SonarHits[i].Hit.point;
+                    if (hit0 == Vector3.zero) positions.Add(sonar.transform.position);
+                    else positions.Add(hit0);
+                    var hit1 = sonar.SonarHits[i+1].Hit.point;
+                    if (hit1 == Vector3.zero) positions.Add(sonar.transform.position);
+                    else positions.Add(hit1);
+                    positions.Add(sonar.transform.position);
                 }
+                RaysLR.positionCount = positions.Count;
+                RaysLR.material = RayMaterial;
+                RaysLR.startWidth = RayThickness;
+                RaysLR.endWidth = RayThickness;
+                RaysLR.SetPositions(positions.ToArray());
             }
+            else RaysLR.enabled = false;
+            
             if (DrawHits)
             {
                 if (UseRainbow){
