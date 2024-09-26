@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework.Internal.Builders;
+using UnityEditor.EditorTools;
 using UnityEngine;
 
 using Sonar = VehicleComponents.Sensors.Sonar;
@@ -22,6 +23,8 @@ namespace GameUI
         [Header("Hits")]
         [Tooltip("Just draw the hit points as particles?")]
         public bool DrawHits = false;
+        [Tooltip("Drawing hits every single frame can create A LOT of points. If you want to visualize a large area fast, you maybe don't need 1mm density :)")]
+        public int DrawEveryNthFrame = 10;
         [Tooltip("Assign a mesh object to be drawn at every hit point. Assign something with few verts, like a quad or triangle, a sphere at most.")]
         public bool UseRainbow = false;
         public float HitsSize = 0.1f;
@@ -37,6 +40,7 @@ namespace GameUI
         GameObject HitsDrawer;
         ParticleSystem HitsParticleSystem;
         ParticleSystem.EmitParams[] HitsEmitParams;
+        int HitsSkipped = 0;
 
 
         public static Color Rainbow(float progress)
@@ -181,7 +185,8 @@ namespace GameUI
         void Update()
         {
             UpdateRays();
-            UpdateHits();
+            if(HitsSkipped == 0) UpdateHits();
+            else HitsSkipped = (HitsSkipped+1)%DrawEveryNthFrame;
         }
 
         
