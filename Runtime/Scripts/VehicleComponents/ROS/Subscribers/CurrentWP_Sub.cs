@@ -59,7 +59,7 @@ namespace VehicleComponents.ROS.Subscribers
             (position.x, position.z) = gpsRef.GetUnityXZFromLatLon(msg.lat, msg.lon);
             position.y = (float) -msg.travel_depth;
 
-            transform.localPosition = position;
+            transform.position = position;
         }
 
         void UpdateLines(GotoWaypointMsg msg)

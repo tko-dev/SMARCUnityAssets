@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework.Internal.Builders;
+using UnityEditor.EditorTools;
 using UnityEngine;
 
 using Sonar = VehicleComponents.Sensors.Sonar;
@@ -12,25 +14,38 @@ namespace GameUI
     {
         Sonar sonar;
 
-        [Header("Visuals")]
+        [Header("Rays")]
         [Tooltip("Draw rays in the scene view as lines?")]
         public bool DrawRays = false;
-        [Tooltip("Just draw the hit points as 1m-long lines?")]
+        public Material RayMaterial;
+        public float RayThickness = 0.05f;
+
+        [Header("Hits")]
+        [Tooltip("Just draw the hit points as particles?")]
         public bool DrawHits = false;
-        [Tooltip("Use rainbow colormap for the hit points?")]
+        [Tooltip("Drawing hits every single frame can create A LOT of points. If you want to visualize a large area fast, you maybe don't need 1mm density :)")]
+        public int DrawEveryNthFrame = 10;
+        [Tooltip("Assign a mesh object to be drawn at every hit point. Assign something with few verts, like a quad or triangle, a sphere at most.")]
         public bool UseRainbow = false;
+        public float HitsSize = 0.1f;
+        [Tooltip("How many seconds should the hits be drawn? Limited by MaxParticlesMultiplier too.")]
+        public float HitsLifetime = 1f;
+        [Tooltip("How many sets of rays should we allow to be drawn? Limited by lifetime too.")]
+        public int MaxParticlesMultiplier = 10;
 
-        private Color rayColor = Color.white;
-        private Color hitColor = Color.red;
+        GameObject RayDrawer;
+        LineRenderer RaysLR;
 
-        private float MaxZ = 0f;
-        private float MinZ = Mathf.Infinity;
 
+        GameObject HitsDrawer;
+        ParticleSystem HitsParticleSystem;
+        ParticleSystem.EmitParams[] HitsEmitParams;
+        int HitsSkipped = 0;
 
 
         public static Color Rainbow(float progress)
         {
-            float div = (Math.Abs(progress % 1) * 6);
+            float div = Math.Abs(progress % 1) * 6;
             int ascending = (int) ((div % 1) * 255);
             int descending = 255 - ascending;
 
@@ -63,47 +78,118 @@ namespace GameUI
         void Start()
         {
             sonar = GetComponent<Sonar>();
-            
-            
+            if(DrawRays)
+            {
+                RayDrawer = new GameObject("RayDrawer");
+                RayDrawer.transform.SetParent(transform);
+                RaysLR = RayDrawer.AddComponent<LineRenderer>();
+                RaysLR.material = RayMaterial;
+                RaysLR.startWidth = RayThickness;
+                RaysLR.endWidth = RayThickness;
+                RaysLR.receiveShadows = false;
+                RaysLR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+
+            if(DrawHits)
+            {
+                HitsDrawer = new GameObject("HitsDrawer");
+                HitsDrawer.transform.SetParent(transform);
+                HitsParticleSystem = HitsDrawer.AddComponent<ParticleSystem>();
+                
+                var rendererModule = HitsDrawer.GetComponent<ParticleSystemRenderer>();
+                rendererModule.material = new Material(Shader.Find("Particles/Standard Unlit"));
+                rendererModule.alignment = ParticleSystemRenderSpace.World;
+                rendererModule.sortMode = ParticleSystemSortMode.YoungestInFront;
+                rendererModule.renderMode = ParticleSystemRenderMode.Mesh;
+                rendererModule.mesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
+
+                
+                var mainModule = HitsParticleSystem.main;
+                mainModule.startSpeed = 0f;
+                mainModule.playOnAwake = false;
+                mainModule.maxParticles = sonar.TotalRayCount * MaxParticlesMultiplier;
+                mainModule.startColor = Color.red;
+                mainModule.startSize = HitsSize;
+                mainModule.startLifetime = HitsLifetime;
+                mainModule.simulationSpace = ParticleSystemSimulationSpace.World;
+                mainModule.ringBufferMode = ParticleSystemRingBufferMode.PauseUntilReplaced;
+
+                var emissionModule = HitsParticleSystem.emission;
+                emissionModule.enabled = false;
+                var shapeModule = HitsParticleSystem.shape;
+                shapeModule.enabled = false;  
+                
+                HitsEmitParams = new ParticleSystem.EmitParams[sonar.TotalRayCount];
+
+            }
         }
-        void FixedUpdate()
+
+        void UpdateRays()
         {
-
-            if (DrawRays)
+            if(RaysLR != null)
             {
-                for (int i=0; i<sonar.SonarHits.Length; i++)
+                if (!DrawRays) RaysLR.enabled = false;
+                else
                 {
-                    if (sonar.SonarHits[i].Hit.point != Vector3.zero)
+                    RaysLR.enabled = true;
+                    // the pattern is [sonar, hit0 hit1 sonar, hit2 hit3 sonar, hit4 hit5 sonar]
+                    var positions = new List<Vector3>();
+                    positions.Add(sonar.transform.position);
+
+                    for (int i=0; i<sonar.TotalRayCount; i+=2)
                     {
-                        Debug.DrawLine(sonar.transform.position, sonar.SonarHits[i].Hit.point, rayColor, 1f);
+                        var hit0 = sonar.SonarHits[i].Hit.point;
+                        if (hit0 == Vector3.zero) positions.Add(sonar.transform.position);
+                        else positions.Add(hit0);
+                        var hit1 = sonar.SonarHits[i+1].Hit.point;
+                        if (hit1 == Vector3.zero) positions.Add(sonar.transform.position);
+                        else positions.Add(hit1);
+                        positions.Add(sonar.transform.position);
                     }
+
+                    RaysLR.positionCount = positions.Count;
+                    RaysLR.material = RayMaterial;
+                    RaysLR.startWidth = RayThickness;
+                    RaysLR.endWidth = RayThickness;
+                    RaysLR.SetPositions(positions.ToArray());
                 }
             }
-            if (DrawHits)
-            {
-                if (UseRainbow){
-                // if using rainbow colormap, find the min and max Z values
-                for (int i=0; i<sonar.SonarHits.Length; i++)
-                    {
-                        if((sonar.SonarHits[i].Hit.point.y > MaxZ)&& (sonar.SonarHits[i].Hit.point.y<0)) MaxZ = sonar.SonarHits[i].Hit.point.y;
-                        if(sonar.SonarHits[i].Hit.point.y < MinZ) MinZ = sonar.SonarHits[i].Hit.point.y;
-                    }
-                }
-                for (int i=0; i<sonar.SonarHits.Length; i++)
-                {
-                    if (UseRainbow)
-                    {
-                        float normalizedZ = Mathf.InverseLerp(MaxZ, MinZ, sonar.SonarHits[i].Hit.point.y);
-                        hitColor= Rainbow(normalizedZ);
-                    }
-                    Debug.DrawRay(sonar.SonarHits[i].Hit.point, Vector3.up, hitColor, 1f);
-
-                }
-            }
-
-
         }
 
+        void UpdateHits()
+        {
+            if (HitsParticleSystem != null)
+            {
+                if (DrawHits)
+                {
+                    for (int i = 0; i < sonar.TotalRayCount; i++)
+                    {
+                        var emitParams = HitsEmitParams[i];
+                        var hitPoint = sonar.SonarHits[i].Hit.point;
+                        var surfaceNormal = sonar.SonarHits[i].Hit.normal;
+
+                        float normalizedZ = Mathf.InverseLerp(sonar.HitsMaxHeight, sonar.HitsMinHeight, hitPoint.y);
+                        if (UseRainbow) emitParams.startColor = Rainbow(normalizedZ);
+                        else emitParams.startColor = Color.red;
+                        emitParams.position = hitPoint + 0.03f*surfaceNormal;
+                        emitParams.rotation3D = Quaternion.LookRotation(-surfaceNormal).eulerAngles;
+                        emitParams.startSize = HitsSize;
+                        emitParams.startLifetime = HitsLifetime;
+                        
+                        HitsParticleSystem.Emit(emitParams, 1);
+                    }
+                }
+            }
+        }
+
+        void Update()
+        {
+            UpdateRays();
+            if(HitsSkipped == 0) UpdateHits();
+            else HitsSkipped = (HitsSkipped+1)%DrawEveryNthFrame;
+        }
+
+        
     }
 
 }

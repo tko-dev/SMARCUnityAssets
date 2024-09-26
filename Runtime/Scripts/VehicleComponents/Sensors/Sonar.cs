@@ -211,6 +211,11 @@ namespace VehicleComponents.Sensors
         // we use this one to keep the latest hits in memory and
         // accessible to outside easily.
         [HideInInspector] public SonarHit[] SonarHits;
+        // Keeping track of lowest and highest hit heights
+        // for visualization or other purposes
+        [HideInInspector] public float HitsMinHeight = Mathf.Infinity;
+        [HideInInspector] public float HitsMaxHeight = 0f;
+        
 
 
         [Header("Load")]
@@ -325,9 +330,10 @@ namespace VehicleComponents.Sensors
             for(int i=0; i < TotalRayCount; i++)
             {
                 var hit = results[i];
-                var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
+                var (beamNum, rayNum) = BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
                 SonarHits[i].Update(hit, BeamProfile[rayNum]);
-                
+                if(hit.point.y > HitsMaxHeight && hit.point.y<0) HitsMaxHeight = hit.point.y;
+                if(hit.point.y < HitsMinHeight) HitsMinHeight = hit.point.y;
             }
         }
             
