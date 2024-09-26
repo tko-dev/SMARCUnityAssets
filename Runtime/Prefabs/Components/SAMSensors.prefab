@@ -1184,6 +1184,8 @@ MonoBehaviour:
   Buckets: 
   BucketsAngleHigh: 
   BucketsAngleLow: 
+  HitsMinHeight: Infinity
+  HitsMaxHeight: 0
   TimeShareInFixedUpdate: 0
   BeamProfile: []
 --- !u!114 &354863042476642253
@@ -1208,14 +1210,19 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3921437329497999745}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 435e0ca92f45ace5794321756f92eaef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DrawRays: 0
+  DrawRays: 1
+  RayMaterial: {fileID: -6478536213147159724, guid: 982c4d158e289562aa45be9f01a615a1, type: 3}
+  RayThickness: 0.05
   DrawHits: 1
   UseRainbow: 1
+  HitsSize: 0.1
+  HitsLifetime: 1
+  MaxParticlesMultiplier: 10
 --- !u!1 &4373050148477529303
 GameObject:
   m_ObjectHideFlags: 0
@@ -1912,6 +1919,8 @@ MonoBehaviour:
   Buckets: 
   BucketsAngleHigh: 
   BucketsAngleLow: 
+  HitsMinHeight: Infinity
+  HitsMaxHeight: 0
   TimeShareInFixedUpdate: 0
   BeamProfile: []
 --- !u!114 &9136482354477442992
@@ -1937,11 +1946,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8102226004099735351}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 435e0ca92f45ace5794321756f92eaef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DrawRays: 0
+  DrawRays: 1
+  RayMaterial: {fileID: 765158034006431142, guid: 4c69fe22859e53c60b1e6d411903d798, type: 3}
+  RayThickness: 0.05
   DrawHits: 1
   UseRainbow: 1
+  HitsSize: 0.2
+  HitsLifetime: 10
+  MaxParticlesMultiplier: 100

@@ -465,12 +465,18 @@ SideScanSonar(SSS)                  |ForwardLookingSonar(FLS)
 
 For all sonars, we can visualize the points that rays hit with colorful lines:
 
-![RayViz](Media/RayViz.png)
+![RayViz](Media/RayViz2.png)
 
 Simply add the component `GameUI/RayViewer` to a sonar and check in its config what you want visualized:
-- Rays
-- Hits
-  - Rainbow or not
+
+![RayViewer](Media/RayViewer.png)
+
+- **Draw Rays/Hits:** Toggle drawing of this data type. If not ON at start, can not be turned on during game. But can be toggle freely if ON at start.
+- **Ray Material:** Assign a material to be used for the rays. Maybe something shiny or transparent?
+- **Ray Thickness / Hits Size**: How thicc do you want your lines/quads to be.
+- **Use Rainbow**: Should the hits be colored according to where they are inside the `[minHeight, maxHeight]` range? If off, they will be red.
+- **Hits Lifetime**: How long, in seconds, should the particles for hits stay around. Limited by Max Particles Multiplier!
+- **Max Particles Multiplier**: How many copies of each hit should be kept on the scene? If you have 256 rays for a MBES, setting this to 100 will result in 25600 particles. Limited by Hits Lifetime!
 
 
 
@@ -578,6 +584,7 @@ PercentageCommand_Sub|**sam_msgs/PercentStamped**
 PropellerCommand_Sub|**smarc_msgs/ThrusterRPM**
 Teleporter_Sub|geometry_msgs/Pose
 TFtoUnity_Sub|tf2_msgs/TFMessage
+CurrentWP_Sub|**smarc_mission_msgs/GotoWaypoint**
 
 - TFtoUnity_Sub is explained more in the [GUI Section](#gameui).
 
