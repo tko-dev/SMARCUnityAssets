@@ -1,5 +1,5 @@
 # SMARC Unity Assets - SAABmarine edition
-This is the Unity simulation repo for SAABmarine.
+This is the Unity simulation repo for SAABmarine. The purpose of this repo is to create a simulation for the BlueROV2 heavy configuration. 
 
 ---------------------------
 This is a package containing all of the SMARC Unity assets and scripts including vehicles, dynamics, sensors and more. 
