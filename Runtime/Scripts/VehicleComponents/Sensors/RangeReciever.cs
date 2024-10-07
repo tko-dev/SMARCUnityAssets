@@ -7,18 +7,20 @@ using DefaultNamespace.Water;
 
 namespace VehicleComponents.Sensors
 {
-    public class DepthSensor : Sensor
+    public class RangeReciever : Sensor
     {
-        [Header("Depth-Sensor")]
-        public float depth;
-        private WaterQueryModel _waterModel;
-        private bool headerWritten = false;
+        [Header("Range-Reciever")]
+        public float distance;
+        public GameObject senderObject;
+        public float range = 10f;
         public float variance = 0.001f;
+
+        private bool headerWritten = false;
 
         void Start()
         {
-            _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
-            depth = 0f;
+            
+            distance = float.PositiveInfinity;
         }
 
         public override bool UpdateSensor(double deltaTime)
@@ -26,29 +28,27 @@ namespace VehicleComponents.Sensors
             float maxRaycastDistance = 30f;  // Adjust based on your needs
             RaycastHit hit;
 
-            Vector3 rayOrigin = transform.position;
-            Vector3 rayDirection = Vector3.down;
-
+            Vector3 rayOrigin = senderObject.transform.position;
+            Vector3 rayEnd = transform.position;
+            
             // Perform raycast downwards from the current position
-            if (Physics.Raycast(rayOrigin, rayDirection, out hit, maxRaycastDistance))
-            {
+            if (senderObject != null && Vector3.Distance(rayOrigin,rayEnd) < range)
+            {   
+                float noise = GenerateGaussianNoise(0f, variance);
+                distance = Vector3.Distance(rayOrigin,rayEnd)*(1 + noise);
                 // If raycast hits something, use the hit point's y-coordinate
-                Debug.Log("Raycast hit at y: " + hit.point.y);
-                depth = -(hit.point.y - transform.position.y);
+                Debug.Log("Distance of AUV: " + distance);
             }
             else
             {
-                // If no hit, fall back to water level calculation
-                float waterSurfaceLevel = _waterModel.GetWaterLevelAt(transform.position);
-                // Debug.Log("y: " + transform.position.y);
-                depth = -(waterSurfaceLevel - transform.position.y);
+                distance = float.PositiveInfinity;
+                Debug.Log("Either senderObject is null or the sensors are not in range");
             }
-            //Add gaussian noise
-            float noise = GenerateGaussianNoise(0f, variance);
-            depth = depth*(1 + noise);
-            return true;
-        } 
 
+            return true;
+        }
+
+                // Gaussian noise helper function
         private float GenerateGaussianNoise(float mean = 0f, float stdDev = 1f)
         {
             float u1 = 1.0f - Random.value;
@@ -58,3 +58,4 @@ namespace VehicleComponents.Sensors
         } 
     }
 }
+
