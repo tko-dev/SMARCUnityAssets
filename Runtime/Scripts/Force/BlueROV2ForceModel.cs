@@ -6,18 +6,18 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 using VehicleComponents.ROS.Subscribers;
-using RosMsgType = RosMessageTypes.SaabMsgs.MPCmsgMsg;
+// using RosMsgType = RosMessageTypes.SaabMsgs.MPCmsgMsg;
 
 namespace DefaultNamespace
 {
-    public class BlueROV2ForceModel : Actuator_Sub<RosMsgType>
+    public class BlueROV2ForceModel : MonoBehaviour // Actuator_Sub<RosMsgType>
     {
         
-        protected override void UpdateVehicle(bool reset)
-        {
-            // Implement what happens when a new message is received
-            print(ROSMsg);
-        }
+        // protected override void UpdateVehicle(bool reset)
+        // {
+        //     // Implement what happens when a new message is received
+        //     print(ROSMsg);
+        // }
         
         public ArticulationBody mainBody;
         public ArticulationBody propeller_front_left_top;
