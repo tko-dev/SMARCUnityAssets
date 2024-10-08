@@ -14,11 +14,11 @@ namespace VehicleComponents.Actuators
         public double rpm;
         public float RPMMax = 100000;
         public float RPMToForceMultiplier = 0.005f;
-        public float NumPropellers = 4f;
 
         [Header("Drone Propeller")]
         [Tooltip("Tick it for Drone and off for SAM/ROV")]
         public bool HoverDefault = false;
+        public float NumPropellers = 4f;
         [Tooltip("should there be a torque")]
         public bool ApplyTorque = false;
         [Tooltip("direction of torque")]

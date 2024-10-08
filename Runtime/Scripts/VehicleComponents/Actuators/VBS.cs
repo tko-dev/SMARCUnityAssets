@@ -8,7 +8,7 @@ namespace VehicleComponents.Actuators
 {
     public class VBS : LinkAttachment, IPercentageActuator
     {
-        [Header("VBS")] [Header("VBS")] [Range(0, 100)]
+        [Header("VBS")][Range(0, 100)]
         public float percentage = 50f;
 
         [Range(0, 100)] public float resetValue = 50f;

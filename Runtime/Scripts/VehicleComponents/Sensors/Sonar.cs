@@ -125,16 +125,7 @@ namespace VehicleComponents.Sensors
             if(intensity > 1) intensity=1;
             if(intensity < 0) intensity=0;
 
-            if(sonar.DrawHits)
-            {
-                // Color c = new Color(hitDistIntensity, hitAngleIntensity, hitMaterialIntensity, intensity);
-                // Color c = new Color(0.5f, 0.5f, hitMaterialIntensity, 1f);
-                // Color c = new Color(0.5f, hitAngleIntensity, 0.5f, 1f);
-                // Color c = new Color(hitDistIntensity, 0.5f, 0.5f, 1f);
-                Color c = new Color(intensity, 0f, 0f, 1f);
-                Debug.DrawRay(Hit.point, Vector3.up, c, 1f);
-                // Debug.Log($"d:{hitDistIntensity}, a:{hitAngleIntensity}, mat:{hitMaterialIntensity}, intens:{intensity}");
-            }
+            
             return intensity;
         }
 
@@ -220,13 +211,12 @@ namespace VehicleComponents.Sensors
         // we use this one to keep the latest hits in memory and
         // accessible to outside easily.
         [HideInInspector] public SonarHit[] SonarHits;
+        // Keeping track of lowest and highest hit heights
+        // for visualization or other purposes
+        [HideInInspector] public float HitsMinHeight = Mathf.Infinity;
+        [HideInInspector] public float HitsMaxHeight = 0f;
+        
 
-        [Header("Visuals")]
-        [Tooltip("Draw rays in the scene view as lines?")]
-        public bool DrawRays = false;
-        private Color rayColor = Color.white;
-        [Tooltip("Just draw the hit points as 1m-long lines?")]
-        public bool DrawHits = true;
 
         [Header("Load")]
         public float TimeShareInFixedUpdate;
@@ -340,14 +330,10 @@ namespace VehicleComponents.Sensors
             for(int i=0; i < TotalRayCount; i++)
             {
                 var hit = results[i];
-                var (beamNum, rayNum) = Sonar.BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
+                var (beamNum, rayNum) = BeamNumRayNumFromRayIndex(i, NumRaysPerBeam);
                 SonarHits[i].Update(hit, BeamProfile[rayNum]);
-                if (DrawRays && hit.point != Vector3.zero)
-                {
-                    if(i < TotalRayCount / 2) rayColor = Color.blue;
-                    if(i >= TotalRayCount / 2) rayColor = Color.red;
-                    Debug.DrawLine(transform.position, hit.point, rayColor, 1f);
-                }
+                if(hit.point.y > HitsMaxHeight && hit.point.y<0) HitsMaxHeight = hit.point.y;
+                if(hit.point.y < HitsMinHeight) HitsMinHeight = hit.point.y;
             }
         }
             

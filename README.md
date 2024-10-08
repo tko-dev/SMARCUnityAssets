@@ -14,7 +14,7 @@ I suggest starting with one of the pre-configured projects:
   - Lesser graphical fidelity, but runs easier.
   - Does not have Unity Water Simulation (water is a plane).
 
-You can find more detailed instructions on using these projects [here](https://github.com/smarc-project/smarc2/tree/humble/simulation). 
+You can find more detailed instructions on using these projects [here](./Documentation/Index.md).
 
 ## Installation for non-SMaRC projects
 
