@@ -10,11 +10,6 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(SensorDepth))]
     class DepthSensor_Pub : ROSPublisher<Float32Msg, SensorDepth>
     { 
-        // protected override void InitializePublication()
-        // {
-        //     // Initialize the header with the link name
-        //     // ROSMsg.header.frame_id = sensor.linkName;
-        // }
 
         protected override void UpdateMessage()
         {
