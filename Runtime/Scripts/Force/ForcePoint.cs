@@ -58,6 +58,24 @@ namespace Force
             }
         }
 
+        public float drag
+        {
+            get {return ab ? ab.linearDamping : rb.drag; }
+            set {
+                if(ab != null) ab.linearDamping = value;
+                else rb.drag = value;
+            }
+        }
+
+        public float angularDrag
+        {
+            get {return ab ? ab.angularDamping : rb.angularDrag; }
+            set {
+                if(ab != null) ab.angularDamping = value;
+                else rb.angularDrag = value;
+            }
+        }
+
         public void AddForceAtPosition(Vector3 force, Vector3 position, ForceMode mode = ForceMode.Force)
         {
             if(ab != null)
@@ -82,9 +100,16 @@ namespace Force
         [Tooltip("If not zero, will be used for buoyancy calculations. If zero, the volumeObject/Mesh above will be used to calculate.")]
         public float Volume;
         public float WaterDensity = 997; // kg/m3
+        [Tooltip("How deep should the point be to apply the entire buoyancy force. Force is applied proportionally.")]
         public float DepthBeforeSubmerged = 0.03f;
+        [Tooltip("Maximum force applied by buoyancy. Nice to keep things from going to space :)")]
         public float MaxBuoyancyForce = 1000f;
-
+        [Tooltip("Linear Drag applied while underwater. This will set the connected body's drag/linearDamping value accordingly. Set to -1 to disable.")]
+        public float UnderwaterDrag = -1f;
+        [Tooltip("Angular Drag applied while underwater. This will set the connected body's drag/linearDamping value accordingly. Set to -1 to disable.")]
+        public float UnderwaterAngularDrag = -1f;
+        public bool IsUnderwater = false;
+        float airDrag, airAngularDrag;
 
         [Header("Gravity")]
         [Tooltip("Do we over-ride the gravity of the connected body?")]
@@ -97,20 +122,23 @@ namespace Force
 
         [Header("Debug")]
         public bool DrawForces = false;
+        public float GizmoSize = 0f;
+        public float AppliedBuoyancyForce, AppliedGravityForce;
+        public bool ApplyCustomForce = false;
+        public Vector3 CustomForce = Vector3.zero;
 
 
-        private MixedBody _body;
-        private int _pointCount;
-        private WaterQueryModel _waterModel;
+        private MixedBody body;
+        private WaterQueryModel waterModel;
+        private ForcePoint[] allForcePoints;
 
         public void ApplyCurrent(Vector3 current)
         {
-            float waterSurfaceLevel = _waterModel.GetWaterLevelAt(transform.position);
-            if (transform.position.y < waterSurfaceLevel)
+            if (GetDepth() > 0)
             {
-                _body.AddForceAtPosition
+                body.AddForceAtPosition
                         (
-                            current / _pointCount,
+                            current / allForcePoints.Length,
                             transform.position,
                             ForceMode.Force
                         );
@@ -120,36 +148,44 @@ namespace Force
 
         public void Awake()
         {
-            _body = new MixedBody();
+            body = new MixedBody();
             
             if(ConnectedArticulationBody == null && ConnectedRigidbody == null)
                 Debug.LogWarning($"{gameObject.name} requires at least one of ConnectedArticulationBody or ConnectedRigidBody to be set!");
             
-            if(ConnectedArticulationBody != null) _body.ab = ConnectedArticulationBody;
-            if(ConnectedRigidbody!= null) _body.rb = ConnectedRigidbody;
+            if(ConnectedArticulationBody != null) body.ab = ConnectedArticulationBody;
+            if(ConnectedRigidbody!= null) body.rb = ConnectedRigidbody;
+            
+            airDrag = body.drag;
+            airAngularDrag = body.angularDrag;
 
              // If the force point is doing the gravity, disable the body's own
             if(AddGravity)
             {
-                _body.useGravity = false;
-                if(Mass == 0) Mass = _body.mass;
+                body.useGravity = false;
+                if(Mass == 0) Mass = body.mass;
             }
-            
-            
-            _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
 
-            var forcePoints = transform.root.gameObject.GetComponentsInChildren<ForcePoint>();
+            waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+
+            allForcePoints = transform.root.gameObject.GetComponentsInChildren<ForcePoint>();
             if (AutomaticCenterOfGravity)
             {
-                _body.automaticCenterOfMass = false;
-                var centerOfMass = forcePoints.Select(point => point.transform.localPosition).Aggregate(new Vector3(0, 0, 0), (s, v) => s + v);
-                _body.centerOfMass = centerOfMass / forcePoints.Length;
+                body.automaticCenterOfMass = false;
+                var centerOfMass = allForcePoints.Select(point => point.transform.localPosition).Aggregate(new Vector3(0, 0, 0), (s, v) => s + v);
+                body.centerOfMass = centerOfMass / allForcePoints.Length;
             }
-
-            _pointCount = forcePoints.Length;
            
             if (VolumeMesh == null && VolumeObject != null) VolumeMesh = VolumeObject.GetComponent<MeshFilter>().mesh;
             if (Volume == 0 && VolumeMesh != null) Volume = MeshVolume.CalculateVolumeOfMesh(VolumeMesh, VolumeObject.transform.lossyScale);
+        }
+
+        float GetDepth()
+        {
+            if(waterModel == null) waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+            float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
+            float depth = waterSurfaceLevel - transform.position.y;
+            return depth;
         }
 
         // Volume * Density * Gravity
@@ -158,30 +194,63 @@ namespace Force
             var forcePointPosition = transform.position;
             if (AddGravity)
             {
-                Vector3 gravityForce = Mass * Physics.gravity / _pointCount;
-                _body.AddForceAtPosition(gravityForce, forcePointPosition, ForceMode.Force);
+                Vector3 gravityForce = Mass * Physics.gravity / allForcePoints.Length;
+                body.AddForceAtPosition(gravityForce, forcePointPosition, ForceMode.Force);
+                AppliedGravityForce = gravityForce.y;
                 if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+gravityForce, Color.red, 0.1f);
             }
 
 
-            float waterSurfaceLevel = _waterModel.GetWaterLevelAt(forcePointPosition);
-            float depth = waterSurfaceLevel - forcePointPosition.y;
+            var depth = GetDepth();
+            IsUnderwater = depth > 0f;
             if (depth > 0f)
             {
                 //Underwater
                 //Apply buoyancy
                 float displacementMultiplier = Mathf.Clamp01(depth / DepthBeforeSubmerged);
 
-                float verticalBuoyancyForce = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier / _pointCount;
-                verticalBuoyancyForce = Mathf.Min(MaxBuoyancyForce, verticalBuoyancyForce);
-                
-                var buoyancyForce =  new Vector3(0, verticalBuoyancyForce, 0);
-                _body.AddForceAtPosition(
+                AppliedBuoyancyForce = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier / allForcePoints.Length;
+                AppliedBuoyancyForce = Mathf.Min(MaxBuoyancyForce, AppliedBuoyancyForce);
+            
+                var buoyancyForce =  new Vector3(0, AppliedBuoyancyForce, 0);
+                body.AddForceAtPosition(
                     buoyancyForce,
                     forcePointPosition,
                     ForceMode.Force);
                 if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+buoyancyForce, Color.blue, 0.1f);
             }
+
+            // change the drag of the body to underwater if any is submerged. This is a ad-hoc way to 
+            // simulate the sticktion water usually applies to objects
+            // also, some objects might need to be useful under AND over water (like ropes...)
+            // and their drag really should reflect where they are moment to moment
+            // yes, all of the points will do the same thing. but this makes it so we dont need
+            // a central forcepoint controller or sth
+            var anySubmerged = allForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
+            if(UnderwaterDrag > 0) body.drag = anySubmerged? UnderwaterDrag:airDrag;
+            if(UnderwaterAngularDrag > 0) body.angularDrag = anySubmerged? UnderwaterAngularDrag:airAngularDrag;
+
+            if(ApplyCustomForce)
+            {
+                body.AddForceAtPosition(
+                    CustomForce,
+                    forcePointPosition,
+                    ForceMode.Force);
+            }
+        }
+
+        void OnDrawGizmos()
+        {
+            if(GizmoSize <= 0) return;
+            
+            Gizmos.color = new Color(0.5f, 0.5f, 0f, 0.5f);
+            var d = GetDepth();
+            if (d > 0f)
+                Gizmos.color = new Color(0f, 0.5f, 0.5f, 0.5f);
+            if (d > DepthBeforeSubmerged)
+                Gizmos.color = new Color(0f, 0f, 1f, 0.5f);
+
+            Gizmos.DrawSphere(transform.position, GizmoSize);
         }
     }
 }
