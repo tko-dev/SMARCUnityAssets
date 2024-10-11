@@ -119,9 +119,9 @@ namespace Rope
             var FP_sphereCollider = FP_tf.GetComponent<SphereCollider>();
             FP_sphereCollider.radius = ropeDiameter/2;
             var FP = FP_tf.GetComponent<ForcePoint>();
-            FP.depthBeforeSubmerged = ropeDiameter;
-            FP.mass = segmentGravityMass;
-            FP.addGravity = true;
+            FP.DepthBeforeSubmerged = ropeDiameter;
+            FP.Mass = segmentGravityMass;
+            FP.AddGravity = true;
         }
 
         void SetupVisuals(Vector3 frontSpherePos, Vector3 backSpherePos)
