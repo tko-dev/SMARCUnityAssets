@@ -104,12 +104,21 @@ namespace Force
         public float DepthBeforeSubmerged = 0.03f;
         [Tooltip("Maximum force applied by buoyancy. Nice to keep things from going to space :)")]
         public float MaxBuoyancyForce = 1000f;
-        [Tooltip("Linear Drag applied while underwater. This will set the connected body's drag/linearDamping value accordingly. Set to -1 to disable.")]
+
+        [Header("Underwater/Air Drag")]
+        [Tooltip("Linear Drag applied while underwater. Sets the connected body's drag/linearDamping value when underwater. Set to -1 to use the starting drag value of the body for this.")]
         public float UnderwaterDrag = -1f;
-        [Tooltip("Angular Drag applied while underwater. This will set the connected body's drag/linearDamping value accordingly. Set to -1 to disable.")]
+
+        [Tooltip("Angular Drag applied while underwater. Sets the connected body's drag/linearDamping value when underwater. Set to -1 to use the starting drag value of the body for this.")]
         public float UnderwaterAngularDrag = -1f;
+
+        [Tooltip("Linear Drag applied while underwater. Sets the connected body's drag/linearDamping value when above water. Set to -1 to use the starting drag value of the body for this.")]
+        public float AirDrag = -1f;
+
+        [Tooltip("Angular Drag applied while underwater. Sets the connected body's drag/linearDamping value when above water. Set to -1 to use the starting drag value of the body for this.")]
+        public float AirAngularDrag = -1f;
         public bool IsUnderwater = false;
-        float airDrag, airAngularDrag;
+
 
         [Header("Gravity")]
         [Tooltip("Do we over-ride the gravity of the connected body?")]
@@ -155,9 +164,11 @@ namespace Force
             
             if(ConnectedArticulationBody != null) body.ab = ConnectedArticulationBody;
             if(ConnectedRigidbody!= null) body.rb = ConnectedRigidbody;
-            
-            airDrag = body.drag;
-            airAngularDrag = body.angularDrag;
+
+            if(AirDrag == -1) AirDrag = body.drag;
+            if(AirAngularDrag == -1) AirAngularDrag = body.angularDrag;
+            if(UnderwaterDrag == -1) UnderwaterDrag = body.drag;
+            if(UnderwaterAngularDrag == -1) UnderwaterAngularDrag = body.angularDrag;
 
              // If the force point is doing the gravity, disable the body's own
             if(AddGravity)
@@ -227,9 +238,10 @@ namespace Force
             // yes, all of the points will do the same thing. but this makes it so we dont need
             // a central forcepoint controller or sth
             var anySubmerged = allForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
-            if(UnderwaterDrag > 0) body.drag = anySubmerged? UnderwaterDrag:airDrag;
-            if(UnderwaterAngularDrag > 0) body.angularDrag = anySubmerged? UnderwaterAngularDrag:airAngularDrag;
+            body.drag = anySubmerged? UnderwaterDrag:AirDrag;
+            body.angularDrag = anySubmerged? UnderwaterAngularDrag:AirAngularDrag;
 
+            // And lastly, whatever custom force was set.
             if(ApplyCustomForce)
             {
                 body.AddForceAtPosition(
