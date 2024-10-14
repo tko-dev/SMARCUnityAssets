@@ -36,7 +36,7 @@ namespace Rope
         public float SegmentLength = 0.1f;
         [Tooltip("Rope will be replaced by two sticks when its end-to-end distance is this close to RopeLength")]
         [Range(0f, 0.05f)]
-        public float RopeReplacementAccuracy = 0.02f;
+        public float RopeTightnessTolerance = 0.02f;
 
 
         [HideInInspector] public float SegmentRBMass = 1f;
@@ -96,6 +96,12 @@ namespace Rope
             {
                 var buoy = (i+1 == NumSegments) && (BuoyGrams > 0);
                 InstantiateLink(RopeContainer.transform.GetChild(i-1), i, buoy);
+            }
+
+            foreach(Transform child in RopeContainer.transform)
+            {
+                var rl = child.GetComponent<RopeLink>();
+                rl.AssignFirstAndLastSegments();
             }
         }
 

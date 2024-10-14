@@ -30,11 +30,18 @@ namespace Rope
         [HideInInspector][SerializeField] float segmentRigidbodyMass;
         [HideInInspector][SerializeField] float segmentGravityMass;
         bool attached = false;
+        bool isTightTowardsVehicle = false;
+        bool isTightTowardsBuoy = false;
+        float tightTowardsVehicleLength;
+        float tightTowardsBuoyLength;
         GameObject connectedHookGO;
 
         CapsuleCollider capsule;
         [HideInInspector] public ConfigurableJoint ropeJoint, hookJoint;
         Rigidbody rb;
+
+        [HideInInspector][SerializeField] Transform firstSegmentTransform;
+        [HideInInspector][SerializeField] Transform lastSegmentTransform;
 
         readonly string hookConnectionPointName = "ConnectionPoint";
 
@@ -49,6 +56,8 @@ namespace Rope
 
             this.isBuoy = isBuoy;
 
+            
+
             SetupBits();
             // center of rotation for front and back links
             // also where we put things like force points
@@ -56,6 +65,12 @@ namespace Rope
             ropeJoint = GetComponent<ConfigurableJoint>();
             SetupConfigJoint(ropeJoint, backSpherePos);
             SetupBalloon();
+        }
+
+        public void AssignFirstAndLastSegments()
+        {
+            firstSegmentTransform = generator.RopeContainer.transform.GetChild(0);
+            lastSegmentTransform = generator.RopeContainer.transform.GetChild(generator.NumSegments-1);
         }
 
 
@@ -265,6 +280,10 @@ namespace Rope
             rb = GetComponent<Rigidbody>();
             ropeJoint = GetComponent<ConfigurableJoint>();
 
+            
+            tightTowardsVehicleLength = Vector3.Distance(firstSegmentTransform.position, transform.position);
+            tightTowardsBuoyLength = Vector3.Distance(lastSegmentTransform.position, transform.position);
+
             // disable self-collisions
             var ropeLinks = FindObjectsByType<RopeLink>(FindObjectsSortMode.None);
             var ownC = GetComponent<Collider>();
@@ -275,23 +294,31 @@ namespace Rope
 
         void FixedUpdate()
         {
-            if(!isBuoy) return;
-            if(!attached) return;
+            var distanceToVehicle = Vector3.Distance(firstSegmentTransform.position, transform.position);
+            isTightTowardsVehicle = Mathf.Abs(distanceToVehicle-tightTowardsVehicleLength) <= generator.RopeTightnessTolerance;
+            var distanceToBuoy = Vector3.Distance(lastSegmentTransform.position, transform.position);
+            isTightTowardsBuoy = Mathf.Abs(distanceToBuoy-tightTowardsBuoyLength) <= generator.RopeTightnessTolerance;
+
             // if its a buoy rope bit, and attached to a hook
-            // check if the distance from the front join of buoy
-            // to back-joint of first link is about equal to rope length
-            // that means the rope is tight.
-            // then we can replace the rope with a stick to make it more stable in sim.
-            var firstRopeLinkObject = generator.RopeContainer.transform.GetChild(0);
-            var firstJoint = firstRopeLinkObject.GetComponent<Joint>();
-            var vehicleJointPos = firstJoint.transform.position + firstJoint.anchor;
-            var hookJointPos = transform.position + hookJoint.anchor;
-            var directLength = Vector3.Distance(vehicleJointPos, hookJointPos);
-            if(Mathf.Abs(directLength-generator.RopeLength) <= generator.RopeReplacementAccuracy)
+            // check if the distance from this segment to the first segment
+            // is equal-ish to the initial distance. 
+            // That means the rope is tight, then we can replace the rope with a stick to make it more stable in sim.
+            if(isBuoy && attached && isTightTowardsVehicle)
             {
-                Debug.Log($"Rope length reached {directLength}m and got replaced!");
+                Debug.Log($"Rope length reached {distanceToVehicle}m and got replaced!");
                 generator.ReplaceRopeWithStick(connectedHookGO);
             }
+        }
+
+        void OnDrawGizmos()
+        {
+            Gizmos.color = isTightTowardsVehicle? Color.blue : Color.green;
+            var p = transform.position + transform.forward*segmentLength/3;
+            Gizmos.DrawSphere(p, ropeDiameter*2);
+            
+            Gizmos.color = isTightTowardsBuoy? Color.red : Color.green;
+            p = transform.position + transform.forward*segmentLength*2/3;
+            Gizmos.DrawSphere(p, ropeDiameter*2);
         }
         
         
