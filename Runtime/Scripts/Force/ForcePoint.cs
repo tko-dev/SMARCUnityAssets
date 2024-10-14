@@ -22,6 +22,11 @@ namespace Force
         public ArticulationBody ab;
         public Rigidbody rb;
 
+        public GameObject gameObject
+        {
+            get {return ab ? ab.gameObject : rb.gameObject; }
+        }
+
         public bool automaticCenterOfMass
         {
             get {return ab ? ab.automaticCenterOfMass : rb.automaticCenterOfMass; }
@@ -179,7 +184,7 @@ namespace Force
 
             waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
 
-            allForcePoints = transform.root.gameObject.GetComponentsInChildren<ForcePoint>();
+            allForcePoints = body.gameObject.GetComponentsInChildren<ForcePoint>();
             if (AutomaticCenterOfGravity)
             {
                 body.automaticCenterOfMass = false;
