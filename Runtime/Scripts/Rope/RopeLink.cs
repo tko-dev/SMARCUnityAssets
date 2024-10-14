@@ -13,7 +13,7 @@ namespace Rope
     [RequireComponent(typeof(CapsuleCollider))]
     public class RopeLink : MonoBehaviour
     {
-        [Header("Rope physics")]
+        [Header("Rope Joints")]
         [Tooltip("Stiffness properties of the rope (spring, damper, maxForce)")]
         public float spring = 0.1f;
         public float damper = 0.1f;
@@ -62,23 +62,21 @@ namespace Rope
 
         SoftJointLimitSpring MakeSJLS(float spring, float damper)
         {
-            var sjls = new SoftJointLimitSpring
+            return new SoftJointLimitSpring
             {
                 damper = damper,
                 spring = spring
             };
-            return sjls;
         }
 
         JointDrive MakeJD(float spring, float damper, float maximumForce)
         {
-            var drive = new JointDrive
+            return new JointDrive
             {
                 positionSpring = spring,
                 positionDamper = damper,
                 maximumForce = maximumForce
             };
-            return drive;
         }
 
         public (Vector3, Vector3) SpherePositions()
@@ -103,8 +101,8 @@ namespace Rope
             joint.zMotion = ConfigurableJointMotion.Locked;
            
 
-            joint.angularXLimitSpring = MakeSJLS(spring, damper);
-            joint.angularYZLimitSpring = MakeSJLS(spring, damper);
+            // joint.angularXLimitSpring = MakeSJLS(spring, damper);
+            // joint.angularYZLimitSpring = MakeSJLS(spring, damper);
             joint.xDrive = MakeJD(spring, damper, maximumForce);
             joint.yDrive = MakeJD(spring, damper, maximumForce);
             joint.zDrive = MakeJD(spring, damper, maximumForce);
@@ -119,9 +117,14 @@ namespace Rope
             var FP_sphereCollider = FP_tf.GetComponent<SphereCollider>();
             FP_sphereCollider.radius = ropeDiameter/2;
             var FP = FP_tf.GetComponent<ForcePoint>();
-            FP.DepthBeforeSubmerged = ropeDiameter;
-            FP.Mass = segmentGravityMass;
-            FP.AddGravity = true;
+            FP.DepthBeforeSubmerged = ropeDiameter*5;
+
+            if(isBuoy)
+            {
+                FP.AirDrag = generator.BuoyLinearDrag;
+                FP.UnderwaterDrag = generator.BuoyLinearDrag;
+            }
+             
         }
 
         void SetupVisuals(Vector3 frontSpherePos, Vector3 backSpherePos)
@@ -152,17 +155,9 @@ namespace Rope
             capsule.center = new Vector3(0, ropeCollisionDiameter/2-ropeDiameter/2, segmentLength/2);
             capsule.height = segmentLength+ropeCollisionDiameter; // we want the collision to overlap with the child's
 
-            // Having the rope be _so tiny_ is problematic for
-            // physics calculations.
-            // But having it be heavy is problematic for lifting
-            // with drone and such.
-            // So we set the mass of the rigidbody to be large, and 
-            // apply our own custom gravity(with ForcePoints) with small mass.
-            // Mass is large in the RB for interactions, but gravity is small
-            // for lifting.
             rb = GetComponent<Rigidbody>();
             rb.mass = segmentRigidbodyMass;
-            rb.useGravity = false;
+            rb.centerOfMass = new Vector3(0, 0, segmentLength/2);
 
             SetupForcePoint(transform.Find("ForcePoint_F"), frontSpherePos);
             SetupForcePoint(transform.Find("ForcePoint_B"), backSpherePos);
@@ -184,6 +179,7 @@ namespace Rope
             // and make it collidable
             var collider = sphere.GetComponent<SphereCollider>();
             collider.radius = rad;
+        
         }
 
         public void SetupConnectionToPrevLink(Transform prevLink)
@@ -198,22 +194,26 @@ namespace Rope
         }
 
         public void SetupConnectionToVehicle(
-            GameObject vehicleBaseLinkConnection,
-            GameObject baseLink)
+            GameObject vehicleConnectionLink,
+            GameObject vehicleBaseLink)
         {
             // First link in the chain, not connected to another link
             ropeJoint = GetComponent<ConfigurableJoint>();
-            ropeJoint.connectedArticulationBody = vehicleBaseLinkConnection.GetComponent<ArticulationBody>();
+            ropeJoint.connectedArticulationBody = vehicleConnectionLink.GetComponent<ArticulationBody>();
 
-            transform.localPosition = new Vector3(0, 0, generator.SegmentLength/2);
-            transform.rotation = vehicleBaseLinkConnection.transform.rotation;
+            transform.position = vehicleConnectionLink.transform.position;
+            transform.rotation = vehicleConnectionLink.transform.rotation;
 
             // make the first link not collide with its attached base link
-            if(baseLink.TryGetComponent<Collider>(out Collider baseCollider))
+            if(vehicleBaseLink.TryGetComponent<Collider>(out Collider baseCollider))
             {
                 var linkCollider = GetComponent<Collider>();
                 Physics.IgnoreCollision(linkCollider, baseCollider);
-            }           
+            }
+
+            // disable the back force point as it is ON the joint
+            var backFP = transform.Find("ForcePoint_B");
+            backFP.gameObject.SetActive(false);
         }
 
         public void ConnectToHook(GameObject hookGO)
@@ -237,18 +237,6 @@ namespace Rope
             attached = true;
         }
 
-
-        public void SetMassScaleForPulling(float pullerOverPulledMassRatio)
-        {
-            if(attached)
-            {
-                hookJoint.massScale = pullerOverPulledMassRatio / rb.mass;
-            }
-            else
-            {
-                ropeJoint.connectedMassScale = pullerOverPulledMassRatio / rb.mass;
-            }
-        }
 
 
         void OnCollisionEnter(Collision collision)

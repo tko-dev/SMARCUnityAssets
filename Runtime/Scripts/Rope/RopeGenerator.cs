@@ -25,6 +25,8 @@ namespace Rope
         public float GramsPerMeter = 0.5f;
         [Tooltip("How heavy is the buoy at the end. Set to 0 for no buoy.")]
         public float BuoyGrams = 0f;
+        [Tooltip("Linear drag of the buoy.")]
+        public float BuoyLinearDrag = 1f;
 
         [Header("Physics stuff")]
         [Tooltip("Diameter of the collision objects for the rope. The bigger the more stable the physics are.")]
@@ -32,9 +34,7 @@ namespace Rope
         [Tooltip("How long each segment of the rope will be. Smaller = more realistic but harder to simulate.")]
         [Range(0.01f, 1f)]
         public float SegmentLength = 0.1f;
-        [Tooltip("Mass of each segment compared to the base_link the rope is connected to. For physics stability! The larger the more stable...")]
-        public float SegmentMassRatio = 0.01f;
-        [Tooltip("Rope will be replaced by a stick when its end-to-end distance is this close to RopeLength")]
+        [Tooltip("Rope will be replaced by two sticks when its end-to-end distance is this close to RopeLength")]
         [Range(0f, 0.05f)]
         public float RopeReplacementAccuracy = 0.02f;
 
@@ -43,7 +43,7 @@ namespace Rope
         // This is the mass we'll use for gravity for each segment. In KGs. Separate from
         // the rigidbody mass for physics-sim reasons.
         [HideInInspector] public float IdealMassPerSegment => GramsPerMeter * 0.001f * SegmentLength;
-        [HideInInspector] public int NumSegments => (int)(RopeLength / (SegmentLength-RopeDiameter));
+        [HideInInspector] public int NumSegments => (int)(RopeLength / (SegmentLength+RopeDiameter));
         //All the rope links we generate will go in here
         [HideInInspector] public GameObject RopeContainer;
 
@@ -87,15 +87,8 @@ namespace Rope
                 RopeContainer.transform.position = vehicleBaseLinkConnection.transform.position;
                 RopeContainer.transform.rotation = vehicleBaseLinkConnection.transform.rotation;
             }
-            
-            // mass for each link so that the bodies can interact nicely
-            // this mass wont be used for gravity!
-            if(baseLink.TryGetComponent(out ArticulationBody BaseAB))
-                SegmentRBMass = BaseAB.mass * SegmentMassRatio;
-            if(baseLink.TryGetComponent(out Rigidbody BaseRB))
-                SegmentRBMass = BaseRB.mass * SegmentMassRatio;
 
-            SegmentRBMass = Mathf.Max(IdealMassPerSegment, SegmentRBMass);
+            SegmentRBMass = IdealMassPerSegment;
 
             InstantiateLink(null, 0, false);
 
