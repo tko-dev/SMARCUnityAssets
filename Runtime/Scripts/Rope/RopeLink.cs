@@ -27,8 +27,7 @@ namespace Rope
         [HideInInspector][SerializeField] float ropeDiameter;
         [HideInInspector][SerializeField] float ropeCollisionDiameter;
         [HideInInspector][SerializeField] float segmentLength;
-        [HideInInspector][SerializeField] float segmentRigidbodyMass;
-        [HideInInspector][SerializeField] float segmentGravityMass;
+        [HideInInspector][SerializeField] float segmentMass;
         bool attached = false;
         bool isTightTowardsVehicle = false;
         bool isTightTowardsBuoy = false;
@@ -51,12 +50,9 @@ namespace Rope
             ropeDiameter = generator.RopeDiameter;
             ropeCollisionDiameter = generator.RopeCollisionDiameter;
             segmentLength = generator.SegmentLength;
-            segmentRigidbodyMass = generator.SegmentRBMass;
-            segmentGravityMass = isBuoy? generator.BuoyGrams * 0.001f : generator.IdealMassPerSegment;
+            segmentMass = isBuoy? generator.BuoyGrams * 0.001f : generator.SegmentMass;
 
             this.isBuoy = isBuoy;
-
-            
 
             SetupBits();
             // center of rotation for front and back links
@@ -171,7 +167,7 @@ namespace Rope
             capsule.height = segmentLength+ropeCollisionDiameter; // we want the collision to overlap with the child's
 
             rb = GetComponent<Rigidbody>();
-            rb.mass = segmentRigidbodyMass;
+            rb.mass = segmentMass;
             rb.centerOfMass = new Vector3(0, 0, segmentLength/2);
 
             SetupForcePoint(transform.Find("ForcePoint_F"), frontSpherePos);
@@ -312,13 +308,15 @@ namespace Rope
 
         void OnDrawGizmos()
         {
+            if(!generator.DrawGizmos) return;
+            
             Gizmos.color = isTightTowardsVehicle? Color.blue : Color.green;
             var p = transform.position + transform.forward*segmentLength/3;
-            Gizmos.DrawSphere(p, ropeDiameter*2);
+            Gizmos.DrawSphere(p, ropeDiameter*1.1f);
             
             Gizmos.color = isTightTowardsBuoy? Color.red : Color.green;
             p = transform.position + transform.forward*segmentLength*2/3;
-            Gizmos.DrawSphere(p, ropeDiameter*2);
+            Gizmos.DrawSphere(p, ropeDiameter*1.1f);
         }
         
         
