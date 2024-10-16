@@ -21,7 +21,7 @@ namespace Rope
 
         public float ropeLength;
 
-        float d1, d2;
+        float partOneLength, partTwoLength;
         float ropeVelocity;
         
 
@@ -106,33 +106,32 @@ namespace Rope
             EndTwo = new MixedBody(ConnectedABTwo, ConnectedRBTwo);
             pulleyJointOne = AttachToPulley(EndOne);
             pulleyJointTwo = AttachToPulley(EndTwo);
-            d1 = Vector3.Distance(EndOne.position, transform.position);
-            d2 = Vector3.Distance(EndTwo.position, transform.position);
-            ropeLength = Mathf.Max(d1 + d2, ropeLength);
-            UpdateJointLimit(pulleyJointOne, d1);
-            UpdateJointLimit(pulleyJointTwo, d2);
+            partOneLength = Vector3.Distance(EndOne.position, transform.position);
+            partTwoLength = Vector3.Distance(EndTwo.position, transform.position);
+            ropeLength = Mathf.Max(partOneLength + partTwoLength, ropeLength);
+            UpdateJointLimit(pulleyJointOne, partOneLength);
+            UpdateJointLimit(pulleyJointTwo, partTwoLength);
         }
 
         void FixedUpdate()
         {
             // Update the joint limits to keep the rope taut
-            float ropeAccel = (pulleyJointOne.currentForce.magnitude - pulleyJointTwo.currentForce.magnitude) / (EndOne.mass + EndTwo.mass);
-            Debug.DrawLine(EndOne.position, EndOne.position + pulleyJointOne.currentForce, Color.red);
-            Debug.DrawLine(EndTwo.position, EndTwo.position + pulleyJointTwo.currentForce, Color.red);
-            if(d1 >= ropeLength || d2 >= ropeLength) 
-                ropeVelocity = 0;
+            if(partOneLength >= ropeLength || partTwoLength >= ropeLength) 
+                // Rope is tight, does not move at all
+                // TODO what if not?
+                return;
             else
             {
+                float ropeAccel = (pulleyJointOne.currentForce.magnitude - pulleyJointTwo.currentForce.magnitude) / (EndOne.mass + EndTwo.mass);
                 ropeVelocity += ropeAccel * Time.fixedDeltaTime;
-                d1 += ropeVelocity * Time.fixedDeltaTime;
-                d2 -= ropeVelocity * Time.fixedDeltaTime;
-                UpdateJointLimit(pulleyJointOne, d1);
-                UpdateJointLimit(pulleyJointTwo, d2);
+                partOneLength += ropeVelocity * Time.fixedDeltaTime;
+                partTwoLength = ropeLength - partOneLength;
+                UpdateJointLimit(pulleyJointOne, partOneLength);
+                UpdateJointLimit(pulleyJointTwo, partTwoLength);
             }
-
-            
             
         }
+
 
     }
 }
