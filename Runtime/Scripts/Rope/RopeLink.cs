@@ -249,18 +249,6 @@ namespace Rope
         }
 
 
-
-        void OnCollisionEnter(Collision collision)
-        {
-            if(!isBuoy) return;
-            if(attached) return;
-            
-            if (collision.gameObject.TryGetComponent(out RopeHook rh))
-            {
-                
-            }
-        }
-
         void Awake()
         {
             rb = GetComponent<Rigidbody>();

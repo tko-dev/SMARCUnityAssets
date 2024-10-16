@@ -120,12 +120,11 @@ namespace Rope
 
         public void DestroyRope()
         {
-            while(true)
-            {
-                RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
-                if(RopeContainer == null) break;
-                DestroyImmediate(RopeContainer);
-            }
+            RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
+            if(RopeContainer == null) return;
+
+            if (Application.isPlaying) Destroy(RopeContainer);
+            else DestroyImmediate(RopeContainer);
         }
 
         public void ReplaceRopeWithStick(GameObject connectedHookGO)
@@ -205,7 +204,7 @@ namespace Rope
         }
         void Update()
         {
-            UpdateLineRenderer();
+            if(RopeContainer != null) UpdateLineRenderer();
         }
 
     }
