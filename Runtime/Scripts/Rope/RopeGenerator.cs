@@ -187,7 +187,7 @@ namespace Rope
             if(RopeContainer == null) RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
             if(vehicleBaseLinkConnection == null) vehicleBaseLinkConnection = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleConnectionName);
             if(baseLink == null) baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, baseLinkName);
-            if(ropeLineRenderer == null) ropeLineRenderer = RopeContainer.GetComponent<LineRenderer>();
+            if(RopeContainer != null && ropeLineRenderer == null) ropeLineRenderer = RopeContainer.GetComponent<LineRenderer>();
         }
 
 
