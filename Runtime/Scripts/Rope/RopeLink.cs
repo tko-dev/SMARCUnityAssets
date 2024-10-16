@@ -257,17 +257,7 @@ namespace Rope
             
             if (collision.gameObject.TryGetComponent(out RopeHook rh))
             {
-                Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
-
-                connectedHookGO = collision.gameObject;
-                ConnectToHook(connectedHookGO);
-                // by default the rope is usually too light to actually pull the vehicle
-                // it is attached to.
-                // we dont change that here, but instead check if the rope is tight in
-                // FixedUpdate() and replace the rope with sticks (for physics stability) that
-                // _can_ pull the vehicle.
-                // The many-links version of the rope is basically only for visual goals like
-                // cameras identifying the rope and such.
+                
             }
         }
 
@@ -309,7 +299,7 @@ namespace Rope
         void OnDrawGizmos()
         {
             if(!generator.DrawGizmos) return;
-            
+
             Gizmos.color = isTightTowardsVehicle? Color.blue : Color.green;
             var p = transform.position + transform.forward*segmentLength/3;
             Gizmos.DrawSphere(p, ropeDiameter*1.1f);
