@@ -7,89 +7,9 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEditor.EditorTools;
 
-// This is a very simple example of how we could compute a buoyancy force at variable points along the body.
-// Its not really accurate per se.
-// [RequireComponent(typeof(Rigidbody))]
-// [RequireComponent(typeof(IForceModel))]
+
 namespace Force
 {
-
-    // Because Arti bodies and Rigid bodies dont share
-    // an ancestor, even though they share like 99% of the
-    // methods and semantics...
-    public class MixedBody
-    {
-        public ArticulationBody ab;
-        public Rigidbody rb;
-
-        public GameObject gameObject
-        {
-            get {return ab ? ab.gameObject : rb.gameObject; }
-        }
-
-        public bool automaticCenterOfMass
-        {
-            get {return ab ? ab.automaticCenterOfMass : rb.automaticCenterOfMass; }
-            set {
-                if(ab != null) ab.automaticCenterOfMass = value;
-                else rb.automaticCenterOfMass = value;
-                }
-        }
-
-        public Vector3 centerOfMass
-        {
-            get {return ab ? ab.centerOfMass : rb.centerOfMass; }
-            set {
-                if(ab != null) ab.centerOfMass = value;
-                else rb.centerOfMass = value;
-            }
-        }
-
-        public bool useGravity
-        {
-            get {return ab ? ab.useGravity : rb.useGravity; }
-            set {
-                if(ab != null) ab.useGravity = value;
-                else rb.useGravity = value;
-            }
-        }
-
-        public float mass
-        {
-            get {return ab ? ab.mass : rb.mass; }
-            set {
-                if(ab != null) ab.mass = value;
-                else rb.mass = value;
-            }
-        }
-
-        public float drag
-        {
-            get {return ab ? ab.linearDamping : rb.drag; }
-            set {
-                if(ab != null) ab.linearDamping = value;
-                else rb.drag = value;
-            }
-        }
-
-        public float angularDrag
-        {
-            get {return ab ? ab.angularDamping : rb.angularDrag; }
-            set {
-                if(ab != null) ab.angularDamping = value;
-                else rb.angularDrag = value;
-            }
-        }
-
-        public void AddForceAtPosition(Vector3 force, Vector3 position, ForceMode mode = ForceMode.Force)
-        {
-            if(ab != null)
-                ab.AddForceAtPosition(force, position, mode);
-            else
-                rb.AddForceAtPosition(force, position, mode);
-        }
-    }
-
     public class ForcePoint : MonoBehaviour
     {
         [Header("Connected Body")]
@@ -162,13 +82,13 @@ namespace Force
 
         public void Awake()
         {
-            body = new MixedBody();
+            body = new MixedBody(ConnectedArticulationBody, ConnectedRigidbody);
             
-            if(ConnectedArticulationBody == null && ConnectedRigidbody == null)
+            if(!body.isValid)
+            {
                 Debug.LogWarning($"{gameObject.name} requires at least one of ConnectedArticulationBody or ConnectedRigidBody to be set!");
-            
-            if(ConnectedArticulationBody != null) body.ab = ConnectedArticulationBody;
-            if(ConnectedRigidbody!= null) body.rb = ConnectedRigidbody;
+                return;
+            }
 
             if(AirDrag == -1) AirDrag = body.drag;
             if(AirAngularDrag == -1) AirAngularDrag = body.angularDrag;
