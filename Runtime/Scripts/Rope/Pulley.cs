@@ -17,12 +17,17 @@ namespace Rope
         MixedBody EndOne;
         MixedBody EndTwo;
 
-        ConfigurableJoint pulleyJointOne, pulleyJointTwo;
+        ConfigurableJoint distanceJointOne, distanceJointTwo;
+        LineRenderer sideOneLR, sideTwoLR;
 
-        public float ropeLength;
+        [Header("Rope Properties")]
+        public float RopeLength;
+        public float RopeDiameter = 0.1f;
 
-        float partOneLength, partTwoLength;
-        float ropeVelocity;
+        [Header("Debug")]
+        public float sideOneLimit;
+        public float sideTwoLimit;
+        public float ropeVelocity;
         
 
         Rigidbody AddIneffectiveRB(GameObject o)
@@ -69,13 +74,13 @@ namespace Rope
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
             // Spherical connection to this object
-            GameObject sphericalToBase = new GameObject("SphericalToBase");
+            var sphericalToBase = new GameObject("SphericalToBase");
             sphericalToBase.transform.parent = transform.parent;
             var sphericalToBaseRB = AddIneffectiveRB(sphericalToBase);
             var sphericalToBaseJoint = AddSphericalJoint(sphericalToBase);
             
             // Linear connection to the previous sphere
-            GameObject distanceToSpherical = new GameObject("DistanceToSpherical");
+            var distanceToSpherical = new GameObject("DistanceToSpherical");
             distanceToSpherical.transform.parent = transform.parent;
             var distanceToSphericalRB = AddIneffectiveRB(distanceToSpherical);
             var distanceToSphericalJoint = AddDistanceJoint(distanceToSpherical);
@@ -86,15 +91,22 @@ namespace Rope
             sphericalToBaseJoint.connectedBody = baseRB;
             distanceToSphericalJoint.connectedBody = sphericalToBaseRB;
             end.ConnectToJoint(sphericalToEndJoint);
-            // sphericalToEndJoint.connectedBody = end;
+
+            // Add a linerenderer to visualize the rope and its tight/slack state
+            var lr = distanceToSpherical.AddComponent<LineRenderer>();
+            lr.positionCount = 2;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startWidth = RopeDiameter;
 
             return distanceToSphericalJoint;
         }
 
         void UpdateJointLimit(ConfigurableJoint joint, float length)
         {
-            SoftJointLimit jointLimit = new SoftJointLimit();
-            jointLimit.limit = length;
+            var jointLimit = new SoftJointLimit
+            {
+                limit = length
+            };
             joint.linearLimit = jointLimit;
         }
 
@@ -104,34 +116,69 @@ namespace Rope
         {
             EndOne = new MixedBody(ConnectedABOne, ConnectedRBOne);
             EndTwo = new MixedBody(ConnectedABTwo, ConnectedRBTwo);
-            pulleyJointOne = AttachToPulley(EndOne);
-            pulleyJointTwo = AttachToPulley(EndTwo);
-            partOneLength = Vector3.Distance(EndOne.position, transform.position);
-            partTwoLength = Vector3.Distance(EndTwo.position, transform.position);
-            ropeLength = Mathf.Max(partOneLength + partTwoLength, ropeLength);
-            UpdateJointLimit(pulleyJointOne, partOneLength);
-            UpdateJointLimit(pulleyJointTwo, partTwoLength);
+            distanceJointOne = AttachToPulley(EndOne);
+            distanceJointTwo = AttachToPulley(EndTwo);
+            sideOneLR = distanceJointOne.gameObject.GetComponent<LineRenderer>();
+            sideTwoLR = distanceJointTwo.gameObject.GetComponent<LineRenderer>();
+            sideOneLimit = Vector3.Distance(EndOne.position, transform.position);
+            sideTwoLimit = Vector3.Distance(EndTwo.position, transform.position);
+            ropeVelocity = 0;
+            UpdateJointLimit(distanceJointOne, sideOneLimit);
+            UpdateJointLimit(distanceJointTwo, sideTwoLimit);
         }
 
         void FixedUpdate()
         {
-            // Update the joint limits to keep the rope taut
-            if(partOneLength >= ropeLength || partTwoLength >= ropeLength) 
-                // Rope is tight, does not move at all
-                // TODO what if not?
-                return;
-            else
-            {
-                float ropeAccel = (pulleyJointOne.currentForce.magnitude - pulleyJointTwo.currentForce.magnitude) / (EndOne.mass + EndTwo.mass);
-                ropeVelocity += ropeAccel * Time.fixedDeltaTime;
-                partOneLength += ropeVelocity * Time.fixedDeltaTime;
-                partTwoLength = ropeLength - partOneLength;
-                UpdateJointLimit(pulleyJointOne, partOneLength);
-                UpdateJointLimit(pulleyJointTwo, partTwoLength);
-            }
-            
-        }
 
+            float sideOneDistance = Vector3.Distance(EndOne.position, transform.position);
+            float sideTwoDistance = Vector3.Distance(EndTwo.position, transform.position);
+
+            bool sideOneSlack = sideOneDistance < sideOneLimit;
+            bool sideTwoSlack = sideTwoDistance < sideTwoLimit;
+
+            // Visualize all the time
+            sideOneLR.SetPosition(0, transform.position);
+            sideOneLR.SetPosition(1, EndOne.position);
+            sideOneLR.startColor = sideOneSlack ? Color.green : Color.red;
+            sideOneLR.endColor = sideOneLR.startColor;
+            sideTwoLR.SetPosition(0, transform.position);
+            sideTwoLR.SetPosition(1, EndTwo.position);
+            sideTwoLR.startColor = sideTwoSlack ? Color.green : Color.red;
+            sideTwoLR.endColor = sideTwoLR.startColor;
+            
+            // both sides are slack, rope doesnt do anything at all
+            if(sideOneSlack && sideTwoSlack)
+            {
+                ropeVelocity = 0;
+                return; 
+            }
+
+            // one side is slack, let the other have all the slack rope
+            if(sideOneSlack)
+            {
+                sideTwoLimit = RopeLength - sideOneDistance;
+                ropeVelocity = 0;
+                UpdateJointLimit(distanceJointTwo, sideTwoLimit);
+                return;
+            }
+            if(sideTwoSlack)
+            {
+                sideOneLimit = RopeLength - sideTwoDistance;
+                ropeVelocity = 0;
+                UpdateJointLimit(distanceJointOne, sideOneLimit);
+                return;
+            }
+
+            // no side is slack, pull around
+            float ropeAccel = (distanceJointOne.currentForce.magnitude - distanceJointTwo.currentForce.magnitude) / (EndOne.mass + EndTwo.mass);
+            ropeVelocity += ropeAccel * Time.fixedDeltaTime;
+            sideOneLimit += ropeVelocity * Time.fixedDeltaTime;
+            sideOneLimit = Mathf.Clamp(sideOneLimit, 0, RopeLength);
+            sideTwoLimit = RopeLength - sideOneLimit;
+
+            UpdateJointLimit(distanceJointOne, sideOneLimit);
+            UpdateJointLimit(distanceJointTwo, sideTwoLimit);
+        }
 
     }
 }
