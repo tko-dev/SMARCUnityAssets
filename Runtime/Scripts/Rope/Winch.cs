@@ -5,27 +5,22 @@ using Force;
 namespace Rope
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class Pulley : MonoBehaviour
+    public class Winch : MonoBehaviour
     {
-        [Header("Connected Bodies")]
-        public ArticulationBody ConnectedABOne;
-        public Rigidbody ConnectedRBOne;
-        public ArticulationBody ConnectedABTwo;
-        public Rigidbody ConnectedRBTwo;
-        MixedBody EndOne;
-        MixedBody EndTwo;
-
-        ConfigurableJoint distanceJointOne, distanceJointTwo;
-        LineRenderer sideOneLR, sideTwoLR;
+        [Header("Connected Body")]
+        public ArticulationBody ConnectedAB;
+        public Rigidbody ConnectedRB;
+    
+        MixedBody end;
+        ConfigurableJoint distanceJoint;
+        LineRenderer lineRenderer;
 
         [Header("Rope Properties")]
-        public float RopeLength;
+        public float CurrentLength = 3f;
+        public float MaxLength = 5f;
+        public float MinLength = 0.1f;
+        public float RopeSpeed;
         public float RopeDiameter = 0.1f;
-
-        [Header("Debug")]
-        public float sideOneLimit;
-        public float sideTwoLimit;
-        public float ropeVelocity;
         
 
         Rigidbody AddIneffectiveRB(GameObject o)
@@ -110,70 +105,44 @@ namespace Rope
 
         void Start()
         {
-            EndOne = new MixedBody(ConnectedABOne, ConnectedRBOne);
-            EndTwo = new MixedBody(ConnectedABTwo, ConnectedRBTwo);
-            distanceJointOne = AttachToPulley(EndOne);
-            distanceJointTwo = AttachToPulley(EndTwo);
-            sideOneLR = distanceJointOne.gameObject.GetComponent<LineRenderer>();
-            sideTwoLR = distanceJointTwo.gameObject.GetComponent<LineRenderer>();
-            sideOneLimit = Vector3.Distance(EndOne.position, transform.position);
-            sideTwoLimit = Vector3.Distance(EndTwo.position, transform.position);
-            ropeVelocity = 0;
-            UpdateJointLimit(distanceJointOne, sideOneLimit);
-            UpdateJointLimit(distanceJointTwo, sideTwoLimit);
+            end = new MixedBody(ConnectedAB, ConnectedRB);
+            distanceJoint = AttachToPulley(end);
+            lineRenderer = distanceJoint.gameObject.GetComponent<LineRenderer>();
+            RopeSpeed = 0;
+            UpdateJointLimit(distanceJoint, CurrentLength);
+        }
+
+        void Update()
+        {
+            float distance = Vector3.Distance(end.position, transform.position);
+            bool ropeSlack = distance < CurrentLength;
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, end.position);
+            lineRenderer.startColor = ropeSlack ? Color.green : Color.red;
+            lineRenderer.endColor = lineRenderer.startColor;
         }
 
         void FixedUpdate()
+        {   
+            if(Mathf.Abs(RopeSpeed) == 0) return;
+
+            CurrentLength += RopeSpeed * Time.fixedDeltaTime;
+            CurrentLength = Mathf.Clamp(CurrentLength, MinLength, MaxLength);
+            if(CurrentLength == MinLength || CurrentLength == MaxLength)
+            {
+                RopeSpeed = 0;
+                return;
+            }
+            UpdateJointLimit(distanceJoint, CurrentLength);
+        }
+
+        void OnDrawGizmos()
         {
-
-            float sideOneDistance = Vector3.Distance(EndOne.position, transform.position);
-            float sideTwoDistance = Vector3.Distance(EndTwo.position, transform.position);
-
-            bool sideOneSlack = sideOneDistance < sideOneLimit;
-            bool sideTwoSlack = sideTwoDistance < sideTwoLimit;
-
-            // Visualize all the time
-            sideOneLR.SetPosition(0, transform.position);
-            sideOneLR.SetPosition(1, EndOne.position);
-            sideOneLR.startColor = sideOneSlack ? Color.green : Color.red;
-            sideOneLR.endColor = sideOneLR.startColor;
-            sideTwoLR.SetPosition(0, transform.position);
-            sideTwoLR.SetPosition(1, EndTwo.position);
-            sideTwoLR.startColor = sideTwoSlack ? Color.green : Color.red;
-            sideTwoLR.endColor = sideTwoLR.startColor;
-            
-            // both sides are slack, rope doesnt do anything at all
-            if(sideOneSlack && sideTwoSlack)
+            if (end != null)
             {
-                ropeVelocity = 0;
-                return; 
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(transform.position, end.position);
             }
-
-            // one side is slack, let the other have all the slack rope
-            if(sideOneSlack)
-            {
-                sideTwoLimit = RopeLength - sideOneDistance;
-                ropeVelocity = 0;
-                UpdateJointLimit(distanceJointTwo, sideTwoLimit);
-                return;
-            }
-            if(sideTwoSlack)
-            {
-                sideOneLimit = RopeLength - sideTwoDistance;
-                ropeVelocity = 0;
-                UpdateJointLimit(distanceJointOne, sideOneLimit);
-                return;
-            }
-
-            // no side is slack, pull around
-            float ropeAccel = (distanceJointOne.currentForce.magnitude - distanceJointTwo.currentForce.magnitude) / (EndOne.mass + EndTwo.mass);
-            ropeVelocity += ropeAccel * Time.fixedDeltaTime;
-            sideOneLimit += ropeVelocity * Time.fixedDeltaTime;
-            sideOneLimit = Mathf.Clamp(sideOneLimit, 0, RopeLength);
-            sideTwoLimit = RopeLength - sideOneLimit;
-
-            UpdateJointLimit(distanceJointOne, sideOneLimit);
-            UpdateJointLimit(distanceJointTwo, sideTwoLimit);
         }
 
     }
