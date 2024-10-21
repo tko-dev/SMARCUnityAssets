@@ -6,18 +6,12 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 using VehicleComponents.ROS.Subscribers;
-// using RosMsgType = RosMessageTypes.SaabMsgs.MPCmsgMsg;
+using RosMsgType = RosMessageTypes.SaabMsgs.MPCmsgMsg;
 
 namespace DefaultNamespace
 {
-    public class BlueROV2ForceModel : MonoBehaviour // Actuator_Sub<RosMsgType>
+    public class BlueROV2ForceModel : MonoBehaviour
     {
-        
-        // protected override void UpdateVehicle(bool reset)
-        // {
-        //     // Implement what happens when a new message is received
-        //     print(ROSMsg);
-        // }
         
         public ArticulationBody mainBody;
         public ArticulationBody propeller_front_left_top;
@@ -85,9 +79,9 @@ namespace DefaultNamespace
         double I_y = 0.23; // [kg*m^2], from OSBS's CAD
         double I_z = 0.37; // [kg*m^2], from OSBS's CAD
 
-        public void Start()
+        protected void Start()
         {
-            myCamera =  Camera.main;
+            myCamera = Camera.main;
             var camera_offset = new Vector3(0f, 0.5f, -2f);
             // mass 11
             m = mainBody.mass;
@@ -95,7 +89,7 @@ namespace DefaultNamespace
             B = rho*g*nabla; // The buoyancy in [N] given by OSBS
         }
         
-        public void FixedUpdate()
+        protected void FixedUpdate()
         {
             // var world_pos = mainBody.transform.position; // Needs to be verified
             var world_rot = mainBody.transform.rotation.eulerAngles; 
@@ -115,6 +109,7 @@ namespace DefaultNamespace
             float u = (float) uvw[0];
             float v = (float) uvw[1];
             float w = (float) uvw[2];
+            
             // print(uvw[0]+","+uvw[1]+","+uvw[2]);
             
             var pqr = -FRD.ConvertAngularVelocityFromRUF(transformAngularVelocity).ToDense(); // FRD is same as NED for ANGLES ONLY
@@ -168,6 +163,7 @@ namespace DefaultNamespace
                 x_b*B*Mathf.Cos(theta)*Mathf.Sin(phi)+y_b*B*Mathf.Sin(theta)
                 }
             );
+         
             // mainBody.inertiaTensor = I_vec;  
             //mainBody.mass = (float) m;
 
@@ -216,7 +212,8 @@ namespace DefaultNamespace
             var RestoringTorque = g_vec.SubVector(3, 3).ToVector3();
             var force_damping = tau_sum_damping.SubVector(0, 3).ToVector3(); //Vector3.zero; //These will be replaced with your model output
             var torque_damping = tau_sum_damping.SubVector(3, 3).ToVector3();
-            
+            // print(tau_sum_coriolis[0] + "," + tau_sum_coriolis[1] + "," + tau_sum_coriolis[2] + "," + tau_sum_coriolis[3] + "," + tau_sum_coriolis[4] + "," + tau_sum_coriolis[5]);
+
             // print(torque_damping[0] + "," + torque_damping[1] + "," + torque_damping[2]);
             // print(vr[0] + "," + vr[1] + "," + vr[2] + "," + vr[3] + "," + vr[4] + "," + vr[5]);
             // print(tau_sum_dampining[0] + "," + tau_sum_dampining[1] + "," + tau_sum_dampining[2] + "," + tau_sum_dampining[3] + "," + tau_sum_dampining[4] + "," + tau_sum_dampining[5]);
@@ -246,7 +243,7 @@ namespace DefaultNamespace
             Vector3 inputTorque = Vector3.zero;
             if (Input.GetKey(KeyCode.W))
             {
-                inputForce[2] = 85;
+                inputForce[2] = 86;
             }
             if (Input.GetKey(KeyCode.A))
             {
@@ -262,11 +259,11 @@ namespace DefaultNamespace
             }
             if (Input.GetKey(KeyCode.Space))
             {
-                inputForce[1] = 120;
+                inputForce[1] = 122;
             }
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                inputForce[1] = -120;
+                inputForce[1] = -122;
             }
             if (Input.GetKey(KeyCode.Q))
             {
@@ -321,15 +318,15 @@ namespace DefaultNamespace
             // print(torque_damping);
             
             // ADD forces to rigid body 
-            mainBody.AddRelativeForce(-force_damping); //invert
-            // mainBody.AddRelativeForce(-coriolisForce); //invert
-            mainBody.AddRelativeForce(-RestoringForce); //invert
-            // mainBody.AddRelativeForce(-addedForce);
+            mainBody.AddRelativeForce(-force_damping);
+            mainBody.AddRelativeForce(-coriolisForce);
+            mainBody.AddRelativeForce(-RestoringForce);
+            mainBody.AddRelativeForce(-addedForce);
             mainBody.AddRelativeForce(inputForce);
             mainBody.AddRelativeTorque(-torque_damping);
-            // mainBody.AddRelativeTorque(-coriolisTorque);
+            mainBody.AddRelativeTorque(-coriolisTorque);
             mainBody.AddRelativeTorque(-RestoringTorque);
-            // mainBody.AddRelativeTorque(-addedTorque);
+            mainBody.AddRelativeTorque(-addedTorque);
             mainBody.AddRelativeTorque(inputTorque);
             // added mass torque and force
 
