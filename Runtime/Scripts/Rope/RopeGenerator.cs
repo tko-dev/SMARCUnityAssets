@@ -54,7 +54,6 @@ namespace Rope
         GameObject vehicleBaseLinkConnection, baseLink;
         readonly string containerName = "Rope";
         readonly string baseLinkName = "base_link";
-        readonly string hookConnectionPointName = "ConnectionPoint";
 
         void OnValidate()
         {

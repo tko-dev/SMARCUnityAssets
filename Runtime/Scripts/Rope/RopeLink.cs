@@ -41,7 +41,7 @@ namespace Rope
         [HideInInspector][SerializeField] Transform lastSegmentTransform;
 
 
-        // Called by RopeGenerator when creating a new link
+        // Called by RopeGenerator
         public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
         {
             generator = ropeGenerator;
@@ -60,13 +60,51 @@ namespace Rope
             SetupConfigJoint(ropeJoint, backSpherePos);
             SetupBalloon();
         }
-        // Called by RopeGenerator when creating a new link
+
         public void AssignFirstAndLastSegments()
         {
             firstSegmentTransform = generator.RopeContainer.transform.GetChild(0);
             lastSegmentTransform = generator.RopeContainer.transform.GetChild(generator.NumSegments-1);
         }
 
+        public void SetupConnectionToPrevLink(Transform prevLink)
+        {
+            ropeJoint = GetComponent<ConfigurableJoint>();
+            var linkZ = prevLink.localPosition.z + generator.SegmentLength;
+            transform.localPosition = new Vector3(0, 0, linkZ);
+            transform.rotation = prevLink.rotation;
+            ropeJoint.autoConfigureConnectedAnchor = false;
+            ropeJoint.connectedBody = prevLink.GetComponent<Rigidbody>();
+            ropeJoint.connectedAnchor = ropeJoint.anchor + new Vector3(0, 0, segmentLength);
+        }
+
+        public void SetupConnectionToVehicle(
+            GameObject vehicleConnectionLink,
+            GameObject vehicleBaseLink)
+        {
+            // First link in the chain, not connected to another link
+            ropeJoint = GetComponent<ConfigurableJoint>();
+            ropeJoint.connectedArticulationBody = vehicleConnectionLink.GetComponent<ArticulationBody>();
+
+            transform.position = vehicleConnectionLink.transform.position;
+            transform.rotation = vehicleConnectionLink.transform.rotation;
+
+            // make the first link not collide with its attached base link
+            if(vehicleBaseLink.TryGetComponent<Collider>(out Collider baseCollider))
+            {
+                var linkCollider = GetComponent<Collider>();
+                Physics.IgnoreCollision(linkCollider, baseCollider);
+            }
+
+            // disable the back force point as it is ON the joint
+            var backFP = transform.Find("ForcePoint_B");
+            backFP.gameObject.SetActive(false);
+        }
+
+        public RopeGenerator GetGenerator()
+        {
+            return generator;
+        }
 
 
         SoftJointLimitSpring MakeSJLS(float spring, float damper)
@@ -88,13 +126,13 @@ namespace Rope
             };
         }
 
-        public (Vector3, Vector3) SpherePositions()
+        (Vector3, Vector3) SpherePositions()
         {
             return ( new Vector3(0,0, segmentLength), new Vector3(0,0,0) );
         }
 
 
-        public void SetupConfigJoint(ConfigurableJoint joint, Vector3 anchorPosition)
+        void SetupConfigJoint(ConfigurableJoint joint, Vector3 anchorPosition)
         {
             // This setup was found here
             // https://forums.tigsource.com/index.php?topic=64389.msg1389271#msg1389271
@@ -190,41 +228,6 @@ namespace Rope
             collider.radius = rad;
         
         }
-
-        public void SetupConnectionToPrevLink(Transform prevLink)
-        {
-            ropeJoint = GetComponent<ConfigurableJoint>();
-            var linkZ = prevLink.localPosition.z + generator.SegmentLength;
-            transform.localPosition = new Vector3(0, 0, linkZ);
-            transform.rotation = prevLink.rotation;
-            ropeJoint.autoConfigureConnectedAnchor = false;
-            ropeJoint.connectedBody = prevLink.GetComponent<Rigidbody>();
-            ropeJoint.connectedAnchor = ropeJoint.anchor + new Vector3(0, 0, segmentLength);
-        }
-
-        public void SetupConnectionToVehicle(
-            GameObject vehicleConnectionLink,
-            GameObject vehicleBaseLink)
-        {
-            // First link in the chain, not connected to another link
-            ropeJoint = GetComponent<ConfigurableJoint>();
-            ropeJoint.connectedArticulationBody = vehicleConnectionLink.GetComponent<ArticulationBody>();
-
-            transform.position = vehicleConnectionLink.transform.position;
-            transform.rotation = vehicleConnectionLink.transform.rotation;
-
-            // make the first link not collide with its attached base link
-            if(vehicleBaseLink.TryGetComponent<Collider>(out Collider baseCollider))
-            {
-                var linkCollider = GetComponent<Collider>();
-                Physics.IgnoreCollision(linkCollider, baseCollider);
-            }
-
-            // disable the back force point as it is ON the joint
-            var backFP = transform.Find("ForcePoint_B");
-            backFP.gameObject.SetActive(false);
-        }
-
 
         void Awake()
         {

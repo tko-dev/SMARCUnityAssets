@@ -21,6 +21,11 @@ namespace Rope
 
         void Awake()
         {
+            SetupSystem();
+        }
+
+        public void SetupSystem()
+        {
             carrierBody = new MixedBody(CarrierAB, CarrierRB);
             var fixedJoint = gameObject.AddComponent<FixedJoint>();
             carrierBody.ConnectToJoint(fixedJoint);

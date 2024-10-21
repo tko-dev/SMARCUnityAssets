@@ -2,83 +2,70 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Utils = DefaultNamespace.Utils;
+
 namespace Rope
 {
     [RequireComponent(typeof(Collider))]
     public class RopeHook : MonoBehaviour
     {
 
-       
-        [Tooltip("Radius of capsule colliders while there is a rope inside the box collider of the hook, to let the rope slide around the hook nicely.")]
-        public float Enlargement = 0.08f;
+        [Header("Carrier")]
+        public GameObject Carrier;
 
-        CapsuleCollider[] capsules;
-        public float[] heights, rads;
-
-        public float ShrinkageCooldown = 1f;
-        public float cooldown = -1f;
+        [Header("Debug")]
+        public bool DrawForces = false;
 
 
-
-        void Awake()
-        {
-            var colliders = transform.Find("Collisions");
-            var count = colliders.transform.childCount;
-            capsules = new CapsuleCollider[count];
-            rads = new float[count];
-            heights = new float[count];
-
-            for(int i=0; i < colliders.transform.childCount; i++)
-            {
-                capsules[i] = colliders.GetChild(i).GetComponent<CapsuleCollider>();
-                heights[i] = capsules[i].height;
-                rads[i] = capsules[i].radius;
-            }
-
-        }
-        
-        void Enlarge(float enlargement)
-        {
-            for(int i=0; i<capsules.Length; i++)
-            {
-                capsules[i].radius = rads[i] + enlargement;
-                // capsules[i].height = heights[i] + enlargement;
-                capsules[i].center = new Vector3(0, 0, -capsules[i].radius);
-            }
-        }
-
-        void OnTriggerEnter(Collider collider)
-        {
-            // Enlarge the capsule collider to keep the rope segments from slipping through when
-            // they inevitably separate due to forces.
-            // Definitely a hack, but I cant find another way to let the rope
-            // slide over nicely without creating a million rope segments...
-            RopeLink rl;
-            if(collider.gameObject.TryGetComponent(out rl))
-            {
-                Enlarge(Enlargement);
-                cooldown = ShrinkageCooldown;
-            }
-        }
-
-        void OnTriggerStay(Collider collider)
+        bool TestGrab(Collision collision)
         {
             RopeLink rl;
-            if(collider.gameObject.TryGetComponent(out rl))
+            if(collision.gameObject.TryGetComponent(out rl))
             {
-                cooldown = ShrinkageCooldown;
+                // we want to ignore collisions with the rope depending on the "up" direction of the
+                // hook and the velocity of the collision
+                // essentially, only grab the rope if it's moving in the same direction as the hook
+                // and the rope is "above" the hook
+                // both of these should be true if the force on the collider is
+                // towards the "down" direction of the hook
+                Vector3 hookUp = transform.up;
+                Vector3 forceDirection = collision.impulse.normalized;
+
+                if(DrawForces)
+                {
+                    Debug.DrawRay(collision.contacts[0].point, forceDirection, Color.red, 1.0f);
+                    Debug.DrawRay(collision.contacts[0].point, hookUp, Color.green, 1.0f);
+                }
+
+                if (Vector3.Dot(forceDirection, hookUp) > 0.5f)
+                {
+                    return true;
+                }
             }
+            return false;
         }
 
-        void FixedUpdate()
+        void OnCollisionStay(Collision collision)
         {
-            if(cooldown == -1f) return;
-
-            cooldown -= Time.fixedDeltaTime;
-            if(cooldown < Time.fixedDeltaTime)
+            if(TestGrab(collision))
             {
-                Enlarge(0);
-                cooldown = -1f;
+                var rl = collision.gameObject.GetComponent<RopeLink>();
+                var generator = rl.GetGenerator();
+                var vehicleConnection = Utils.FindDeepChildWithName(generator.transform.root.gameObject, generator.VehicleConnectionName);
+
+                var vehicleAB = vehicleConnection.GetComponent<ArticulationBody>();
+                var vehicleRB = vehicleConnection.GetComponent<Rigidbody>();
+
+                var winch = gameObject.AddComponent<Winch>();
+                winch.RopeLength = generator.RopeLength;
+                winch.RopeDiameter = generator.RopeDiameter;
+                winch.ConnectedAB = vehicleAB;
+                winch.ConnectedRB = vehicleRB;
+                winch.CarrierAB = Carrier.GetComponent<ArticulationBody>();
+                winch.CarrierRB = Carrier.GetComponent<Rigidbody>();
+                winch.SetupSystem();
+
+                generator.DestroyRope();
             }
         }
 
