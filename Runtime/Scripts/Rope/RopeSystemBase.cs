@@ -8,6 +8,30 @@ namespace Rope
 
         [Header("Rope Properties")]
         public float RopeDiameter = 0.1f;
+        [Tooltip("Length of the rope. A winch can extend this much and a Pulley can have this distance between the two ends.")]
+        public float RopeLength = 5f;
+
+
+        [Header("Carrier Object")]
+        [Tooltip("The physics object that will carry the rope system")]
+        public ArticulationBody CarrierAB;
+        public Rigidbody CarrierRB;
+        MixedBody carrierBody;
+
+
+        void Awake()
+        {
+            carrierBody = new MixedBody(CarrierAB, CarrierRB);
+            var fixedJoint = gameObject.AddComponent<FixedJoint>();
+            carrierBody.ConnectToJoint(fixedJoint);
+            SetupEnds();
+        }
+
+        protected virtual void SetupEnds()
+        {
+            Debug.LogWarning("SetupEnds() not implemented in " + GetType());
+        }
+
 
         protected static Rigidbody AddIneffectiveRB(GameObject o)
         {
@@ -61,14 +85,14 @@ namespace Rope
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
             // Spherical connection to this object
-            var sphericalToBase = new GameObject("SphericalToBase");
-            sphericalToBase.transform.parent = transform.parent;
+            var sphericalToBase = new GameObject("Rope_SphericalToBase");
+            sphericalToBase.transform.parent = transform;
             var sphericalToBaseRB = AddIneffectiveRB(sphericalToBase);
             var sphericalToBaseJoint = AddSphericalJoint(sphericalToBase);
             
             // Linear connection to the previous sphere
-            var distanceToSpherical = new GameObject("DistanceToSpherical");
-            distanceToSpherical.transform.parent = transform.parent;
+            var distanceToSpherical = new GameObject("Rope_DistanceToSpherical");
+            distanceToSpherical.transform.parent = transform;
             var distanceToSphericalRB = AddIneffectiveRB(distanceToSpherical);
             var distanceToSphericalJoint = AddDistanceJoint(distanceToSpherical);
             // Spherical connection to the end object

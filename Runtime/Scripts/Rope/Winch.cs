@@ -17,7 +17,6 @@ namespace Rope
 
         [Header("Rope Properties")]
         public float CurrentLength = 3f;
-        public float MaxLength = 5f;
         public float MinLength = 0.1f;
 
         [Header("Controllable Properties")]
@@ -25,7 +24,7 @@ namespace Rope
         
         
 
-        void Start()
+        protected override void SetupEnds()
         {
             end = new MixedBody(ConnectedAB, ConnectedRB);
             distanceJoint = AttachBody(end);
@@ -49,22 +48,13 @@ namespace Rope
             if(Mathf.Abs(RopeSpeed) == 0) return;
 
             CurrentLength += RopeSpeed * Time.fixedDeltaTime;
-            CurrentLength = Mathf.Clamp(CurrentLength, MinLength, MaxLength);
-            if(CurrentLength == MinLength || CurrentLength == MaxLength)
+            CurrentLength = Mathf.Clamp(CurrentLength, MinLength, RopeLength);
+            if(CurrentLength == MinLength || CurrentLength == RopeLength)
             {
                 RopeSpeed = 0;
                 return;
             }
             UpdateJointLimit(distanceJoint, CurrentLength);
-        }
-
-        void OnDrawGizmos()
-        {
-            if (end != null)
-            {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawLine(transform.position, end.position);
-            }
         }
 
     }

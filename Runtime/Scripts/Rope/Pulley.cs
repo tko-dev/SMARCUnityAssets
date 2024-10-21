@@ -19,8 +19,6 @@ namespace Rope
         ConfigurableJoint distanceJointOne, distanceJointTwo;
         LineRenderer sideOneLR, sideTwoLR;
 
-        [Header("Rope Properties")]
-        public float RopeLength;
 
         [Header("Debug")]
         public float sideOneLimit;
@@ -28,7 +26,7 @@ namespace Rope
         public float ropeVelocity;
         
 
-        void Start()
+        protected override void SetupEnds()
         {
             EndOne = new MixedBody(ConnectedABOne, ConnectedRBOne);
             EndTwo = new MixedBody(ConnectedABTwo, ConnectedRBTwo);
