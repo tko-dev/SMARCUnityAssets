@@ -127,60 +127,6 @@ namespace Rope
             else DestroyImmediate(RopeContainer);
         }
 
-        public void ReplaceRopeWithStick(GameObject connectedHookGO)
-        {
-            // the rope breaking means its tight and carrying something.
-            // so we replace the entire rope with a STICK
-            // to make the physics more stable!
-            // Reverse loop because we're gonna remove things from the collection
-            var container = RopeContainer.transform;
-            for(int i=container.childCount-1; i>=0; i--)
-                Destroy(container.GetChild(i).gameObject);
-
-            // Now that all the rope is gone, create a new RopeLink object
-            // but, at this point, we shall have TWO segments that is as long as the rope
-            // why two? because one wouldnt allow the rope to bend _at all_, making
-            // any kind of "pick up and lower" maneuver's "lower" part very hard.
-            // two segments is still quite stable compared to 10s...
-            SegmentLength = RopeLength/2;
-
-            var stickBase = InstantiateLink(null, 1000, buoy:false);
-            // InstantiateLink calls RopeLink::SetupConnectionToVehicle
-            // where the rope link is created "going straigh out" from the baselink
-            // but in this case we need the rope to be "looking at" the hook it is connected
-            var hookConnectionPoint = connectedHookGO.transform.Find(hookConnectionPointName);
-            stickBase.transform.LookAt(hookConnectionPoint.transform.position);
-            var stickBaseRL = stickBase.GetComponent<RopeLink>();
-
-            var stickTip = InstantiateLink(stickBase.transform, 1001, buoy:false);
-            var stickTipRL = stickTip.GetComponent<RopeLink>();
-
-            // this stick is already connected to the base_link
-            // but now it also needs to connect to the hook's connection point
-            // we took the hook object from the ropelink that called this method.
-            // See RopeLink::OnCollisionEnter then RopeLink::FixedUpdate
-            stickTipRL.ConnectToHook(connectedHookGO);
-
-            // This is not needed! Code left as lesson.
-            // and finally, we set the mass scales of the rope pieces
-            // so that they pull the drone/auv proportional to auv/drone's mass.
-            // var hookBaseLink = Utils.FindDeepChildWithName(connectedHookGO.transform.root.gameObject, baseLinkName);
-            // var hookBaseLinkAB = hookBaseLink.GetComponent<ArticulationBody>();
-            // var baseLinkAB = baseLink.GetComponent<ArticulationBody>();
-            // var pullerOverPulledMassRatio = hookBaseLinkAB.mass / baseLinkAB.mass;
-            // divide by 2 because one is pulling the other is getting pulled more by this much
-            // mass ratio. Gotta share the force, not accumulate it.
-            // stickBaseRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
-            // stickTipRL.SetMassScaleForPulling(pullerOverPulledMassRatio/2);
-
-            // Disable collision between the stick and the hook so that we can attach the rope to he base links CoM.
-            var colliders = connectedHookGO.transform.root.gameObject.GetComponentsInChildren<Collider>();
-            foreach(var c in colliders)
-            {
-                Physics.IgnoreCollision(c, stickBase.GetComponent<Collider>());
-                Physics.IgnoreCollision(c, stickTip.GetComponent<Collider>());
-            }
-        }
 
         void Awake()
         {
@@ -202,6 +148,8 @@ namespace Rope
             var lastChild = RopeContainer.transform.GetChild(NumSegments-1);;
             ropeLineRenderer.SetPosition(NumSegments, lastChild.position+lastChild.forward*SegmentLength);
         }
+
+
         void Update()
         {
             if(RopeContainer != null) UpdateLineRenderer();

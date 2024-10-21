@@ -28,22 +28,20 @@ namespace Rope
         [HideInInspector][SerializeField] float ropeCollisionDiameter;
         [HideInInspector][SerializeField] float segmentLength;
         [HideInInspector][SerializeField] float segmentMass;
-        bool attached = false;
         bool isTightTowardsVehicle = false;
         bool isTightTowardsBuoy = false;
         float tightTowardsVehicleLength;
         float tightTowardsBuoyLength;
-        GameObject connectedHookGO;
 
         CapsuleCollider capsule;
-        [HideInInspector] public ConfigurableJoint ropeJoint, hookJoint;
+        [HideInInspector] public ConfigurableJoint ropeJoint;
         Rigidbody rb;
 
         [HideInInspector][SerializeField] Transform firstSegmentTransform;
         [HideInInspector][SerializeField] Transform lastSegmentTransform;
 
-        readonly string hookConnectionPointName = "ConnectionPoint";
 
+        // Called by RopeGenerator when creating a new link
         public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
         {
             generator = ropeGenerator;
@@ -62,7 +60,7 @@ namespace Rope
             SetupConfigJoint(ropeJoint, backSpherePos);
             SetupBalloon();
         }
-
+        // Called by RopeGenerator when creating a new link
         public void AssignFirstAndLastSegments()
         {
             firstSegmentTransform = generator.RopeContainer.transform.GetChild(0);
@@ -112,8 +110,8 @@ namespace Rope
             joint.zMotion = ConfigurableJointMotion.Locked;
            
 
-            // joint.angularXLimitSpring = MakeSJLS(spring, damper);
-            // joint.angularYZLimitSpring = MakeSJLS(spring, damper);
+            joint.angularXLimitSpring = MakeSJLS(spring, damper);
+            joint.angularYZLimitSpring = MakeSJLS(spring, damper);
             joint.xDrive = MakeJD(spring, damper, maximumForce);
             joint.yDrive = MakeJD(spring, damper, maximumForce);
             joint.zDrive = MakeJD(spring, damper, maximumForce);
@@ -227,27 +225,6 @@ namespace Rope
             backFP.gameObject.SetActive(false);
         }
 
-        public void ConnectToHook(GameObject hookGO)
-        {
-            hookJoint = gameObject.AddComponent<ConfigurableJoint>();
-            var (frontSpherePos, backSpherePos) = SpherePositions();
-            SetupConfigJoint(hookJoint, frontSpherePos);
-
-            try
-            {
-                hookJoint.autoConfigureConnectedAnchor = false;
-                hookJoint.connectedAnchor = hookGO.transform.Find(hookConnectionPointName).localPosition;
-            }
-            catch(Exception)
-            {
-                Debug.Log("Hook object did not have a ConnectionPoint child, connecting where we touched...");
-            }
-
-            var hookAB = hookGO.GetComponent<ArticulationBody>();
-            hookJoint.connectedArticulationBody = hookAB;
-            attached = true;
-        }
-
 
         void Awake()
         {
@@ -272,16 +249,6 @@ namespace Rope
             isTightTowardsVehicle = Mathf.Abs(distanceToVehicle-tightTowardsVehicleLength) <= generator.RopeTightnessTolerance;
             var distanceToBuoy = Vector3.Distance(lastSegmentTransform.position, transform.position);
             isTightTowardsBuoy = Mathf.Abs(distanceToBuoy-tightTowardsBuoyLength) <= generator.RopeTightnessTolerance;
-
-            // if its a buoy rope bit, and attached to a hook
-            // check if the distance from this segment to the first segment
-            // is equal-ish to the initial distance. 
-            // That means the rope is tight, then we can replace the rope with a stick to make it more stable in sim.
-            if(isBuoy && attached && isTightTowardsVehicle)
-            {
-                Debug.Log($"Rope length reached {distanceToVehicle}m and got replaced!");
-                generator.ReplaceRopeWithStick(connectedHookGO);
-            }
         }
 
         void OnDrawGizmos()
