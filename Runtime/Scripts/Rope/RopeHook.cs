@@ -46,21 +46,18 @@ namespace Rope
         {
             if(TestGrab(collision))
             {
+
                 var rl = collision.gameObject.GetComponent<RopeLink>();
                 var generator = rl.GetGenerator();
-                var vehicleConnection = Utils.FindDeepChildWithName(generator.transform.root.gameObject, generator.VehicleConnectionName);
-
-                var vehicleAB = vehicleConnection.GetComponent<ArticulationBody>();
-                var vehicleRB = vehicleConnection.GetComponent<Rigidbody>();
+                generator.DestroyRope();
 
                 var winch = gameObject.AddComponent<Winch>();
                 winch.RopeLength = generator.RopeLength;
                 winch.RopeDiameter = generator.RopeDiameter;
-                winch.ConnectedAB = vehicleAB;
-                winch.ConnectedRB = vehicleRB;
-                // winch.Awake();
+                
+                var vehicleConnection = Utils.FindDeepChildWithName(generator.transform.root.gameObject, generator.VehicleConnectionName);
+                winch.AttachLoad(vehicleConnection);
 
-                generator.DestroyRope();
             }
         }
 

@@ -5,15 +5,13 @@ namespace Rope
 {
     public class Pulley : RopeSystemBase
     {
-        [Header("Body One")]
-        public ArticulationBody ConnectedABOne;
-        public Rigidbody ConnectedRBOne;
-        MixedBody EndOne;
+        [Header("Load One")]
+        public ArticulationBody LoadOneAB;
+        public Rigidbody LoadOneRB;
         
-        [Header("Body Two")]
-        public ArticulationBody ConnectedABTwo;
-        public Rigidbody ConnectedRBTwo;
-        MixedBody EndTwo;
+        [Header("Load Two")]
+        public ArticulationBody LoadTwoAB;
+        public Rigidbody LoadTwoRB;
 
         ConfigurableJoint distanceJointOne, distanceJointTwo;
         LineRenderer sideOneLR, sideTwoLR;
@@ -27,14 +25,14 @@ namespace Rope
 
         public override void SetupEnds()
         {
-            EndOne = new MixedBody(ConnectedABOne, ConnectedRBOne);
-            EndTwo = new MixedBody(ConnectedABTwo, ConnectedRBTwo);
-            distanceJointOne = AttachBody(EndOne);
-            distanceJointTwo = AttachBody(EndTwo);
+            if(LoadOneAB) LoadOneRB = ConvertABToRB(LoadOneAB);
+            if(LoadTwoAB) LoadTwoRB = ConvertABToRB(LoadTwoAB);
+            distanceJointOne = AttachBody(LoadOneRB);
+            distanceJointTwo = AttachBody(LoadTwoRB);
             sideOneLR = distanceJointOne.gameObject.GetComponent<LineRenderer>();
             sideTwoLR = distanceJointTwo.gameObject.GetComponent<LineRenderer>();
-            sideOneLimit = Vector3.Distance(EndOne.position, transform.position);
-            sideTwoLimit = Vector3.Distance(EndTwo.position, transform.position);
+            sideOneLimit = Vector3.Distance(LoadOneRB.position, transform.position);
+            sideTwoLimit = Vector3.Distance(LoadTwoRB.position, transform.position);
             ropeVelocity = 0;
             SetRopeTargetLength(distanceJointOne, sideOneLimit);
             SetRopeTargetLength(distanceJointTwo, sideTwoLimit);
@@ -42,19 +40,19 @@ namespace Rope
 
         void FixedUpdate()
         {
-            float sideOneDistance = Vector3.Distance(EndOne.position, transform.position);
-            float sideTwoDistance = Vector3.Distance(EndTwo.position, transform.position);
+            float sideOneDistance = Vector3.Distance(LoadOneRB.position, transform.position);
+            float sideTwoDistance = Vector3.Distance(LoadTwoRB.position, transform.position);
 
             bool sideOneSlack = sideOneDistance < sideOneLimit;
             bool sideTwoSlack = sideTwoDistance < sideTwoLimit;
 
             // Visualize all the time
             sideOneLR.SetPosition(0, transform.position);
-            sideOneLR.SetPosition(1, EndOne.position);
+            sideOneLR.SetPosition(1, LoadOneRB.position);
             sideOneLR.startColor = sideOneSlack ? Color.green : Color.red;
             sideOneLR.endColor = sideOneLR.startColor;
             sideTwoLR.SetPosition(0, transform.position);
-            sideTwoLR.SetPosition(1, EndTwo.position);
+            sideTwoLR.SetPosition(1, LoadTwoRB.position);
             sideTwoLR.startColor = sideTwoSlack ? Color.green : Color.red;
             sideTwoLR.endColor = sideTwoLR.startColor;
             
@@ -82,7 +80,7 @@ namespace Rope
             }
 
             // no side is slack, pull around
-            float ropeAccel = (distanceJointOne.currentForce.magnitude - distanceJointTwo.currentForce.magnitude) / (EndOne.mass + EndTwo.mass);
+            float ropeAccel = (distanceJointOne.currentForce.magnitude - distanceJointTwo.currentForce.magnitude) / (LoadOneRB.mass + LoadTwoRB.mass);
             ropeVelocity += ropeAccel * Time.fixedDeltaTime;
             sideOneLimit += ropeVelocity * Time.fixedDeltaTime;
             sideOneLimit = Mathf.Clamp(sideOneLimit, 0, RopeLength);

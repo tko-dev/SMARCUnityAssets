@@ -6,44 +6,54 @@ namespace Rope
 {
     public class Winch : RopeSystemBase
     {
-        [Header("Connected Body")]
-        public ArticulationBody ConnectedAB;
-        public Rigidbody ConnectedRB;
+        [Header("Hanging Load")]
+        [Tooltip("Due to how ABs are solved, the AB will be converted to an RB when its attached to the winch for stability.")]
+        public ArticulationBody LoadAB;
+        public Rigidbody LoadRB;
     
-        MixedBody end;
-        ConfigurableJoint distanceJoint;
+        ConfigurableJoint ropeJoint;
         LineRenderer lineRenderer;
-
-        [Header("Winch")]
-        public float CurrentLength = 3f;
-        [Tooltip("If true, the current length will be set to the distance between this object and the connected body.")]
-        public float MinLength = 0.1f;
 
         [Header("Winch Controls")]
         public float RopeSpeed;
+
+        [Header("Winch")]
+        public float CurrentLength = 3f;
+        public float MinLength = 0.1f;
+
+        bool setup = false;
+
         
+        public void AttachLoad(GameObject load)
+        {
+            LoadAB = load.GetComponent<ArticulationBody>();
+            LoadRB = load.GetComponent<Rigidbody>();
+        }
 
         public override void SetupEnds()
         {
-            end = new MixedBody(ConnectedAB, ConnectedRB);
-            distanceJoint = AttachBody(end);
-            lineRenderer = distanceJoint.gameObject.GetComponent<LineRenderer>();
+            if(LoadAB) LoadRB = ConvertABToRB(LoadAB);
+            ropeJoint = AttachBody(LoadRB);
+            lineRenderer = ropeJoint.gameObject.GetComponent<LineRenderer>();
             RopeSpeed = 0;
-            SetRopeTargetLength(distanceJoint, CurrentLength);
+            SetRopeTargetLength(ropeJoint, CurrentLength);
+            setup = true;
         }
 
         void Update()
         {
-            float distance = Vector3.Distance(end.position, transform.position);
+            if(!setup) return;
+            float distance = Vector3.Distance(LoadRB.position, transform.position);
             bool ropeSlack = distance < CurrentLength;
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, end.position);
+            lineRenderer.SetPosition(1, LoadRB.position);
             lineRenderer.startColor = ropeSlack ? Color.green : Color.red;
             lineRenderer.endColor = lineRenderer.startColor;
         }
 
         void FixedUpdate()
         {   
+            if(!setup) return;
             if(Mathf.Abs(RopeSpeed) == 0) return;
 
             CurrentLength += RopeSpeed * Time.fixedDeltaTime;
@@ -53,7 +63,7 @@ namespace Rope
                 RopeSpeed = 0;
                 return;
             }
-            SetRopeTargetLength(distanceJoint, CurrentLength);
+            SetRopeTargetLength(ropeJoint, CurrentLength);
         }
 
     }
