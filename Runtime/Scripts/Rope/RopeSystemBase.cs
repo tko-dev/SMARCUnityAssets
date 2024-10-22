@@ -12,27 +12,16 @@ namespace Rope
         public float RopeLength = 5f;
 
 
-        [Header("Carrier Object")]
-        [Tooltip("The physics object that will carry the rope system")]
-        public ArticulationBody CarrierAB;
-        public Rigidbody CarrierRB;
-        MixedBody carrierBody;
-
-
         void Awake()
         {
-            SetupSystem();
-        }
-
-        public void SetupSystem()
-        {
-            carrierBody = new MixedBody(CarrierAB, CarrierRB);
-            var fixedJoint = gameObject.AddComponent<FixedJoint>();
-            carrierBody.ConnectToJoint(fixedJoint);
+            var selfRB = GetComponent<Rigidbody>();
+            if(selfRB == null) AddIneffectiveRB(gameObject);
             SetupEnds();
         }
 
-        protected virtual void SetupEnds()
+
+
+        public virtual void SetupEnds()
         {
             Debug.LogWarning("SetupEnds() not implemented in " + GetType());
         }
@@ -49,31 +38,34 @@ namespace Rope
             return rb;
         }
 
-        protected static ConfigurableJoint AddSphericalJoint(GameObject o)
+        static ConfigurableJoint AddConfigurableJoint(GameObject o)
         {
             ConfigurableJoint joint = o.AddComponent<ConfigurableJoint>();
-            joint.xMotion = ConfigurableJointMotion.Locked;
-            joint.yMotion = ConfigurableJointMotion.Locked;
-            joint.zMotion = ConfigurableJointMotion.Locked;
-            joint.anchor = Vector3.zero;
+            joint.enableCollision = false;
+            joint.enablePreprocessing = false;
             joint.autoConfigureConnectedAnchor = false;
-            joint.connectedAnchor = Vector3.zero;
             return joint;
         }
 
-        protected static ConfigurableJoint AddDistanceJoint(GameObject o)
+        protected static ConfigurableJoint AddSphericalJoint(GameObject o)
         {
-            ConfigurableJoint joint = o.AddComponent<ConfigurableJoint>();
+            var joint = AddConfigurableJoint(o);
             joint.xMotion = ConfigurableJointMotion.Locked;
-            joint.yMotion = ConfigurableJointMotion.Limited;
+            joint.yMotion = ConfigurableJointMotion.Locked;
             joint.zMotion = ConfigurableJointMotion.Locked;
-            joint.angularXMotion = ConfigurableJointMotion.Locked;
-            joint.angularYMotion = ConfigurableJointMotion.Locked;
-            joint.angularZMotion = ConfigurableJointMotion.Locked;
-            joint.anchor = Vector3.zero;
-            joint.autoConfigureConnectedAnchor = false;
-            joint.connectedAnchor = Vector3.zero;
             return joint;
+        }
+
+        protected static ConfigurableJoint AddRopeJoint(GameObject o)
+        {
+            var ropeJoint = AddConfigurableJoint(o);
+            ropeJoint.xMotion = ConfigurableJointMotion.Locked;
+            ropeJoint.yMotion = ConfigurableJointMotion.Limited;
+            ropeJoint.zMotion = ConfigurableJointMotion.Locked;
+            ropeJoint.angularXMotion = ConfigurableJointMotion.Free;
+            ropeJoint.angularYMotion = ConfigurableJointMotion.Free;
+            ropeJoint.angularZMotion = ConfigurableJointMotion.Free;
+            return ropeJoint;
         }
 
         protected static void UpdateJointLimit(ConfigurableJoint joint, float length)
@@ -89,32 +81,26 @@ namespace Rope
         {
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
-            // Spherical connection to this object
-            var sphericalToBase = new GameObject("Rope_SphericalToBase");
-            sphericalToBase.transform.parent = transform;
-            var sphericalToBaseRB = AddIneffectiveRB(sphericalToBase);
-            var sphericalToBaseJoint = AddSphericalJoint(sphericalToBase);
-            
-            // Linear connection to the previous sphere
-            var distanceToSpherical = new GameObject("Rope_DistanceToSpherical");
-            distanceToSpherical.transform.parent = transform;
-            var distanceToSphericalRB = AddIneffectiveRB(distanceToSpherical);
-            var distanceToSphericalJoint = AddDistanceJoint(distanceToSpherical);
-            // Spherical connection to the end object
-            var sphericalToEndJoint = AddSphericalJoint(distanceToSpherical);
-            
-            // Base -> Sphere -> Linear+Sphere -> End
-            sphericalToBaseJoint.connectedBody = baseRB;
-            distanceToSphericalJoint.connectedBody = sphericalToBaseRB;
-            end.ConnectToJoint(sphericalToEndJoint);
+            GameObject rope = new GameObject("Rope");
+            rope.transform.parent = transform.parent;
+            rope.transform.position = transform.position;
+            rope.transform.rotation = transform.rotation;
+            var ropeRB = AddIneffectiveRB(rope);
+            var ropeJoint = AddRopeJoint(rope);
+
+            // Spherical connection on the end object
+            var sphericalOnEndJoint = AddSphericalJoint(end.gameObject);
+
+            ropeJoint.connectedBody = baseRB;
+            sphericalOnEndJoint.connectedBody = ropeRB;
 
             // Add a linerenderer to visualize the rope and its tight/slack state
-            var lr = distanceToSpherical.AddComponent<LineRenderer>();
+            var lr = rope.AddComponent<LineRenderer>();
             lr.positionCount = 2;
             lr.material = new Material(Shader.Find("Sprites/Default"));
             lr.startWidth = RopeDiameter;
 
-            return distanceToSphericalJoint;
+            return ropeJoint;
         }
     }
 }

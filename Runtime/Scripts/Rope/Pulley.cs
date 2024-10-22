@@ -3,7 +3,6 @@ using Force;
 
 namespace Rope
 {
-    [RequireComponent(typeof(Rigidbody))]
     public class Pulley : RopeSystemBase
     {
         [Header("Body One")]
@@ -26,7 +25,7 @@ namespace Rope
         public float ropeVelocity;
         
 
-        protected override void SetupEnds()
+        public override void SetupEnds()
         {
             EndOne = new MixedBody(ConnectedABOne, ConnectedRBOne);
             EndTwo = new MixedBody(ConnectedABTwo, ConnectedRBTwo);

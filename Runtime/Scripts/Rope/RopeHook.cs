@@ -10,9 +10,6 @@ namespace Rope
     public class RopeHook : MonoBehaviour
     {
 
-        [Header("Carrier")]
-        public GameObject Carrier;
-
         [Header("Debug")]
         public bool DrawForces = false;
 
@@ -61,9 +58,7 @@ namespace Rope
                 winch.RopeDiameter = generator.RopeDiameter;
                 winch.ConnectedAB = vehicleAB;
                 winch.ConnectedRB = vehicleRB;
-                winch.CarrierAB = Carrier.GetComponent<ArticulationBody>();
-                winch.CarrierRB = Carrier.GetComponent<Rigidbody>();
-                winch.SetupSystem();
+                // winch.Awake();
 
                 generator.DestroyRope();
             }

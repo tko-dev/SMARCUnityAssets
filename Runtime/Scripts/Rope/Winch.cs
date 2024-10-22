@@ -4,7 +4,6 @@ using Force;
 
 namespace Rope
 {
-    [RequireComponent(typeof(Rigidbody))]
     public class Winch : RopeSystemBase
     {
         [Header("Connected Body")]
@@ -15,16 +14,16 @@ namespace Rope
         ConfigurableJoint distanceJoint;
         LineRenderer lineRenderer;
 
-        [Header("Rope Properties")]
+        [Header("Winch")]
         public float CurrentLength = 3f;
+        [Tooltip("If true, the current length will be set to the distance between this object and the connected body.")]
         public float MinLength = 0.1f;
 
-        [Header("Controllable Properties")]
+        [Header("Winch Controls")]
         public float RopeSpeed;
         
-        
 
-        protected override void SetupEnds()
+        public override void SetupEnds()
         {
             end = new MixedBody(ConnectedAB, ConnectedRB);
             distanceJoint = AttachBody(end);
