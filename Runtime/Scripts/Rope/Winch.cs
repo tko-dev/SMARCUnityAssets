@@ -29,7 +29,7 @@ namespace Rope
             distanceJoint = AttachBody(end);
             lineRenderer = distanceJoint.gameObject.GetComponent<LineRenderer>();
             RopeSpeed = 0;
-            UpdateJointLimit(distanceJoint, CurrentLength);
+            SetRopeTargetLength(distanceJoint, CurrentLength);
         }
 
         void Update()
@@ -53,7 +53,7 @@ namespace Rope
                 RopeSpeed = 0;
                 return;
             }
-            UpdateJointLimit(distanceJoint, CurrentLength);
+            SetRopeTargetLength(distanceJoint, CurrentLength);
         }
 
     }

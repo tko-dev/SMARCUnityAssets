@@ -56,25 +56,33 @@ namespace Rope
             return joint;
         }
 
-        protected static ConfigurableJoint AddRopeJoint(GameObject o)
+        protected static ConfigurableJoint AddRopeJoint(GameObject o, float RopeLength)
         {
-            var ropeJoint = AddConfigurableJoint(o);
-            ropeJoint.xMotion = ConfigurableJointMotion.Locked;
-            ropeJoint.yMotion = ConfigurableJointMotion.Limited;
-            ropeJoint.zMotion = ConfigurableJointMotion.Locked;
-            ropeJoint.angularXMotion = ConfigurableJointMotion.Free;
-            ropeJoint.angularYMotion = ConfigurableJointMotion.Free;
-            ropeJoint.angularZMotion = ConfigurableJointMotion.Free;
-            return ropeJoint;
+            var j = AddConfigurableJoint(o);
+            j.xMotion = ConfigurableJointMotion.Locked;
+            j.yMotion = ConfigurableJointMotion.Limited;
+            j.zMotion = ConfigurableJointMotion.Locked;
+            j.angularXMotion = ConfigurableJointMotion.Free;
+            j.angularYMotion = ConfigurableJointMotion.Free;
+            j.angularZMotion = ConfigurableJointMotion.Free;
+            j.yDrive = new JointDrive
+            {
+                positionSpring = 1000,
+                positionDamper = 100,
+                maximumForce = 1000,
+            };
+            j.linearLimit = new SoftJointLimit
+            {
+                limit = RopeLength,
+                bounciness = 0,
+                contactDistance = 0,
+            };
+            return j;
         }
 
-        protected static void UpdateJointLimit(ConfigurableJoint joint, float length)
+        protected static void SetRopeTargetLength(ConfigurableJoint joint, float length)
         {
-            var jointLimit = new SoftJointLimit
-            {
-                limit = length
-            };
-            joint.linearLimit = jointLimit;
+            joint.targetPosition = new Vector3(0, length, 0);
         }
 
         protected ConfigurableJoint AttachBody(MixedBody end)
@@ -86,7 +94,7 @@ namespace Rope
             rope.transform.position = transform.position;
             rope.transform.rotation = transform.rotation;
             var ropeRB = AddIneffectiveRB(rope);
-            var ropeJoint = AddRopeJoint(rope);
+            var ropeJoint = AddRopeJoint(rope, RopeLength);
 
             // Spherical connection on the end object
             var sphericalOnEndJoint = AddSphericalJoint(end.gameObject);

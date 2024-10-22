@@ -36,8 +36,8 @@ namespace Rope
             sideOneLimit = Vector3.Distance(EndOne.position, transform.position);
             sideTwoLimit = Vector3.Distance(EndTwo.position, transform.position);
             ropeVelocity = 0;
-            UpdateJointLimit(distanceJointOne, sideOneLimit);
-            UpdateJointLimit(distanceJointTwo, sideTwoLimit);
+            SetRopeTargetLength(distanceJointOne, sideOneLimit);
+            SetRopeTargetLength(distanceJointTwo, sideTwoLimit);
         }
 
         void FixedUpdate()
@@ -70,14 +70,14 @@ namespace Rope
             {
                 sideTwoLimit = RopeLength - sideOneDistance;
                 ropeVelocity = 0;
-                UpdateJointLimit(distanceJointTwo, sideTwoLimit);
+                SetRopeTargetLength(distanceJointTwo, sideTwoLimit);
                 return;
             }
             if(sideTwoSlack)
             {
                 sideOneLimit = RopeLength - sideTwoDistance;
                 ropeVelocity = 0;
-                UpdateJointLimit(distanceJointOne, sideOneLimit);
+                SetRopeTargetLength(distanceJointOne, sideOneLimit);
                 return;
             }
 
@@ -88,8 +88,8 @@ namespace Rope
             sideOneLimit = Mathf.Clamp(sideOneLimit, 0, RopeLength);
             sideTwoLimit = RopeLength - sideOneLimit;
 
-            UpdateJointLimit(distanceJointOne, sideOneLimit);
-            UpdateJointLimit(distanceJointTwo, sideTwoLimit);
+            SetRopeTargetLength(distanceJointOne, sideOneLimit);
+            SetRopeTargetLength(distanceJointTwo, sideTwoLimit);
         }
 
     }
