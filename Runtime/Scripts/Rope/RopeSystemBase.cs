@@ -42,7 +42,7 @@ namespace Rope
             Rigidbody rb = o.AddComponent<Rigidbody>();
             rb.useGravity = false;
             rb.inertiaTensor = Vector3.one * 1e-6f;
-            rb.drag = 0.01f;
+            rb.drag = 0.1f;
             rb.angularDrag = 0.01f;
             rb.mass = 0.1f;
             return rb;
@@ -61,21 +61,23 @@ namespace Rope
             var ropeRB = AddIneffectiveRB(rope);
             
             var ropeJoint = rope.AddComponent<SpringJoint>();
+            ropeJoint.enablePreprocessing = false;
+            ropeJoint.enableCollision = false;
             ropeJoint.autoConfigureConnectedAnchor = false;
             ropeJoint.connectedBody = baseRB;
             ropeJoint.anchor = Vector3.zero;
             ropeJoint.connectedAnchor = Vector3.zero;
             ropeJoint.spring = 5000;
-            ropeJoint.damper = 200;
+            ropeJoint.damper = 2500;
             ropeJoint.maxDistance = RopeLength;
 
             var loadJoint = rope.AddComponent<CharacterJoint>();
+            loadJoint.enablePreprocessing = false;
+            loadJoint.enableCollision = false;
             loadJoint.autoConfigureConnectedAnchor = false;
             load.ConnectToJoint(loadJoint);
             loadJoint.anchor = Vector3.zero;
             loadJoint.connectedAnchor = Vector3.zero;
-            loadJoint.connectedMassScale = load.GetTotalConnectedMass() / ropeRB.mass;
-
 
             // Add a linerenderer to visualize the rope and its tight/slack state
             var lr = rope.AddComponent<LineRenderer>();

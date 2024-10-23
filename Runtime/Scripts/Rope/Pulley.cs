@@ -17,7 +17,7 @@ namespace Rope
 
         SpringJoint distanceJointOne, distanceJointTwo;
         LineRenderer sideOneLR, sideTwoLR;
-
+        bool setup = false;
 
         [Header("Debug")]
         public float sideOneLimit;
@@ -38,10 +38,13 @@ namespace Rope
             ropeVelocity = 0;
             distanceJointOne.maxDistance = sideOneLimit;
             distanceJointTwo.maxDistance = sideTwoLimit;
+            setup = true;
         }
 
         void FixedUpdate()
         {
+            if(!setup) return;
+            
             float sideOneDistance = Vector3.Distance(loadOneBody.position, transform.position);
             float sideTwoDistance = Vector3.Distance(loadTwoBody.position, transform.position);
 
