@@ -42,8 +42,8 @@ namespace Rope
             Rigidbody rb = o.AddComponent<Rigidbody>();
             rb.useGravity = false;
             rb.inertiaTensor = Vector3.one * 1e-6f;
-            rb.drag = 0;
-            rb.angularDrag = 0;
+            rb.drag = 0.01f;
+            rb.angularDrag = 0.01f;
             rb.mass = 0.1f;
             return rb;
         }
@@ -63,6 +63,7 @@ namespace Rope
             joint.xMotion = ConfigurableJointMotion.Locked;
             joint.yMotion = ConfigurableJointMotion.Locked;
             joint.zMotion = ConfigurableJointMotion.Locked;
+            joint.angularYMotion = ConfigurableJointMotion.Locked;
             return joint;
         }
 
@@ -73,7 +74,7 @@ namespace Rope
             j.yMotion = ConfigurableJointMotion.Limited;
             j.zMotion = ConfigurableJointMotion.Locked;
             j.angularXMotion = ConfigurableJointMotion.Free;
-            j.angularYMotion = ConfigurableJointMotion.Free;
+            j.angularYMotion = ConfigurableJointMotion.Locked;
             j.angularZMotion = ConfigurableJointMotion.Free;
             j.linearLimit = new SoftJointLimit
             {
@@ -83,8 +84,8 @@ namespace Rope
             };
             j.linearLimitSpring = new SoftJointLimitSpring
             {
-                spring = 1000,
-                damper = 100,
+                spring = 5000,
+                damper = 4000,
             };
             return j;
         }
@@ -95,7 +96,7 @@ namespace Rope
             {
                 limit = length+0.01f,
                 bounciness = 0,
-                contactDistance = 0.01f,
+                contactDistance = 0,
             };
         }
 
@@ -109,19 +110,26 @@ namespace Rope
             rope.transform.position = transform.position;
             rope.transform.rotation = transform.rotation;
             var ropeRB = AddIneffectiveRB(rope);
+            
             var ropeJoint = AddRopeJoint(rope, RopeLength);
             ropeJoint.connectedBody = baseRB;
 
             // Spherical connection to the load
             var sphericalToLoadJoint = AddSphericalJoint(rope);
             load.ConnectToJoint(sphericalToLoadJoint);
-            sphericalToLoadJoint.swapBodies = true;
+            // if(load.ab) sphericalToLoadJoint.swapBodies = false;
+            // else sphericalToLoadJoint.swapBodies = true;
+
 
             // Add a linerenderer to visualize the rope and its tight/slack state
             var lr = rope.AddComponent<LineRenderer>();
             lr.positionCount = 2;
             lr.material = new Material(Shader.Find("Sprites/Default"));
             lr.startWidth = RopeDiameter;
+            lr.startColor = Color.blue;
+            lr.endColor = lr.startColor;
+            lr.SetPosition(0, transform.position);
+            lr.SetPosition(1, load.position);
 
             return ropeJoint;
         }

@@ -95,6 +95,11 @@ namespace Force
             get {return ab ? ab.transform.position : rb.transform.position; }
         }
 
+        public Quaternion rotation
+        {
+            get {return ab ? ab.transform.rotation : rb.transform.rotation; }
+        }
+
         public void AddForceAtPosition(Vector3 force, Vector3 position, ForceMode mode = ForceMode.Force)
         {
             if(ab != null)
