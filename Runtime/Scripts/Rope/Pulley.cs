@@ -15,7 +15,7 @@ namespace Rope
         public Rigidbody LoadTwoRB;
         MixedBody loadTwoBody;
 
-        ConfigurableJoint distanceJointOne, distanceJointTwo;
+        SpringJoint distanceJointOne, distanceJointTwo;
         LineRenderer sideOneLR, sideTwoLR;
 
 
@@ -36,8 +36,8 @@ namespace Rope
             sideOneLimit = Vector3.Distance(loadOneBody.position, transform.position);
             sideTwoLimit = Vector3.Distance(loadTwoBody.position, transform.position);
             ropeVelocity = 0;
-            SetRopeTargetLength(distanceJointOne, sideOneLimit);
-            SetRopeTargetLength(distanceJointTwo, sideTwoLimit);
+            distanceJointOne.maxDistance = sideOneLimit;
+            distanceJointTwo.maxDistance = sideTwoLimit;
         }
 
         void FixedUpdate()
@@ -70,14 +70,14 @@ namespace Rope
             {
                 sideTwoLimit = RopeLength - sideOneDistance;
                 ropeVelocity = 0;
-                SetRopeTargetLength(distanceJointTwo, sideTwoLimit);
+                distanceJointTwo.maxDistance = sideTwoLimit;
                 return;
             }
             if(sideTwoSlack)
             {
                 sideOneLimit = RopeLength - sideTwoDistance;
                 ropeVelocity = 0;
-                SetRopeTargetLength(distanceJointOne, sideOneLimit);
+                distanceJointOne.maxDistance = sideOneLimit;
                 return;
             }
 
@@ -88,8 +88,8 @@ namespace Rope
             sideOneLimit = Mathf.Clamp(sideOneLimit, 0, RopeLength);
             sideTwoLimit = RopeLength - sideOneLimit;
 
-            SetRopeTargetLength(distanceJointOne, sideOneLimit);
-            SetRopeTargetLength(distanceJointTwo, sideTwoLimit);
+            distanceJointOne.maxDistance = sideOneLimit;
+            distanceJointTwo.maxDistance = sideTwoLimit;
         }
 
     }

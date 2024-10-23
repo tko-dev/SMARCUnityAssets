@@ -12,7 +12,7 @@ namespace Rope
         public Rigidbody LoadRB;
         MixedBody loadBody;
     
-        ConfigurableJoint ropeJoint;
+        SpringJoint ropeJoint;
         LineRenderer lineRenderer;
 
         [Header("Winch Controls")]
@@ -37,8 +37,10 @@ namespace Rope
             ropeJoint = AttachBody(loadBody);
             lineRenderer = ropeJoint.gameObject.GetComponent<LineRenderer>();
             RopeSpeed = 0;
-            SetRopeTargetLength(ropeJoint, CurrentLength);
+            ropeJoint.maxDistance = CurrentLength;
             setup = true;
+            Update();
+            FixedUpdate();
         }
 
         void Update()
@@ -64,7 +66,7 @@ namespace Rope
                 RopeSpeed = 0;
                 return;
             }
-            SetRopeTargetLength(ropeJoint, CurrentLength);
+            ropeJoint.maxDistance = CurrentLength;
         }
 
     }

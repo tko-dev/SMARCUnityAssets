@@ -48,60 +48,9 @@ namespace Rope
             return rb;
         }
 
-        static ConfigurableJoint AddConfigurableJoint(GameObject o)
-        {
-            ConfigurableJoint joint = o.AddComponent<ConfigurableJoint>();
-            joint.enableCollision = false;
-            joint.enablePreprocessing = false;
-            joint.autoConfigureConnectedAnchor = false;
-            return joint;
-        }
-
-        protected static ConfigurableJoint AddSphericalJoint(GameObject o)
-        {
-            var joint = AddConfigurableJoint(o);
-            joint.xMotion = ConfigurableJointMotion.Locked;
-            joint.yMotion = ConfigurableJointMotion.Locked;
-            joint.zMotion = ConfigurableJointMotion.Locked;
-            joint.angularYMotion = ConfigurableJointMotion.Locked;
-            return joint;
-        }
-
-        protected static ConfigurableJoint AddRopeJoint(GameObject o, float RopeLength)
-        {
-            var j = AddConfigurableJoint(o);
-            j.xMotion = ConfigurableJointMotion.Locked;
-            j.yMotion = ConfigurableJointMotion.Limited;
-            j.zMotion = ConfigurableJointMotion.Locked;
-            j.angularXMotion = ConfigurableJointMotion.Free;
-            j.angularYMotion = ConfigurableJointMotion.Locked;
-            j.angularZMotion = ConfigurableJointMotion.Free;
-            j.linearLimit = new SoftJointLimit
-            {
-                limit = RopeLength+0.1f,
-                bounciness = 0,
-                contactDistance = 0,
-            };
-            j.linearLimitSpring = new SoftJointLimitSpring
-            {
-                spring = 5000,
-                damper = 4000,
-            };
-            return j;
-        }
-
-        protected static void SetRopeTargetLength(ConfigurableJoint joint, float length)
-        {
-            joint.linearLimit = new SoftJointLimit
-            {
-                limit = length+0.01f,
-                bounciness = 0,
-                contactDistance = 0,
-            };
-        }
 
 
-        protected ConfigurableJoint AttachBody(MixedBody load)
+        protected SpringJoint AttachBody(MixedBody load)
         {
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
@@ -111,14 +60,21 @@ namespace Rope
             rope.transform.rotation = transform.rotation;
             var ropeRB = AddIneffectiveRB(rope);
             
-            var ropeJoint = AddRopeJoint(rope, RopeLength);
+            var ropeJoint = rope.AddComponent<SpringJoint>();
+            ropeJoint.autoConfigureConnectedAnchor = false;
             ropeJoint.connectedBody = baseRB;
+            ropeJoint.anchor = Vector3.zero;
+            ropeJoint.connectedAnchor = Vector3.zero;
+            ropeJoint.spring = 5000;
+            ropeJoint.damper = 200;
+            ropeJoint.maxDistance = RopeLength;
 
-            // Spherical connection to the load
-            var sphericalToLoadJoint = AddSphericalJoint(rope);
-            load.ConnectToJoint(sphericalToLoadJoint);
-            // if(load.ab) sphericalToLoadJoint.swapBodies = false;
-            // else sphericalToLoadJoint.swapBodies = true;
+            var loadJoint = rope.AddComponent<CharacterJoint>();
+            loadJoint.autoConfigureConnectedAnchor = false;
+            load.ConnectToJoint(loadJoint);
+            loadJoint.anchor = Vector3.zero;
+            loadJoint.connectedAnchor = Vector3.zero;
+            loadJoint.connectedMassScale = load.GetTotalConnectedMass() / ropeRB.mass;
 
 
             // Add a linerenderer to visualize the rope and its tight/slack state

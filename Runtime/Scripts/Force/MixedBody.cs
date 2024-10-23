@@ -113,5 +113,45 @@ namespace Force
             if(ab != null) j.connectedArticulationBody = ab;
             else j.connectedBody = rb;
         }
+
+        public float GetTotalConnectedMass()
+        {
+            // too much hassle to follow through an arbitrary system
+            // of rigidbodies and joints...
+            if(ab == null) return rb.mass;
+
+            // find the root of the articulation chain and sum up
+            // the mass of all the bodies
+            ArticulationBody root = ab;
+            while (root.transform.parent != null)
+            {
+                var parentAB = root.transform.parent.GetComponent<ArticulationBody>();
+                if(parentAB == null) break;
+                root = parentAB;
+                if(parentAB.isRoot) break;
+            }
+
+            float totalMass = 0f;
+            var queue = new Queue<ArticulationBody>();
+            queue.Enqueue(root);
+
+            while (queue.Count > 0)
+            {
+                ArticulationBody current = queue.Dequeue();
+                totalMass += current.mass;
+
+                for (int i = 0; i < current.transform.childCount; i++)
+                {
+                    ArticulationBody child = current.transform.GetChild(i).GetComponent<ArticulationBody>();
+                    if (child != null)
+                    {
+                        queue.Enqueue(child);
+                    }
+                }
+            }
+
+            return totalMass;
+
+        }
     }
 }
