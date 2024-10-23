@@ -75,47 +75,32 @@ namespace Rope
             j.angularXMotion = ConfigurableJointMotion.Free;
             j.angularYMotion = ConfigurableJointMotion.Free;
             j.angularZMotion = ConfigurableJointMotion.Free;
-            j.yDrive = new JointDrive
-            {
-                positionSpring = 1000,
-                positionDamper = 100,
-                maximumForce = 1000,
-            };
             j.linearLimit = new SoftJointLimit
             {
                 limit = RopeLength+0.1f,
                 bounciness = 0,
                 contactDistance = 0,
             };
+            j.linearLimitSpring = new SoftJointLimitSpring
+            {
+                spring = 1000,
+                damper = 100,
+            };
             return j;
         }
 
         protected static void SetRopeTargetLength(ConfigurableJoint joint, float length)
         {
-            joint.targetPosition = new Vector3(0, length, 0);
+            joint.linearLimit = new SoftJointLimit
+            {
+                limit = length+0.01f,
+                bounciness = 0,
+                contactDistance = 0.01f,
+            };
         }
 
-        protected static Rigidbody ConvertABToRB(ArticulationBody ab)
-        {
-            var rbGo = new GameObject(ab.name + "_RB");
-            rbGo.transform.position = ab.transform.position;
-            rbGo.transform.rotation = ab.transform.rotation;
-            rbGo.transform.localScale = ab.transform.localScale;
-            // put the new object in the world space, since its an AB, it might have
-            // parental relations that we dont want to keep in the RB. We want this
-            // RB to be a simple pointmass that _kinda looks like_ the AB.
-            var rb = rbGo.AddComponent<Rigidbody>();
-            rb.mass = ab.mass;
-            rb.drag = ab.linearDamping;
-            rb.angularDrag = ab.angularDamping;
-            rb.useGravity = ab.useGravity;
-            rb.centerOfMass = ab.centerOfMass;
-            rb.inertiaTensor = ab.inertiaTensor;
-            rb.inertiaTensorRotation = ab.inertiaTensorRotation;
-            return rb;
-        }
 
-        protected ConfigurableJoint AttachBody(Rigidbody load)
+        protected ConfigurableJoint AttachBody(MixedBody load)
         {
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
@@ -128,8 +113,9 @@ namespace Rope
             ropeJoint.connectedBody = baseRB;
 
             // Spherical connection to the load
-            var sphericalToLoadJoint = AddSphericalJoint(load.gameObject);
-            sphericalToLoadJoint.connectedBody = ropeRB;
+            var sphericalToLoadJoint = AddSphericalJoint(rope);
+            load.ConnectToJoint(sphericalToLoadJoint);
+            sphericalToLoadJoint.swapBodies = true;
 
             // Add a linerenderer to visualize the rope and its tight/slack state
             var lr = rope.AddComponent<LineRenderer>();

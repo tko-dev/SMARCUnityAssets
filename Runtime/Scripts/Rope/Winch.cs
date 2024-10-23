@@ -10,6 +10,7 @@ namespace Rope
         [Tooltip("Due to how ABs are solved, the AB will be converted to an RB when its attached to the winch for stability.")]
         public ArticulationBody LoadAB;
         public Rigidbody LoadRB;
+        MixedBody loadBody;
     
         ConfigurableJoint ropeJoint;
         LineRenderer lineRenderer;
@@ -32,8 +33,8 @@ namespace Rope
 
         public override void SetupEnds()
         {
-            if(LoadAB) LoadRB = ConvertABToRB(LoadAB);
-            ropeJoint = AttachBody(LoadRB);
+            loadBody = new MixedBody(LoadAB, LoadRB);
+            ropeJoint = AttachBody(loadBody);
             lineRenderer = ropeJoint.gameObject.GetComponent<LineRenderer>();
             RopeSpeed = 0;
             SetRopeTargetLength(ropeJoint, CurrentLength);
@@ -43,10 +44,10 @@ namespace Rope
         void Update()
         {
             if(!setup) return;
-            float distance = Vector3.Distance(LoadRB.position, transform.position);
+            float distance = Vector3.Distance(loadBody.position, transform.position);
             bool ropeSlack = distance < CurrentLength;
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, LoadRB.position);
+            lineRenderer.SetPosition(1, loadBody.position);
             lineRenderer.startColor = ropeSlack ? Color.green : Color.red;
             lineRenderer.endColor = lineRenderer.startColor;
         }
