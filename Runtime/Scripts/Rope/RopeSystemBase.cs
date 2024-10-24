@@ -26,11 +26,19 @@ namespace Rope
         {
             var selfRB = GetComponent<Rigidbody>();
             if(selfRB == null) AddIneffectiveRB(gameObject);
+            SetupOnStart = false;
             SetupEnds();
+        }
+        public void UnSetup()
+        {
+            UnSetupEnds();
         }
 
 
-
+        public virtual void UnSetupEnds()
+        {
+            Debug.LogWarning("UnSetupEnds() not implemented in " + GetType());
+        }
         public virtual void SetupEnds()
         {
             Debug.LogWarning("SetupEnds() not implemented in " + GetType());
@@ -42,8 +50,8 @@ namespace Rope
             Rigidbody rb = o.AddComponent<Rigidbody>();
             rb.useGravity = false;
             rb.inertiaTensor = Vector3.one * 1e-6f;
-            rb.drag = 0.1f;
-            rb.angularDrag = 0.01f;
+            rb.drag = 1f;
+            rb.angularDrag = 1f;
             rb.mass = 0.1f;
             return rb;
         }
@@ -54,7 +62,7 @@ namespace Rope
         {
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
-            GameObject rope = new GameObject("Rope");
+            GameObject rope = new GameObject($"{transform.name}_Rope");
             rope.transform.parent = transform.parent;
             rope.transform.position = transform.position;
             rope.transform.rotation = transform.rotation;
@@ -68,7 +76,7 @@ namespace Rope
             ropeJoint.anchor = Vector3.zero;
             ropeJoint.connectedAnchor = Vector3.zero;
             ropeJoint.spring = 5000;
-            ropeJoint.damper = 2500;
+            ropeJoint.damper = 500;
             ropeJoint.maxDistance = RopeLength;
 
             var loadJoint = rope.AddComponent<CharacterJoint>();

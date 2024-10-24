@@ -10,6 +10,13 @@ namespace Rope
     public class RopeHook : MonoBehaviour
     {
 
+        [Header ("Rope System")]
+        [Tooltip("The winch that the hook is attached to.")]
+        public Winch WinchGO;
+        [Tooltip("The pulley that is attached to the hook.")]
+        public Pulley PulleyGO;
+
+
         [Header("Debug")]
         public bool DrawForces = false;
 
@@ -46,17 +53,16 @@ namespace Rope
         {
             if(TestGrab(collision))
             {
+                // var rl = collision.gameObject.GetComponent<RopeLink>();
+                // var generator = rl.GetGenerator();
+                // generator.DestroyRope();
 
-                var rl = collision.gameObject.GetComponent<RopeLink>();
-                var generator = rl.GetGenerator();
-                generator.DestroyRope();
-
-                var winch = gameObject.AddComponent<Winch>();
-                winch.RopeLength = generator.RopeLength;
-                winch.RopeDiameter = generator.RopeDiameter;
+                // var winch = gameObject.AddComponent<Winch>();
+                // winch.RopeLength = generator.RopeLength;
+                // winch.RopeDiameter = generator.RopeDiameter;
                 
-                var vehicleConnection = Utils.FindDeepChildWithName(generator.transform.root.gameObject, generator.VehicleConnectionName);
-                winch.AttachLoad(vehicleConnection);
+                // var vehicleConnection = Utils.FindDeepChildWithName(generator.transform.root.gameObject, generator.VehicleConnectionName);
+                // winch.AttachLoad(vehicleConnection);
 
             }
         }

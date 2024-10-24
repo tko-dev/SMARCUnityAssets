@@ -20,6 +20,11 @@ namespace Editor.Scripts
             {
                 ropesys.Setup();
             }
+
+            if(GUILayout.Button("UnSetup"))
+            {
+                ropesys.UnSetup();
+            }
         }
     }
 }

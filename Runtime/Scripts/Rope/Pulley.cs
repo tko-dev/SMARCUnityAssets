@@ -8,91 +8,120 @@ namespace Rope
         [Header("Load One")]
         public ArticulationBody LoadOneAB;
         public Rigidbody LoadOneRB;
-        MixedBody loadOneBody;
+        [HideInInspector][SerializeField] MixedBody loadOneBody;
         
         [Header("Load Two")]
         public ArticulationBody LoadTwoAB;
         public Rigidbody LoadTwoRB;
-        MixedBody loadTwoBody;
+        [HideInInspector][SerializeField] MixedBody loadTwoBody;
 
-        SpringJoint distanceJointOne, distanceJointTwo;
-        LineRenderer sideOneLR, sideTwoLR;
-        bool setup = false;
+        [HideInInspector][SerializeField] SpringJoint ropeJointOne;
+        [HideInInspector][SerializeField] SpringJoint ropeJointTwo;
+        [HideInInspector][SerializeField] LineRenderer LROne;
+        [HideInInspector][SerializeField] LineRenderer LRTwo;
+        [HideInInspector][SerializeField] bool setup = false;
 
         [Header("Debug")]
-        public float sideOneLimit;
-        public float sideTwoLimit;
-        public float ropeVelocity;
+        public float limitOne;
+        public float limitTwo;
+        public float limitSum;
+        public float ropeSpeed;
         
 
         public override void SetupEnds()
         {
             loadOneBody = new MixedBody(LoadOneAB, LoadOneRB);
             loadTwoBody = new MixedBody(LoadTwoAB, LoadTwoRB);
-            distanceJointOne = AttachBody(loadOneBody);
-            distanceJointTwo = AttachBody(loadTwoBody);
-            sideOneLR = distanceJointOne.gameObject.GetComponent<LineRenderer>();
-            sideTwoLR = distanceJointTwo.gameObject.GetComponent<LineRenderer>();
-            sideOneLimit = Vector3.Distance(loadOneBody.position, transform.position);
-            sideTwoLimit = Vector3.Distance(loadTwoBody.position, transform.position);
-            ropeVelocity = 0;
-            distanceJointOne.maxDistance = sideOneLimit;
-            distanceJointTwo.maxDistance = sideTwoLimit;
+            ropeJointOne = AttachBody(loadOneBody);
+            ropeJointTwo = AttachBody(loadTwoBody);
+            LROne = ropeJointOne.gameObject.GetComponent<LineRenderer>();
+            LRTwo = ropeJointTwo.gameObject.GetComponent<LineRenderer>();
+            limitOne = Vector3.Distance(loadOneBody.position, transform.position);
+            limitTwo = Vector3.Distance(loadTwoBody.position, transform.position);
+            ropeSpeed = 0;
+            ropeJointOne.maxDistance = limitOne;
+            ropeJointTwo.maxDistance = limitTwo;
             setup = true;
+        }
+
+        public override void UnSetupEnds()
+        {
+            if (Application.isPlaying) Destroy(ropeJointOne.gameObject);
+            else DestroyImmediate(ropeJointOne.gameObject);
+            if (Application.isPlaying) Destroy(ropeJointTwo.gameObject);
+            else DestroyImmediate(ropeJointTwo.gameObject);
+            
+            setup = false;
         }
 
         void FixedUpdate()
         {
             if(!setup) return;
             
-            float sideOneDistance = Vector3.Distance(loadOneBody.position, transform.position);
-            float sideTwoDistance = Vector3.Distance(loadTwoBody.position, transform.position);
+            float distOne = Vector3.Distance(loadOneBody.position, transform.position);
+            float distTwo = Vector3.Distance(loadTwoBody.position, transform.position);
 
-            bool sideOneSlack = sideOneDistance < sideOneLimit;
-            bool sideTwoSlack = sideTwoDistance < sideTwoLimit;
+            bool oneIsSlack = distOne < limitOne;
+            bool twoIsSlack = distTwo < limitTwo;
 
             // Visualize all the time
-            sideOneLR.SetPosition(0, transform.position);
-            sideOneLR.SetPosition(1, loadOneBody.position);
-            sideOneLR.startColor = sideOneSlack ? Color.green : Color.red;
-            sideOneLR.endColor = sideOneLR.startColor;
-            sideTwoLR.SetPosition(0, transform.position);
-            sideTwoLR.SetPosition(1, loadTwoBody.position);
-            sideTwoLR.startColor = sideTwoSlack ? Color.green : Color.red;
-            sideTwoLR.endColor = sideTwoLR.startColor;
+            LROne.SetPosition(0, transform.position);
+            LROne.SetPosition(1, loadOneBody.position);
+            LROne.startColor = oneIsSlack ? Color.green : Color.red;
+            LROne.endColor = LROne.startColor;
+            LRTwo.SetPosition(0, transform.position);
+            LRTwo.SetPosition(1, loadTwoBody.position);
+            LRTwo.startColor = twoIsSlack ? Color.green : Color.red;
+            LRTwo.endColor = LRTwo.startColor;
             
-            // both sides are slack, rope doesnt do anything at all
-            if(sideOneSlack && sideTwoSlack)
+            // both sides are slack, give maximum slack to the one
+            // with the most rope already and tighten the other
+            // without pulling the side with the less rope
+            if(oneIsSlack && twoIsSlack)
             {
-                ropeVelocity = 0;
-                return; 
+                ropeSpeed = 0;
+                if(distOne > distTwo)
+                {
+                    limitOne = RopeLength - distTwo;
+                    limitTwo = RopeLength - limitOne;
+                }
+                else
+                {
+                    limitTwo = RopeLength - distOne;
+                    limitOne = RopeLength - limitTwo;
+                }
             }
-
             // one side is slack, let the other have all the slack rope
-            if(sideOneSlack)
+            else if(oneIsSlack)
             {
-                sideTwoLimit = RopeLength - sideOneDistance;
-                ropeVelocity = 0;
-                distanceJointTwo.maxDistance = sideTwoLimit;
-                return;
+                ropeSpeed = 0;
+                limitTwo = RopeLength - distOne;
+                limitOne = RopeLength - limitTwo;
             }
-            if(sideTwoSlack)
+            else if(twoIsSlack)
             {
-                sideOneLimit = RopeLength - sideTwoDistance;
-                ropeVelocity = 0;
-                distanceJointOne.maxDistance = sideOneLimit;
-                return;
+                ropeSpeed = 0;
+                limitOne = RopeLength - distTwo;
+                limitTwo = RopeLength - limitOne;
             }
-
             // no side is slack, pull around
-            float ropeAccel = (distanceJointOne.currentForce.magnitude - distanceJointTwo.currentForce.magnitude) / (loadOneBody.mass + loadTwoBody.mass);
-            ropeVelocity += ropeAccel * Time.fixedDeltaTime;
-            sideOneLimit += ropeVelocity * Time.fixedDeltaTime;
-            sideOneLimit = Mathf.Clamp(sideOneLimit, 0, RopeLength);
-            sideTwoLimit = RopeLength - sideOneLimit;
+            else
+            {
+                var pullOne = ropeJointOne.currentForce.magnitude;
+                var pullTwo = ropeJointTwo.currentForce.magnitude;
+                float ropeAccel = (pullOne-pullTwo) / (loadOneBody.mass + loadTwoBody.mass);
+                ropeSpeed += ropeAccel * Time.fixedDeltaTime;
+                limitOne += ropeSpeed * Time.fixedDeltaTime;
+                limitOne = Mathf.Clamp(limitOne, 0, RopeLength);
+                limitTwo = RopeLength - limitOne;
+            }
 
-            distanceJointOne.maxDistance = sideOneLimit;
-            distanceJointTwo.maxDistance = sideTwoLimit;
+            if(limitOne == 0 || limitTwo == 0) ropeSpeed = 0;
+
+            // update the joint limits
+            ropeJointOne.maxDistance = limitOne;
+            ropeJointTwo.maxDistance = limitTwo;
+            limitSum = limitOne + limitTwo;
         }
 
     }

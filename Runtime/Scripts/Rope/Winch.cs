@@ -10,19 +10,21 @@ namespace Rope
         [Tooltip("Due to how ABs are solved, the AB will be converted to an RB when its attached to the winch for stability.")]
         public ArticulationBody LoadAB;
         public Rigidbody LoadRB;
-        MixedBody loadBody;
+        [HideInInspector][SerializeField] MixedBody loadBody;
     
-        SpringJoint ropeJoint;
-        LineRenderer lineRenderer;
+        [HideInInspector][SerializeField] SpringJoint ropeJoint;
+        [HideInInspector][SerializeField] LineRenderer lineRenderer;
 
         [Header("Winch Controls")]
-        public float RopeSpeed;
+        public float TargetLength = 0.5f;
+        public float WinchSpeed = 0.5f;
 
         [Header("Winch")]
-        public float CurrentLength = 3f;
+        public float CurrentRopeSpeed;
+        public float CurrentLength = 0.5f;
         public float MinLength = 0.1f;
 
-        bool setup = false;
+        [HideInInspector][SerializeField] bool setup = false;
 
         
         public void AttachLoad(GameObject load)
@@ -36,11 +38,28 @@ namespace Rope
             loadBody = new MixedBody(LoadAB, LoadRB);
             ropeJoint = AttachBody(loadBody);
             lineRenderer = ropeJoint.gameObject.GetComponent<LineRenderer>();
-            RopeSpeed = 0;
+            CurrentRopeSpeed = 0;
             ropeJoint.maxDistance = CurrentLength;
             setup = true;
             Update();
             FixedUpdate();
+        }
+        public override void UnSetupEnds()
+        {
+            if (Application.isPlaying)Destroy(ropeJoint.gameObject);
+            else DestroyImmediate(ropeJoint.gameObject);
+
+            setup = false;
+        }
+
+        void OnValidate()
+        {
+            TargetLength = Mathf.Clamp(TargetLength, MinLength, RopeLength);
+        }
+        
+        void Awake()
+        {
+            if(loadBody == null) loadBody = new MixedBody(LoadAB, LoadRB);
         }
 
         void Update()
@@ -57,13 +76,25 @@ namespace Rope
         void FixedUpdate()
         {   
             if(!setup) return;
-            if(Mathf.Abs(RopeSpeed) == 0) return;
+            
 
-            CurrentLength += RopeSpeed * Time.fixedDeltaTime;
+            // simple speed control
+            var lenDiff = TargetLength - CurrentLength;
+            if(Mathf.Abs(lenDiff) > 0.025)
+            {
+                CurrentRopeSpeed = lenDiff > 0 ? WinchSpeed : -WinchSpeed;
+            }
+            else
+            {
+                CurrentRopeSpeed = 0;
+                return;
+            }
+
+            CurrentLength += CurrentRopeSpeed * Time.fixedDeltaTime;
             CurrentLength = Mathf.Clamp(CurrentLength, MinLength, RopeLength);
             if(CurrentLength == MinLength || CurrentLength == RopeLength)
             {
-                RopeSpeed = 0;
+                CurrentRopeSpeed = 0;
                 return;
             }
             ropeJoint.maxDistance = CurrentLength;
