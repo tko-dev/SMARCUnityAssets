@@ -10,10 +10,12 @@ namespace Rope
     {
         [Header("Prefab of the rope parts")]
         public GameObject RopeLinkPrefab;
+        public GameObject BuoyPrefab;
 
         [Header("Connected Body")]
-        [Tooltip("What should the first link in the rope connect to?")]
-        public string VehicleConnectionName;
+        [Tooltip("What should the first link in the rope connect to? rope_link in SAM.")]
+        public string VehicleRopeLinkName = "rope_link";
+        public  string VehicleBaseLinkName = "base_link";
     
 
         [Header("Rope parameters")]
@@ -25,8 +27,6 @@ namespace Rope
         public float GramsPerMeter = 0.5f;
         [Tooltip("How heavy is the buoy at the end. Set to 0 for no buoy.")]
         public float BuoyGrams = 0f;
-        [Tooltip("Linear drag of the buoy.")]
-        public float BuoyLinearDrag = 1f;
 
         [Header("Physics stuff")]
         [Tooltip("Diameter of the collision objects for the rope. The bigger the more stable the physics are.")]
@@ -51,27 +51,27 @@ namespace Rope
         [HideInInspector] public GameObject RopeContainer;
 
 
-        GameObject vehicleBaseLinkConnection, baseLink;
+        [HideInInspector] public GameObject VehicleRopeLink;
+        [HideInInspector] public GameObject VehicleBaseLink;
         readonly string containerName = "Rope";
-        readonly string baseLinkName = "base_link";
+        
 
         void OnValidate()
         {
             if(NumSegments > 50) Debug.LogWarning($"There will be {NumSegments} rope segments generated on game Start, might be too many?");
         }
 
-        GameObject InstantiateLink(Transform prevLink, int num, bool buoy)
+        GameObject InstantiateLink(Transform prevLink, int num)
         {
             var link = Instantiate(RopeLinkPrefab);
             link.transform.SetParent(RopeContainer.transform);
             link.name = $"{link.name}_{num}";
-            if(buoy) link.name = $"{link.name}_buoy";
 
             var rl = link.GetComponent<RopeLink>();
-            rl.SetRopeParams(this, buoy);
+            rl.SetRopeParams(this);
 
             if(prevLink != null) rl.SetupConnectionToPrevLink(prevLink);
-            else rl.SetupConnectionToVehicle(vehicleBaseLinkConnection, baseLink);
+            else rl.SetupConnectionToVehicle(VehicleRopeLink, VehicleBaseLink);
             
             return link;
         }
@@ -79,15 +79,16 @@ namespace Rope
 
         public void SpawnRope()
         {
-            vehicleBaseLinkConnection = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleConnectionName);
-            baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, baseLinkName);
-
+            VehicleRopeLink = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleRopeLinkName);
+            VehicleBaseLink = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleBaseLinkName);
+            
+            RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
             if(RopeContainer == null)
             {
                 RopeContainer = new GameObject(containerName);
                 RopeContainer.transform.SetParent(transform.root);
-                RopeContainer.transform.position = vehicleBaseLinkConnection.transform.position;
-                RopeContainer.transform.rotation = vehicleBaseLinkConnection.transform.rotation;
+                RopeContainer.transform.position = VehicleRopeLink.transform.position;
+                RopeContainer.transform.rotation = VehicleRopeLink.transform.rotation;
             }
 
             ropeLineRenderer = RopeContainer.AddComponent<LineRenderer>();
@@ -100,45 +101,76 @@ namespace Rope
             ropeLineRenderer.useWorldSpace = true;
             ropeLineRenderer.receiveShadows = false;
 
-            InstantiateLink(null, 0, false);
+            InstantiateLink(null, 0);
 
             for(int i=1; i < NumSegments; i++)
             {
-                var buoy = (i+1 == NumSegments) && (BuoyGrams > 0);
-                InstantiateLink(RopeContainer.transform.GetChild(i-1), i, buoy);
+                InstantiateLink(RopeContainer.transform.GetChild(i-1), i);
             }
 
-            foreach(Transform child in RopeContainer.transform)
+            foreach(RopeLink rl in RopeContainer.GetComponentsInChildren<RopeLink>())
             {
-                var rl = child.GetComponent<RopeLink>();
                 rl.AssignFirstAndLastSegments();
             }
 
             UpdateLineRenderer();
+
+            if(BuoyGrams > 0 && BuoyPrefab != null)
+            {
+                var lastLink = RopeContainer.transform.GetChild(NumSegments-1);
+                var lastLinkRL = lastLink.GetComponent<RopeLink>();
+                var (lastLinkFront, lastLinkBack) = lastLinkRL.SpherePositions();
+                var buoy = Instantiate(BuoyPrefab);
+                buoy.transform.SetParent(RopeContainer.transform);
+                buoy.transform.position = lastLink.position + lastLinkFront;
+                buoy.transform.rotation = lastLink.rotation;
+                buoy.name = "Buoy";
+                var buoyRB = buoy.GetComponent<Rigidbody>();
+                buoyRB.mass = BuoyGrams * 0.001f;
+                var buoyJoint = buoy.GetComponent<CharacterJoint>();
+                buoyJoint.connectedBody = lastLink.GetComponent<Rigidbody>();
+            }
+
         }
 
-        public void DestroyRope()
+        void DestroyEitherWay(GameObject go)
+        {
+            if (Application.isPlaying) Destroy(go);
+            else DestroyImmediate(go);
+        }
+
+        public void DestroyRope(bool keepBuoy = false)
         {
             RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
             if(RopeContainer == null) return;
 
-            if (Application.isPlaying) Destroy(RopeContainer);
-            else DestroyImmediate(RopeContainer);
+            if(!keepBuoy) DestroyEitherWay(RopeContainer);
+            else
+            {
+                foreach(RopeLink rl in RopeContainer.GetComponentsInChildren<RopeLink>())
+                {
+                    Destroy(rl.gameObject);
+                }
+                Destroy(ropeLineRenderer);
+                ropeLineRenderer = null;
+            }
         }
 
 
         void Awake()
         {
             if(RopeContainer == null) RopeContainer = Utils.FindDeepChildWithName(transform.root.gameObject, containerName);
-            if(vehicleBaseLinkConnection == null) vehicleBaseLinkConnection = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleConnectionName);
-            if(baseLink == null) baseLink = Utils.FindDeepChildWithName(transform.root.gameObject, baseLinkName);
+            if(VehicleRopeLink == null) VehicleRopeLink = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleRopeLinkName);
+            if(VehicleBaseLink == null) VehicleBaseLink = Utils.FindDeepChildWithName(transform.root.gameObject, VehicleBaseLinkName);
             if(RopeContainer != null && ropeLineRenderer == null) ropeLineRenderer = RopeContainer.GetComponent<LineRenderer>();
         }
 
 
         void UpdateLineRenderer()
         {
-            for (int i = 0; i < NumSegments; i++)
+            if(ropeLineRenderer == null) return;
+            var numPts = Mathf.Min(NumSegments, ropeLineRenderer.positionCount);
+            for (int i = 0; i < numPts; i++)
             {
                 var child = RopeContainer.transform.GetChild(i);
                 ropeLineRenderer.SetPosition(i, child.position);

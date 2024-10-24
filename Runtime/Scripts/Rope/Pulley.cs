@@ -36,8 +36,8 @@ namespace Rope
             ropeJointTwo = AttachBody(loadTwoBody);
             LROne = ropeJointOne.gameObject.GetComponent<LineRenderer>();
             LRTwo = ropeJointTwo.gameObject.GetComponent<LineRenderer>();
-            limitOne = Vector3.Distance(loadOneBody.position, transform.position);
-            limitTwo = Vector3.Distance(loadTwoBody.position, transform.position);
+            limitOne = Vector3.Distance(loadOneBody.position, transform.position) + 0.05f;
+            limitTwo = Vector3.Distance(loadTwoBody.position, transform.position) + 0.05f;
             ropeSpeed = 0;
             ropeJointOne.maxDistance = limitOne;
             ropeJointTwo.maxDistance = limitTwo;
@@ -50,7 +50,7 @@ namespace Rope
             else DestroyImmediate(ropeJointOne.gameObject);
             if (Application.isPlaying) Destroy(ropeJointTwo.gameObject);
             else DestroyImmediate(ropeJointTwo.gameObject);
-            
+
             setup = false;
         }
 

@@ -23,7 +23,6 @@ namespace Rope
         // we want these saved with the object (so you dont have to re-generate 100 times...),
         // but not shown in editor since they are set by the RopeGenerator on creation.
         [HideInInspector][SerializeField] RopeGenerator generator;
-        [HideInInspector][SerializeField] bool isBuoy = false;
         [HideInInspector][SerializeField] float ropeDiameter;
         [HideInInspector][SerializeField] float ropeCollisionDiameter;
         [HideInInspector][SerializeField] float segmentLength;
@@ -34,7 +33,7 @@ namespace Rope
         float tightTowardsBuoyLength;
 
         CapsuleCollider capsule;
-        [HideInInspector] public ConfigurableJoint ropeJoint;
+        [HideInInspector] public ConfigurableJoint linkJoint;
         Rigidbody rb;
 
         [HideInInspector][SerializeField] Transform firstSegmentTransform;
@@ -42,23 +41,20 @@ namespace Rope
 
 
         // Called by RopeGenerator
-        public void SetRopeParams(RopeGenerator ropeGenerator, bool isBuoy)
+        public void SetRopeParams(RopeGenerator ropeGenerator)
         {
             generator = ropeGenerator;
             ropeDiameter = generator.RopeDiameter;
             ropeCollisionDiameter = generator.RopeCollisionDiameter;
             segmentLength = generator.SegmentLength;
-            segmentMass = isBuoy? generator.BuoyGrams * 0.001f : generator.SegmentMass;
-
-            this.isBuoy = isBuoy;
+            segmentMass = generator.SegmentMass;
 
             SetupBits();
             // center of rotation for front and back links
             // also where we put things like force points
             var (frontSpherePos, backSpherePos) = SpherePositions();
-            ropeJoint = GetComponent<ConfigurableJoint>();
-            SetupConfigJoint(ropeJoint, backSpherePos);
-            SetupBalloon();
+            linkJoint = GetComponent<ConfigurableJoint>();
+            SetupJoint(linkJoint, backSpherePos);
         }
 
         public void AssignFirstAndLastSegments()
@@ -69,13 +65,13 @@ namespace Rope
 
         public void SetupConnectionToPrevLink(Transform prevLink)
         {
-            ropeJoint = GetComponent<ConfigurableJoint>();
+            linkJoint = GetComponent<ConfigurableJoint>();
             var linkZ = prevLink.localPosition.z + generator.SegmentLength;
             transform.localPosition = new Vector3(0, 0, linkZ);
             transform.rotation = prevLink.rotation;
-            ropeJoint.autoConfigureConnectedAnchor = false;
-            ropeJoint.connectedBody = prevLink.GetComponent<Rigidbody>();
-            ropeJoint.connectedAnchor = ropeJoint.anchor + new Vector3(0, 0, segmentLength);
+            linkJoint.autoConfigureConnectedAnchor = false;
+            linkJoint.connectedBody = prevLink.GetComponent<Rigidbody>();
+            linkJoint.connectedAnchor = linkJoint.anchor + new Vector3(0, 0, segmentLength);
         }
 
         public void SetupConnectionToVehicle(
@@ -83,8 +79,8 @@ namespace Rope
             GameObject vehicleBaseLink)
         {
             // First link in the chain, not connected to another link
-            ropeJoint = GetComponent<ConfigurableJoint>();
-            ropeJoint.connectedArticulationBody = vehicleConnectionLink.GetComponent<ArticulationBody>();
+            linkJoint = GetComponent<ConfigurableJoint>();
+            linkJoint.connectedArticulationBody = vehicleConnectionLink.GetComponent<ArticulationBody>();
 
             transform.position = vehicleConnectionLink.transform.position;
             transform.rotation = vehicleConnectionLink.transform.rotation;
@@ -126,13 +122,13 @@ namespace Rope
             };
         }
 
-        (Vector3, Vector3) SpherePositions()
+        public (Vector3, Vector3) SpherePositions()
         {
             return ( new Vector3(0,0, segmentLength), new Vector3(0,0,0) );
         }
 
 
-        void SetupConfigJoint(ConfigurableJoint joint, Vector3 anchorPosition)
+        void SetupJoint(ConfigurableJoint joint, Vector3 anchorPosition)
         {
             // This setup was found here
             // https://forums.tigsource.com/index.php?topic=64389.msg1389271#msg1389271
@@ -164,14 +160,7 @@ namespace Rope
             var FP_sphereCollider = FP_tf.GetComponent<SphereCollider>();
             FP_sphereCollider.radius = ropeDiameter/2;
             var FP = FP_tf.GetComponent<ForcePoint>();
-            FP.DepthBeforeSubmerged = ropeDiameter*5;
-
-            if(isBuoy)
-            {
-                FP.AirDrag = generator.BuoyLinearDrag;
-                FP.UnderwaterDrag = generator.BuoyLinearDrag;
-            }
-             
+            FP.DepthBeforeSubmerged = ropeDiameter*5;             
         }
 
         void SetupVisuals(Vector3 frontSpherePos, Vector3 backSpherePos)
@@ -211,28 +200,10 @@ namespace Rope
             SetupVisuals(frontSpherePos, backSpherePos);
         }
 
-        void SetupBalloon()
-        {
-            if(!isBuoy) return;
-
-            // Add a visual sphere to the rope as the buoy balloon
-            var visuals = transform.Find("Visuals");
-            Transform sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere).transform;
-            sphere.SetParent(visuals);
-            sphere.localPosition = new Vector3(0, ropeDiameter, segmentLength);
-            var rad = segmentLength-ropeDiameter;
-            var scale = new Vector3(rad, rad, rad);
-            sphere.localScale = scale;
-            // and make it collidable
-            var collider = sphere.GetComponent<SphereCollider>();
-            collider.radius = rad;
-        
-        }
-
         void Awake()
         {
             rb = GetComponent<Rigidbody>();
-            ropeJoint = GetComponent<ConfigurableJoint>();
+            linkJoint = GetComponent<ConfigurableJoint>();
 
             
             tightTowardsVehicleLength = Vector3.Distance(firstSegmentTransform.position, transform.position);

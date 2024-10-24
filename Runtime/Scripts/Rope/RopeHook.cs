@@ -12,14 +12,15 @@ namespace Rope
 
         [Header ("Rope System")]
         [Tooltip("The winch that the hook is attached to.")]
-        public Winch WinchGO;
+        public GameObject WinchGO;
         [Tooltip("The pulley that is attached to the hook.")]
-        public Pulley PulleyGO;
+        public GameObject PulleyGO;
 
 
         [Header("Debug")]
         public bool DrawForces = false;
 
+        
 
         bool TestGrab(Collision collision)
         {
@@ -41,7 +42,8 @@ namespace Rope
                     Debug.DrawRay(collision.contacts[0].point, hookUp, Color.green, 1.0f);
                 }
 
-                if (Vector3.Dot(forceDirection, hookUp) > 0.5f)
+                var dot = Vector3.Dot(forceDirection, hookUp);
+                if (Mathf.Abs(dot) > 0.5f)
                 {
                     return true;
                 }
@@ -49,21 +51,26 @@ namespace Rope
             return false;
         }
 
+
         void OnCollisionStay(Collision collision)
         {
             if(TestGrab(collision))
             {
-                // var rl = collision.gameObject.GetComponent<RopeLink>();
-                // var generator = rl.GetGenerator();
-                // generator.DestroyRope();
-
-                // var winch = gameObject.AddComponent<Winch>();
-                // winch.RopeLength = generator.RopeLength;
-                // winch.RopeDiameter = generator.RopeDiameter;
-                
-                // var vehicleConnection = Utils.FindDeepChildWithName(generator.transform.root.gameObject, generator.VehicleConnectionName);
-                // winch.AttachLoad(vehicleConnection);
-
+                var rl = collision.gameObject.GetComponent<RopeLink>();
+                var generator = rl.GetGenerator();
+                var RLBuoys = generator.RopeContainer.GetComponentsInChildren<RopeLinkBuoy>();
+                if(RLBuoys.Length == 0) return;
+                var RLBuoy = RLBuoys[0];
+                if(RLBuoy == null) return;
+                var buoyRB = RLBuoy.gameObject.GetComponent<Rigidbody>();
+                var pulley = PulleyGO.GetComponent<Pulley>();
+                pulley.LoadOneRB = buoyRB;
+                pulley.LoadTwoRB = generator.VehicleRopeLink.gameObject.GetComponent<Rigidbody>();
+                pulley.LoadTwoAB = generator.VehicleRopeLink.gameObject.GetComponent<ArticulationBody>();
+                pulley.RopeLength = generator.RopeLength;
+                pulley.RopeDiameter = generator.RopeDiameter;
+                pulley.SetupEnds();
+                generator.DestroyRope(keepBuoy: true);
             }
         }
 
