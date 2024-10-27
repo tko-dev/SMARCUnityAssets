@@ -3052,7 +3052,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0.31499958, y: 0, z: 0}
+  m_ParentAnchorPosition: {x: 0.31500006, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
@@ -3801,13 +3801,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6110627571383574328}
+  - component: {fileID: 8826866181995455972}
   m_Layer: 0
   m_Name: DroneTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6110627571383574328
 Transform:
   m_ObjectHideFlags: 0
@@ -3824,6 +3825,22 @@ Transform:
   - {fileID: 6902234891640967566}
   m_Father: {fileID: 4800906380731054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8826866181995455972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4818855960593909349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e898b76d8bcbc45f846a97126c9e375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  alpha: 0.25
+  AUVTransform: {fileID: 0}
+  desired_height: 7
+  desired_displacement: 5
 --- !u!1 &4902113512128566159
 GameObject:
   m_ObjectHideFlags: 0
@@ -4435,7 +4452,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.31499958, y: 0, z: 0}
+  m_ParentAnchorPosition: {x: -0.31500006, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.70710677, w: 0.70710677}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: -0.70710677, z: 0, w: 0.70710677}
@@ -6200,7 +6217,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: -0.14999962, y: 0, z: -0.14999962}
+  m_ParentAnchorPosition: {x: -0.1500001, y: 0, z: -0.14999962}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
