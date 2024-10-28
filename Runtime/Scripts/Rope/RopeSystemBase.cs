@@ -79,6 +79,12 @@ namespace Rope
             ropeJoint.damper = 500;
             ropeJoint.maxDistance = RopeLength;
 
+            //FIXME i think this is causing the snapping behaviour
+            // the joint is created at the base of the rope, not where
+            // the load is, and then the load is snapped to the joint
+            // with sam, its heavy, so it just cant. but the buoy flies over fast
+            // this should be made into an object at the end of the rope that has a fixed joint to
+            // ropejoint and a char joint to the load
             var loadJoint = rope.AddComponent<CharacterJoint>();
             loadJoint.enablePreprocessing = false;
             loadJoint.enableCollision = false;

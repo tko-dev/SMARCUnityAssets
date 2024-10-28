@@ -129,6 +129,8 @@ namespace Rope
                 buoyRB.mass = BuoyGrams * 0.001f;
                 var buoyJoint = buoy.GetComponent<CharacterJoint>();
                 buoyJoint.connectedBody = lastLink.GetComponent<Rigidbody>();
+                var RLBuoy = buoy.GetComponent<RopeLinkBuoy>();
+                RLBuoy.OtherSideOfTheRope = VehicleRopeLink.GetComponent<ArticulationBody>();
             }
 
         }

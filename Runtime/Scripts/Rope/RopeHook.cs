@@ -22,7 +22,7 @@ namespace Rope
 
         
 
-        bool TestGrab(Collision collision)
+        bool TestRopeGrab(Collision collision)
         {
             RopeLink rl;
             if(collision.gameObject.TryGetComponent(out rl))
@@ -51,10 +51,9 @@ namespace Rope
             return false;
         }
 
-
         void OnCollisionStay(Collision collision)
         {
-            if(TestGrab(collision))
+            if(TestRopeGrab(collision))
             {
                 var rl = collision.gameObject.GetComponent<RopeLink>();
                 var generator = rl.GetGenerator();
@@ -71,6 +70,35 @@ namespace Rope
                 pulley.RopeDiameter = generator.RopeDiameter;
                 pulley.SetupEnds();
                 generator.DestroyRope(keepBuoy: true);
+                // pause the game
+                UnityEditor.EditorApplication.isPaused = true;
+                
+                return; // only grab things one at a time...
+            }
+
+            RopeLinkBuoy rlb;
+            if(collision.gameObject.TryGetComponent(out rlb))
+            {
+                // if we collide with the buoy, that means the pulley is tight
+                // for sim stability, we will destroy the pulley, the buoy and the hook
+                // and attach the "OtherSideOfTheRope" to the winch directly.
+                var winch = WinchGO.GetComponent<Winch>();
+                winch.UnSetupEnds();
+                // this could be generalized to RBs and such... but for now, we'll just do the ArticulationBody
+                winch.LoadAB = rlb.OtherSideOfTheRope;
+                winch.CurrentRopeSpeed = 0;
+                winch.WinchSpeed = 0;
+                var dist = Vector3.Distance(rlb.OtherSideOfTheRope.transform.position, winch.transform.position);
+                winch.TargetLength = dist;
+                winch.CurrentLength = dist;
+                winch.SetupEnds();
+
+                var pulley = PulleyGO.GetComponent<Pulley>();
+                pulley.UnSetupEnds();
+                Destroy(PulleyGO);
+
+                Destroy(rlb.gameObject);
+                Destroy(gameObject);
             }
         }
 
