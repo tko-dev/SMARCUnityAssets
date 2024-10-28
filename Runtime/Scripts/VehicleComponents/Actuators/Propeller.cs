@@ -26,7 +26,7 @@ namespace VehicleComponents.Actuators
         public double DefaultHoverRPM;
 
         [SerializeField] private ArticulationBody baseLinkArticulationBody;
-        private float c_tau_f = 8.004e-4f;
+        private float c_tau_f = 0.08f;
         
         
         public void SetRpm(double rpm)
@@ -57,6 +57,7 @@ namespace VehicleComponents.Actuators
             // if(HoverDefault) Debug.Log("the value of 4xr is: " + r*4 );
 
             // Visualize the applied force
+            Debug.DrawRay(transform.position, (float)r * transform.forward, Color.red);
             
             parentArticulationBody.AddForceAtPosition((float)r * parentArticulationBody.transform.forward,
                                                    parentArticulationBody.transform.position,

@@ -19,6 +19,9 @@ public class DroneLoadController: MonoBehaviour
     public float ControlFrequency = 50f;
     [Tooltip("The maximum distance error between the load and the target position, kind of controls the aggressiveness of the maneuvers.")]
     public float DistanceErrorCap = 10f;
+    private Vector<double> startingPosition = null;
+    public float MaxVelocityWithTrackingTarget = 1f;
+    public float MaxAccelerationWithTrackingTarget = 1f;
 
     [Header("Tracking")]
     [Tooltip("An object to follow")]
@@ -58,6 +61,7 @@ public class DroneLoadController: MonoBehaviour
     double d;
     Matrix<double> J;
     float c_tau_f;
+    Matrix<double> T_inv;
 
     // Load parameters
     double mL;
@@ -72,8 +76,8 @@ public class DroneLoadController: MonoBehaviour
     // Gains
     double kx;
     double kv;
-    double kR;
-    double kW;
+    Matrix<double> kR;
+    Matrix<double> kW;
     double kq;
     double kw;
 
@@ -100,7 +104,7 @@ public class DroneLoadController: MonoBehaviour
         q_c_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
         q_c_dot_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
-		propellers_rpms = new float[] { 0, 0, 0, 0 };
+		propellers_rpms = new float[] { 0, 0, 0, 0 }; // 0.0666 g of thrust per rpm, maxrpm is 10656
 
         if(LoadLinkTF != null) load_link_ab = LoadLinkTF.GetComponent<ArticulationBody>();
         
@@ -108,7 +112,7 @@ public class DroneLoadController: MonoBehaviour
         mQ = base_link_ab.mass;
         d = 0.315;
         J = DenseMatrix.OfArray(new double[,] { { base_link_ab.inertiaTensor.x, 0, 0 }, { 0, base_link_ab.inertiaTensor.z, 0 }, { 0, 0, base_link_ab.inertiaTensor.y } });
-        c_tau_f = 8.004e-4f;
+        c_tau_f = 0.08f;
 
         mL = 0;
         // Use this load mass when load_link is on sam
@@ -126,7 +130,9 @@ public class DroneLoadController: MonoBehaviour
         // Simulation parameters
         g = Physics.gravity.magnitude;
         e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
-        dt = 1f/ControlFrequency;
+        dt = Time.fixedDeltaTime;//1f/ControlFrequency;
+
+        T_inv = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 }, { 0, -d, 0, d }, { d, 0, -d, 0 }, { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } }).Inverse();
 
 
         //  One dimensional 
@@ -256,8 +262,8 @@ public class DroneLoadController: MonoBehaviour
         // Gains
         kx = 16*mQ;
         kv = 5.6*mQ;
-        kR = 10;
-        kW = 0.5;
+        kR = DenseMatrix.OfArray(new double[,] { { 8.81, 0, 0 }, { 0, 8.81, 0 }, { 0, 0, 8.81 } });
+        kW = DenseMatrix.OfArray(new double[,] { { 0.5, 0, 0 }, { 0, 0.5, 0 }, { 0, 0, 0.5 } });
         kq = 2;
         kw = 0.5;
         
@@ -289,7 +295,7 @@ public class DroneLoadController: MonoBehaviour
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, Math.Sqrt(2)/2, 0 });
 
         // Load position controller
-        Vector<double> ex = (xL_s - xL_s_d)*Math.Min(DistanceErrorCap/(xL_s - xL_s_d).Norm(2), 1);
+        Vector<double> ex = (xL_s - xL_s_d);//*Math.Min(DistanceErrorCap/(xL_s - xL_s_d).Norm(2), 1);
         Vector<double> ev = vL_s - vL_s_d;
 
         Vector<double> A = -kx*ex - kv*ev + (mQ+mL)*(aL_s_d + g*e3) + mQ*l*(q_dot*q_dot)*q;
@@ -357,8 +363,8 @@ public class DroneLoadController: MonoBehaviour
         // Gains
         kx = 16*mQ;
         kv = 5.6*mQ;
-        kR = 8.81;
-        kW = 2.54;
+        kR = DenseMatrix.OfArray(new double[,] { { 8.81, 0, 0 }, { 0, 8.81, 0 }, { 0, 0, 8.81 } });
+        kW = DenseMatrix.OfArray(new double[,] { { 2.54, 0, 0 }, { 0, 2.54, 0 }, { 0, 0, 2.54 } });
         
         // Quadrotor states
         Vector<double> x_s = BaseLink.transform.position.To<NED>().ToDense();
@@ -366,7 +372,7 @@ public class DroneLoadController: MonoBehaviour
         Matrix<double> R_wa = DenseMatrix.OfArray(new double[,] { { BaseLink.transform.right.x, BaseLink.transform.forward.x, BaseLink.transform.up.x },
                                                                 { BaseLink.transform.right.z, BaseLink.transform.forward.z, BaseLink.transform.up.z },
                                                                 { BaseLink.transform.right.y, BaseLink.transform.forward.y, BaseLink.transform.up.y } });
-        Vector<double> W_b = FRD.ConvertAngularVelocityFromRUF(BaseLink.transform.InverseTransformDirection(base_link_ab.angularVelocity)).ToDense();
+        Vector<double> W_b = -1f*BaseLink.transform.InverseTransformDirection(base_link_ab.angularVelocity).To<NED>().ToDense();
 
         // Transformations
         Matrix<double> R_ws = DenseMatrix.OfArray(new double[,] { { 0, 1, 0 },
@@ -384,9 +390,41 @@ public class DroneLoadController: MonoBehaviour
         Vector<double> v_s_d;
         Vector<double> a_s_d;
 
-        x_s_d = TrackingTargetTF.position.To<NED>().ToDense();
-        v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        // Vector<double> unitVectorTowardsTarget = (TrackingTargetTF.position.To<NED>().ToDense() - x_s)/(TrackingTargetTF.position.To<NED>().ToDense() - x_s).Norm(2);
+        // double accelerationDistance = Mathf.Pow(MaxVelocityWithTrackingTarget, 2)/(2*MaxAccelerationWithTrackingTarget);
+        // double distanceToTarget = (TrackingTargetTF.position.To<NED>().ToDense() - x_s).Norm(2);
+        // double velocityMagnitude;
+        
+        // // If we are not at the maximum velocity, we can accelerate
+        // if (distanceToTarget > accelerationDistance && v_s.Norm(2) < MaxVelocityWithTrackingTarget) {
+        //     if (startingPosition == null) {
+        //         startingPosition = x_s - 1e-3*unitVectorTowardsTarget;
+        //     }
+        //     velocityMagnitude = Math.Sqrt(2*MaxAccelerationWithTrackingTarget*(x_s - startingPosition).Norm(2));
+        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
+        //     v_s_d = velocityMagnitude*unitVectorTowardsTarget;
+        //     a_s_d = MaxAccelerationWithTrackingTarget*unitVectorTowardsTarget;
+        // // If we want to move towards the target with maximum velocity
+        // } else if (distanceToTarget > accelerationDistance) {
+        //     startingPosition = null;
+        //     velocityMagnitude = MaxVelocityWithTrackingTarget;
+        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
+        //     v_s_d = velocityMagnitude*unitVectorTowardsTarget;
+        //     a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        // // If we are close to the target, slow down
+        // } else if (distanceToTarget > 0.1) {
+        //     startingPosition = null;
+        //     velocityMagnitude = Math.Sqrt(2*MaxAccelerationWithTrackingTarget*distanceToTarget);
+        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
+        //     v_s_d = velocityMagnitude*unitVectorTowardsTarget;
+        //     a_s_d = -MaxAccelerationWithTrackingTarget*unitVectorTowardsTarget;
+        // // If we are at the target, stop
+        // } else {
+        //     startingPosition = null;
+            x_s_d = TrackingTargetTF.position.To<NED>().ToDense();
+            v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+            a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        // }
 
         // Minum snap trajectory parameters 
         double T = 5.0; // Total time for trajectory
@@ -467,7 +505,7 @@ public class DroneLoadController: MonoBehaviour
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, Math.Sqrt(2)/2, 0 });
 
         // Control
-        Vector<double> ex = (x_s - x_s_d)*Math.Min(DistanceErrorCap/(x_s - x_s_d).Norm(2), 1);
+        Vector<double> ex = (x_s - x_s_d);//*Math.Min(DistanceErrorCap/(x_s - x_s_d).Norm(2), 1);
         Vector<double> ev = v_s - v_s_d;
 
         Vector<double> pid = -kx*ex - kv*ev - mQ*g*e3 + mQ*a_s_d;
@@ -490,12 +528,16 @@ public class DroneLoadController: MonoBehaviour
         R_sb_d_prev = R_sb_d;
         W_b_d_prev = W_b_d;
 
-        if (times2 < 2 || M.Norm(2) > 100) 
+        if (times2 < 2)// || M.Norm(2) > 100) 
         {
             times2++;
             f = 0;
             M = DenseVector.OfArray(new double[] { 0, 0, 0 });
         }
+        // if (M.Norm(2) > 1) 
+        // {
+        //     M = M/M.Norm(2);
+        // }
         // Debug.Log($"R_sb: {R_sb}, R_sb_d: {R_sb_d} R_sb_d_prev: {R_sb_d_prev}");
         return (f, M);
     }
@@ -513,21 +555,27 @@ public class DroneLoadController: MonoBehaviour
         else (f, M) = TrackingControl();
 
         // Convert to propeller forces
-        Matrix<double> T = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 }, { 0, -d, 0, d }, { d, 0, -d, 0 }, { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } });
-        Vector<double> F = T.Inverse() * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
+        Vector<double> F = T_inv * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
 
         // Debug.Log($"f: {f}, M: {M}");
 
         // Set propeller rpms
-        for (int i = 0; i < propellers.Length; i++) 
+        for (int i = 0; i < propellers.Length; i++)
             propellers_rpms[i] = (float)F[i]/propellers[i].RPMToForceMultiplier;
 	}
 
 	void ApplyRPMs() 
     {
         // TODO: try clamping rpms to zero
-		for (int i = 0; i < propellers.Length; i++) 
+		bool val = false;
+        for (int i = 0; i < propellers.Length; i++) {
+            if (propellers_rpms[i] < 0) {
+                val = true;
+                // propellers_rpms[i] = 0;
+            }
             propellers[i].SetRpm(propellers_rpms[i]);
+        }
+        if (val) Debug.LogWarning($"Negative RPMs: {propellers_rpms[0]}, {propellers_rpms[1]}, {propellers_rpms[2]}, {propellers_rpms[3]}");
 	}
 
     static Vector<double> _Cross(Vector<double> a, Vector<double> b) 
