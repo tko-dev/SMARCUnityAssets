@@ -10,10 +10,10 @@ namespace Rope
         [Tooltip("Due to how ABs are solved, the AB will be converted to an RB when its attached to the winch for stability.")]
         public ArticulationBody LoadAB;
         public Rigidbody LoadRB;
-        [HideInInspector][SerializeField] MixedBody loadBody;
+        MixedBody loadBody;
     
-        [HideInInspector][SerializeField] SpringJoint ropeJoint;
-        [HideInInspector][SerializeField] LineRenderer lineRenderer;
+        SpringJoint ropeJoint;
+        LineRenderer lineRenderer;
 
         [Header("Winch Controls")]
         public float TargetLength = 0.5f;
@@ -24,7 +24,10 @@ namespace Rope
         public float CurrentLength = 0.5f;
         public float MinLength = 0.1f;
 
-        [HideInInspector][SerializeField] bool setup = false;
+        [Header("Debug")]
+        public float ActualDistance;
+
+        
 
         
         public void AttachLoad(GameObject load)
@@ -33,7 +36,7 @@ namespace Rope
             LoadRB = load.GetComponent<Rigidbody>();
         }
 
-        public override void SetupEnds()
+        protected override void SetupEnds()
         {
             loadBody = new MixedBody(LoadAB, LoadRB);
             ropeJoint = AttachBody(loadBody);
@@ -44,13 +47,7 @@ namespace Rope
             Update();
             FixedUpdate();
         }
-        public override void UnSetupEnds()
-        {
-            if (Application.isPlaying)Destroy(ropeJoint.gameObject);
-            else DestroyImmediate(ropeJoint.gameObject);
-
-            setup = false;
-        }
+        
 
         void OnValidate()
         {
@@ -65,8 +62,8 @@ namespace Rope
         void Update()
         {
             if(!setup) return;
-            float distance = Vector3.Distance(loadBody.position, transform.position);
-            bool ropeSlack = distance < CurrentLength;
+            ActualDistance = Vector3.Distance(loadBody.position, transform.position);
+            bool ropeSlack = ActualDistance < CurrentLength;
             lineRenderer.SetPosition(0, transform.position);
             lineRenderer.SetPosition(1, loadBody.position);
             lineRenderer.startColor = ropeSlack ? Color.green : Color.red;

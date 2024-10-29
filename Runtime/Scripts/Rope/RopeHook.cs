@@ -68,7 +68,7 @@ namespace Rope
                 pulley.LoadTwoAB = generator.VehicleRopeLink.gameObject.GetComponent<ArticulationBody>();
                 pulley.RopeLength = generator.RopeLength;
                 pulley.RopeDiameter = generator.RopeDiameter;
-                pulley.SetupEnds();
+                pulley.Setup();
                 generator.DestroyRope(keepBuoy: true);
                 // pause the game
                 UnityEditor.EditorApplication.isPaused = true;
@@ -83,7 +83,7 @@ namespace Rope
                 // for sim stability, we will destroy the pulley, the buoy and the hook
                 // and attach the "OtherSideOfTheRope" to the winch directly.
                 var winch = WinchGO.GetComponent<Winch>();
-                winch.UnSetupEnds();
+                winch.UnSetup();
                 // this could be generalized to RBs and such... but for now, we'll just do the ArticulationBody
                 winch.LoadAB = rlb.OtherSideOfTheRope;
                 winch.CurrentRopeSpeed = 0;
@@ -91,10 +91,10 @@ namespace Rope
                 var dist = Vector3.Distance(rlb.OtherSideOfTheRope.transform.position, winch.transform.position);
                 winch.TargetLength = dist;
                 winch.CurrentLength = dist;
-                winch.SetupEnds();
+                winch.Setup();
 
                 var pulley = PulleyGO.GetComponent<Pulley>();
-                pulley.UnSetupEnds();
+                pulley.UnSetup();
                 Destroy(PulleyGO);
 
                 Destroy(rlb.gameObject);

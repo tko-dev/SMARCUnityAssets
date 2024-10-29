@@ -4935,14 +4935,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: WinchSystem
       objectReference: {fileID: 0}
-    - target: {fileID: 4065076637292215025, guid: 246faa4526e9e158389691a72feb5596, type: 3}
-      propertyPath: LoadOneRB
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 4065076637292215025, guid: 246faa4526e9e158389691a72feb5596, type: 3}
-      propertyPath: LoadTwoAB
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 8205656881797901549, guid: 246faa4526e9e158389691a72feb5596, type: 3}
       propertyPath: m_ConnectedArticulationBody
       value: 

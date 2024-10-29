@@ -8,18 +8,17 @@ namespace Rope
         [Header("Load One")]
         public ArticulationBody LoadOneAB;
         public Rigidbody LoadOneRB;
-        [HideInInspector][SerializeField] MixedBody loadOneBody;
+        MixedBody loadOneBody;
         
         [Header("Load Two")]
         public ArticulationBody LoadTwoAB;
         public Rigidbody LoadTwoRB;
-        [HideInInspector][SerializeField] MixedBody loadTwoBody;
+        MixedBody loadTwoBody;
 
-        [HideInInspector][SerializeField] SpringJoint ropeJointOne;
-        [HideInInspector][SerializeField] SpringJoint ropeJointTwo;
-        [HideInInspector][SerializeField] LineRenderer LROne;
-        [HideInInspector][SerializeField] LineRenderer LRTwo;
-        [HideInInspector][SerializeField] bool setup = false;
+        SpringJoint ropeJointOne;
+        SpringJoint ropeJointTwo;
+        LineRenderer LROne;
+        LineRenderer LRTwo;
 
         [Header("Debug")]
         public float limitOne;
@@ -28,7 +27,7 @@ namespace Rope
         public float ropeSpeed;
         
 
-        public override void SetupEnds()
+        protected override void SetupEnds()
         {
             loadOneBody = new MixedBody(LoadOneAB, LoadOneRB);
             loadTwoBody = new MixedBody(LoadTwoAB, LoadTwoRB);
@@ -41,18 +40,8 @@ namespace Rope
             ropeSpeed = 0;
             ropeJointOne.maxDistance = limitOne;
             ropeJointTwo.maxDistance = limitTwo;
-            setup = true;
         }
 
-        public override void UnSetupEnds()
-        {
-            if (Application.isPlaying) Destroy(ropeJointOne.gameObject);
-            else DestroyImmediate(ropeJointOne.gameObject);
-            if (Application.isPlaying) Destroy(ropeJointTwo.gameObject);
-            else DestroyImmediate(ropeJointTwo.gameObject);
-
-            setup = false;
-        }
 
         void FixedUpdate()
         {

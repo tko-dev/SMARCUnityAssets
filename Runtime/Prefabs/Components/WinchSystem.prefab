@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 920350988464342731}
-  - component: {fileID: 4214407722293813177}
   - component: {fileID: 4065076637292215025}
+  - component: {fileID: 4214407722293813177}
   - component: {fileID: 2883172632654091541}
   m_Layer: 0
   m_Name: PulleyToLoads
@@ -35,6 +35,29 @@ Transform:
   - {fileID: 2948391968266531818}
   m_Father: {fileID: 3658882480078120043}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4065076637292215025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754093669834084086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fb4341d983e36f679c2423be66aa746, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RopeDiameter: 0.1
+  RopeLength: 3
+  SetupOnStart: 0
+  LoadOneAB: {fileID: 0}
+  LoadOneRB: {fileID: 0}
+  LoadTwoAB: {fileID: 0}
+  LoadTwoRB: {fileID: 0}
+  limitOne: 1.0319612
+  limitTwo: 1.0804071
+  limitSum: 0
+  ropeSpeed: 0
 --- !u!54 &4214407722293813177
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -62,34 +85,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4065076637292215025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 754093669834084086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fb4341d983e36f679c2423be66aa746, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  RopeDiameter: 0.1
-  RopeLength: 3
-  SetupOnStart: 0
-  LoadOneAB: {fileID: 0}
-  LoadOneRB: {fileID: 0}
-  LoadTwoAB: {fileID: 0}
-  LoadTwoRB: {fileID: 0}
-  ropeJointOne: {fileID: 0}
-  ropeJointTwo: {fileID: 0}
-  LROne: {fileID: 0}
-  LRTwo: {fileID: 0}
-  setup: 0
-  limitOne: 1.0319612
-  limitTwo: 1.0804071
-  limitSum: 0
-  ropeSpeed: 0
 --- !u!138 &2883172632654091541
 FixedJoint:
   m_ObjectHideFlags: 0
@@ -267,14 +262,12 @@ MonoBehaviour:
   SetupOnStart: 1
   LoadAB: {fileID: 0}
   LoadRB: {fileID: 2855852348665451609}
-  ropeJoint: {fileID: 0}
-  lineRenderer: {fileID: 0}
   TargetLength: 0.1
   WinchSpeed: 0.5
   CurrentRopeSpeed: 0.5
   CurrentLength: 0.13
   MinLength: 0.1
-  setup: 1
+  ActualDistance: 0
 --- !u!138 &8205656881797901549
 FixedJoint:
   m_ObjectHideFlags: 0
@@ -717,7 +710,7 @@ Rigidbody:
   m_GameObject: {fileID: 6040559385985837056}
   serializedVersion: 4
   m_Mass: 0.1
-  m_Drag: 3.61
+  m_Drag: 0.28
   m_AngularDrag: 0.1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}

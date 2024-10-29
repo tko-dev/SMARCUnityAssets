@@ -1,5 +1,8 @@
 using UnityEngine;
+using System.Collections.Generic;
+
 using Force;
+
 
 namespace Rope
 {
@@ -14,6 +17,9 @@ namespace Rope
         [Tooltip("Set false if you want to call Setup() manually, maybe as a result of a button press or event.")]
         public bool SetupOnStart = true;
 
+        List<GameObject> ropeParts;
+        protected bool setup = false;
+
 
         void Start()
         {
@@ -21,25 +27,27 @@ namespace Rope
             Setup();
         }
 
-        // also called by editor script
         public void Setup()
         {
             var selfRB = GetComponent<Rigidbody>();
             if(selfRB == null) AddIneffectiveRB(gameObject);
             SetupOnStart = false;
+            if(ropeParts == null) ropeParts = new List<GameObject>();
             SetupEnds();
+            setup = true;
         }
         public void UnSetup()
         {
-            UnSetupEnds();
+            foreach (var connector in ropeParts)
+            {
+                if (Application.isPlaying) Destroy(connector);
+                else DestroyImmediate(connector);
+            }
+            setup = false;
         }
 
 
-        public virtual void UnSetupEnds()
-        {
-            Debug.LogWarning("UnSetupEnds() not implemented in " + GetType());
-        }
-        public virtual void SetupEnds()
+        protected virtual void SetupEnds()
         {
             Debug.LogWarning("SetupEnds() not implemented in " + GetType());
         }
@@ -63,6 +71,7 @@ namespace Rope
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
             GameObject rope = new GameObject($"Rope_{transform.name}--{load.transform.name}");
+            ropeParts.Add(rope);
             rope.transform.parent = transform.parent;
             rope.transform.position = transform.position;
             rope.transform.rotation = transform.rotation;
@@ -81,6 +90,7 @@ namespace Rope
 
 
             var loadConnector = new GameObject($"Connector_{transform.name}--{load.transform.name}");
+            ropeParts.Add(loadConnector);
             loadConnector.transform.parent = transform.parent;
             loadConnector.transform.position = load.position;
             loadConnector.transform.rotation = load.rotation;
