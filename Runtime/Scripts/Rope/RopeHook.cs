@@ -70,9 +70,6 @@ namespace Rope
                 pulley.RopeDiameter = generator.RopeDiameter;
                 pulley.Setup();
                 generator.DestroyRope(keepBuoy: true);
-                // pause the game
-                UnityEditor.EditorApplication.isPaused = true;
-                
                 return; // only grab things one at a time...
             }
 
