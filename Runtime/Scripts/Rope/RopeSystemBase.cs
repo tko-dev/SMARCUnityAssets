@@ -62,7 +62,7 @@ namespace Rope
         {
             Rigidbody baseRB = GetComponent<Rigidbody>();
 
-            GameObject rope = new GameObject($"{transform.name}_Rope");
+            GameObject rope = new GameObject($"Rope_{transform.name}--{load.transform.name}");
             rope.transform.parent = transform.parent;
             rope.transform.position = transform.position;
             rope.transform.rotation = transform.rotation;
@@ -79,18 +79,25 @@ namespace Rope
             ropeJoint.damper = 500;
             ropeJoint.maxDistance = RopeLength;
 
-            //FIXME i think this is causing the snapping behaviour
-            // the joint is created at the base of the rope, not where
-            // the load is, and then the load is snapped to the joint
-            // with sam, its heavy, so it just cant. but the buoy flies over fast
-            // this should be made into an object at the end of the rope that has a fixed joint to
-            // ropejoint and a char joint to the load
-            var loadJoint = rope.AddComponent<CharacterJoint>();
+
+            var loadConnector = new GameObject($"Connector_{transform.name}--{load.transform.name}");
+            loadConnector.transform.parent = transform.parent;
+            loadConnector.transform.position = load.position;
+            loadConnector.transform.rotation = load.rotation;
+            var loadConRB = AddIneffectiveRB(loadConnector);
+            
+            var connectorToRopeJoint = loadConnector.AddComponent<FixedJoint>();
+            connectorToRopeJoint.connectedBody = ropeRB;
+            connectorToRopeJoint.autoConfigureConnectedAnchor = false;
+            connectorToRopeJoint.anchor = Vector3.zero;
+            connectorToRopeJoint.connectedAnchor = Vector3.zero;
+
+            var loadJoint = loadConnector.AddComponent<CharacterJoint>();
             loadJoint.enablePreprocessing = false;
             loadJoint.enableCollision = false;
+            loadJoint.anchor = Vector3.zero;
             loadJoint.autoConfigureConnectedAnchor = false;
             load.ConnectToJoint(loadJoint);
-            loadJoint.anchor = Vector3.zero;
             loadJoint.connectedAnchor = Vector3.zero;
 
             // Add a linerenderer to visualize the rope and its tight/slack state
