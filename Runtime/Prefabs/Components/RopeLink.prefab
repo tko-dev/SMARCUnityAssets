@@ -209,8 +209,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3220833670880742058}
-  - component: {fileID: 4876152612544120068}
   - component: {fileID: 3260935119812365718}
+  - component: {fileID: 4876152612544120068}
   m_Layer: 0
   m_Name: ForcePoint_B
   m_TagString: Untagged
@@ -233,27 +233,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1649529466708576780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &4876152612544120068
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4420765165816499496}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3260935119812365718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,6 +267,27 @@ MonoBehaviour:
   AppliedGravityForce: 0
   ApplyCustomForce: 0
   CustomForce: {x: 0, y: 0, z: 0}
+--- !u!135 &4876152612544120068
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4420765165816499496}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6502671150740987231
 GameObject:
   m_ObjectHideFlags: 0
@@ -380,8 +380,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 720764538486028133}
-  - component: {fileID: 5890788663254625585}
   - component: {fileID: 5096116835249348008}
+  - component: {fileID: 5890788663254625585}
   m_Layer: 0
   m_Name: ForcePoint_F
   m_TagString: Untagged
@@ -404,27 +404,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1649529466708576780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &5890788663254625585
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8003534790774156089}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &5096116835249348008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -459,6 +438,27 @@ MonoBehaviour:
   AppliedGravityForce: 0
   ApplyCustomForce: 0
   CustomForce: {x: 0, y: 0, z: 0}
+--- !u!135 &5890788663254625585
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8003534790774156089}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8527497976637253487
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,8 +468,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1649529466708576780}
-  - component: {fileID: 4447885801482707029}
   - component: {fileID: 10039788946428091}
+  - component: {fileID: 4447885801482707029}
   - component: {fileID: 1080205937504706963}
   - component: {fileID: 2453692462447050752}
   - component: {fileID: 3607058454141938631}
@@ -498,6 +498,29 @@ Transform:
   - {fileID: 3220833670880742058}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &10039788946428091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8527497976637253487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spring: 0.1
+  damper: 0.1
+  maximumForce: 5000
+  generator: {fileID: 0}
+  ropeDiameter: 0
+  ropeCollisionDiameter: 0
+  segmentLength: 0
+  segmentMass: 0
+  linkJoint: {fileID: 0}
+  firstSegmentTransform: {fileID: 0}
+  lastSegmentTransform: {fileID: 0}
 --- !u!136 &4447885801482707029
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -521,32 +544,6 @@ CapsuleCollider:
   m_Height: 0
   m_Direction: 2
   m_Center: {x: 0, y: 0.01, z: 0}
---- !u!114 &10039788946428091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8527497976637253487}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7284c59de35753c1aabd86a7273926ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spring: 0.1
-  damper: 0.1
-  maximumForce: 5000
-  generator: {fileID: 0}
-  isBuoy: 0
-  ropeDiameter: 0
-  ropeCollisionDiameter: 0
-  segmentLength: 0
-  segmentRigidbodyMass: 0
-  segmentGravityMass: 0
-  ropeJoint: {fileID: 0}
-  hookJoint: {fileID: 0}
-  firstSegmentTransform: {fileID: 0}
-  lastSegmentTransform: {fileID: 0}
 --- !u!114 &1080205937504706963
 MonoBehaviour:
   m_ObjectHideFlags: 0

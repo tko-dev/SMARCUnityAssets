@@ -1066,17 +1066,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RopeLinkPrefab: {fileID: 8527497976637253487, guid: eebb343a23cba1423be0f5ab11c20e78, type: 3}
-  VehicleConnectionName: rope_link
+  BuoyPrefab: {fileID: 8815314036595629783, guid: 1a141f36c860298228d360ce3f711dd2, type: 3}
+  VehicleRopeLinkName: rope_link
+  VehicleBaseLinkName: base_link
   RopeDiameter: 0.01
-  RopeLength: 2
-  GramsPerMeter: 0.5
+  RopeLength: 3
+  GramsPerMeter: 5
   BuoyGrams: 1
-  RopeCollisionDiameter: 0.1
+  RopeCollisionDiameter: 0.05
   SegmentLength: 0.1
-  SegmentMassRatio: 0.01
-  RopeReplacementAccuracy: 0.02
-  SegmentRBMass: 0.12012
+  RopeTightnessTolerance: 0.02
+  RopeColor: {r: 1, g: 0.41793656, b: 0.015686274, a: 1}
+  DrawGizmos: 0
   RopeContainer: {fileID: 0}
+  VehicleRopeLink: {fileID: 4285824644817236138}
+  VehicleBaseLink: {fileID: 459097933565788526}
 --- !u!114 &6645243133524045330
 MonoBehaviour:
   m_ObjectHideFlags: 0

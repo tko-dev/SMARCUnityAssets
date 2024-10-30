@@ -92,11 +92,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4542338594766161557}
+  - component: {fileID: 3671385864243226011}
+  - component: {fileID: 3071595635879220505}
   - component: {fileID: 9133454180898049926}
   - component: {fileID: 5350459715123617840}
-  - component: {fileID: 3071595635879220505}
   - component: {fileID: 4395868529773121043}
-  - component: {fileID: 3671385864243226011}
+  - component: {fileID: 4678498351213570979}
   m_Layer: 0
   m_Name: RopeLinkBuoy
   m_TagString: Untagged
@@ -120,6 +121,53 @@ Transform:
   - {fileID: 2057301011594975050}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3671385864243226011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8815314036595629783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29dfae708978cd0849fb7f2ac88addda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OtherSideOfTheRope: {fileID: 0}
+--- !u!114 &3071595635879220505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8815314036595629783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConnectedArticulationBody: {fileID: 0}
+  ConnectedRigidbody: {fileID: 5350459715123617840}
+  VolumeObject: {fileID: 2126975242162296386}
+  VolumeMesh: {fileID: 0}
+  Volume: 0
+  WaterDensity: 997
+  DepthBeforeSubmerged: 0.1
+  MaxBuoyancyForce: 1000
+  UnderwaterDrag: 50
+  UnderwaterAngularDrag: 5
+  AirDrag: 5
+  AirAngularDrag: 5
+  IsUnderwater: 0
+  AddGravity: 0
+  AutomaticCenterOfGravity: 0
+  Mass: 0
+  DrawForces: 0
+  GizmoSize: 0
+  AppliedBuoyancyForce: 0
+  AppliedGravityForce: 0
+  ApplyCustomForce: 0
+  CustomForce: {x: 0, y: 0, z: 0}
 --- !u!135 &9133454180898049926
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -168,40 +216,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &3071595635879220505
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8815314036595629783}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cabd620bcc508e47915e35234c68c5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ConnectedArticulationBody: {fileID: 0}
-  ConnectedRigidbody: {fileID: 5350459715123617840}
-  VolumeObject: {fileID: 2126975242162296386}
-  VolumeMesh: {fileID: 0}
-  Volume: 0
-  WaterDensity: 997
-  DepthBeforeSubmerged: 0.1
-  MaxBuoyancyForce: 1000
-  UnderwaterDrag: 50
-  UnderwaterAngularDrag: 5
-  AirDrag: 5
-  AirAngularDrag: 5
-  IsUnderwater: 0
-  AddGravity: 0
-  AutomaticCenterOfGravity: 0
-  Mass: 0
-  DrawForces: 0
-  GizmoSize: 0
-  AppliedBuoyancyForce: 0
-  AppliedGravityForce: 0
-  ApplyCustomForce: 0
-  CustomForce: {x: 0, y: 0, z: 0}
 --- !u!144 &4395868529773121043
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -248,7 +262,7 @@ CharacterJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
---- !u!114 &3671385864243226011
+--- !u!114 &4678498351213570979
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -257,6 +271,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8815314036595629783}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29dfae708978cd0849fb7f2ac88addda, type: 3}
+  m_Script: {fileID: 11500000, guid: fba5fd74d37a6cf4284698624eb8f6aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsBaseLink: 0

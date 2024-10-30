@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.EditorTools;
 using UnityEngine;
 using Utils = DefaultNamespace.Utils;
+using TFPub = VehicleComponents.ROS.Publishers.ROSTransformTreePublisher;
 
 namespace Rope
 {
@@ -54,6 +55,7 @@ namespace Rope
         [HideInInspector] public GameObject VehicleRopeLink;
         [HideInInspector] public GameObject VehicleBaseLink;
         readonly string containerName = "Rope";
+
         
 
         void OnValidate()
@@ -65,7 +67,7 @@ namespace Rope
         {
             var link = Instantiate(RopeLinkPrefab);
             link.transform.SetParent(RopeContainer.transform);
-            link.name = $"{link.name}_{num}";
+            link.name = $"RopeSegment_{num}";
 
             var rl = link.GetComponent<RopeLink>();
             rl.SetRopeParams(this);
@@ -74,6 +76,49 @@ namespace Rope
             else rl.SetupConnectionToVehicle(VehicleRopeLink, VehicleBaseLink);
             
             return link;
+        }
+
+        void InstantiateAllLinks()
+        {
+            var prevLink = InstantiateLink(null, 0);
+
+            for(int i=1; i < NumSegments; i++)
+                prevLink = InstantiateLink(prevLink.transform, i);
+
+            foreach(RopeLink rl in RopeContainer.GetComponentsInChildren<RopeLink>())
+                rl.AssignFirstAndLastSegments();
+        }
+
+        void CreateLineRenderer()
+        {
+            ropeLineRenderer = RopeContainer.AddComponent<LineRenderer>();
+            ropeLineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            ropeLineRenderer.startColor = RopeColor;
+            ropeLineRenderer.endColor = RopeColor;
+            ropeLineRenderer.startWidth = RopeDiameter;
+            ropeLineRenderer.endWidth = RopeDiameter;
+            ropeLineRenderer.positionCount = NumSegments+1;
+            ropeLineRenderer.useWorldSpace = true;
+            ropeLineRenderer.receiveShadows = false;
+        }
+
+
+        void InstantiateBuoy()
+        {
+            var lastLink = RopeContainer.transform.GetChild(NumSegments-1);
+            var lastLinkRL = lastLink.GetComponent<RopeLink>();
+            var (lastLinkFront, lastLinkBack) = lastLinkRL.SpherePositions();
+            var buoy = Instantiate(BuoyPrefab);
+            buoy.transform.SetParent(RopeContainer.transform);
+            buoy.transform.position = lastLink.position + lastLinkFront;
+            buoy.transform.rotation = lastLink.rotation;
+            buoy.name = "Buoy";
+            var buoyRB = buoy.GetComponent<Rigidbody>();
+            buoyRB.mass = BuoyGrams * 0.001f;
+            var buoyJoint = buoy.GetComponent<CharacterJoint>();
+            buoyJoint.connectedBody = lastLink.GetComponent<Rigidbody>();
+            var RLBuoy = buoy.GetComponent<RopeLinkBuoy>();
+            RLBuoy.OtherSideOfTheRope = VehicleRopeLink.GetComponent<ArticulationBody>();
         }
 
 
@@ -91,47 +136,10 @@ namespace Rope
                 RopeContainer.transform.rotation = VehicleRopeLink.transform.rotation;
             }
 
-            ropeLineRenderer = RopeContainer.AddComponent<LineRenderer>();
-            ropeLineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-            ropeLineRenderer.startColor = RopeColor;
-            ropeLineRenderer.endColor = RopeColor;
-            ropeLineRenderer.startWidth = RopeDiameter;
-            ropeLineRenderer.endWidth = RopeDiameter;
-            ropeLineRenderer.positionCount = NumSegments+1;
-            ropeLineRenderer.useWorldSpace = true;
-            ropeLineRenderer.receiveShadows = false;
-
-            InstantiateLink(null, 0);
-
-            for(int i=1; i < NumSegments; i++)
-            {
-                InstantiateLink(RopeContainer.transform.GetChild(i-1), i);
-            }
-
-            foreach(RopeLink rl in RopeContainer.GetComponentsInChildren<RopeLink>())
-            {
-                rl.AssignFirstAndLastSegments();
-            }
-
+            InstantiateAllLinks();
+            CreateLineRenderer();
             UpdateLineRenderer();
-
-            if(BuoyGrams > 0 && BuoyPrefab != null)
-            {
-                var lastLink = RopeContainer.transform.GetChild(NumSegments-1);
-                var lastLinkRL = lastLink.GetComponent<RopeLink>();
-                var (lastLinkFront, lastLinkBack) = lastLinkRL.SpherePositions();
-                var buoy = Instantiate(BuoyPrefab);
-                buoy.transform.SetParent(RopeContainer.transform);
-                buoy.transform.position = lastLink.position + lastLinkFront;
-                buoy.transform.rotation = lastLink.rotation;
-                buoy.name = "Buoy";
-                var buoyRB = buoy.GetComponent<Rigidbody>();
-                buoyRB.mass = BuoyGrams * 0.001f;
-                var buoyJoint = buoy.GetComponent<CharacterJoint>();
-                buoyJoint.connectedBody = lastLink.GetComponent<Rigidbody>();
-                var RLBuoy = buoy.GetComponent<RopeLinkBuoy>();
-                RLBuoy.OtherSideOfTheRope = VehicleRopeLink.GetComponent<ArticulationBody>();
-            }
+            if(BuoyGrams > 0 && BuoyPrefab != null) InstantiateBuoy();
 
         }
 
@@ -147,13 +155,13 @@ namespace Rope
             if(RopeContainer == null) return;
 
             if(!keepBuoy) DestroyEitherWay(RopeContainer);
-            else
+            else 
             {
                 foreach(RopeLink rl in RopeContainer.GetComponentsInChildren<RopeLink>())
                 {
-                    Destroy(rl.gameObject);
+                    DestroyEitherWay(rl.gameObject);
                 }
-                Destroy(ropeLineRenderer);
+                DestroyEitherWay(ropeLineRenderer);
                 ropeLineRenderer = null;
             }
         }
@@ -171,14 +179,15 @@ namespace Rope
         void UpdateLineRenderer()
         {
             if(ropeLineRenderer == null) return;
-            var numPts = Mathf.Min(NumSegments, ropeLineRenderer.positionCount);
-            for (int i = 0; i < numPts; i++)
+            var ropeLinks = RopeContainer.GetComponentsInChildren<RopeLink>();
+            ropeLineRenderer.positionCount = ropeLinks.Length+1;
+            foreach(var rl in ropeLinks)
+            for(int i=0; i<ropeLinks.Length; i++)
             {
-                var child = RopeContainer.transform.GetChild(i);
-                ropeLineRenderer.SetPosition(i, child.position);
+                ropeLineRenderer.SetPosition(i, ropeLinks[i].transform.position);
             }
 
-            var lastChild = RopeContainer.transform.GetChild(NumSegments-1);;
+            var lastChild = ropeLinks[ropeLinks.Length-1].transform;
             ropeLineRenderer.SetPosition(NumSegments, lastChild.position+lastChild.forward*SegmentLength);
         }
 
