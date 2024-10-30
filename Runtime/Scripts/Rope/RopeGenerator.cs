@@ -161,7 +161,7 @@ namespace Rope
                 {
                     DestroyEitherWay(rl.gameObject);
                 }
-                DestroyEitherWay(ropeLineRenderer);
+                Destroy(ropeLineRenderer);
                 ropeLineRenderer = null;
             }
         }
