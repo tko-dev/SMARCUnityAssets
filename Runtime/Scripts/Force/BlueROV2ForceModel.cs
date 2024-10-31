@@ -3,11 +3,9 @@ using DefaultNamespace.LookUpTable;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Unity.Mathematics;
-using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 using VehicleComponents.Actuators;
-using RosMsgType = RosMessageTypes.SaabMsgs.MPCmsgMsg;
 
 namespace DefaultNamespace
 {
