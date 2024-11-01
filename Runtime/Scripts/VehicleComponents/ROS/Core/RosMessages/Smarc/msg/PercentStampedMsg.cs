@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Text;
 using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 
-namespace RosMessageTypes.Sam
+namespace RosMessageTypes.Smarc
 {
     [Serializable]
     public class PercentStampedMsg : Message
     {
-        public const string k_RosMessageName = "sam_msgs/PercentStamped";
+        public const string k_RosMessageName = "smarc_msgs/PercentStamped";
         public override string RosMessageName => k_RosMessageName;
 
         public float value;
