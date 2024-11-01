@@ -66,9 +66,14 @@ namespace Force
         private WaterQueryModel waterModel;
         private ForcePoint[] allForcePoints;
 
-        public void ApplyCurrent(Vector3 current)
+        public void ApplyForce(Vector3 current, bool onlyUnderWater = false, bool onlyAboveWater = false)
         {
-            if (GetDepth() > 0)
+            bool enabled = true;
+            if(onlyAboveWater) enabled = !IsUnderwater;
+            if(onlyUnderWater) enabled = IsUnderwater;
+            if(onlyAboveWater && onlyUnderWater) enabled = false;
+
+            if (enabled)
             {
                 body.AddForceAtPosition
                         (
@@ -131,7 +136,7 @@ namespace Force
             if (AddGravity)
             {
                 Vector3 gravityForce = Mass * Physics.gravity / allForcePoints.Length;
-                body.AddForceAtPosition(gravityForce, forcePointPosition, ForceMode.Force);
+                ApplyForce(gravityForce);
                 AppliedGravityForce = gravityForce.y;
                 if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+gravityForce, Color.red, 0.1f);
             }
@@ -149,10 +154,7 @@ namespace Force
                 AppliedBuoyancyForce = Mathf.Min(MaxBuoyancyForce, AppliedBuoyancyForce);
             
                 var buoyancyForce =  new Vector3(0, AppliedBuoyancyForce, 0);
-                body.AddForceAtPosition(
-                    buoyancyForce,
-                    forcePointPosition,
-                    ForceMode.Force);
+                ApplyForce(buoyancyForce);
                 if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+buoyancyForce, Color.blue, 0.1f);
             }
 
@@ -167,13 +169,8 @@ namespace Force
             body.angularDrag = anySubmerged? UnderwaterAngularDrag:AirAngularDrag;
 
             // And lastly, whatever custom force was set.
-            if(ApplyCustomForce)
-            {
-                body.AddForceAtPosition(
-                    CustomForce,
-                    forcePointPosition,
-                    ForceMode.Force);
-            }
+            if(ApplyCustomForce) ApplyForce(CustomForce);
+            
         }
 
         void OnDrawGizmos()

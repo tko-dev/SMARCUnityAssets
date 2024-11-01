@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DefaultNamespace.Water
+using Force;
+
+namespace GameUI
 {
-    public class WaterCurrentVisualizer : MonoBehaviour
+    public class ForceFieldVisualizer : MonoBehaviour
     {   
 
-        [Header("Current Visuals")]
+        [Header("Visuals")]
         [Range(0,1)]
         public float alpha = 0.3f;
         [Range(0,5)]
@@ -35,12 +37,12 @@ namespace DefaultNamespace.Water
 
             // Gotta find the global min/max corners of _all_ the currents
             Bounds worldBounds = new Bounds();
-            var currents = new List<IWaterCurrent>();
+            var fields = new List<IForceField>();
             var colliders = new List<Collider>();
             for(int i=0; i < transform.childCount; i++)
             {
                 var child = transform.GetChild(i);
-                if(child.TryGetComponent<IWaterCurrent>(out IWaterCurrent current))
+                if(child.TryGetComponent<IForceField>(out IForceField current))
                 {
                     var col = child.GetComponent<Collider>();
                     // Gotta make sure we dont create bounds out of nowhere
@@ -49,7 +51,7 @@ namespace DefaultNamespace.Water
                     if(i == 0) worldBounds = col.bounds;
                     // Otherwise we extend it.
                     else worldBounds.Encapsulate(col.bounds);
-                    currents.Add(current);
+                    fields.Add(current);
                     colliders.Add(col);
                 }
             }
@@ -64,9 +66,9 @@ namespace DefaultNamespace.Water
                         localCurrent.x=0; localCurrent.y=0; localCurrent.z=0;
                         worldPoint.x = x; worldPoint.y = y; worldPoint.z = z;
                         // collect currents from multiple boxes that the point is inside of
-                        for(int i=0; i<currents.Count; i++)
+                        for(int i=0; i<fields.Count; i++)
                         {
-                            if(IsInside(colliders[i], worldPoint)) localCurrent += currents[i].GetCurrentAt(worldPoint);
+                            if(IsInside(colliders[i], worldPoint)) localCurrent += fields[i].GetForceAt(worldPoint);
                         }
                         // Avoid drawing if there is no current here.
                         if(localCurrent.x != 0 || localCurrent.y != 0 || localCurrent.z != 0)
