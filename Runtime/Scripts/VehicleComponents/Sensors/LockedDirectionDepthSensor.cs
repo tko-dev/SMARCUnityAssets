@@ -21,6 +21,8 @@ namespace VehicleComponents.Sensors
         public float maxRaycastDistance = 30f;
         private WaterQueryModel _waterModel;
 
+        public Vector3 sensingDirection = Vector3.down;
+
         void Start()
         {
             _waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
@@ -33,7 +35,7 @@ namespace VehicleComponents.Sensors
             RaycastHit hit;
 
             Vector3 rayOrigin = transform.position;
-            Vector3 rayDirection = Vector3.down;
+            Vector3 rayDirection = sensingDirection;
 
             // Perform raycast downwards from the current position
             if (Physics.Raycast(rayOrigin, rayDirection, out hit, maxRaycastDistance))
