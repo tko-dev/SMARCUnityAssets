@@ -483,6 +483,29 @@ Simply add the component `GameUI/RayViewer` to a sonar and check in its config w
 - **Hits Lifetime**: How long, in seconds, should the particles for hits stay around. Limited by Max Particles Multiplier!
 - **Max Particles Multiplier**: How many copies of each hit should be kept on the scene? If you have 256 rays for a MBES, setting this to 100 will result in 25600 particles. Limited by Hits Lifetime!
 
+### Locked Direction Depth Sensor
+A sensor that estimates the depth of an object by raycasting in a given direction and measuring the distance to the first surface hit or, if no surface is hit, by using the water level as a fallback. The sensor adds Gaussian noise to simulate real-world inaccuracies. The depth is measured from the current position of the sensor relative to the water level or surface hit.
+
+![LockedDirectionDepthSensor](Media/DepthSensor.png)
+
+- **Max Raycast Distance**: The maximum distance the raycast will check for a surface in the specified direction.
+- **Noise Mean**: The average (mean) value of the Gaussian noise applied to the depth measurements, used to simulate inaccuracies in depth readings.
+- **Noise Sigma**: The standard deviation of the Gaussian noise to control how much the measurements fluctuate.
+- **Water Query Model**: This sensor uses a water query system to determine the water level when no raycast hit occurs.
+- **Sensing Direction**:  The direction in which depth is sensed.
+
+---
+
+### Range Receiver
+This sensor calculates the distance between a sender object and the receiver. If the sender object is within a predefined range, the distance is calculated and Gaussian noise is added to simulate sensor inaccuracy. If the distance exceeds the range, the sensor reports an infinite distance, indicating no signal.
+
+![RangeReceiver](Media/RangeReceiver.png)
+
+- **Range**: The maximum distance within which the sensor can detect the sender object.
+- **Sender Object**: The object from which the distance is being measured. The sensor calculates the distance between the sender and itself.
+- **Noise Mean**: The mean value of the Gaussian noise added to the distance measurement, used to simulate real-world inaccuracies.
+- **Noise Sigma**: The standard deviation of the Gaussian noise to add variability to the distance measurement.
+
 
 
 ## ROS
