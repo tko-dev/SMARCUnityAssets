@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using DefaultNamespace.LookUpTable;
 using VehicleComponents.Actuators;
@@ -61,7 +62,10 @@ public class DroneLoadController: MonoBehaviour
     double d;
     Matrix<double> J;
     float c_tau_f;
-    Matrix<double> T_inv;
+    private Matrix<double> T;
+    private Matrix<double> T_inv;
+    private Matrix<double> S;
+    private const int NUM_PROPS = 4;
 
     // Load parameters
     double mL;
@@ -132,8 +136,12 @@ public class DroneLoadController: MonoBehaviour
         e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
         dt = Time.fixedDeltaTime;//1f/ControlFrequency;
 
-        T_inv = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 }, { 0, -d, 0, d }, { d, 0, -d, 0 }, { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } }).Inverse();
-
+        T = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 },
+                                                    { 0, -d, 0, d },
+                                                    { d, 0, -d, 0 },
+                                                    { -c_tau_f, c_tau_f, -c_tau_f, c_tau_f } });
+        T_inv = T.Inverse();
+        S = T.Transpose()*T;
 
         //  One dimensional 
         /*
@@ -528,24 +536,18 @@ public class DroneLoadController: MonoBehaviour
         R_sb_d_prev = R_sb_d;
         W_b_d_prev = W_b_d;
 
-        if (times2 < 2)// || M.Norm(2) > 100) 
+        if (times2 < 2)
         {
             times2++;
             f = 0;
             M = DenseVector.OfArray(new double[] { 0, 0, 0 });
         }
-        // if (M.Norm(2) > 1) 
-        // {
-        //     M = M/M.Norm(2);
-        // }
         // Debug.Log($"R_sb: {R_sb}, R_sb_d: {R_sb_d} R_sb_d_prev: {R_sb_d_prev}");
         return (f, M);
     }
 
 	void ComputeRPMs() 
     {
-        t = Time.time;
-
         double f;
         Vector<double> M;
 
@@ -554,10 +556,47 @@ public class DroneLoadController: MonoBehaviour
         if (Rope != null && Rope.childCount == 2) (f, M) = SuspendedLoadControl();
         else (f, M) = TrackingControl();
 
-        // Convert to propeller forces
-        Vector<double> F = T_inv * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
+        // Convert optimal propeller forces
+        Vector<double> F_star = T_inv * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
+        Vector<double> v = DenseVector.OfArray(new double[] { 0, 0, 0, 0 });
 
-        // Debug.Log($"f: {f}, M: {M}");
+        int num_negative = 0;
+        int[] skip = { 0, 0, 0, 0 };
+        // for (int i = 0; i < NUM_PROPS; i++) {
+        //     if (F_star[i] < 0) {
+        //         v[i] = -F_star[i];
+        //         num_negative++;
+        //     }
+        //     skip[i] = num_negative;
+        // }
+        // Debug.Log("skip = " + skip[0] + ", " + skip[1] + ", " + skip[2] + ", " + skip[3]);
+
+        Vector<double> F;
+        if (num_negative == 0) {
+            F = F_star;
+        } else {
+            // Debug.Log("Negative forces detected: F0 = " + F_star[0] + ", F1 = " + F_star[1] + ", F2 = " + F_star[2] + ", F3 = " + F_star[3]);
+            Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS - num_negative, NUM_PROPS - num_negative);
+            Vector<double> b = Vector<double>.Build.Dense(NUM_PROPS - num_negative);
+            for (int i = 0; i < NUM_PROPS; i++) {
+                for (int j = 0; j < NUM_PROPS; j++) {
+                    if (v[i] == 0 && v[j] == 0) {
+                        A[i - skip[i], j - skip[j]] = S[i, j];
+                    }
+                    if (v[i] == 0 && v[j] != 0) {
+                        b[i - skip[i]] += S[i, j]*F_star[j];
+                    }
+                }
+            }
+            // Debug.Log("A = " + A + ", b = " + b);
+            Vector<double> v_removed = A.Inverse()*b;
+            for (int i = 0; i < NUM_PROPS; i++) {
+                if (v[i] == 0) {
+                    v[i] = v_removed[i - skip[i]];
+                }
+            }
+            F = F_star + v;
+        }
 
         // Set propeller rpms
         for (int i = 0; i < propellers.Length; i++)
@@ -567,15 +606,10 @@ public class DroneLoadController: MonoBehaviour
 	void ApplyRPMs() 
     {
         // TODO: try clamping rpms to zero
-		bool val = false;
         for (int i = 0; i < propellers.Length; i++) {
-            if (propellers_rpms[i] < 0) {
-                val = true;
-                // propellers_rpms[i] = 0;
-            }
+            Assert.IsTrue(propellers_rpms[i] >= 0);
             propellers[i].SetRpm(propellers_rpms[i]);
         }
-        if (val) Debug.LogWarning($"Negative RPMs: {propellers_rpms[0]}, {propellers_rpms[1]}, {propellers_rpms[2]}, {propellers_rpms[3]}");
 	}
 
     static Vector<double> _Cross(Vector<double> a, Vector<double> b) 
