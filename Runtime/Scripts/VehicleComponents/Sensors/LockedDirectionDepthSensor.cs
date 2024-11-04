@@ -8,9 +8,9 @@ using DefaultNamespace.Water;
 
 namespace VehicleComponents.Sensors
 {
-    public class DepthSensor : Sensor
+    public class LockedDirectionDepthSensor : Sensor
     {
-        [Header("Depth-Sensor")]
+        [Header("Locked-Direction-Depth-Sensor")]
         public float depth;
     
         private bool headerWritten = false;
