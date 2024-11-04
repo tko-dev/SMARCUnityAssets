@@ -2,13 +2,13 @@ using UnityEngine;
 using RosMessageTypes.Std; // For Float32MultiArray
 using Unity.Robotics.Core; // For TimeStamp
 
-using SensorDepth = VehicleComponents.Sensors.DepthSensor;
+using SensorDepth = VehicleComponents.Sensors.LockedDirectionDepthSensor;
 using VehicleComponents.ROS.Core;
 
 namespace VehicleComponents.ROS.Publishers
 {
     [RequireComponent(typeof(SensorDepth))]
-    class DepthSensor_Pub : ROSPublisher<Float32Msg, SensorDepth>
+    class LockedDirectionDepthSensor_Pub : ROSPublisher<Float32Msg, SensorDepth>
     { 
 
         protected override void UpdateMessage()
