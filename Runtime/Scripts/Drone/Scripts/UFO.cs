@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class UFO : MonoBehaviour {
+    public float alpha = 0.25f;
+    public Transform AUVTransform ;
+    public float desired_height = 7f;
+    public float desired_displacement= 5f;
 
     void Start() {}
 
     void FixedUpdate() {
         float t = Time.time;
-        transform.position = new Vector3(2*Mathf.Cos(t), 5, 2*Mathf.Sin(2*t));
+        float t_dash = t % (float)Math.Floor(2f * (float)desired_displacement / (float)alpha);
+        transform.position = new Vector3(AUVTransform.position.x-desired_displacement + alpha*t_dash, desired_height, AUVTransform.position.z);
     }
 }
