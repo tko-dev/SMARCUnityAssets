@@ -486,7 +486,7 @@ Simply add the component `GameUI/RayViewer` to a sonar and check in its config w
 ### Locked Direction Depth Sensor
 A sensor that estimates the depth of an object by raycasting in a given direction and measuring the distance to the first surface hit or, if no surface is hit, by using the water level as a fallback. The sensor adds Gaussian noise to simulate real-world inaccuracies. The depth is measured from the current position of the sensor relative to the water level or surface hit.
 
-![DepthSensor](Media/DepthSensor.png)
+![LockedDirectionDepthSensor](Media/DepthSensor.png)
 
 - **Max Raycast Distance**: The maximum distance the raycast will check for a surface in the specified direction.
 - **Noise Mean**: The average (mean) value of the Gaussian noise applied to the depth measurements, used to simulate inaccuracies in depth readings.
