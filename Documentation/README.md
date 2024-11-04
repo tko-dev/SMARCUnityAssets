@@ -46,6 +46,10 @@
       - [Actuator Subscriber](#actuator-subscriber)
 - [Utilities](#utilities)
   - [Rope](#rope)
+    - [Rope Winch and Pulley](#rope-winch-and-pulley)
+      - [Winch](#winch)
+      - [Pulley](#pulley)
+      - [RopeHook](#ropehook)
   - [Importer](#importer)
 - [Prefabs](#prefabs)
   - [SAM AUV](#sam-auv)
@@ -55,6 +59,7 @@
     - [Keyboard controller](#keyboard-controller-1)
     - [Geometric Tracking Controller](#geometric-tracking-controller)
   - [GameUI](#gameui)
+  - [WinchSystem](#winchsystem)
 
 
 
@@ -655,7 +660,12 @@ These are mostly intended to be used by scene creators to produce prefabs and ob
 ![RopeFancy](Media/RopeFancy.png)
 
 We simulate a rope using a chain of rigid bodies.
-Using rigid bodies instead of an articulation body allows us to connect two articulation body chains together with the rope at runtime, since new joints can be added to rigid bodies but not articulation bodies.
+This allows us to have per-segment physical properties, like buoyancy, damping, mass etc. to allow visually-accurate motion of the rope when it is partially underwater.
+
+> This many-segment rope looks nice, but is not physically accurate!
+
+Putting this rope under tension will cause stretching and eventually erratic behaviour.
+For systems that handle tension, see [this section](#rope-winch-and-pulley) on winches and pulleys.
 
 ![Rope](Media/Rope.png)
 
@@ -669,27 +679,25 @@ This component
 
 ![RopeGen](Media/RopeGen.png)
 
-- **Rope Link Prefab**: The prefab that will be used for each link in the rope chain.
-- **Vehicle Connection Name**: Similar to a [link attachment](#linkattachment), the rope will be jointed to this part of the robot.
-- **Rope Diameter/Length**: Thickness and total length of the rope. The rope is generated straight.
-- **Grams Per Meter**: How heavy the rope is. Each link will be assigned a mass according to this.
-- **Buoy Grams**: How heavy a buoy at the end of the rope will be.
-- **Rope Collision Diameter**: Small things moving fast makes collision checks very difficult. To go around this limitation, we use a separate size for just the collisions. The collision geometry will be tangent to the visual geometry at the "bottom" and grow from there. This way if the rope is hanging somewhere, it looks visually accurate despite the collisions being unnaturally large.
-- **Segment Length**: Length of each rope link segment. The total length will be divided by this to determine the number of segments. Be aware that more segments usually means that the physics engine will explode when forces get bigger. 
-- **Segment Mass Ratio**: Mass ratio to assign to each segment. This is a hack within the joint system to allow very-small-mass objects (like a rope link with 5 miligrams of mass) to affect larger-mass objects when connected by joints. 1% seems to be a sweet spot.
-- **Rope Replacement Accuracy**: When the rope is tight, and the buoy is attached to something, the rope is replaced by exactly two links. 
-  - This allows the rope to carry larger forces without breaking physics or stretching much, since there will be exactly 3 joints after replacement instead of 10s of joints. 
-  - At the moment of replacement, rope can jerk the two connected objects around due to small differences in end points. This is the setting to determine how small those differences can be. 
-    - The bigger it is, the quicker and easier the rope is replaced, but it will jerk the connected objects. 
-    - The smaller it is, the more accurate the rope will be during replacement, but getting the rope to be that accurate while in motion is very difficult. 
-    - 2cm default seems to be a happy medium.
+- **Prefab of the rope parts**
+  - **Rope Link Prefab**: The prefab that will be used for each link in the rope chain.
+  - **Rope Buoy Prefab**: The prefab of a buoy to attach at the end of the rope.
+- **Connected Body**
+  - **Vehicle Rope link Name**: Similar to a [link attachment](#linkattachment), the rope will be jointed to this part of the robot.
+  - **Vehicle Base Link Name**: The base_link of the vehicle the rope is attached to. The "Rope" object will be created as a child here.
+- **Rope Parameters**
+  - **Rope Diameter/Length**: Thickness and total length of the rope. The rope is generated straight.
+  - **Grams Per Meter**: How heavy the rope is. Each link will be assigned a mass according to this.
+  - **Buoy Grams**: How heavy a buoy at the end of the rope will be. If 0, no buoy will be created.
+- **Physics Stuff**
+  - **Rope Collision Diameter**: Small things moving fast makes collision checks very difficult. To go around this limitation, we use a separate size for just the collisions. The collision geometry will be tangent to the visual geometry at the "bottom" and grow from there. This way if the rope is hanging somewhere, it looks visually accurate despite the collisions being unnaturally large.
+  - **Segment Length**: Length of each rope link segment. The total length will be divided by this to determine the number of segments. Be aware that more segments usually means that the physics engine will explode when forces get bigger. 
+  - **Rope Tightness Tolerance**: The individual rope segments will color their gizmos red/green if they are tight or not, towards both the buoy and the vehicle.
+- **Rendering**
+  - **Rope Color**: You can pick any color for your rope.
+- **Debug**
+  - **Draw Gizmos**: If checked, rope will visualize some stuff as gizmos.
 - **(Re)Generate Rope**: This will create an object called `Rope` as a child of the object the component is attached to and place all the rope links in there. If the `Rope` object exists, it will delete it and re-create it with the currently set parameters.
-
-A replaced rope attached to a drone, carrying a SAM:
-
-![RopeLinks](Media/Rope2Links.png)
-
-![RopeCarry](Media/RopeCarry.png)
 
 A rope link prefab must contain this component:
 
@@ -697,6 +705,84 @@ A rope link prefab must contain this component:
 
 - **Spring/Damper/Max Force**: The rope links are connected by configurable joints with drives. These parameters control the spring system between each link. Playing with these parameters can make a rope stiffer or slacker.
 
+
+### Rope Winch and Pulley
+
+The many-segment rope system above does not work (usually) when under tension. 
+But sometimes, an articulation body system (like a drone) might need to carry another articulation body system (like a submarine) by catching a piece of rope attached to the load.
+
+**Common assumptions**
+
+- The rope is visualized as a line. It is assumed that most of the time, these components will be used while the rope is under tension.
+- The color of the line is red when the load is applying force to the rope (tense) and green when the rope is not carrying the load (slack).
+- The rope allows some stretch. Very rigid ropes are possible, but simulation stability will suffer.
+- The rope parts are created at runtime.
+- Rope has no collision
+- Ropes have 0.1 mass, 1 Drag, 1 Angular Drag and 1e-6 Inertia.
+
+
+#### Winch
+
+![WinchViz](Media/WinchViz.png)
+
+A length-adjustable rope.
+In the picture above, the red hook is attached to the selected cube with a Winch.
+The cube is the "winch body" that is attached to the drone with a fixed joint.
+
+![WinchSetup](Media/WinchSetup.png)
+
+- **Rope Properties**
+  - **Rope Diameter**: Just visual thickness
+  - **Rope Length**: Total length of the rope. Target Length will be limited by this.
+  - **Setup On Start**: If checked, the rope will be created and connected when you press play.
+- **Hanging Load**
+  - **Load AB/RB**: The load that will be attached to the end of the rope.
+- **Winch Controls**
+  - **Target Length**: The winch will spool up or down the rope to get the extended rope to this length.
+  - **Winch Speed**: How fast the winch spools. Rate of change in length.
+- **Winch**
+  - **Current Rope Speed/Length**: Read-outs.
+  - **Min Length**: To keep the load from hitting the carrier.
+- **Debug**
+  - **Actual Distance**: Distance between Winch and Load. If under tension, usually a little bigger than Current Length.
+
+#### Pulley
+
+![PulleyViz](Media/PulleyViz.png)
+
+When a rope is "plucked" by a hook, it creates a pulley system where the two loads connected by the rope will balance around.
+In the picture above, SAM and the buoy are connected through the green rope, over the red hook.
+The "Pulley" object is shown as a cube with a funny texture.
+
+The pulley works by effectively using two winches attached to each load.
+The speed of the rope over the hook (towards load one or two), is determined by the force they apply on the joints of the rope.
+This allows the pulley to behave kind of realistically in the presence of drag, inertia and momentum. 
+
+
+![PulleyConfig](Media/PulleyConfig.png)
+
+- **Rope Properties, Load One, Load Two**: Same as [Winch](#winch)
+- **Debug**:
+  - **Limit One/Two**: The individual limits of each load
+  - **Limit sum**: To make sure the sum matches the length of the rope.
+
+#### RopeHook
+
+The RopeHook script manages the lifecycles of a hook that is suspended by a winch and carrying a pulley.
+
+> You should start by using [the prefab](#winchsystem).
+
+The expected usage of the RopeHook is such:
+- A hook that is suspended on a winch is lowered towards a visual rope.
+- The hook collides with the RopeLink.
+  - Hook replaces the visual rope with a [pulley](#pulley) that connects the two ends of the rope.
+- Hook winch is raised to the top.
+  - This usually leads to a collision between hook and buoy.
+- On collision with buoy (signifying that the pulley is all the way towards one side) the heavier load (SAM) is attached to the same winch the hook is.
+  - Buoy, Hook and Pulley (and their components) are destroyed.
+- The end result is a winch carrying the heavy load.
+  - This is the most stable joints can get, since there is exactly 3: Winch to carrier, winch to rope, rope to load.
+- Carrier can now carry away the load, lower it, raise it etc.
 
 
 ## Importer
@@ -790,3 +876,14 @@ This is provided as a prefab under `SMARCUnityAssets/Runtime/Prefabs/GUI/GameUI`
 - The names of the robots are displayed with yellow lines and background
 - The TF Tree of SAM is displayed with colored arrows.
 
+## WinchSystem
+Found under: `SMARCUnityAssets/Runtime/Prefabs/Components` and is a part of [the Quadrotor prefab](#quadrotor).
+
+A simple prefab that implements the [winch-pulley-hook setup](#rope-winch-and-pulley).
+You need to assign:
+- The carrier body to `WinchToHook`'s FixedJoint.
+- The loads of `PulleyToLoads`
+
+after instantiating one of these to use it.
+
+![WinchSys](Media/WinchSys.png)
