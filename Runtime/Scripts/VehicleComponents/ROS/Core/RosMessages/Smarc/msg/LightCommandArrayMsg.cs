@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Text;
 using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 
-namespace RosMessageTypes.Sam
+namespace RosMessageTypes.Smarc
 {
     [Serializable]
     public class LightCommandArrayMsg : Message
     {
-        public const string k_RosMessageName = "sam_msgs/LightCommandArray";
+        public const string k_RosMessageName = "smarc_msgs/LightCommandArray";
         public override string RosMessageName => k_RosMessageName;
 
         // 
