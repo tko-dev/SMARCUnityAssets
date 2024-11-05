@@ -26,6 +26,7 @@ namespace VehicleComponents.ROS.Publishers
         public float fyp=1, cxp=1, cyp=1, Tx=1, Ty=1;
         Camera cam;
 
+
         protected override void InitializePublication()
         {
             ROSMsg.distortion_model = "plumb_bob";
@@ -43,11 +44,12 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.header.stamp = new TimeStamp(Clock.time);   
 
             float[] D = {k1,k2,t1,t2,k3};
+            
             // Camera intrinsic matrix K 
-            float fx = cam.focalLength * ROSMsg.width / cam.sensorSize.x;
-            float fy = cam.focalLength * ROSMsg.height / cam.sensorSize.y;
-            float cx = ROSMsg.width / 2f;
-            float cy = ROSMsg.height / 2f;
+            fx = cam.focalLength * ROSMsg.width / cam.sensorSize.x;
+            fy = cam.focalLength * ROSMsg.height / cam.sensorSize.y;
+            cx = ROSMsg.width / 2f;
+            cy = ROSMsg.height / 2f;
             
             float[] K = {
                 fx, 0,  cx,

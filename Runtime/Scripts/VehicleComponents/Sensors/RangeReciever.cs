@@ -20,8 +20,6 @@ namespace VehicleComponents.Sensors
         public float noiseSigma = 0.1f;
         private NormalDistribution noiseGenerator;
 
-        private bool headerWritten = false;
-
         void Start()
         {
             
