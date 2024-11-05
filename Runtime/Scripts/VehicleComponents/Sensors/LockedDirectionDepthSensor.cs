@@ -13,7 +13,6 @@ namespace VehicleComponents.Sensors
         [Header("Locked-Direction-Depth-Sensor")]
         public float depth;
     
-        private bool headerWritten = false;
         //Noise params and generator
         public float noiseMean = 0f;
         public float noiseSigma = 0.1f;
