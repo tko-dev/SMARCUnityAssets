@@ -519,45 +519,26 @@ public class DroneLoadController: MonoBehaviour
 
         // Convert optimal propeller forces
         Vector<double> F_star = T_inv * DenseVector.OfArray(new double[] { f, M[0], M[1], M[2] });
-        Vector<double> v = DenseVector.OfArray(new double[] { 0, 0, 0, 0 });
-
-        int num_negative = 0;
-        int[] skip = { 0, 0, 0, 0 };
+        Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS, NUM_PROPS);
+        Vector<double> b = Vector<double>.Build.Dense(NUM_PROPS);
         for (int i = 0; i < NUM_PROPS; i++) {
+            for (int j = 0; j < NUM_PROPS; j++) {
+                if (F_star[i] >= 0 && F_star[j] >= 0) {
+                    A[i, j] = S[i, j];
+                } else if (i == j) {
+                    A[i, j] = 1;
+                } else {
+                    A[i, j] = 0;
+                }
+                if (F_star[i] >= 0 && F_star[j] < 0) {
+                    b[i] += S[i, j]*F_star[j];
+                }
+            }
             if (F_star[i] < 0) {
-                v[i] = -F_star[i];
-                num_negative++;
+                b[i] = -F_star[i];
             }
-            skip[i] = num_negative;
         }
-        // Debug.Log("skip = " + skip[0] + ", " + skip[1] + ", " + skip[2] + ", " + skip[3]);
-
-        Vector<double> F;
-        if (num_negative == 0) {
-            F = F_star;
-        } else {
-            // Debug.Log("Negative forces detected: F0 = " + F_star[0] + ", F1 = " + F_star[1] + ", F2 = " + F_star[2] + ", F3 = " + F_star[3]);
-            Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS - num_negative, NUM_PROPS - num_negative);
-            Vector<double> b = Vector<double>.Build.Dense(NUM_PROPS - num_negative);
-            for (int i = 0; i < NUM_PROPS; i++) {
-                for (int j = 0; j < NUM_PROPS; j++) {
-                    if (v[i] == 0 && v[j] == 0) {
-                        A[i - skip[i], j - skip[j]] = S[i, j];
-                    }
-                    if (v[i] == 0 && v[j] != 0) {
-                        b[i - skip[i]] += S[i, j]*F_star[j];
-                    }
-                }
-            }
-            // Debug.Log("A = " + A + ", b = " + b);
-            Vector<double> v_removed = A.Inverse()*b;
-            for (int i = 0; i < NUM_PROPS; i++) {
-                if (v[i] == 0) {
-                    v[i] = v_removed[i - skip[i]];
-                }
-            }
-            F = F_star + v;
-        }
+        Vector<double> F = F_star + A.Solve(b);
 
         // Set propeller rpms
         for (int i = 0; i < propellers.Length; i++)
