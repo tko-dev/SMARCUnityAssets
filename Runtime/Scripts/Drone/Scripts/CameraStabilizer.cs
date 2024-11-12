@@ -15,7 +15,7 @@ public class CameraStabilizer : MonoBehaviour {
 			// down.x = 0;
 			// down.z = 0;
             // Use this to define the look-at direction of the camera;
-            transform.LookAt(transform.position + Vector3.down);
+            transform.LookAt(transform.position + Vector3.down, transform.parent.up);
         } else {
             transform.rotation = transform.parent.rotation;
         }
