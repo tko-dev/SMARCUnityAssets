@@ -56,7 +56,6 @@ namespace Force
 
         [Header("Debug")]
         public bool DrawForces = false;
-        public float GizmoSize = 0f;
         public float AppliedBuoyancyForce, AppliedGravityForce;
         public bool ApplyCustomForce = false;
         public Vector3 CustomForce = Vector3.zero;
