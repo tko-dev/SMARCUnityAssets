@@ -5460,9 +5460,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -5596,9 +5612,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -5737,9 +5769,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -5811,9 +5859,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -5885,9 +5949,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -6092,9 +6172,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -6290,9 +6386,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -6364,9 +6476,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -6624,9 +6752,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
@@ -6698,9 +6842,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: VolumeObject
       value: 
       objectReference: {fileID: 7988793297394776768}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: AirAngularDrag
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterDrag
+      value: 1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
+      propertyPath: UnderwaterAngularDrag
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5935641589257227573, guid: 3a014debc3b3e05449edaee2fa65ba19, type: 3}
       propertyPath: ConnectedArticulationBody
       value: 
