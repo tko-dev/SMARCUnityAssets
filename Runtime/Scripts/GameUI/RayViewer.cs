@@ -168,6 +168,7 @@ namespace GameUI
                         var hitPoint = sonar.SonarHits[i].Hit.point;
                         var surfaceNormal = sonar.SonarHits[i].Hit.normal;
                         if(surfaceNormal == null) continue;
+                        if(surfaceNormal == Vector3.zero) surfaceNormal = Vector3.up;
 
                         float normalizedZ = Mathf.InverseLerp(sonar.HitsMaxHeight, sonar.HitsMinHeight, hitPoint.y);
                         if (UseRainbow) emitParams.startColor = Rainbow(normalizedZ);
