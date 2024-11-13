@@ -31,6 +31,12 @@ namespace Force
             return closest == point;
         }
 
+        public Vector3 GetRandomPointInside()
+        {
+            //TODO this can be improved for arbitrary collider shapes
+            return col.bounds.center + Random.insideUnitSphere * col.bounds.extents.magnitude;
+        }
+
         public Vector3 GetForceAt(Vector3 position)
         {
             if(!IsInside(position)) return Vector3.zero;
