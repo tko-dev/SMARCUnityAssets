@@ -20,8 +20,14 @@ namespace VehicleComponents.Sensors
         public float noiseSigma = 0.1f;
         private NormalDistribution noiseGenerator;
 
+
         void Start()
         {
+            if(senderObject == null)
+            {
+                Debug.LogWarning("No sender object set for RangeReciever sensor. Disabling sensor.");
+                enabled = false;
+            }
             
             distance = float.PositiveInfinity;
             noiseGenerator = new NormalDistribution(noiseMean, noiseSigma);
@@ -30,6 +36,10 @@ namespace VehicleComponents.Sensors
 
         public override bool UpdateSensor(double deltaTime)
         {
+            if(!enabled)
+            {
+                return false;
+            }
 
             Vector3 rayOrigin = senderObject.transform.position;
             Vector3 rayEnd = transform.position;

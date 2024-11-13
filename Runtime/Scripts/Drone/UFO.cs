@@ -8,7 +8,14 @@ public class UFO : MonoBehaviour {
     public float desired_height = 7f;
     public float desired_displacement= 5f;
 
-    void Start() {}
+    void Start()
+    {
+        if (AUVTransform == null)
+        {
+            Debug.LogWarning("No AUVTransform set for UFO sensor. Disabling.");
+            enabled = false;
+        }
+    }
 
     void FixedUpdate() {
         float t = Time.time;
