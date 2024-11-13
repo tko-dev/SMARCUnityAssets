@@ -56,7 +56,6 @@ namespace Force
 
         [Header("Debug")]
         public bool DrawForces = false;
-        public float GizmoSize = 0f;
         public float AppliedBuoyancyForce, AppliedGravityForce;
         public bool ApplyCustomForce = false;
         public Vector3 CustomForce = Vector3.zero;
@@ -123,7 +122,12 @@ namespace Force
 
         float GetDepth()
         {
-            if(waterModel == null) waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+            if(waterModel == null) 
+            {
+                var waterModels = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None);
+                if(waterModels.Length <= 0) return -1;
+                waterModel = waterModels[0];
+            }
             float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
             float depth = waterSurfaceLevel - transform.position.y;
             return depth;
@@ -173,18 +177,5 @@ namespace Force
             
         }
 
-        void OnDrawGizmos()
-        {
-            if(GizmoSize <= 0) return;
-            
-            Gizmos.color = new Color(0.5f, 0.5f, 0f, 0.5f);
-            var d = GetDepth();
-            if (d > 0f)
-                Gizmos.color = new Color(0f, 0.5f, 0.5f, 0.5f);
-            if (d > DepthBeforeSubmerged)
-                Gizmos.color = new Color(0f, 0f, 1f, 0.5f);
-
-            Gizmos.DrawSphere(transform.position, GizmoSize);
-        }
     }
 }
