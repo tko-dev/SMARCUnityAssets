@@ -56,7 +56,7 @@ namespace Force
 
         [Header("Debug")]
         public bool DrawForces = false;
-        public float AppliedBuoyancyForce, AppliedGravityForce;
+        public Vector3 AppliedBuoyancyForce, AppliedGravityForce;
         public bool ApplyCustomForce = false;
         public Vector3 CustomForce = Vector3.zero;
 
@@ -65,8 +65,9 @@ namespace Force
         private WaterQueryModel waterModel;
         private ForcePoint[] allForcePoints;
 
-        public void ApplyForce(Vector3 current, bool onlyUnderWater = false, bool onlyAboveWater = false)
+        public Vector3 ApplyForce(Vector3 force, bool onlyUnderWater = false, bool onlyAboveWater = false)
         {
+            Vector3 appliedForce = Vector3.zero;
             bool enabled = true;
             if(onlyAboveWater) enabled = !IsUnderwater;
             if(onlyUnderWater) enabled = IsUnderwater;
@@ -74,13 +75,16 @@ namespace Force
 
             if (enabled)
             {
+                appliedForce = force / allForcePoints.Length;
                 body.AddForceAtPosition
                         (
-                            current / allForcePoints.Length,
+                            appliedForce,
                             transform.position,
                             ForceMode.Force
                         );
             }
+
+            return appliedForce;
         }
 
 
@@ -139,27 +143,24 @@ namespace Force
             var forcePointPosition = transform.position;
             if (AddGravity)
             {
-                Vector3 gravityForce = Mass * Physics.gravity / allForcePoints.Length;
-                ApplyForce(gravityForce);
-                AppliedGravityForce = gravityForce.y;
-                if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+gravityForce, Color.red, 0.1f);
+                AppliedGravityForce = ApplyForce(Mass * Physics.gravity);
+                
+                if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+AppliedGravityForce, Color.red, 0.1f);
             }
 
 
             var depth = GetDepth();
             IsUnderwater = depth > 0f;
-            if (depth > 0f)
+            if (IsUnderwater)
             {
-                //Underwater
-                //Apply buoyancy
                 float displacementMultiplier = Mathf.Clamp01(depth / DepthBeforeSubmerged);
+                var buoyancyForceMag = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier;
+                buoyancyForceMag = Mathf.Min(MaxBuoyancyForce, buoyancyForceMag);
+                var buoyancyForce =  new Vector3(0, buoyancyForceMag, 0);
 
-                AppliedBuoyancyForce = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier / allForcePoints.Length;
-                AppliedBuoyancyForce = Mathf.Min(MaxBuoyancyForce, AppliedBuoyancyForce);
-            
-                var buoyancyForce =  new Vector3(0, AppliedBuoyancyForce, 0);
-                ApplyForce(buoyancyForce);
-                if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+buoyancyForce, Color.blue, 0.1f);
+                AppliedBuoyancyForce = ApplyForce(buoyancyForce, onlyUnderWater: true);
+                
+                if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+AppliedBuoyancyForce, Color.blue, 0.1f);
             }
 
             // change the drag of the body to underwater if any is submerged. This is a ad-hoc way to 
