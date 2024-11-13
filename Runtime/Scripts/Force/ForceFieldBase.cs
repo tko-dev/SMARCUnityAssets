@@ -13,6 +13,8 @@ namespace Force
         [Tooltip("If enabled, only ForcePoints that are ABOVE water will be affected")]
         public bool onlyAboveWater = false;
 
+        public bool IncludeInVisualizer = true;
+
         Collider col;
 
         protected virtual Vector3 Field(Vector3 position)

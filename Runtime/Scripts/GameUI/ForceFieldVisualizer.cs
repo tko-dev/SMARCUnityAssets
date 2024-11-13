@@ -34,6 +34,9 @@ namespace GameUI
         void Start()
         {
             fields = FindObjectsByType<ForceFieldBase>(FindObjectsSortMode.None);
+            // find fields where IncludeInVisualizer is true
+            fields = System.Array.FindAll(fields, f => f.IncludeInVisualizer);
+            
             particleQueue = new Queue<ForceFieldParticle>(ParticleCount);
             for(int i = 0; i < ParticleCount; i++)
             {
