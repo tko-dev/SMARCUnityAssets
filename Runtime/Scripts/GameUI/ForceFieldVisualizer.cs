@@ -50,6 +50,7 @@ namespace GameUI
         void FixedUpdate()
         {
             if(particleQueue.Count == 0) return;
+            if(fields.Length == 0) return;
             do
             {
                 var particle = particleQueue.Dequeue();
