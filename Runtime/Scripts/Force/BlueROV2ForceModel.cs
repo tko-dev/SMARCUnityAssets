@@ -5,6 +5,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using Unity.Mathematics;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
+using UnityEngine.UIElements;
 using VehicleComponents.Actuators;
 
 namespace DefaultNamespace
@@ -196,7 +197,7 @@ namespace DefaultNamespace
             });
             Matrix<double> D_of_vel = D + Dn;
             
-            var v_c = 0; // Assume no ocean current. If desired to integrete it, info about it can be found in OSBS
+            var v_c = 0; // Assume no ocean current. If desired to integrate it, info about it can be found in OSBS
             var vr = vel_vec - v_c;
             
             // Calculate dampening and coriolis forces
@@ -247,7 +248,31 @@ namespace DefaultNamespace
                 {-0.06, -0.06,  0.06,  0.06, -0.12, -0.12, 0.12,  0.12},
                 {0.99,  -0.99, -0.99,  0.99,  0,     0,    0,     0   }
             });
+            
+            // Matrix<double> T = DenseMatrix.OfArray(new double[,]
+            // {
+            //     { Math.Sqrt(2)/2,  Math.Sqrt(2)/2, -Math.Sqrt(2)/2, -Math.Sqrt(2)/2,  0,      0,       0,       0       },
+            //     { -Math.Sqrt(2)/2, Math.Sqrt(2)/2, -Math.Sqrt(2)/2,  Math.Sqrt(2)/2,  0,      0,       0,       0       },
+            //     { 0,               0,              0,               0,              -1,      1,       1,      -1       },
+            //     { 0,               0,              0,               0,               0.218,  0.218,  -0.218,  -0.218   },
+            //     { 0,               0,              0,               0,               0.12,  -0.12,    0.12,   -0.12    },
+            //     { -0.1888,         0.1888,         0.1888,         -0.1888,          0,      0,       0,       0       }
+            // });
             // Calculate force vector
+            
+            // Vector<double> F_vec = Vector<double>.Build.DenseOfArray(new double[] 
+            //     {
+            //         rpmBotFrontRight/rpmMax,
+            //         rpmBotFrontLeft/rpmMax,
+            //         rpmBotBackRight/rpmMax,
+            //         rpmBotBackLeft/rpmMax,
+            //         rpmTopFrontRight/rpmMax,
+            //         rpmTopFrontLeft/rpmMax,
+            //         rpmTopBackRight/rpmMax, 
+            //         rpmTopBackLeft/rpmMax
+            //     }
+            // );
+            
             Vector<double> F_vec = Vector<double>.Build.DenseOfArray(new double[] 
                 {
                     VoltageToForce(rpmBotFrontRight/rpmMax),
@@ -260,10 +285,32 @@ namespace DefaultNamespace
                     VoltageToForce(rpmTopBackLeft/rpmMax)
                 }
             );
+            
+            Vector<double> F_vec_approx = Vector<double>.Build.DenseOfArray(new double[] 
+                {
+                    31*rpmBotFrontRight/rpmMax,
+                    31*rpmBotFrontLeft/rpmMax,
+                    31*rpmBotBackRight/rpmMax,
+                    31*rpmBotBackLeft/rpmMax,
+                    31*rpmTopFrontRight/rpmMax,
+                    31*rpmTopFrontLeft/rpmMax,
+                   31*rpmTopBackRight/rpmMax, 
+                    31*rpmTopBackLeft/rpmMax
+                }
+            );
+            
+            // print(F_vec[0]+","+F_vec[1]+","+F_vec[2]+","+F_vec[3]+","+F_vec[4]+","+F_vec[5]+","+F_vec[6]+","+F_vec[7]);    
 
-            var ROSForces = T * F_vec;
+            
+            var ROSForces = T * F_vec_approx;
             inputForce  = ROSForces.SubVector(0, 3).ToVector3();
             inputTorque = ROSForces.SubVector(3, 3).ToVector3();
+            
+            print("Got forces");
+            for (int i = 0; i < F_vec_approx.Count; i++)
+            {
+                print(F_vec_approx[i]);
+            }
             
             // Convert to keyboard format (unity coordinates)
             inputForce = NED.ConvertToRUF(inputForce);
@@ -310,14 +357,15 @@ namespace DefaultNamespace
             {
                 inputTorque[2] += 14;
             }
-        
+            // inputForce = Vector3.zero;
+            // inputTorque = Vector3.zero;
             // ADDED MASS
             var input_forces = inputForce.To<NED>().ToDense(); // Might need to revisit. Rel. velocity in point m block.
-            var input_torques = -FRD.ConvertAngularVelocityFromRUF(inputTorque).ToDense(); // FRD is same as NED for ANGLES ONLY (Negative since inputs are right handed )       
+            var input_torques = FRD.ConvertAngularVelocityFromRUF(inputTorque).ToDense(); // FRD is same as NED for ANGLES ONLY (Negative since inputs are right handed )       
             var reactive_force_sum = (-g_vec - tau_sum_damping - tau_sum_coriolis);
             Vector<double> input_forces_sum  = Vector<double>.Build.DenseOfArray(new double[] {input_forces[0], input_forces[1], input_forces[2], input_torques[0], input_torques[1], input_torques[2] });
             var total_force_sum = reactive_force_sum + input_forces_sum;
-            print(input_forces[0]+","+input_forces[1]+","+input_forces[2]);
+            //print(input_forces[0]+","+input_forces[1]+","+input_forces[2]);
             Matrix<double> M_inv = DenseMatrix.OfDiagonalArray(new double[] // Inverted total mass matrix (rigid body + added mass)
             {
                 0.0504,
@@ -327,7 +375,8 @@ namespace DefaultNamespace
                 2.7397,
                 1.6892
             });
-            
+            //print(input_forces_sum[0]+","+input_forces_sum[1]+","+input_forces_sum[2]+","+input_forces_sum[3]+","+input_forces_sum[4]+","+input_forces_sum[5]);    
+
             var vel_vec_dot = M_inv*total_force_sum;
             var added_inertia = M_A * vel_vec_dot;
             var addedForce = added_inertia.SubVector(0, 3).ToVector3();
