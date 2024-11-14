@@ -36,7 +36,24 @@ namespace Force
         public Vector3 GetRandomPointInside()
         {
             //TODO this can be improved for arbitrary collider shapes
-            return col.bounds.center + Random.insideUnitSphere * col.bounds.extents.magnitude;
+
+        Vector3 randomPoint = new Vector3(
+            Random.Range(col.bounds.min.x, col.bounds.max.x),
+            Random.Range(col.bounds.min.y, col.bounds.max.y),
+            Random.Range(col.bounds.min.z, col.bounds.max.z)
+        );
+
+        // // Ensure the random point is inside the collider
+        // while (!IsInside(randomPoint))
+        // {
+        //     randomPoint = new Vector3(
+        //         Random.Range(col.bounds.min.x, col.bounds.max.x),
+        //         Random.Range(col.bounds.min.y, col.bounds.max.y),
+        //         Random.Range(col.bounds.min.z, col.bounds.max.z)
+        //     );
+        // }
+
+        return randomPoint;
         }
 
         public Vector3 GetForceAt(Vector3 position)
