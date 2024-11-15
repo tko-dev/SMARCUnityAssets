@@ -24,14 +24,7 @@ namespace Force
 
         Propeller getProp()
         {
-            var current = transform;
-            while (current.parent != null)
-            {
-                current = current.parent;
-                var prop = current.GetComponent<Propeller>();
-                if (prop != null) return prop;
-            }
-            return null;
+            return transform.parent.GetComponent<Propeller>();
         }
 
         protected override Vector3 Field(Vector3 position)
