@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
@@ -76,7 +77,6 @@ public class DroneLoadController: MonoBehaviour
     double g;
     Vector<double> e3;
     float dt;
-    float t;
 
     // Gains
     double kx;
@@ -92,6 +92,9 @@ public class DroneLoadController: MonoBehaviour
     int min_snap_flag;
     double catching_time; 
 
+    // Logging
+    string filePath = "/home/jonat/log.csv";
+    TextWriter tw;
 
 	// Use this for initialization
 	void Start() 
@@ -254,7 +257,9 @@ public class DroneLoadController: MonoBehaviour
         
         */
 
-
+        tw = new StreamWriter(filePath, false);
+        tw.WriteLine("t,x_s1,x_s2,x_s3,x_s_d1,x_s_d2,x_s_d3");
+        tw.Close();
 
 	}
 	
@@ -447,12 +452,17 @@ public class DroneLoadController: MonoBehaviour
             a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 1/8 });
             */
             //Debug.Log($"x_s_d: {x_s_d[0]:F2},{x_s_d[1]:F2},{x_s_d[2]:F2}"); // desired position
-            Debug.Log($"x_s: {x_s[0]:F2},{x_s[1]:F2},{x_s[2]:F2}"); // desired position
+            // Debug.Log($"x_s: {x_s[0]:F2},{x_s[1]:F2},{x_s[2]:F2}"); // desired position
         }else
         {
             catching_time = 0; // reset time
         }
         // Debug.Log($"t: {t}"); // Time
+
+        // Logging
+        tw = new StreamWriter(filePath, true);
+        tw.WriteLine($"{Time.time},{x_s[0]},{x_s[1]},{x_s[2]},{x_s_d[0]},{x_s_d[1]},{x_s_d[2]}");
+        tw.Close();
 
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2)/2, -Math.Sqrt(2)/2, 0 });
 
