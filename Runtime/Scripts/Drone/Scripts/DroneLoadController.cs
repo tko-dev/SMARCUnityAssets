@@ -93,7 +93,7 @@ public class DroneLoadController: MonoBehaviour
     double catching_time; 
 
     // Logging
-    string filePath = "/home/jonat/log.csv";
+    string filePath = Application.dataPath + "/../../SMARCUnityAssets/Logs/log.csv";
     TextWriter tw;
 
 	// Use this for initialization
