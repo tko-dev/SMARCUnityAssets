@@ -567,6 +567,7 @@ public class DroneLoadController: MonoBehaviour
 	void ApplyRPMs() 
     {
         // TODO: try clamping rpms to zero
+        Debug.Log($"RPM: {propellers_rpms[0]:F2},{propellers_rpms[1]:F2},{propellers_rpms[2]:F2},{propellers_rpms[3]:F2}"); // desired position
         for (int i = 0; i < propellers.Length; i++) {
             if (propellers_rpms[i] < 0) {
                 Debug.LogWarning("Propeller " + i + " has negative RPMs: " + propellers_rpms[i]);
