@@ -239,25 +239,25 @@ namespace DefaultNamespace
             float rpmBotFrontLeft = (float)PropBotFrontLeft.rpm;
             
             // Define T matrix
-            Matrix<double> T = DenseMatrix.OfArray(new double[,]
-            {
-                {-0.71, -0.71,  0.71,  0.71,  0,     0,    0,     0   },
-                {0.71,  -0.71,  0.71, -0.71,  0,     0,    0,     0   },
-                {0,      0,     0,     0,     1,     1,    1,     1   },
-                {-0.06,  0.06, -0.06,  0.06,  0.22, -0.22, 0.22, -0.22},
-                {-0.06, -0.06,  0.06,  0.06, -0.12, -0.12, 0.12,  0.12},
-                {0.99,  -0.99, -0.99,  0.99,  0,     0,    0,     0   }
-            });
-            
             // Matrix<double> T = DenseMatrix.OfArray(new double[,]
             // {
-            //     { Math.Sqrt(2)/2,  Math.Sqrt(2)/2, -Math.Sqrt(2)/2, -Math.Sqrt(2)/2,  0,      0,       0,       0       },
-            //     { -Math.Sqrt(2)/2, Math.Sqrt(2)/2, -Math.Sqrt(2)/2,  Math.Sqrt(2)/2,  0,      0,       0,       0       },
-            //     { 0,               0,              0,               0,              -1,      1,       1,      -1       },
-            //     { 0,               0,              0,               0,               0.218,  0.218,  -0.218,  -0.218   },
-            //     { 0,               0,              0,               0,               0.12,  -0.12,    0.12,   -0.12    },
-            //     { -0.1888,         0.1888,         0.1888,         -0.1888,          0,      0,       0,       0       }
+            //     {-0.71, -0.71,  0.71,  0.71,  0,     0,    0,     0   },
+            //     {0.71,  -0.71,  0.71, -0.71,  0,     0,    0,     0   },
+            //     {0,      0,     0,     0,     1,     1,    1,     1   },
+            //     {-0.06,  0.06, -0.06,  0.06,  0.22, -0.22, 0.22, -0.22},
+            //     {-0.06, -0.06,  0.06,  0.06, -0.12, -0.12, 0.12,  0.12},
+            //     {0.99,  -0.99, -0.99,  0.99,  0,     0,    0,     0   }
             // });
+            
+            Matrix<double> T = DenseMatrix.OfArray(new double[,]
+            {
+                { Math.Sqrt(2)/2,  Math.Sqrt(2)/2, -Math.Sqrt(2)/2, -Math.Sqrt(2)/2,  0,      0,       0,       0       },
+                { -Math.Sqrt(2)/2, Math.Sqrt(2)/2, -Math.Sqrt(2)/2,  Math.Sqrt(2)/2,  0,      0,       0,       0       },
+                { 0,               0,              0,               0,              -1,      1,       1,      -1       },
+                { 0,               0,              0,               0,               0.218,  0.218,  -0.218,  -0.218   },
+                { 0,                 0,              0,               0,               0.12,  -0.12,    0.12,   -0.12    },
+                { -0.1888,         0.1888,         0.1888,         -0.1888,          0,      0,       0,       0       }
+            });
             // Calculate force vector
             
             // Vector<double> F_vec = Vector<double>.Build.DenseOfArray(new double[] 
@@ -293,9 +293,9 @@ namespace DefaultNamespace
                     31*rpmBotBackRight/rpmMax,
                     31*rpmBotBackLeft/rpmMax,
                     31*rpmTopFrontRight/rpmMax,
+                    31*rpmTopBackLeft/rpmMax,
                     31*rpmTopFrontLeft/rpmMax,
-                   31*rpmTopBackRight/rpmMax, 
-                    31*rpmTopBackLeft/rpmMax
+                    31*rpmTopBackRight/rpmMax
                 }
             );
             
@@ -305,16 +305,32 @@ namespace DefaultNamespace
             var ROSForces = T * F_vec_approx;
             inputForce  = ROSForces.SubVector(0, 3).ToVector3();
             inputTorque = ROSForces.SubVector(3, 3).ToVector3();
+
+            print(message: "RPM");
+            for (int i = 0; i < F_vec_approx.Count; i++)
+            {
+                //print(F_vec_approx[i]*rpmMax/31);
+            }
             
             print("Got forces");
             for (int i = 0; i < F_vec_approx.Count; i++)
             {
                 print(F_vec_approx[i]);
             }
-            
+
+            // print(message: "Tao");
+            //
+            // for (int i = 0; i < 6; i++)
+            // {
+            //     print(ROSForces[i]);
+            // }
+
             // Convert to keyboard format (unity coordinates)
             inputForce = NED.ConvertToRUF(inputForce);
             inputTorque = FRD.ConvertAngularVelocityToRUF(inputTorque);
+            
+           // inputForce = Vector3.zero;
+           // inputTorque = Vector3.zero;
             
             // Keyboard controlls
             if (Input.GetKey(KeyCode.W))
@@ -357,8 +373,8 @@ namespace DefaultNamespace
             {
                 inputTorque[2] += 14;
             }
-            // inputForce = Vector3.zero;
-            // inputTorque = Vector3.zero;
+            //inputForce = Vector3.zero;
+            //inputTorque = Vector3.zero;
             // ADDED MASS
             var input_forces = inputForce.To<NED>().ToDense(); // Might need to revisit. Rel. velocity in point m block.
             var input_torques = FRD.ConvertAngularVelocityFromRUF(inputTorque).ToDense(); // FRD is same as NED for ANGLES ONLY (Negative since inputs are right handed )       
