@@ -24,7 +24,7 @@ public class DroneLoadController: MonoBehaviour
     // private Vector<double> startingPosition = null;
     public float MaxVelocityWithTrackingTarget = 1f;
     // public float MaxAccelerationWithTrackingTarget = 1f;
-    public float DecelerationDistance = 1f;
+    public float DecelerationDistance = 0.1f;
 
     [Header("Tracking")]
     [Tooltip("An object to follow")]
@@ -550,11 +550,8 @@ public class DroneLoadController: MonoBehaviour
 
 	void ApplyRPMs() 
     {
-<<<<<<< HEAD
         // TODO: try clamping rpms to zero
         Debug.Log($"RPM: {propellers_rpms[0]:F2},{propellers_rpms[1]:F2},{propellers_rpms[2]:F2},{propellers_rpms[3]:F2}"); // desired position
-=======
->>>>>>> 6b3b1c1f12a534dea7a245bf186883a5d4151c60
         for (int i = 0; i < propellers.Length; i++) {
             if (propellers_rpms[i] < 0) {
                 Debug.LogWarning("Propeller " + i + " has negative RPMs: " + propellers_rpms[i]);
