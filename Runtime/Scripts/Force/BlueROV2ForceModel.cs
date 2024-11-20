@@ -75,10 +75,9 @@ namespace DefaultNamespace
         double N_rdot = 0.222; // [kg*m^2]
         
         //Inertia 
-        double I_x = 0.26; // [kg*m^2], from OSBS's CAD
-        double I_y = 0.23; // [kg*m^2], from OSBS's CAD
-        double I_z = 0.37; // [kg*m^2], from OSBS's CAD
-
+        double I_x = 0.2818; // [kg*m^2], from OSBS's CAD
+        double I_y = 0.245; // [kg*m^2], from OSBS's CAD
+        double I_z = 0.3852; // [kg*m^2], from OSBS's CAD
         void Start()
         {
             // Get all propeller components
@@ -107,6 +106,9 @@ namespace DefaultNamespace
             
             // Get mass from unity + one time calculations
             m = mainBody.mass; // mass 13.5
+            I_x = mainBody.inertiaTensor.x;
+            I_y = mainBody.inertiaTensor.z;
+            I_z = mainBody.inertiaTensor.y; // y z switch. Unity to NED coordinates
             W = m * g; // weight
             B = rho*g*nabla; // The buoyancy in [N] given by OSBS
         }
@@ -293,9 +295,9 @@ namespace DefaultNamespace
                     31*rpmBotBackRight/rpmMax,
                     31*rpmBotBackLeft/rpmMax,
                     31*rpmTopFrontRight/rpmMax,
-                    31*rpmTopBackLeft/rpmMax,
                     31*rpmTopFrontLeft/rpmMax,
-                    31*rpmTopBackRight/rpmMax
+                    31*rpmTopBackRight/rpmMax,
+                    31*rpmTopBackLeft/rpmMax
                 }
             );
             
