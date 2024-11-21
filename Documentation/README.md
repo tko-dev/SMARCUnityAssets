@@ -28,11 +28,14 @@
     - [GPS](#gps)
       - [GPSReferencePoint](#gpsreferencepoint)
     - [IMU](#imu)
+      - [Accuracy tests](#accuracy-tests)
     - [Leak](#leak)
     - [Sonar](#sonar)
       - [Sonar Concepts](#sonar-concepts)
       - [Sonar Configuration](#sonar-configuration)
       - [Sonar Visualization](#sonar-visualization)
+    - [Locked Direction Depth Sensor](#locked-direction-depth-sensor)
+    - [Range Receiver](#range-receiver)
   - [ROS](#ros)
     - [Core](#core)
       - [RosMessages](#rosmessages)
@@ -413,6 +416,29 @@ Accelerations are calculated from ground truth velocity differences at every upd
 
 - **With Gravity**: If checked, IMU will add the gravity vector to its output.
 
+#### Accuracy tests
+The IMU has been tested for accuracy with this method:
+
+- A floating rigidbody cube with 1 unit of mass and no drag is created.
+- A 1 unit force is applied to the stationary cube for a fixed period of time.
+- A 1 unit of force is applied in the opposite direction for the same amount of time after the first application is done.
+- The cube should have 0 velocity.
+- During this process, the accelerations of the cube as reported by the IMU are integrated into velocities with a simple ROS node.
+- The final velocity reported by the ROS node should also be 0.
+
+The above test is implemented here:
+- https://github.com/KKalem/smarc2/tree/sim_imu_testing
+- https://github.com/KKalem/SMARCUnityStandard/tree/sim_imu_testing
+- https://github.com/KKalem/SMARCUnityAssets/tree/sim_imu_testing
+  
+To run it yourself:
+- Pull the above branches.
+- Run `smarc2/scripts/imu_tester.py`
+- Run the game from the scene `SMARCUnityStandard/Assets/Scenes/Dev/IMUTester.unity`
+- Plot `accel_tester/data`, `imu_test/linear_acceleration/y` and `odom_test/twist/linear/y`.
+  - `data` and `linear/y` should overlap entirely and form a triangle.
+
+This is not merged into master since the result is... boring. **The IMU is accurate.**
 
 
 ### Leak
