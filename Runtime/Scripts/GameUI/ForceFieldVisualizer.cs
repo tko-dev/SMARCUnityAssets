@@ -57,10 +57,11 @@ namespace GameUI
             do
             {
                 var particle = particleQueue.Dequeue();
+                // active particle means its already spawned and moving around
                 if(particle.gameObject.activeSelf) continue;
-                // pick one of the fields randomly
                 var field = fields[Random.Range(0, fields.Length)];
-                // spawn the particle at a random position inside the field
+                // maybe someone disabled/enabled a field at runtime?
+                if(field.gameObject.activeSelf == false) continue;
                 var position = field.GetRandomPointInside();
                 particle.Spawn(position, particleQueue);
 

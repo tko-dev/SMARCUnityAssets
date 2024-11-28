@@ -33,27 +33,31 @@ namespace Force
             return closest == point;
         }
 
-        public Vector3 GetRandomPointInside()
+        public Vector3 GetRandomPointInside(bool strictlyInside = false)
         {
+            if(col == null) return Vector3.zero;
+            
             //TODO this can be improved for arbitrary collider shapes
+            var min = col.bounds.min;
+            var max = col.bounds.max;            
 
-        Vector3 randomPoint = new Vector3(
-            Random.Range(col.bounds.min.x, col.bounds.max.x),
-            Random.Range(col.bounds.min.y, col.bounds.max.y),
-            Random.Range(col.bounds.min.z, col.bounds.max.z)
-        );
+            Vector3 randomPoint = new Vector3(
+                Random.Range(min.x, max.x),
+                Random.Range(min.y, max.y),
+                Random.Range(min.z, max.z)
+            );
 
-        // // Ensure the random point is inside the collider
-        // while (!IsInside(randomPoint))
-        // {
-        //     randomPoint = new Vector3(
-        //         Random.Range(col.bounds.min.x, col.bounds.max.x),
-        //         Random.Range(col.bounds.min.y, col.bounds.max.y),
-        //         Random.Range(col.bounds.min.z, col.bounds.max.z)
-        //     );
-        // }
+            // Ensure the random point is inside the collider
+            while (strictlyInside && !IsInside(randomPoint))
+            {
+                randomPoint = new Vector3(
+                    Random.Range(min.x, max.x),
+                    Random.Range(min.y, max.y),
+                    Random.Range(min.z, max.z)
+                );
+            }
 
-        return randomPoint;
+            return randomPoint;
         }
 
         public Vector3 GetForceAt(Vector3 position)
