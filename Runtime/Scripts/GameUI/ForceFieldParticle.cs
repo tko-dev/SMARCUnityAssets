@@ -45,7 +45,7 @@ namespace GameUI
         
 
 
-        public void Spawn(Vector3 position, Queue<ForceFieldParticle> queue)
+        public void Spawn(Vector3 position, Color color, Queue<ForceFieldParticle> queue)
         {
             RB.isKinematic = true;
             transform.position = position;
@@ -54,6 +54,8 @@ namespace GameUI
             TR.time = Lifetime;
             TR.startWidth = Size;
             TR.endWidth = 0f;
+            TR.startColor = color;
+            TR.endColor = new Color(color.r, color.g, color.b, 0f);
             FPgizmo.radius = Size;
             FP.enabled = true;
             this.queue = queue;
