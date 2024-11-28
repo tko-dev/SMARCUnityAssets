@@ -63,6 +63,7 @@ namespace GameUI
                 // maybe someone disabled/enabled a field at runtime?
                 if(field.gameObject.activeSelf == false) continue;
                 var position = field.GetRandomPointInside();
+                var color = field.onlyAboveWater? Color.red : field.onlyUnderwater? Color.blue : Color.green;
                 particle.Spawn(position, particleQueue);
 
             } while(particleQueue.Count > 0);

@@ -63,7 +63,8 @@ namespace GameUI
         void FixedUpdate()
         {
             if(queue == null) return;
-            remainingLifetime -= Time.fixedDeltaTime;
+            if(remainingLifetime > 0) remainingLifetime -= Time.fixedDeltaTime;
+            TR.startWidth = Size * (remainingLifetime / Lifetime);
             bool dead = remainingLifetime <= 0 || (DeactivateWhenOut && RB.GetAccumulatedForce() == Vector3.zero);
             RB.isKinematic = dead;
             FP.enabled = !dead;

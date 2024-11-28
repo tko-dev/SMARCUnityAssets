@@ -38,7 +38,7 @@ namespace Force
         }
 
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         switch(mode)
             {
