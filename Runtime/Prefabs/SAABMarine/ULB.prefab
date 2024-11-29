@@ -95,7 +95,7 @@ ArticulationBody:
   m_GameObject: {fileID: 7421646096417740346}
   m_Enabled: 1
   serializedVersion: 5
-  m_Mass: 0.2
+  m_Mass: 0.0000002
   m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_AnchorPosition: {x: 0, y: 0, z: 0}
