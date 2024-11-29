@@ -134,12 +134,12 @@ namespace Force
                 waterModel = waterModels[0];
             }
             float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
-            float depth = Mathf.Min(0, waterSurfaceLevel - transform.position.y);
+            float depth = Mathf.Max(0, waterSurfaceLevel - transform.position.y);
             return depth;
         }
 
         // Volume * Density * Gravity
-        private void FixedUpdate()
+        void FixedUpdate()
         {
             var forcePointPosition = transform.position;
             if (AddGravity)
