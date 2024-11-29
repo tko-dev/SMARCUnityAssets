@@ -110,7 +110,8 @@ namespace Force
                 if(Mass == 0) Mass = body.mass;
             }
 
-            waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+            var waterModels = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None);
+            if(waterModels.Length > 0) waterModel = waterModels[0];
 
             allForcePoints = body.gameObject.GetComponentsInChildren<ForcePoint>();
             if (AutomaticCenterOfGravity)
@@ -133,7 +134,7 @@ namespace Force
                 waterModel = waterModels[0];
             }
             float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
-            float depth = waterSurfaceLevel - transform.position.y;
+            float depth = Mathf.Min(0, waterSurfaceLevel - transform.position.y);
             return depth;
         }
 
@@ -150,28 +151,32 @@ namespace Force
 
 
             var depth = GetDepth();
-            IsUnderwater = depth > 0f;
-            if (IsUnderwater)
+            if(depth != -1)
             {
-                float displacementMultiplier = Mathf.Clamp01(depth / DepthBeforeSubmerged);
-                var buoyancyForceMag = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier;
-                buoyancyForceMag = Mathf.Min(MaxBuoyancyForce, buoyancyForceMag);
-                var buoyancyForce =  new Vector3(0, buoyancyForceMag, 0);
+                IsUnderwater = depth > 0f;
+                if (IsUnderwater)
+                {
+                    float displacementMultiplier = Mathf.Clamp01(depth / DepthBeforeSubmerged);
+                    var buoyancyForceMag = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier;
+                    buoyancyForceMag = Mathf.Min(MaxBuoyancyForce, buoyancyForceMag);
+                    var buoyancyForce =  new Vector3(0, buoyancyForceMag, 0);
 
-                AppliedBuoyancyForce = ApplyForce(buoyancyForce, onlyUnderWater: true);
-                
-                if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+AppliedBuoyancyForce, Color.blue, 0.1f);
+                    AppliedBuoyancyForce = ApplyForce(buoyancyForce, onlyUnderWater: true);
+                    
+                    if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+AppliedBuoyancyForce, Color.blue, 0.1f);
+                }
+
+                // change the drag of the body to underwater if any is submerged. This is a ad-hoc way to 
+                // simulate the sticktion water usually applies to objects
+                // also, some objects might need to be useful under AND over water (like ropes...)
+                // and their drag really should reflect where they are moment to moment
+                // yes, all of the points will do the same thing. but this makes it so we dont need
+                // a central forcepoint controller or sth
+                var anySubmerged = allForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
+                body.drag = anySubmerged? UnderwaterDrag:AirDrag;
+                body.angularDrag = anySubmerged? UnderwaterAngularDrag:AirAngularDrag;
             }
 
-            // change the drag of the body to underwater if any is submerged. This is a ad-hoc way to 
-            // simulate the sticktion water usually applies to objects
-            // also, some objects might need to be useful under AND over water (like ropes...)
-            // and their drag really should reflect where they are moment to moment
-            // yes, all of the points will do the same thing. but this makes it so we dont need
-            // a central forcepoint controller or sth
-            var anySubmerged = allForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
-            body.drag = anySubmerged? UnderwaterDrag:AirDrag;
-            body.angularDrag = anySubmerged? UnderwaterAngularDrag:AirAngularDrag;
 
             // And lastly, whatever custom force was set.
             if(ApplyCustomForce) ApplyForce(CustomForce);
