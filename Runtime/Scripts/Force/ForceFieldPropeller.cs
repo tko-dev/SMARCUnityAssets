@@ -5,52 +5,61 @@ using VehicleComponents.Actuators;
 namespace Force
 {
     
+    [RequireComponent(typeof(MeshCollider))]
     public class ForceFieldPropeller : ForceFieldBase
     {
-
-        public float fov, maxRange;
-
+        [Header("Propeller Force Field")]
+        [Tooltip("The point where the force field is applied from. This could be outside the collider bounds for more vertical pushing and inside for more horizontal pushing.")]
+        public float ConeTip = 0.2f;
+        [Tooltip("The propellers can spin _reall fast_ causing huge forces. Maybe cap them a little.")]
+        public float ForceMagnitudeCap = 1f;
         Propeller prop;
 
-        void Awake()
+
+        void Start()
         {
-            prop = getProp();
+            prop = GetProp();
             if (prop == null)
             {
-                Debug.LogError("ForceFieldPropeller: No Propeller found in the hierarchy!");
+                Debug.LogWarning($"ForceFieldPropeller: No Propeller found in the parent:{transform.parent.name}, disabling propeller force field!");
                 enabled = false;
             }
         }
 
-        Propeller getProp()
+        Propeller GetProp()
         {
             return transform.parent.GetComponent<Propeller>();
         }
 
-        protected override Vector3 Field(Vector3 position)
+        Vector3 GetTip()
         {
-            var relativePosition = position - transform.position;
-            if(relativePosition.magnitude > maxRange) return Vector3.zero;
-            if(Vector3.Angle(transform.forward, relativePosition) > fov) return Vector3.zero;
-            return relativePosition;
+            return transform.position + transform.forward * ConeTip;
         }
 
-        void OnDrawGizmos()
+        protected override Vector3 Field(Vector3 position)
         {
-            // Draw a camera frustum in front of the propeller
-            var propeller = getProp();
-            if (propeller != null)
+            var tip = GetTip();
+            var directionToPosition = position - tip;
+            var distance = directionToPosition.magnitude;
+            var forceMag = (float)(prop.rpm * prop.RPMToForceMultiplier * 1/(distance*distance));
+            forceMag = Mathf.Clamp(forceMag, 0, ForceMagnitudeCap);
+            var dotProduct = Vector3.Dot(directionToPosition, transform.forward);
+            if (dotProduct > 0)
             {
-                Gizmos.color = new Color(0, 1, 0, 0.5f);
-                Gizmos.matrix = transform.localToWorldMatrix;
-                Gizmos.DrawFrustum(
-                    center: Vector3.zero,
-                    fov: fov,
-                    maxRange: maxRange * (propeller.reverse? -1 : 1),
-                    minRange: 0,
-                    aspect: 1
-                );
+                // The position is above the tip: apply "sucktion" directly towards the tip linearly
+                return forceMag * transform.forward;
             }
+            else
+            {
+                // The position is below the tip: apply pushing force along the tip->position vector
+                return forceMag * directionToPosition.normalized;
+            }
+        }
+
+        void OnDrawGizmosSelected()
+        {
+            Gizmos.color = new Color(0.5f, 0.2f, 0.7f, 0.5f);
+            Gizmos.DrawSphere(GetTip(), 0.01f);
         }
     }
 

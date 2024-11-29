@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Force;
+using UnityEditor.EditorTools;
 
 namespace GameUI
 {
@@ -16,6 +17,8 @@ namespace GameUI
 
         [Tooltip("If enabled, the particles will be recycled when they are out of all fields")]
         public bool RecycleWhenOut = true;
+        [Tooltip("If enabled, particles will be spawned exactly inside the fields. This is expensive but might look nicer for some setups.")]
+        public bool SpawnStrictlyInside = false;
 
 
         ForceFieldBase[] fields;
@@ -62,7 +65,7 @@ namespace GameUI
                 var field = fields[Random.Range(0, fields.Length)];
                 // maybe someone disabled/enabled a field at runtime?
                 if(field.gameObject.activeSelf == false) continue;
-                var position = field.GetRandomPointInside();
+                var position = field.GetRandomPointInside(strictlyInside: SpawnStrictlyInside);
                 var color = field.onlyAboveWater? Color.red : field.onlyUnderwater? Color.blue : Color.green;
                 particle.Spawn(position, color, particleQueue);
 

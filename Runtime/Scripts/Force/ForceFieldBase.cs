@@ -70,6 +70,7 @@ namespace Force
         {
             if(objCol.gameObject.TryGetComponent<ForcePoint>(out ForcePoint fp))
             {
+                if(objCol.transform.root == transform.root) return; // Don't apply force to self lol
                 fp.ApplyForce(GetForceAt(objCol.transform.position), onlyUnderwater, onlyAboveWater);
             }
         }

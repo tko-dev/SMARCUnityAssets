@@ -4,16 +4,16 @@ namespace Force
 {
     public enum StaticForceFieldMode
     {
-        Vector,
-        Attarction,
-        Repulsion
+        GlobalVector,
+        CentralAttarction,
+        CentralRepulsion
     }
 
     public class ForceFieldStatic : ForceFieldBase
     {
 
         [Header("Static Force Field")]
-        public StaticForceFieldMode mode = StaticForceFieldMode.Vector;
+        public StaticForceFieldMode mode = StaticForceFieldMode.GlobalVector;
 
         [Tooltip("Magnitude will be over-written by ForceMagnitude.")]
         public Vector3 ForceVector;
@@ -23,13 +23,13 @@ namespace Force
         {
             switch(mode)
             {
-                case StaticForceFieldMode.Vector:
+                case StaticForceFieldMode.GlobalVector:
                     return ForceVector.normalized * ForceMagnitude;
 
-                case StaticForceFieldMode.Repulsion:
+                case StaticForceFieldMode.CentralRepulsion:
                     return (position - transform.position).normalized * ForceMagnitude;
 
-                case StaticForceFieldMode.Attarction:
+                case StaticForceFieldMode.CentralAttarction:
                     return (transform.position - position).normalized * ForceMagnitude;
 
                 default:
@@ -42,7 +42,7 @@ namespace Force
     {
         switch(mode)
             {
-                case StaticForceFieldMode.Vector:
+                case StaticForceFieldMode.GlobalVector:
                     Gizmos.color = new Color(Mathf.Abs(ForceVector.x), Mathf.Abs(ForceVector.y), Mathf.Abs(ForceVector.z), 0.1f);
                     Collider collider = GetComponent<Collider>();
                     if (collider != null)
@@ -55,7 +55,7 @@ namespace Force
                     }
                     break;
 
-                case StaticForceFieldMode.Repulsion:
+                case StaticForceFieldMode.CentralRepulsion:
                     Gizmos.color = new Color(0, 0, 1, 0.1f);
                     collider = GetComponent<Collider>();
                     if (collider != null)
@@ -70,7 +70,7 @@ namespace Force
                     }
                     break;
 
-                case StaticForceFieldMode.Attarction:
+                case StaticForceFieldMode.CentralAttarction:
                     Gizmos.color = new Color(1, 0, 0, 0.1f);
                     collider = GetComponent<Collider>();
                     if (collider != null)
