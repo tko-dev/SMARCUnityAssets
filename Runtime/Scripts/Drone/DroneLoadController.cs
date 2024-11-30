@@ -65,11 +65,19 @@ public class DroneLoadController : MonoBehaviour
     ////////////////// SYSTEM SPECIFIC //////////////////
     // Quadrotor parameters
     double massQuadrotor;
-    double d;
     Matrix<double> J;
-    float c_tau_f;
-    Matrix<double> PROPELLOR_FORCE_TO_GLOBAL_MAP;
-    Matrix<double> T_inv;
+    const double ROTOR_MOMENT_ARM = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
+    const float TORQUE_COEFFICIENT = 0.08f; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
+
+    // Mapping from propeller forces to the equivalent wrench (similar version found in the paper)
+    static readonly Matrix<double> PROPELLOR_FORCE_TO_GLOBAL_MAP = DenseMatrix.OfArray(new double[,]
+        { { 1, 1, 1, 1 },
+        { ROTOR_MOMENT_ARM, 0, -ROTOR_MOMENT_ARM, 0 },
+        { 0, -ROTOR_MOMENT_ARM, 0, ROTOR_MOMENT_ARM },
+        { TORQUE_COEFFICIENT, -TORQUE_COEFFICIENT, TORQUE_COEFFICIENT, -TORQUE_COEFFICIENT }
+        }
+    );
+    static readonly Matrix<double> PROPELLOR_FORCE_TO_GLOBAL_MAP_INVERSE = PROPELLOR_FORCE_TO_GLOBAL_MAP.Inverse();
     Matrix<double> Q;
     const int NUM_PROPS = 4;
 
@@ -127,15 +135,8 @@ public class DroneLoadController : MonoBehaviour
         ////////////////// SYSTEM SPECIFIC //////////////////
         // Quadrotor parameters
         massQuadrotor = baseLinkAB.mass; // Quadrotor mass (kg)
-        d = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
         J = DenseMatrix.OfArray(new double[,] { { baseLinkAB.inertiaTensor.x, 0, 0 }, { 0, baseLinkAB.inertiaTensor.z, 0 }, { 0, 0, baseLinkAB.inertiaTensor.y } }); // Inertia tensor of the quadrotor in ENU (kg m^2)
-        c_tau_f = 0.08f; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
 
-        PROPELLOR_FORCE_TO_GLOBAL_MAP = DenseMatrix.OfArray(new double[,] { { 1, 1, 1, 1 },
-                                                    { d, 0, -d, 0 },
-                                                    { 0, -d, 0, d },
-                                                    { c_tau_f, -c_tau_f, c_tau_f, -c_tau_f } }); // Mapping from propeller forces to the equivalent wrench (similar version found in the paper)
-        T_inv = PROPELLOR_FORCE_TO_GLOBAL_MAP.Inverse();
         Q = PROPELLOR_FORCE_TO_GLOBAL_MAP.Transpose() * PROPELLOR_FORCE_TO_GLOBAL_MAP;
 
         // Load parameters
@@ -345,10 +346,10 @@ public class DroneLoadController : MonoBehaviour
                                                                     { b1c[1], b2c[1], b3c[1] },
                                                                     { b1c[2], b2c[2], b3c[2] } });
 
-        Vector<double> W_b_c = _Vee(_Logm3(R_sb_c_prev.Transpose() * R_sb_c) / dt);
+        Vector<double> W_b_c = _VeeMap(_Logm3(R_sb_c_prev.Transpose() * R_sb_c) / dt);
         Vector<double> W_b_c_dot = (W_b_c - W_b_c_prev) / dt;
 
-        Vector<double> eR = 0.5 * _Vee(R_sb_c.Transpose() * R_sb - R_sb.Transpose() * R_sb_c);
+        Vector<double> eR = 0.5 * _VeeMap(R_sb_c.Transpose() * R_sb - R_sb.Transpose() * R_sb_c);
         Vector<double> eW = W_b - R_sb.Transpose() * R_sb_c * W_b_c;
 
         f = F_for_f * (R_sb * e3);
@@ -493,10 +494,10 @@ public class DroneLoadController : MonoBehaviour
                                                                     { b1d_temp[1], b2d[1], b3d[1] },
                                                                     { b1d_temp[2], b2d[2], b3d[2] } });
 
-        Vector<double> W_b_d = _Vee(_Logm3(R_sb_d_prev.Transpose() * R_sb_d) / dt);
+        Vector<double> W_b_d = _VeeMap(_Logm3(R_sb_d_prev.Transpose() * R_sb_d) / dt);
         Vector<double> W_b_d_dot = (W_b_d - W_b_d_prev) / dt;
 
-        Vector<double> eR = 0.5 * _Vee(R_sb_d.Transpose() * R_sb - R_sb.Transpose() * R_sb_d);
+        Vector<double> eR = 0.5 * _VeeMap(R_sb_d.Transpose() * R_sb - R_sb.Transpose() * R_sb_d);
         Vector<double> eW = W_b - R_sb.Transpose() * R_sb_d * W_b_d;
 
         f = pid * (R_sb * e3);
@@ -526,8 +527,8 @@ public class DroneLoadController : MonoBehaviour
         else (f, M) = TrackingControl();
 
         // Compute optimal propeller forces
-        vector<double> globalForces = _StackForceMomentVector(f, M);
-        Vector<double> F_star = T_inv * globalForces;
+        Vector<double> globalForces = _StackForceMomentVector(f, M);
+        Vector<double> F_star = PROPELLOR_FORCE_TO_GLOBAL_MAP_INVERSE * globalForces;
 
         // Build a matrix A and a vector b to solve for the variation on the optimal propeller forces
         Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS, NUM_PROPS);
@@ -739,7 +740,7 @@ public class DroneLoadController : MonoBehaviour
                 omg = (1.0 / Math.Sqrt(2 * (1 + R[1, 1]))) * DenseVector.OfArray(new double[] { R[0, 1], 1 + R[1, 1], R[2, 1] });
             else
                 omg = (1.0 / Math.Sqrt(2 * (1 + R[0, 0]))) * DenseVector.OfArray(new double[] { 1 + R[0, 0], R[1, 0], R[2, 0] });
-            m_ret = _Hat(Math.PI * omg);
+            m_ret = _HatMap(Math.PI * omg);
             return m_ret;
         }
         else
