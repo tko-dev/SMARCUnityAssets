@@ -55,8 +55,8 @@ public class DroneLoadController : MonoBehaviour
     ArticulationBody loadLinkAB;
     Matrix<double> R_sb_d_prev;
     Matrix<double> R_sb_c_prev;
-    Vector<double> W_b_d_prev;
-    Vector<double> W_b_c_prev;
+    Vector<double> Omega_b_d_prev;
+    Vector<double> Omega_b_c_prev;
     Vector<double> q_c_prev;
     Vector<double> q_c_dot_prev;
     int times1 = 0;
@@ -65,7 +65,7 @@ public class DroneLoadController : MonoBehaviour
     ////////////////// SYSTEM SPECIFIC //////////////////
     // Quadrotor parameters (from unity)
     double massQuadrotor;
-    Matrix<double> J;
+    Matrix<double> inertiaJ;
 
     // General quadrotor parameters
     const int NUM_PROPS = 4;
@@ -101,7 +101,7 @@ public class DroneLoadController : MonoBehaviour
 
     // Simulation parameters
     double g;
-    Vector<double> e3;
+    static readonly Vector<double> e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
     float dt;
 
     // Min snap trajectory
@@ -126,10 +126,13 @@ public class DroneLoadController : MonoBehaviour
 
         baseLinkAB = BaseLink.GetComponent<ArticulationBody>();
 
-        R_sb_d_prev = DenseMatrix.OfArray(new double[,] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
-        R_sb_c_prev = DenseMatrix.OfArray(new double[,] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
-        W_b_d_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        W_b_c_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        // Creating identity matrices (3 x 3) for previous frame transforms
+        R_sb_d_prev = DenseMatrix.CreateDiagonal(3, 3, 1.0);
+        R_sb_c_prev = DenseMatrix.CreateDiagonal(3, 3, 1.0);
+
+        // Creating zero vector for previous frame angular velocities
+        Omega_b_d_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        Omega_b_c_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
         q_c_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
         q_c_dot_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
@@ -140,7 +143,10 @@ public class DroneLoadController : MonoBehaviour
         ////////////////// SYSTEM SPECIFIC //////////////////
         // Quadrotor parameters
         massQuadrotor = baseLinkAB.mass; // Quadrotor mass (kg)
-        J = DenseMatrix.OfArray(new double[,] { { baseLinkAB.inertiaTensor.x, 0, 0 }, { 0, baseLinkAB.inertiaTensor.z, 0 }, { 0, 0, baseLinkAB.inertiaTensor.y } }); // Inertia tensor of the quadrotor in ENU (kg m^2)
+
+        // Creating diagonal matrix of inertia
+        double[] diagonal = { baseLinkAB.inertiaTensor.x, baseLinkAB.inertiaTensor.z, baseLinkAB.inertiaTensor.y };
+        inertiaJ = DenseMatrix.CreateDiagonal(3, 3, index => diagonal[index]);
 
         Q = PROPELLOR_FORCE_TO_GLOBAL_MAP.Transpose() * PROPELLOR_FORCE_TO_GLOBAL_MAP;
 
@@ -159,7 +165,6 @@ public class DroneLoadController : MonoBehaviour
 
         // Simulation parameters
         g = Physics.gravity.magnitude;
-        e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
         dt = Time.fixedDeltaTime;//1f/ControlFrequency;
 
         //  One dimensional
@@ -352,17 +357,17 @@ public class DroneLoadController : MonoBehaviour
                                                                     { b1c[2], b2c[2], b3c[2] } });
 
         Vector<double> W_b_c = _VeeMap(_Logm3(R_sb_c_prev.Transpose() * R_sb_c) / dt);
-        Vector<double> W_b_c_dot = (W_b_c - W_b_c_prev) / dt;
+        Vector<double> W_b_c_dot = (W_b_c - Omega_b_c_prev) / dt;
 
         Vector<double> eR = 0.5 * _VeeMap(R_sb_c.Transpose() * R_sb - R_sb.Transpose() * R_sb_c);
         Vector<double> eW = W_b - R_sb.Transpose() * R_sb_c * W_b_c;
 
         f = F_for_f * (R_sb * e3);
-        M = -kR * eR - kW * eW + _Cross(W_b, J * W_b) - J * (_HatMap(W_b) * R_sb.Transpose() * R_sb_c * W_b_c - R_sb.Transpose() * R_sb_c * W_b_c_dot);
+        M = -kR * eR - kW * eW + _Cross(W_b, inertiaJ * W_b) - inertiaJ * (_HatMap(W_b) * R_sb.Transpose() * R_sb_c * W_b_c - R_sb.Transpose() * R_sb_c * W_b_c_dot);
 
         // Save previous values
         R_sb_c_prev = R_sb_c;
-        W_b_c_prev = W_b_c;
+        Omega_b_c_prev = W_b_c;
         q_c_prev = q_c;
         q_c_dot_prev = q_c_dot;
 
@@ -485,31 +490,36 @@ public class DroneLoadController : MonoBehaviour
         tw.WriteLine($"{Time.time},{x_s[0]},{x_s[1]},{x_s[2]},{x_s_d[0]},{x_s_d[1]},{x_s_d[2]}");
         tw.Close();
 
-        Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2) / 2, -Math.Sqrt(2) / 2, 0 });
 
         // Control
-        Vector<double> ex = x_s - x_s_d;
-        Vector<double> ev = v_s - v_s_d;
+        Vector<double> errorTrackingPosition = x_s - x_s_d;
+        Vector<double> errorTrackingVelocity = v_s - v_s_d;
 
-        Vector<double> pid = -kx * ex - kv * ev + massQuadrotor * g * e3 + massQuadrotor * a_s_d;
-        Vector<double> b3d = pid / pid.Norm(2);
-        Vector<double> b2d = _Cross(b3d, b1d) / _Cross(b3d, b1d).Norm(2);
-        Vector<double> b1d_temp = _Cross(b2d, b3d);
-        Matrix<double> R_sb_d = DenseMatrix.OfArray(new double[,] { { b1d_temp[0], b2d[0], b3d[0] },
-                                                                    { b1d_temp[1], b2d[1], b3d[1] },
-                                                                    { b1d_temp[2], b2d[2], b3d[2] } });
+        Vector<double> PIDGain = _ComputePIDTerm(
+            kx,
+            kv,
+            g,
+            massQuadrotor,
+            a_s_d,
+            errorTrackingPosition,
+            errorTrackingVelocity
+        );
+
+        Matrix<double> R_sb_d = _ComputeDesiredAttitudeVectors(
+            PIDGain
+        );
 
         Vector<double> W_b_d = _VeeMap(_Logm3(R_sb_d_prev.Transpose() * R_sb_d) / dt);
-        Vector<double> W_b_d_dot = (W_b_d - W_b_d_prev) / dt;
+        Vector<double> W_b_d_dot = (W_b_d - Omega_b_d_prev) / dt;
 
         Vector<double> eR = 0.5 * _VeeMap(R_sb_d.Transpose() * R_sb - R_sb.Transpose() * R_sb_d);
         Vector<double> eW = W_b - R_sb.Transpose() * R_sb_d * W_b_d;
 
-        f = pid * (R_sb * e3);
-        M = -kR * eR - kW * eW + _Cross(W_b, J * W_b) - J * (_HatMap(W_b) * R_sb.Transpose() * R_sb_d * W_b_d - R_sb.Transpose() * R_sb_d * W_b_d_dot);
+        f = PIDGain * (R_sb * e3);
+        M = -kR * eR - kW * eW + _Cross(W_b, inertiaJ * W_b) - inertiaJ * (_HatMap(W_b) * R_sb.Transpose() * R_sb_d * W_b_d - R_sb.Transpose() * R_sb_d * W_b_d_dot);
 
         R_sb_d_prev = R_sb_d;
-        W_b_d_prev = W_b_d;
+        Omega_b_d_prev = W_b_d;
 
         if (times2 < 2 || M.Norm(2) > 100) // If previous values have not been initialized yet or moments are excessive
         {
@@ -679,6 +689,41 @@ public class DroneLoadController : MonoBehaviour
         return (x_s_d, v_s_d, a_s_d);
     }
 
+    /// <summary>
+    /// Computes "PID"-like gain for tracking controller
+    ///
+    /// Uses global e3 vector FIXME: this probably can be done better
+    /// </summary>
+    private static Vector<double> _ComputePIDTerm(double gainX,
+                                                  double gainV,
+                                                  double gravityMagnitude,
+                                                  double mass,
+                                                  Vector<double> desiredAcceleration,
+                                                  Vector<double> errorPosition,
+                                                  Vector<double> errorVelocity)
+    {
+        // This is upper term of equation (12) from geometric tracking paper
+        Vector<double> pid = -gainX * errorPosition - gainV * errorVelocity + mass * gravityMagnitude * e3 + mass * desiredAcceleration;
+        return pid;
+    }
+    /// <summary>
+    /// Computes desired attitude vector for quadrotor from Geometric Tracking and Control.
+    ///
+    /// Computes the desired headings for body vectors 1,2,3 where 3 is normal to rotor plane.
+    /// Equations that pertain to this section can be found in Tracking Errors Section
+    /// </summary>
+    private static Matrix<double> _ComputeDesiredAttitudeVectors(Vector<double> pid)
+    {
+
+        Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2) / 2, -Math.Sqrt(2) / 2, 0 });
+        Vector<double> b3d = pid / pid.Norm(2);
+        Vector<double> b2d = _Cross(b3d, b1d) / _Cross(b3d, b1d).Norm(2);
+        b1d = _Cross(b2d, b3d);
+        Matrix<double> R_sb_d = DenseMatrix.OfArray(new double[,] { { b1d[0], b2d[0], b3d[0] },
+                                                                    { b1d[1], b2d[1], b3d[1] },
+                                                                    { b1d[2], b2d[2], b3d[2] } });
+        return R_sb_d;
+    }
     /// <summary>
     /// Cross product operation for R^3 vectors
     /// </summary>
