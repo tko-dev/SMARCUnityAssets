@@ -63,9 +63,15 @@ public class DroneLoadController : MonoBehaviour
     int times2 = 0;
 
     ////////////////// SYSTEM SPECIFIC //////////////////
-    // Quadrotor parameters
+    // Quadrotor parameters (from unity)
     double massQuadrotor;
     Matrix<double> J;
+
+    // General quadrotor parameters
+    const int NUM_PROPS = 4;
+
+
+    // Quadrotor parameters from paper
     const double ROTOR_MOMENT_ARM = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
     const float TORQUE_COEFFICIENT = 0.08f; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
 
@@ -79,7 +85,6 @@ public class DroneLoadController : MonoBehaviour
     );
     static readonly Matrix<double> PROPELLOR_FORCE_TO_GLOBAL_MAP_INVERSE = PROPELLOR_FORCE_TO_GLOBAL_MAP.Inverse();
     Matrix<double> Q;
-    const int NUM_PROPS = 4;
 
     // Load parameters
     double mL;
