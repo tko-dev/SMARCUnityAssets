@@ -39,6 +39,7 @@ namespace DefaultNamespace
         private Vector3 camera_offset;
         public bool Ardusub_mode;
         public bool Arusub_prep;
+        public bool Controller_mode = true;
         
         //Constants
         public double vbs = 0.0f; //some weird thing
@@ -82,6 +83,11 @@ namespace DefaultNamespace
         double I_x = 0.2818; // [kg*m^2], from OSBS's CAD
         double I_y = 0.245; // [kg*m^2], from OSBS's CAD
         double I_z = 0.3852; // [kg*m^2], from OSBS's CAD
+
+        public void OnTickChange(bool tick)
+        {
+            Controller_mode = tick;
+        }
         void Start()
         {
             // Get all propeller components
@@ -170,13 +176,12 @@ namespace DefaultNamespace
                 {-Y_vdot*v, X_udot*u,   0,          -M_qdot*q,  K_pdot*p,   0           }
             });
             Matrix<double> C = C_RB + C_A;
-
-            // print(world_pos.y);
-            // if (world_pos.y >= 0)
-            // {
-            //     B = 0;
-            // }
-            // print(B);
+            
+            B = rho*g*nabla;
+            if (world_pos.y >= 0)
+            {
+                B = 0;
+            }
             
             // Restoring forces vector
             Vector<double> g_vec = Vector<double>.Build.DenseOfArray(new double[] 
@@ -272,20 +277,6 @@ namespace DefaultNamespace
                 { 0,                 0,              0,               0,               0.12,  -0.12,    0.12,   -0.12    },
                 { -0.1888,         0.1888,         0.1888,         -0.1888,          0,      0,       0,       0       }
             });
-            // Calculate force vector
-            
-            // Vector<double> F_vec = Vector<double>.Build.DenseOfArray(new double[] 
-            //     {
-            //         rpmBotFrontRight/rpmMax,
-            //         rpmBotFrontLeft/rpmMax,
-            //         rpmBotBackRight/rpmMax,
-            //         rpmBotBackLeft/rpmMax,
-            //         rpmTopFrontRight/rpmMax,
-            //         rpmTopFrontLeft/rpmMax,
-            //         rpmTopBackRight/rpmMax, 
-            //         rpmTopBackLeft/rpmMax
-            //     }
-            // );
             
             Vector<double> F_vec = Vector<double>.Build.DenseOfArray(new double[] 
                 {
@@ -303,188 +294,176 @@ namespace DefaultNamespace
             var ROSForces = T * F_vec;
             
             // print(F_vec[0]+","+F_vec[1]+","+F_vec[2]+","+F_vec[3]+","+F_vec[4]+","+F_vec[5]+","+F_vec[6]+","+F_vec[7]);    
-            if (Arusub_prep)
-            {
-                Matrix<double> T_hat_inv = DenseMatrix.OfArray(new double[,]
-                {
-                    { 0.25,  0.25, -0.25, -0.25,  0.0,  0.0,  0.0,  0.0 },
-                    { -0.25,  0.25, -0.25,  0.25,  0.0,  0.0,  0.0,  0.0 },
-                    { -0.0,  -0.0,  -0.0,   0.0,  -0.25, 0.25,  0.25, -0.25 },
-                    {  0.0,   0.0,   0.0,   0.0,   0.25, 0.25, -0.25, -0.25 },
-                    {  0.0,   0.0,   0.0,   0.0,   0.25, -0.25, 0.25, -0.25 },
-                    { -0.25,  0.25,  0.25, -0.25,  0.0,  0.0,  0.0,  0.0 }
-                });
-                
-                ROSForces = T_hat_inv * F_vec;
-               
-            }
-            
-            
-            // print("before ardusub");
-            // for (int i = 0; i < F_vec.Count; i++)
+            // if (Arusub_prep)
             // {
-            //     print(F_vec[i]);
+            //     Matrix<double> T_hat_inv = DenseMatrix.OfArray(new double[,]
+            //     {
+            //         { 0.25,  0.25, -0.25, -0.25,  0.0,  0.0,  0.0,  0.0 },
+            //         { -0.25,  0.25, -0.25,  0.25,  0.0,  0.0,  0.0,  0.0 },
+            //         { -0.0,  -0.0,  -0.0,   0.0,  -0.25, 0.25,  0.25, -0.25 },
+            //         {  0.0,   0.0,   0.0,   0.0,   0.25, 0.25, -0.25, -0.25 },
+            //         {  0.0,   0.0,   0.0,   0.0,   0.25, -0.25, 0.25, -0.25 },
+            //         { -0.25,  0.25,  0.25, -0.25,  0.0,  0.0,  0.0,  0.0 }
+            //     });
+            //     
+            //     ROSForces = T_hat_inv * F_vec;
+            //    
+            // }
+            //
+            //   // print("before ardusub");
+            //   //           for (int i = 0; i < F_vec.Count; i++)
+            //   //           {
+            //   //               print(F_vec[i]);
+            //   //           }
+            //
+            //
+            //
+            // if (Ardusub_mode)
+            // {
+            //     // print("thruster forces");
+            //     // for (int i = 0; i < F_vec.Count; i++)
+            //     // {
+            //     //     F_vec[i] = VoltageToForce(F_vec[i]);
+            //     //     print(F_vec[i]);
+            //     // }
+            //     Matrix<double> T_transpose = DenseMatrix.OfArray(new double[,]
+            //     {
+            //         {-1,  1,  0,  0,  0,  1},
+            //         {-1, -1,  0,  0,  0, -1},
+            //         { 1,  1,  0,  0,  0, -1},
+            //         { 1, -1,  0,  0,  0,  1},
+            //         { 0,  0, -1,  1, -1,  0},
+            //         { 0,  0, 1, -1, -1,  0},
+            //         { 0,  0, 1,  1,  1,  0},
+            //         { 0,  0, -1, -1,  1,  0},
+            //     });
+            //     
+            //     var F_vec_ardusub_unscaled = T_transpose * ROSForces;
+            //     
+            //     double[] yss = new double[4];
+            //     double[] rph = new double[4];
+            //     
+            //     for (int i = 0; i < 4; i++)
+            //     {
+            //         yss[i] = F_vec_ardusub_unscaled[i];
+            //         rph[i] = F_vec_ardusub_unscaled[i + 4];
+            //     }
+            //     
+            //     double max_yss = 1;
+            //     double max_rph = 1;
+            //     
+            //     for (int i = 1; i < 4; i++)
+            //     {
+            //         if (math.abs(yss[i]) > max_yss)
+            //             max_yss = math.abs(yss[i]);
+            //     
+            //         if (math.abs(rph[i]) > max_rph)
+            //             max_rph = math.abs(rph[i]);
+            //     }
+            //     
+            //     for (int i = 0; i < 4; i++)
+            //     {
+            //         yss[i] /= max_yss;
+            //         
+            //         rph[i] /= max_rph;
+            //     }   
+            //     
+            //     double[] adjust = { 1, 1, 1, 1, 1, 1, 1, 1 };
+            //     
+            //     Vector<double> F_vec_ardusub = Vector<double>.Build.DenseOfArray(new double[] 
+            //         {
+            //             (yss[0]*adjust[0]),
+            //             (yss[1]*adjust[1]),
+            //             (yss[2]*adjust[2]),
+            //             (yss[3]*adjust[3]),
+            //             (rph[0]*adjust[4]),
+            //             (rph[1]*adjust[5]),
+            //             (rph[2]*adjust[6]),
+            //             (rph[3]*adjust[7]),
+            //         }
+            //     );
+            //
+            //     F_vec = F_vec_ardusub;
             // }
             
-            
-            if (Ardusub_mode)
-            {
-                print("thruster forces");
-                for (int i = 0; i < F_vec.Count; i++)
-                {
-                    F_vec[i] = VoltageToForce(F_vec[i]);
-                    print(F_vec[i]);
-                }
-                Matrix<double> T_transpose = DenseMatrix.OfArray(new double[,]
-                {
-                    {-1,  1,  0,  0,  0,  1},
-                    {-1, -1,  0,  0,  0, -1},
-                    { 1,  1,  0,  0,  0, -1},
-                    { 1, -1,  0,  0,  0,  1},
-                    { 0,  0, -1,  1, -1,  0},
-                    { 0,  0, 1, -1, -1,  0},
-                    { 0,  0, 1,  1,  1,  0},
-                    { 0,  0, -1, -1,  1,  0},
-                });
-                
-                var F_vec_ardusub_unscaled = T_transpose * ROSForces;
-                
-                double[] yss = new double[4];
-                double[] rph = new double[4];
-                
-                for (int i = 0; i < 4; i++)
-                {
-                    yss[i] = F_vec_ardusub_unscaled[i];
-                    rph[i] = F_vec_ardusub_unscaled[i + 4];
-                }
-                
-                double max_yss = 1;
-                double max_rph = 1;
-                
-                for (int i = 1; i < 4; i++)
-                {
-                    if (math.abs(yss[i]) > max_yss)
-                        max_yss = math.abs(yss[i]);
-                
-                    if (math.abs(rph[i]) > max_rph)
-                        max_rph = math.abs(rph[i]);
-                }
-                
-                for (int i = 0; i < 4; i++)
-                {
-                    yss[i] /= max_yss;
-                    
-                    rph[i] /= max_rph;
-                }   
-                
-                double[] adjust = { 1, 1, 1, 1, 1, 1, 1, 1 };
-                
-                Vector<double> F_vec_ardusub = Vector<double>.Build.DenseOfArray(new double[] 
-                    {
-                        (yss[0]*adjust[0]),
-                        (yss[1]*adjust[1]),
-                        (yss[2]*adjust[2]),
-                        (yss[3]*adjust[3]),
-                        (rph[0]*adjust[4]),
-                        (rph[1]*adjust[5]),
-                        (rph[2]*adjust[6]),
-                        (rph[3]*adjust[7]),
-                    }
-                );
-
-                F_vec = F_vec_ardusub;
-            }
-            
-            print("arduprepped thruster forces");
+            // print("arduprepped thruster forces");
             for (int i = 0; i < F_vec.Count; i++)
             {
-                if (i < 4)
-                {
-                    F_vec[i] = -(F_vec[i]);
-                }
+                // if (i < 4)
+                // {
+                //     F_vec[i] = -(F_vec[i]);
+                // }
                 F_vec[i] = VoltageToForce(F_vec[i]);
-                print(F_vec[i]);
+                // print(F_vec[i]);
             }
             
             ROSForces = T * F_vec;
             
-            // print("ardusub");
-            // for (int i = 0; i < F_vec.Count; i++)
-            // {
-            //     print(F_vec[i]);
-            // }
-            
             inputForce  = ROSForces.SubVector(0, 3).ToVector3();
             inputTorque = ROSForces.SubVector(3, 3).ToVector3();
-
-           //  print(message: "RPM");
-           //  for (int i = 0; i < F_vec.Count; i++)
-           //  {
-           //      //print(F_vec_approx[i]*rpmMax/31);
-           //  }
-           //  
-           //  //print("Got forces");
-           //  //for (int i = 0; i < F_vec_approx.Count; i++)
-           //  //{
-           // //     print(F_vec_approx[i]);
-           //  //}
-           //
-           //  print(message: "Tao");
-           //  
-           //   for (int i = 0; i < 6; i++)
-           //   {
-           //       print(ROSForces[i]);
-           //   }
 
             // Convert to keyboard format (unity coordinates)
             inputForce = NED.ConvertToRUF(inputForce);
             inputTorque = FRD.ConvertAngularVelocityToRUF(inputTorque);
            
             // debugging zero MPC input
-           //inputForce = Vector3.zero;
-           //inputTorque = Vector3.zero;
-            
-            // Keyboard controlls
-            if (Input.GetKey(KeyCode.W))
+            if (Controller_mode == false)
             {
-                inputForce[2] += 86;
+                inputForce = Vector3.zero;
+                inputTorque = Vector3.zero;
+
+                // Keyboard controlls
+                if (Input.GetKey(KeyCode.W))
+                {
+                    inputForce[2] += 86;
+                }
+
+                if (Input.GetKey(KeyCode.A))
+                {
+                    inputForce[0] -= 85;
+                }
+
+                if (Input.GetKey(KeyCode.S))
+                {
+                    inputForce[2] -= 85;
+                }
+
+                if (Input.GetKey(KeyCode.D))
+                {
+                    inputForce[0] += 85;
+                }
+
+                if (Input.GetKey(KeyCode.Space))
+                {
+                    inputForce[1] += 122;
+                }
+
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    inputForce[1] -= 122;
+                }
+
+                if (Input.GetKey(KeyCode.Q))
+                {
+                    inputTorque[1] -= 14;
+                }
+
+                if (Input.GetKey(KeyCode.E))
+                {
+                    inputTorque[1] += 14;
+                }
+
+                if (Input.GetKey(KeyCode.X))
+                {
+                    inputTorque[0] += 14;
+                }
+
+                if (Input.GetKey(KeyCode.C))
+                {
+                    inputTorque[2] += 14;
+                }
             }
-            if (Input.GetKey(KeyCode.A))
-            {
-                inputForce[0] -= 85;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                inputForce[2] -= 85;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                inputForce[0] += 85;
-            }
-            if (Input.GetKey(KeyCode.Space))
-            {
-                inputForce[1] += 122;
-            }
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                inputForce[1] -= 122;
-            }
-            if (Input.GetKey(KeyCode.Q))
-            {
-                inputTorque[1] -= 14;
-            }
-            if (Input.GetKey(KeyCode.E))
-            {
-                inputTorque[1] += 14;
-            }
-            if (Input.GetKey(KeyCode.X))
-            {
-                inputTorque[0] += 14;
-            }
-            if (Input.GetKey(KeyCode.C))
-            {
-                inputTorque[2] += 14;
-            }
+
             // inputForce = Vector3.zero;
             // inputTorque = Vector3.zero;
             // ADDED MASS
