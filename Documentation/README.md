@@ -928,6 +928,7 @@ To alleviate this problem, here is the general process for setting up the dotnet
     - Path usually looks something like this `/home/<user name>/Unity/Hub/Editor/<editor version>/Editor/Data/NetCoreRuntime`
 2. Download the appropriate (likely `.NET 9.0`) sdk from [Microsoft Dotnet SDK Link](https://dotnet.microsoft.com/en-us/download)
     - [Dotnet Installation Instruction for Ubuntu 22.04](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?pivots=os-linux-ubuntu-2204&tabs=dotnet9)
+    - **Install the SDK only, the runtime comes prepackaged with Unity**
 3. Check to ensure dotnet-sdk installed with `dotnet --list-sdks`
     -  Example output: `9.0.100 [/usr/lib/dotnet/sdk]`
 4. Restart your editor of choice and should be able to access LSP features
