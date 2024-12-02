@@ -63,8 +63,8 @@
     - [Geometric Tracking Controller](#geometric-tracking-controller)
   - [GameUI](#gameui)
   - [WinchSystem](#winchsystem)
-- [Developer Environment Setup](#dev-environment)
-    - [C# SDK and LSP Setup](#lsp-setup-csharp)
+- [Developer Environment Setup](#developer-environment-setup)
+    - [CSharp SDK and LSP Setup](#csharp-sdk-and-lsp-setup)
 
 
 
@@ -918,7 +918,7 @@ after instantiating one of these to use it.
 
 # Developer Environment Setup
 
-## C# SDK (Software Development Kit) Setup for Editor Support
+## CSharp SDK and LSP Setup
 Unity's default C# dotnet package does not come with an SDK. This can impede text editors ability to properly refactor code and provide reference searching and other tasks. Basically it will slow you down.
 
 To alleviate this problem, here is the general process for setting up the dotnet SDK such that code can be efficiently refactored using LSP's (language server protocol).
