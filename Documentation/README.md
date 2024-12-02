@@ -5,7 +5,10 @@
   - [(Something)ForceModel](#somethingforcemodel)
 - [Water](#water)
   - [SimpleWaterQueryModel](#simplewaterquerymodel)
-  - [SimpleWaterCurrent](#simplewatercurrent)
+  - [Currents and Winds](#currents-and-winds)
+    - [Static fields](#static-fields)
+    - [Propeller fields](#propeller-fields)
+    - [Field Visualization](#field-visualization)
 - [Vehicle Components](#vehicle-components)
     - [Update rates](#update-rates)
     - [LinkAttachment](#linkattachment)
@@ -64,7 +67,7 @@
   - [GameUI](#gameui)
   - [WinchSystem](#winchsystem)
 - [Developer Environment Setup](#developer-environment-setup)
-    - [CSharp SDK and LSP Setup](#csharp-sdk-and-lsp-setup)
+  - [CSharp SDK and LSP Setup](#csharp-sdk-and-lsp-setup)
 
 
 
@@ -102,15 +105,21 @@ They are children to the `base_link` object which contains a Body.
 
 - Connected Body: Either an articulation body or a rigidbody can be assigned here. Usually the `base_link` of a robot.
 - Buoyancy
-  - Volume Object: An object can be assigned to automatically assign the mesh from.
-  - Volume Mesh: A mesh can be assigned to calculate the volume from.
-  - Volume: Volume can be set directly.
+  - Volume Object/Mesh: An object can be assigned to automatically assign the mesh from. Or a mesh directly.
+  - Volume: Volume can also be set directly, if a mesh is not available.
   - Water Density: In Kg/m3, density of the fluid to calculate buoyancy forces from.
   - Depth Before Submerged: A workaround the fixed delta time simulation steps. When set to zero, the force points tend to produce high frequency oscilations. In one update it is in water and in the next it is out. To prevent this, some depth is allowed without applying the full buoyancy force. This smooths out the oscilations.
+  - Max Buoyancy Force: A limit to keep physics from breaking.
+- Underwater/Air Drag: If these values are set to anything except -1, the force points will set the corresponding drag values when the object is (partially) under the surface.
 - Gravity
   - Add Gravity: If checked, this force point will add a gravity force as well.
   - Automatic Center of Gravity: If checked, the center of gravity of the object is calculated based on the locations of the force points it has. This can be useful when the object they are attached to has complicated geometry.
   - Mass: If gravity is to be applied, the mass of the entire object. The mass will also be distributed among the forcepoints, similarly to buoyancy forces.
+- Debug
+  - Draw Forces: Draws some debug lines for applied forces.
+  - Applied X Force: Currently applied force as a vector.
+  - Apply Custom Force: If checked, the vector below will be applied on every update.
+  - Custom Force: A globally defined force vector to apply at this ForcePoint.
 
 
 ## (Something)ForceModel
@@ -135,16 +144,49 @@ HDRP Water:
 
 ![Waves](Media/HDRPWaves.png)
 
-## SimpleWaterCurrent
+## Currents and Winds
+
+### Static fields
 A simple vector field within a volume that applies forces to any ForcePoints within it.
-Used to simulate currents within that volume.
+Used to simulate currents or winds within that volume.
 
-Two volumes with different currents, mixing in overlapping regions.
-Currents visualized with WaterCurrentVisualizer:
+4 current fields in the water visualized with Gizmos:
 
-![Currents](Media/Currents.png)
+![StaticFields](Media/ForceFieldStaticGizmos.png)
+
+![StaticFieldsConfig](Media/ForceFieldStaticConfig.png)
+
+- **Only Underwater/Above Water:** If checked, the field will only apply on to ForcePoints that are under/above water.
+- **Include In Visualizer:** Check if you want tiny swarms of game-visible particles 
+
+### Propeller fields
+
+Propellers should be pushing things in front of them as much as they push the thing they are attached to.
+We use a conical mesh-collider to create this effect.
+The magnitude of the force is inversely proportional with distance to object and proportional to the Propeller's applied force (`RPM * RPMToForceMultiplier`).
+The `Cone Tip` acts as a simple repulsor with a variable magnitude.
+
+![PropField](Media/ForceFieldPropeller.png)
+
+![PropFieldConfig](Media/ForceFieldPropellerConfig.png)
+
+- Cone Tip: Adjust this to match the collider geometry. Sometimes it is desirable to apply forces inside the cone, but not right from its tip. The tip is visualized as a purple sphere gizmo.
+- Force Magnitude Cap: Upper-limit of how much force the field will apply. Some drones require lots of force to float that maybe you might not want to apply to things below.
 
 
+### Field Visualization
+
+We use a pool of ForcePoints spawned within any field with a simple trail renderer to visualize the fields and their effect on any objects containing ForcePoints.
+
+![FieldViz](Media/ForceFieldViz.png)
+
+![VizConfig](Media/ForceFieldVizConfig.png)
+
+- ParticlePrefab: The prefab particle to spawn. This should contain a ForcePoint object and possibly some nice visual additions.
+- Count, Lifetime: How many particles to keep around and for how long.
+- Size: Given to the particle object to scale itself. For the default ForceFieldParticle, this is the radius of the ball.
+- Recycle When Out: If checked, particles that leave the effect of any fields are re-spawned. This effectively keeps all particles within effect areas. However, if your fields are not overlapping, then you will not see "combined" effects of these fields.
+- Spawn Strictly Inside: If checked, particles will be re-spawned until they are inside the effective volume. Otheriwise they are spawned inside the containing rectangular prism. If your fields are many and overlapping, keeping this unchecked would save you some performance. If your fields are very small, checking this would make them look better.
 
 # Vehicle Components
 These are the components that can be collected within a vehicle: usually sensors and actuators.
