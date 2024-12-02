@@ -166,114 +166,9 @@ public class DroneLoadController : MonoBehaviour
         // Simulation parameters
         g = Physics.gravity.magnitude;
         dt = Time.fixedDeltaTime;//1f/ControlFrequency;
-
-        //  One dimensional
-        /*
-        // Define the start and end conditions for the trajectory
-        double startPos = 0.0, startVel = 0.0, startAcc = 0.0;
-        double endPos = 10.0, endVel = 0.0, endAcc = 0.0;
-        double T = 5.0; // Total time for trajectory
-
-        // Calculate the minimum snap trajectory coefficients
-        double[] coeffs = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos, startVel, startAcc, endPos, endVel, endAcc, T);
-
-        // Print the calculated polynomial coefficients
-        Debug.Log("Minimum Snap Trajectory Coefficients:");
-        for (int i = 0; i < coeffs.Length; i++)
-        {
-            Debug.Log($"Coefficient a{i}: {coeffs[i]}");
-        }
-
-        // Evaluate the position at different time points and print the results
-        Debug.Log("\nEvaluating Trajectory at various time points:");
-        for (double t = 0; t <= T; t += 0.5)
-        {
-            double positionAtT = MinimumSnapTrajectory.EvaluatePolynomial(coeffs, t);
-            Debug.Log($"Position at time t={t}: {positionAtT}");
-        }
-        */
-
-        //  Three dimensional
-        // Define start and end positions, velocities, and accelerations for x, y, z
-
         //
         min_snap_flag = 0;
         catching_time = 0;
-        /*
-        Vector<double> x_s = BaseLink.transform.position.To<NED>().ToDense();
-        Vector3 startPos = new Vector3((float)x_s[0], (float)x_s[1], (float)x_s[2]);
-        // Vector3 startPos = new Vector3(0.0f, 0.0f, 0.0f);
-        Vector3 startVel = new Vector3(0.0f, 0.0f, 0.0f);
-        Vector3 startAcc = new Vector3(0.0f, 0.0f, 0.0f);
-
-
-        // Transformations
-        Matrix<double> R_ws = DenseMatrix.OfArray(new double[,] { { 0, 1, 0 },
-                                                                { 1, 0, 0 },
-                                                                { 0, 0, -1 } });
-
-        Vector<double> buoy_w = R_ws*Rope.GetChild(Rope.childCount-1).position.To<NED>().ToDense();
-        Vector3 endPos = new Vector3((float)buoy_w[0], (float)buoy_w[1], (float)buoy_w[2]);
-        //Vector3 endPos = new Vector3(10.0f, 5.0f, 3.0f);
-        Vector3 endVel = new Vector3(0.0f, 0.0f, 0.0f);
-        Vector3 endAcc = new Vector3(0.0f, 0.0f, 0.0f);
-
-        double T = 5.0; // Total time for trajectory
-
-        // Calculate minimum snap trajectory coefficients for each axis (x, y, z)
-        double[] coeffsX = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.x, startVel.x, startAcc.x, endPos.x, endVel.x, endAcc.x, T);
-        double[] coeffsY = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.y, startVel.y, startAcc.y, endPos.y, endVel.y, endAcc.y, T);
-        double[] coeffsZ = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.z, startVel.z, startAcc.z, endPos.z, endVel.z, endAcc.z, T);
-
-        // Print the calculated polynomial coefficients for each axis
-        Debug.Log("Minimum Snap Trajectory Coefficients (X, Y, Z):");
-
-        // Print coefficients for X
-        Debug.Log("X axis:");
-        for (int i = 0; i < coeffsX.Length; i++)
-        {
-            Debug.Log($"Coefficient a{i}: {coeffsX[i]}");
-        }
-
-        // Print coefficients for Y
-        Debug.Log("Y axis:");
-        for (int i = 0; i < coeffsY.Length; i++)
-        {
-            Debug.Log($"Coefficient a{i}: {coeffsY[i]}");
-        }
-
-        // Print coefficients for Z
-        Debug.Log("Z axis:");
-        for (int i = 0; i < coeffsZ.Length; i++)
-        {
-            Debug.Log($"Coefficient a{i}: {coeffsZ[i]}");
-        }
-
-        // Evaluate the position at different time points for all axes
-        Debug.Log("\nEvaluating Trajectory at various time points:");
-        for (double t = 0; t <= T; t += 0.5)
-        {
-            double posX = MinimumSnapTrajectory.EvaluatePolynomial(coeffsX, t);
-            double posY = MinimumSnapTrajectory.EvaluatePolynomial(coeffsY, t);
-            double posZ = MinimumSnapTrajectory.EvaluatePolynomial(coeffsZ, t);
-
-            // Evaluate velocity (first derivative)
-            double velX = MinimumSnapTrajectory.EvaluatePolynomialDerivative(coeffsX, t);
-            double velY = MinimumSnapTrajectory.EvaluatePolynomialDerivative(coeffsY, t);
-            double velZ = MinimumSnapTrajectory.EvaluatePolynomialDerivative(coeffsZ, t);
-
-            // Evaluate acceleration (second derivative)
-            double accX = MinimumSnapTrajectory.EvaluatePolynomialSecondDerivative(coeffsX, t);
-            double accY = MinimumSnapTrajectory.EvaluatePolynomialSecondDerivative(coeffsY, t);
-            double accZ = MinimumSnapTrajectory.EvaluatePolynomialSecondDerivative(coeffsZ, t);
-
-            // Print the 3D position, velocity, and acceleration at time t
-            Debug.Log($"Time t={t}: Position=({posX}, {posY}, {posZ}), Velocity=({velX}, {velY}, {velZ}), Acceleration=({accX}, {accY}, {accZ})");
-            // Print the 3D position at time t
-            // Debug.Log($"Position at time t={t}: ({posX}, {posY}, {posZ})");
-        }
-
-        */
 
         tw = new StreamWriter(filePath, false);
         tw.WriteLine("t,x_s1,x_s2,x_s3,x_s_d1,x_s_d2,x_s_d3");
@@ -470,20 +365,11 @@ public class DroneLoadController : MonoBehaviour
             }
 
 
-            /*
-            Vector<double> buoy_w = R_ws*Rope.GetChild(Rope.childCount-1).position.To<NED>().ToDense();
-            x_s_d = R_sw*DenseVector.OfArray(new double[] { buoy_w[0], buoy_w[1], Math.Pow(t-4, 2)/16 + buoy_w[2] + 0.16 });
-            v_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, (t-4)/8 });
-            a_s_d = R_sw*DenseVector.OfArray(new double[] { 0, 0, 1/8 });
-            */
-            //Debug.Log($"x_s_d: {x_s_d[0]:F2},{x_s_d[1]:F2},{x_s_d[2]:F2}"); // desired position
-            // Debug.Log($"x_s: {x_s[0]:F2},{x_s[1]:F2},{x_s[2]:F2}"); // desired position
         }
         else
         {
             catching_time = 0; // reset time
         }
-        // Debug.Log($"t: {t}"); // Time
 
         // Logging
         tw = new StreamWriter(filePath, true);
@@ -613,65 +499,7 @@ public class DroneLoadController : MonoBehaviour
         Vector<double> a_s_d;
 
         Vector<double> unitVectorTowardsTarget = (x_TT - x_s) / (x_TT - x_s).Norm(2);
-        // double accelerationDistance = Mathf.Pow(MaxVelocityWithTrackingTarget, 2)/(2*MaxAccelerationWithTrackingTarget);
         double distanceToTarget = (x_TT - x_s).Norm(2);
-        // double velocityMagnitude;
-
-        // // If we are not at the maximum velocity, we can accelerate
-        // if (distanceToTarget > accelerationDistance && v_s.Norm(2) < MaxVelocityWithTrackingTarget) {
-        //     if (startingPosition == null) {
-        //         startingPosition = x_s - 1e-3*unitVectorTowardsTarget;
-        //     }
-        //     velocityMagnitude = Math.Sqrt(2*MaxAccelerationWithTrackingTarget*(x_s - startingPosition).Norm(2));
-        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
-        //     v_s_d = velocityMagnitude*unitVectorTowardsTarget;
-        //     a_s_d = MaxAccelerationWithTrackingTarget*unitVectorTowardsTarget;
-        // // If we want to move towards the target with maximum velocity
-        // } else if (distanceToTarget > accelerationDistance) {
-        //     startingPosition = null;
-        //     velocityMagnitude = MaxVelocityWithTrackingTarget;
-        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
-        //     v_s_d = velocityMagnitude*unitVectorTowardsTarget;
-        //     a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        // // If we are close to the target, slow down
-        // } else if (distanceToTarget > 0.1) {
-        //     startingPosition = null;
-        //     velocityMagnitude = Math.Sqrt(2*MaxAccelerationWithTrackingTarget*distanceToTarget);
-        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
-        //     v_s_d = velocityMagnitude*unitVectorTowardsTarget;
-        //     a_s_d = -MaxAccelerationWithTrackingTarget*unitVectorTowardsTarget;
-        // // If we are at the target, stop
-        // } else {
-        //     startingPosition = null;
-        //     x_s_d = x_TT;
-        //     v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        //     a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        // }
-
-        // // If we are not at the maximum velocity, we can accelerate
-        // if (distanceToTarget > accelerationDistance && v_s.Norm(2) < MaxVelocityWithTrackingTarget) {
-        //     if (startingPosition == null) {
-        //         startingPosition = x_s - 1e-3*unitVectorTowardsTarget;
-        //     }
-        //     velocityMagnitude = Math.Sqrt(2*MaxAccelerationWithTrackingTarget*(x_s - startingPosition).Norm(2));
-        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
-        // // If we want to move towards the target with maximum velocity
-        // } else if (distanceToTarget > accelerationDistance) {
-        //     startingPosition = null;
-        //     velocityMagnitude = MaxVelocityWithTrackingTarget;
-        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
-        // // If we are close to the target, slow down
-        // } else if (distanceToTarget > 0.1) {
-        //     startingPosition = null;
-        //     velocityMagnitude = Math.Sqrt(2*MaxAccelerationWithTrackingTarget*distanceToTarget);
-        //     x_s_d = x_s + velocityMagnitude*dt*unitVectorTowardsTarget;
-        // // If we are at the target, stop
-        // } else {
-        //     startingPosition = null;
-        //     x_s_d = x_TT;
-        // }
-        // v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        // a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
         if (distanceToTarget > DecelerationDistance)
         {
