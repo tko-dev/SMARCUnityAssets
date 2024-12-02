@@ -11,6 +11,8 @@ using Rope;
 
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using MinimumSnapTrajectory = Trajectory.MinimumSnapTrajectory;
+using MinSnapTraj = Trajectory.MinSnapTrajectory;
 
 /// <summary>
 /// Tracking controller is implemented per "Geometric tracking control of a quadrotor UAV on SE(3)"
@@ -335,6 +337,13 @@ public class DroneLoadController : MonoBehaviour
 
                 // Calculate minimum snap trajectory coefficients for each axis (x, y, z)
                 coeffsX = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.x, startVel.x, startAcc.x, endPos.x, endVel.x, endAcc.x, T);
+                MinSnapTraj test = new MinSnapTraj(startPos.x,
+                    startVel.x,
+                    startAcc.x,
+                    endPos.x,
+                    endVel.x,
+                    endAcc.x,
+                    T);
                 coeffsY = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.y, startVel.y, startAcc.y, endPos.y, endVel.y, endAcc.y, T);
                 coeffsZ = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.z, startVel.z, startAcc.z, endPos.z, endVel.z, endAcc.z, T);
                 min_snap_flag = 2;
@@ -632,68 +641,5 @@ public class DroneLoadController : MonoBehaviour
     static Vector3 ToUnity(Vector<double> v)
     {
         return new Vector3((float)v[0], (float)v[2], (float)v[1]);
-    }
-}
-
-
-
-// Helper class for Minimum Snap Trajectory
-public static class MinimumSnapTrajectory
-{
-    public static double[] MinimumSnapCoefficients(double startPos, double startVel, double startAcc,
-                                                   double endPos, double endVel, double endAcc,
-                                                   double T)
-    {
-        var A = Matrix<double>.Build.DenseOfArray(new double[,]
-        {
-            {1, 0, 0,    0,    0,    0},
-            {0, 1, 0,    0,    0,    0},
-            {0, 0, 2,    0,    0,    0},
-            {1, T, Math.Pow(T, 2), Math.Pow(T, 3), Math.Pow(T, 4), Math.Pow(T, 5)},
-            {0, 1, 2*T,  3*Math.Pow(T, 2), 4*Math.Pow(T, 3), 5*Math.Pow(T, 4)},
-            {0, 0, 2,    6*T,  12*Math.Pow(T, 2), 20*Math.Pow(T, 3)}
-        });
-
-        var b = Vector<double>.Build.Dense(new double[]
-        {
-            startPos, startVel, startAcc, endPos, endVel, endAcc
-        });
-
-        var x = A.Solve(b);
-
-        return x.ToArray();
-    }
-
-    // Evaluate the polynomial at a given time t
-    public static double EvaluatePolynomial(double[] coeffs, double t)
-    {
-        double result = 0;
-        for (int i = 0; i < coeffs.Length; i++)
-        {
-            result += coeffs[i] * Math.Pow(t, i);
-        }
-        return result;
-    }
-
-    // Evaluate the first derivative (velocity) of the polynomial at time t
-    public static double EvaluatePolynomialDerivative(double[] coeffs, double t)
-    {
-        double result = 0;
-        for (int i = 1; i < coeffs.Length; i++)  // Start at i=1 because the derivative of a0 is 0
-        {
-            result += i * coeffs[i] * Math.Pow(t, i - 1);
-        }
-        return result;
-    }
-
-    // Evaluate the second derivative (acceleration) of the polynomial at time t
-    public static double EvaluatePolynomialSecondDerivative(double[] coeffs, double t)
-    {
-        double result = 0;
-        for (int i = 2; i < coeffs.Length; i++)  // Start at i=2 because the second derivative of a0 and a1 is 0
-        {
-            result += i * (i - 1) * coeffs[i] * Math.Pow(t, i - 2);
-        }
-        return result;
     }
 }
