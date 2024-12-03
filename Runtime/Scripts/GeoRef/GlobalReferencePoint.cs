@@ -2,15 +2,18 @@ using CoordinateSharp;
 using UnityEngine;
 
 
-namespace VehicleComponents.Sensors
+namespace GeoRef
 {
-    public class GPSReferencePoint: MonoBehaviour
+    public enum OriginMode
     {
-        [Tooltip("If true, uses the given lat,lon as the reference, otherwise uses the utm properties")]
-        public bool originIsLatLon = true;
+        LatLon,
+        UTM
+    }
 
-        [Tooltip("Draw a line from each GPS object to the reference point of this terrain")]
-        public bool drawLineToReferencePoint = true;
+    public class GlobalReferencePoint: MonoBehaviour
+    {
+        [Tooltip("Use Lat/Lon or UTM as the origin and set the other values accordingly")]
+        public OriginMode originMode = OriginMode.LatLon;
 
         [Header("Lat/lon in decimal degrees")]
         public double lon = 17.596178; // asko bottom left defaults
@@ -24,13 +27,13 @@ namespace VehicleComponents.Sensors
 
         void OnValidate()
         {
-            var refpoints = FindObjectsByType<GPSReferencePoint>(FindObjectsSortMode.None);
+            var refpoints = FindObjectsByType<GlobalReferencePoint>(FindObjectsSortMode.None);
             if(refpoints.Length > 1)
             {
                 Debug.LogWarning("Found too many GPSReferencePoints in the scene, there should only be one!");
             }
 
-            if(originIsLatLon)
+            if(originMode == OriginMode.LatLon)
             {
                 var latlon = new Coordinate(lat, lon);
                 easting = latlon.UTM.Easting;
@@ -54,7 +57,6 @@ namespace VehicleComponents.Sensors
         public (double easting, double northing, double lat, double lon) GetUTMLatLonOfObject(GameObject o)
         {
             var posDiff = o.transform.position - transform.position;
-            if(drawLineToReferencePoint) Debug.DrawLine(o.transform.position, transform.position);
             var xDiff = posDiff.x;
             var zDiff = posDiff.z;
             // +z = north
