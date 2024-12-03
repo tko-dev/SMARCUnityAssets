@@ -8,7 +8,7 @@ using RosMessageTypes.Tf2;
 using Unity.Robotics.Core;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
-using GPSRef = VehicleComponents.Sensors.GPSReferencePoint;
+using GPSRef = GeoRef.GlobalReferencePoint;
 
 
 namespace VehicleComponents.ROS.Publishers
@@ -35,7 +35,7 @@ namespace VehicleComponents.ROS.Publishers
             var gpsRefs = FindObjectsByType<GPSRef>(FindObjectsSortMode.None);
             if(gpsRefs.Length < 1)
             {
-                Debug.LogWarning("[UTM->Map pub] No GPS Reference found in the scene. There must be at least one!");
+                Debug.LogWarning("[UTM->Map pub] No Global Reference Point found in the scene. There must be at least one!");
             }
             else gpsRef = gpsRefs[0];
 
