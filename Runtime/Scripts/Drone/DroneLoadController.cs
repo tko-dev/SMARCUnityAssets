@@ -12,7 +12,6 @@ using Rope;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MinimumSnapTrajectory = Trajectory.MinimumSnapTrajectory;
-using MinSnapTraj = Trajectory.MinSnapTrajectory;
 
 /// <summary>
 /// Tracking controller is implemented per "Geometric tracking control of a quadrotor UAV on SE(3)"
@@ -73,6 +72,7 @@ public class DroneLoadController : MonoBehaviour
     const int NUM_PROPS = 4;
 
 
+    // Drone specific stuff must be parameters in header
     // Quadrotor parameters from paper
     const double ROTOR_MOMENT_ARM = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
     const float TORQUE_COEFFICIENT = 0.08f; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
@@ -107,11 +107,12 @@ public class DroneLoadController : MonoBehaviour
     float dt;
 
     // Min snap trajectory
-    double[] coeffsX = new double[6];
-    double[] coeffsY = new double[6];
-    double[] coeffsZ = new double[6];
     int min_snap_flag;
     double catching_time;
+    // TODO: This should not be tracked in a global state
+    MinimumSnapTrajectory xTraj;
+    MinimumSnapTrajectory yTraj;
+    MinimumSnapTrajectory zTraj;
 
     // Logging
     string filePath = Application.dataPath + "/../../SMARCUnityAssets/Logs/log.csv";
@@ -210,7 +211,7 @@ public class DroneLoadController : MonoBehaviour
 
         // Load states
         Vector<double> xL_s = LoadLinkTF.position.To<ENU>().ToDense();
-        Vector<double> vL_s = loadLinkAB.velocity.To<ENU>().ToDense();
+        Vector<double> vL_s = loadLinkAB.velocity.To<ENU>().ToDense(); // NOTE: Not realistic for actual load controller
         l = (xL_s - xQ_s).Norm(2); // TODO: Figure out the fixed rope length from the rope object, the controller should work even with stretching
         Vector<double> q = (xL_s - xQ_s) / l;
         Vector<double> q_dot = (vL_s - vQ_s) / l;
@@ -310,6 +311,7 @@ public class DroneLoadController : MonoBehaviour
 
 
 
+        // TODO: Need to fix global state on trajectory here
         if (AttackTheBuoy && Rope != null)
         {
             if (min_snap_flag == 0)
@@ -336,35 +338,46 @@ public class DroneLoadController : MonoBehaviour
 
 
                 // Calculate minimum snap trajectory coefficients for each axis (x, y, z)
-                coeffsX = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.x, startVel.x, startAcc.x, endPos.x, endVel.x, endAcc.x, T);
-                MinSnapTraj test = new MinSnapTraj(startPos.x,
+                xTraj = new MinimumSnapTrajectory(startPos.x,
                     startVel.x,
                     startAcc.x,
                     endPos.x,
                     endVel.x,
                     endAcc.x,
                     T);
-                coeffsY = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.y, startVel.y, startAcc.y, endPos.y, endVel.y, endAcc.y, T);
-                coeffsZ = MinimumSnapTrajectory.MinimumSnapCoefficients(startPos.z, startVel.z, startAcc.z, endPos.z, endVel.z, endAcc.z, T);
+                yTraj = new MinimumSnapTrajectory(startPos.y,
+                    startVel.y,
+                    startAcc.y,
+                    endPos.y,
+                    endVel.y,
+                    endAcc.y,
+                    T);
+                zTraj = new MinimumSnapTrajectory(startPos.z,
+                    startVel.z,
+                    startAcc.z,
+                    endPos.z,
+                    endVel.z,
+                    endAcc.z,
+                    T);
                 min_snap_flag = 2;
             }
 
             if (min_snap_flag == 2 && catching_time <= T)
             {
                 catching_time = catching_time + 0.1;
-                double posX = MinimumSnapTrajectory.EvaluatePolynomial(coeffsX, catching_time);
-                double posY = MinimumSnapTrajectory.EvaluatePolynomial(coeffsY, catching_time);
-                double posZ = MinimumSnapTrajectory.EvaluatePolynomial(coeffsZ, catching_time);
+                double posX = xTraj.EvaluatePolynomial(catching_time);
+                double posY = yTraj.EvaluatePolynomial(catching_time);
+                double posZ = zTraj.EvaluatePolynomial(catching_time);
 
                 // Evaluate velocity (first derivative)
-                double velX = MinimumSnapTrajectory.EvaluatePolynomialDerivative(coeffsX, catching_time);
-                double velY = MinimumSnapTrajectory.EvaluatePolynomialDerivative(coeffsY, catching_time);
-                double velZ = MinimumSnapTrajectory.EvaluatePolynomialDerivative(coeffsZ, catching_time);
+                double velX = xTraj.EvaluatePolynomialDerivative(catching_time);
+                double velY = yTraj.EvaluatePolynomialDerivative(catching_time);
+                double velZ = zTraj.EvaluatePolynomialDerivative(catching_time);
 
                 // Evaluate acceleration (second derivative)
-                double accX = MinimumSnapTrajectory.EvaluatePolynomialSecondDerivative(coeffsX, catching_time);
-                double accY = MinimumSnapTrajectory.EvaluatePolynomialSecondDerivative(coeffsY, catching_time);
-                double accZ = MinimumSnapTrajectory.EvaluatePolynomialSecondDerivative(coeffsZ, catching_time);
+                double accX = xTraj.EvaluatePolynomialSecondDerivative(catching_time);
+                double accY = yTraj.EvaluatePolynomialSecondDerivative(catching_time);
+                double accZ = zTraj.EvaluatePolynomialSecondDerivative(catching_time);
 
 
                 x_s_d = DenseVector.OfArray(new double[] { posX, posY, posZ });
@@ -379,11 +392,6 @@ public class DroneLoadController : MonoBehaviour
         {
             catching_time = 0; // reset time
         }
-
-        // Logging
-        tw = new StreamWriter(filePath, true);
-        tw.WriteLine($"{Time.time},{x_s[0]},{x_s[1]},{x_s[2]},{x_s_d[0]},{x_s_d[1]},{x_s_d[2]}");
-        tw.Close();
 
 
         // Control
@@ -564,6 +572,7 @@ public class DroneLoadController : MonoBehaviour
     /// <summary>
     /// Cross product operation for R^3 vectors
     /// </summary>
+    /// TODO: Does cross product exist in unity math
     private static Vector<double> _Cross(Vector<double> a, Vector<double> b)
     {
         // Calculate each component of the cross product
