@@ -34,9 +34,9 @@ public class DroneLoadController : MonoBehaviour
 
     [Header("Drone Configuration")]
     [Tooltip("The euclidean distance from the center of gravity of the drone to rotor")]
-    double rotorMomentArm = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
+    public double rotorMomentArm = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
     [Tooltip("The ratio specifying how much of the rotor force is translated into torque around the drones 3rd axis (normal to the rotor plane)")]
-    double torqueCoefficient = 0.08; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
+    public double torqueCoefficient = 0.08; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
 
     [Header("Tracking")]
     [Tooltip("An object to follow")]
@@ -69,6 +69,8 @@ public class DroneLoadController : MonoBehaviour
     int times1 = 0;
     int times2 = 0;
 
+    Matrix<double> propellorForceToGlobalMap;
+    Matrix<double> propllerForceToGlobalMapInverse;
     ////////////////// SYSTEM SPECIFIC //////////////////
     // Quadrotor parameters (from unity)
     double massQuadrotor;
@@ -79,15 +81,6 @@ public class DroneLoadController : MonoBehaviour
 
 
 
-    // Mapping from propeller forces to the equivalent wrench (similar version found in the paper)
-    Matrix<double> propellorForceToGlobalMap = DenseMatrix.OfArray(new double[,]
-        { { 1, 1, 1, 1 },
-        { rotorMomentArm, 0, -rotorMomentArm, 0 },
-        { 0, -rotorMomentArm, 0, rotorMomentArm },
-        { torqueCoefficient, -torqueCoefficient, torqueCoefficient, -torqueCoefficient }
-        }
-    );
-    Matrix<double> propllerForceToGlobalMapInverse = propellorForceToGlobalMap.Inverse();
     Matrix<double> Q;
 
     // Load parameters
@@ -129,6 +122,7 @@ public class DroneLoadController : MonoBehaviour
         propellers[2] = PropBR.GetComponent<Propeller>();
         propellers[3] = PropBL.GetComponent<Propeller>();
 
+
         baseLinkAB = BaseLink.GetComponent<ArticulationBody>();
 
         // Creating identity matrices (3 x 3) for previous frame transforms
@@ -148,6 +142,16 @@ public class DroneLoadController : MonoBehaviour
         ////////////////// SYSTEM SPECIFIC //////////////////
         // Quadrotor parameters
         massQuadrotor = baseLinkAB.mass; // Quadrotor mass (kg)
+
+        // Mapping from propeller forces to the equivalent wrench (similar version found in the paper)
+        Matrix<double> propellorForceToGlobalMap = DenseMatrix.OfArray(new double[,]
+            { { 1, 1, 1, 1 },
+            { rotorMomentArm, 0, -rotorMomentArm, 0 },
+            { 0, -rotorMomentArm, 0, rotorMomentArm },
+            { torqueCoefficient, -torqueCoefficient, torqueCoefficient, -torqueCoefficient }
+            }
+        );
+        Matrix<double> propllerForceToGlobalMapInverse = propellorForceToGlobalMap.Inverse();
 
         // Creating diagonal matrix of inertia
         double[] diagonal = { baseLinkAB.inertiaTensor.x, baseLinkAB.inertiaTensor.z, baseLinkAB.inertiaTensor.y };
