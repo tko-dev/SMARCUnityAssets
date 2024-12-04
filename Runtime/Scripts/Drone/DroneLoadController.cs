@@ -32,6 +32,12 @@ public class DroneLoadController : MonoBehaviour
     // public float MaxAccelerationWithTrackingTarget = 1f;
     public float DecelerationDistance = 1f;
 
+    [Header("Drone Configuration")]
+    [Tooltip("The euclidean distance from the center of gravity of the drone to rotor")]
+    double rotorMomentArm = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
+    [Tooltip("The ratio specifying how much of the rotor force is translated into torque around the drones 3rd axis (normal to the rotor plane)")]
+    double torqueCoefficient = 0.08; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
+
     [Header("Tracking")]
     [Tooltip("An object to follow")]
     public Transform TrackingTargetTF;
@@ -72,20 +78,16 @@ public class DroneLoadController : MonoBehaviour
     const int NUM_PROPS = 4;
 
 
-    // Drone specific stuff must be parameters in header
-    // Quadrotor parameters from paper
-    const double ROTOR_MOMENT_ARM = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
-    const float TORQUE_COEFFICIENT = 0.08f; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
 
     // Mapping from propeller forces to the equivalent wrench (similar version found in the paper)
-    static readonly Matrix<double> PROPELLOR_FORCE_TO_GLOBAL_MAP = DenseMatrix.OfArray(new double[,]
+    Matrix<double> propellorForceToGlobalMap = DenseMatrix.OfArray(new double[,]
         { { 1, 1, 1, 1 },
-        { ROTOR_MOMENT_ARM, 0, -ROTOR_MOMENT_ARM, 0 },
-        { 0, -ROTOR_MOMENT_ARM, 0, ROTOR_MOMENT_ARM },
-        { TORQUE_COEFFICIENT, -TORQUE_COEFFICIENT, TORQUE_COEFFICIENT, -TORQUE_COEFFICIENT }
+        { rotorMomentArm, 0, -rotorMomentArm, 0 },
+        { 0, -rotorMomentArm, 0, rotorMomentArm },
+        { torqueCoefficient, -torqueCoefficient, torqueCoefficient, -torqueCoefficient }
         }
     );
-    static readonly Matrix<double> PROPELLOR_FORCE_TO_GLOBAL_MAP_INVERSE = PROPELLOR_FORCE_TO_GLOBAL_MAP.Inverse();
+    Matrix<double> propllerForceToGlobalMapInverse = propellorForceToGlobalMap.Inverse();
     Matrix<double> Q;
 
     // Load parameters
@@ -151,7 +153,7 @@ public class DroneLoadController : MonoBehaviour
         double[] diagonal = { baseLinkAB.inertiaTensor.x, baseLinkAB.inertiaTensor.z, baseLinkAB.inertiaTensor.y };
         inertiaJ = DenseMatrix.CreateDiagonal(3, 3, index => diagonal[index]);
 
-        Q = PROPELLOR_FORCE_TO_GLOBAL_MAP.Transpose() * PROPELLOR_FORCE_TO_GLOBAL_MAP;
+        Q = propellorForceToGlobalMap.Transpose() * propellorForceToGlobalMap;
 
         // Load parameters
         mL = 0; // Load mass (sum of all mass elements on sam) ~15 kg
@@ -446,7 +448,7 @@ public class DroneLoadController : MonoBehaviour
 
         // Compute optimal propeller forces
         Vector<double> globalForces = _StackForceMomentVector(f, M);
-        Vector<double> F_star = PROPELLOR_FORCE_TO_GLOBAL_MAP_INVERSE * globalForces;
+        Vector<double> F_star = propllerForceToGlobalMapInverse * globalForces;
 
         // Build a matrix A and a vector b to solve for the variation on the optimal propeller forces
         Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS, NUM_PROPS);
