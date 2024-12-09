@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 
 namespace DefaultNamespace
 {
     public static class Extensions
     {
+
+        public static Vector3 ToUnityVec3(this Vector3<FLU> vec)
+        {
+            return new Vector3(vec.x, vec.y, vec.z);
+        }
         public static List<T> FindAllChildrenOfType<T>(this Transform item)
         {
             var findResults = new List<T>();

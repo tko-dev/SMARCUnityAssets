@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using NUnit.Framework.Internal.Builders;
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 using Sonar = VehicleComponents.Sensors.Sonar;
