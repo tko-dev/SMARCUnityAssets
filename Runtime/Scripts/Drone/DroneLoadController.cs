@@ -33,7 +33,7 @@ public class DroneLoadController : MonoBehaviour
     public float DecelerationDistance = 1f;
 
     [Header("Drone Configuration")]
-    [Tooltip("The euclidean distance from the center of gravity of the drone to rotor")]
+    [Tooltip("The euclidean distance from the center of gravity of the drone to rotor (assumes square prop configuration)")]
     public double rotorMomentArm = 0.315; // Distance from the center of the quadrotor to each propeller (assumes square prop configuration) (m)
     [Tooltip("The ratio specifying how much of the rotor force is translated into torque around the drones 3rd axis (normal to the rotor plane)")]
     public double torqueCoefficient = 0.08; // Torque to force ratio of the propellers (also found in Propeller.cs, TODO: make this one variable) (m)
@@ -109,9 +109,6 @@ public class DroneLoadController : MonoBehaviour
     MinimumSnapTrajectory yTraj;
     MinimumSnapTrajectory zTraj;
 
-    // Logging
-    string filePath = Application.dataPath + "/../../SMARCUnityAssets/Logs/log.csv";
-    TextWriter tw;
 
     // Use this for initialization
     void Start()
@@ -178,11 +175,6 @@ public class DroneLoadController : MonoBehaviour
         //
         min_snap_flag = 0;
         catching_time = 0;
-
-        tw = new StreamWriter(filePath, false);
-        tw.WriteLine("t,x_s1,x_s2,x_s3,x_s_d1,x_s_d2,x_s_d3");
-        tw.Close();
-
     }
 
     // Update is called once per frame
@@ -259,6 +251,8 @@ public class DroneLoadController : MonoBehaviour
         Matrix<double> R_sb_c = DenseMatrix.OfArray(new double[,] { { b1c[0], b2c[0], b3c[0] },
                                                                     { b1c[1], b2c[1], b3c[1] },
                                                                     { b1c[2], b2c[2], b3c[2] } });
+
+
 
         Vector<double> W_b_c = _VeeMap(_Logm3(R_sb_c_prev.Transpose() * R_sb_c) / dt);
         Vector<double> W_b_c_dot = (W_b_c - Omega_b_c_prev) / dt;
@@ -570,9 +564,9 @@ public class DroneLoadController : MonoBehaviour
         Vector<double> b3d = pid / pid.Norm(2);
         Vector<double> b2d = _Cross(b3d, b1d) / _Cross(b3d, b1d).Norm(2);
         b1d = _Cross(b2d, b3d);
-        Matrix<double> R_sb_d = DenseMatrix.OfArray(new double[,] { { b1d[0], b2d[0], b3d[0] },
-                                                                    { b1d[1], b2d[1], b3d[1] },
-                                                                    { b1d[2], b2d[2], b3d[2] } });
+        // NOTE: If needed can update for performance to just manually creating matrix like before
+        Matrix<double> R_sb_d = CreateMatrix.DenseOfColumns(new Vector<double>[] { b1d, b2d, b3d });
+
         return R_sb_d;
     }
     /// <summary>
