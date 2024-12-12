@@ -70,7 +70,7 @@ public class DroneLoadController : MonoBehaviour
     int times2 = 0;
 
     Matrix<double> propellorForceToGlobalMap;
-    Matrix<double> propllerForceToGlobalMapInverse;
+    Matrix<double> propellerForceToGlobalMapInverse;
     ////////////////// SYSTEM SPECIFIC //////////////////
     // Quadrotor parameters (from unity)
     double massQuadrotor;
@@ -141,14 +141,14 @@ public class DroneLoadController : MonoBehaviour
         massQuadrotor = baseLinkAB.mass; // Quadrotor mass (kg)
 
         // Mapping from propeller forces to the equivalent wrench (similar version found in the paper)
-        Matrix<double> propellorForceToGlobalMap = DenseMatrix.OfArray(new double[,]
+        propellorForceToGlobalMap = DenseMatrix.OfArray(new double[,]
             { { 1, 1, 1, 1 },
             { rotorMomentArm, 0, -rotorMomentArm, 0 },
             { 0, -rotorMomentArm, 0, rotorMomentArm },
             { torqueCoefficient, -torqueCoefficient, torqueCoefficient, -torqueCoefficient }
             }
         );
-        Matrix<double> propllerForceToGlobalMapInverse = propellorForceToGlobalMap.Inverse();
+        propellerForceToGlobalMapInverse = propellorForceToGlobalMap.Inverse();
 
         // Creating diagonal matrix of inertia
         double[] diagonal = { baseLinkAB.inertiaTensor.x, baseLinkAB.inertiaTensor.z, baseLinkAB.inertiaTensor.y };
@@ -446,7 +446,7 @@ public class DroneLoadController : MonoBehaviour
 
         // Compute optimal propeller forces
         Vector<double> globalForces = _StackForceMomentVector(f, M);
-        Vector<double> F_star = propllerForceToGlobalMapInverse * globalForces;
+        Vector<double> F_star = propellerForceToGlobalMapInverse * globalForces;
 
         // Build a matrix A and a vector b to solve for the variation on the optimal propeller forces
         Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS, NUM_PROPS);
