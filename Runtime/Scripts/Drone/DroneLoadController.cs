@@ -155,6 +155,7 @@ public class DroneLoadController : MonoBehaviour
         inertiaJ = DenseMatrix.CreateDiagonal(3, 3, index => diagonal[index]);
 
         Q = propellorForceToGlobalMap.Transpose() * propellorForceToGlobalMap;
+        Debug.Log($"Q Matrix: {Q}");
 
         // Load parameters
         mL = 0; // Load mass (sum of all mass elements on sam) ~15 kg
@@ -447,37 +448,41 @@ public class DroneLoadController : MonoBehaviour
         // Compute optimal propeller forces
         Vector<double> globalForces = _StackForceMomentVector(f, M);
         Vector<double> F_star = propellerForceToGlobalMapInverse * globalForces;
+        Vector<double> F = F_star;
 
-        // Build a matrix A and a vector b to solve for the variation on the optimal propeller forces
-        Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS, NUM_PROPS);
-        Vector<double> b = Vector<double>.Build.Dense(NUM_PROPS);
-        for (int i = 0; i < NUM_PROPS; i++)
-        {
-            for (int j = 0; j < NUM_PROPS; j++)
-            {
-                if (F_star[i] >= 0 && F_star[j] >= 0)
-                {
-                    A[i, j] = Q[i, j];
-                }
-                else if (i == j)
-                {
-                    A[i, j] = 1;
-                }
-                else
-                {
-                    A[i, j] = 0;
-                }
-                if (F_star[i] >= 0 && F_star[j] < 0)
-                {
-                    b[i] += Q[i, j] * F_star[j];
-                }
-            }
-            if (F_star[i] < 0)
-            {
-                b[i] = -F_star[i];
-            }
-        }
-        Vector<double> F = F_star + A.Solve(b);
+        // // NOTE: Solves constrained optimization problem to imporve the propeller RPM's (Jonathan over slack)
+        // // Build a matrix A and a vector b to solve for the variation on the optimal propeller forces
+        // Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS, NUM_PROPS);
+        // Vector<double> b = Vector<double>.Build.Dense(NUM_PROPS);
+        // for (int i = 0; i < NUM_PROPS; i++)
+        // {
+        //     for (int j = 0; j < NUM_PROPS; j++)
+        //     {
+        //         if (F_star[i] >= 0 && F_star[j] >= 0)
+        //         {
+        //             A[i, j] = Q[i, j];
+        //         }
+        //         // okay so the diagonals need to be at 1
+        //         else if (i == j)
+        //         {
+        //             A[i, j] = 1;
+        //         }
+        //         else
+        //         {
+        //             A[i, j] = 0;
+        //         }
+        //         if (F_star[i] >= 0 && F_star[j] < 0)
+        //         {
+        //             b[i] += Q[i, j] * F_star[j];
+        //         }
+        //     }
+        //     if (F_star[i] < 0)
+        //     {
+        //         b[i] = -F_star[i];
+        //     }
+        // }
+        // Vector<double> F = F_star + A.Solve(b);
+        // Debug.Log($"Delta:{F - F_star}, Solution with optimization: {F}, Solution without optimization {F_star}");
 
         // If the gradient tangent to any of the boundaries makes the solution not satisfy the constraints,
         // project it back to the boundary
