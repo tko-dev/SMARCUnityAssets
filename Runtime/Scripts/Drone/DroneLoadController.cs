@@ -450,7 +450,8 @@ public class DroneLoadController : MonoBehaviour
         Vector<double> F_star = propellerForceToGlobalMapInverse * globalForces;
         Vector<double> F = F_star;
 
-        // // NOTE: Solves constrained optimization problem to imporve the propeller RPM's (Jonathan over slack)
+        // NOTE: Solves constrained optimization problem to imporve the propeller RPM's (Jonathan over slack)
+        // TODO: Identify if we need to actually use this or not
         // // Build a matrix A and a vector b to solve for the variation on the optimal propeller forces
         // Matrix<double> A = Matrix<double>.Build.Dense(NUM_PROPS, NUM_PROPS);
         // Vector<double> b = Vector<double>.Build.Dense(NUM_PROPS);
