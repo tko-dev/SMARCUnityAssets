@@ -168,7 +168,7 @@ namespace GameUI
 
         void UpdateHits()
         {
-            if (!DrawHits || HitsParticleSystem != null || HitsEmitParams != null) return;
+            if (!DrawHits || HitsParticleSystem == null || HitsEmitParams == null) return;
             
             for (int i = 0; i < sonar.TotalRayCount; i++)
             {
