@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 33019645332297352}
   - component: {fileID: 7705517650903841670}
   - component: {fileID: 3969115870681176583}
-  - component: {fileID: 8137322772277680695}
   m_Layer: 0
   m_Name: Asko
   m_TagString: Untagged
@@ -114,16 +113,3 @@ MonoBehaviour:
   zone: 33
   easting: 649947.1331677668
   northing: 6521967.582881769
---- !u!114 &8137322772277680695
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8036170069423691497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee81888241533583a9d98e158a029d69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frequency: 1
