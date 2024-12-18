@@ -70,13 +70,12 @@ public class DroneController : MonoBehaviour
     // Cached values to avoid recompute
     static readonly Vector<double> e3 = DenseVector.OfArray(new double[] { 0, 0, 1 });
     double g;
+    float dt;
 
     // State Tracking
     Matrix<double> R_sb_d_prev;
     Matrix<double> R_sb_c_prev;
 
-    // FIXME: Was in the middle of fixing all the errors in the tracking controller and missing variable / states
-    // Just had fixed the fact that Omega is a vector not a matrix, I also believe I partially only refactored W to Omega in old code
     Vector<double> Omega_sb_d_prev;
     Vector<double> Omega_sb_c_prev;
 
@@ -109,19 +108,24 @@ public class DroneController : MonoBehaviour
         // Creating identity matrices (3 x 3) for previous frame transforms
         R_sb_d_prev = DenseMatrix.CreateDiagonal(3, 3, 1.0);
         R_sb_c_prev = DenseMatrix.CreateDiagonal(3, 3, 1.0);
-        
+
 
         // Creating zero vector for previous frame angular velocities
         Omega_sb_d_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
         Omega_sb_c_prev = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
+        dt = Time.fixedDeltaTime;
+
     }
 
     void FixedUpdate()
     {
+        double f = 0 ;
+        Vector<double> M = DenseVector.OfArray(new double[] {0,0,0});
+
         if (controllerState == DroneControllerState.TrackingControl)
         {
-            // TODO: Implement me
+            (f,M) = ComputeTrackingControl();
         }
         else if (controllerState == DroneControllerState.LoadControl)
         {
@@ -136,8 +140,9 @@ public class DroneController : MonoBehaviour
             Debug.Log("Controller state is outside possible states");
         }
 
-        //TODO: Compute RPMs from Force and moment
-        //TODO: Apply RPMs
+        double [] currPropellerRPMs= ComputeRPMs(f,M);
+
+
 
     }
 
@@ -173,7 +178,7 @@ public class DroneController : MonoBehaviour
         v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
         a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
-        
+
         // Control
 
         // FIXME: Hardcoded Error cap
@@ -181,7 +186,7 @@ public class DroneController : MonoBehaviour
         Vector<double> errorTrackingPosition = (x_s - x_s_d) * Math.Min(DistanceErrorCap / (x_s - x_s_d).Norm(2), 1);
         Vector<double> errorTrackingVelocity = v_s - v_s_d;
 
-        Vector<double> pid = _ComputePIDTerm(kx,
+        Vector<double> pidGain = _ComputePIDTerm(kx,
             kv,
             g,
             massQuadrotor,
@@ -189,21 +194,22 @@ public class DroneController : MonoBehaviour
             errorTrackingPosition,
             errorTrackingVelocity);
 
-        Matrix<double> R_sb_d = _ComputeDesiredAttitudeVectors(pid);
+        Matrix<double> R_sb_d = _ComputeDesiredAttitudeVectors(pidGain);
 
         // TODO: Abstract away computation of forces and moments if possible
         Vector<double> W_b_d = _VeeMap(_Logm3(R_sb_d_prev.Transpose() * R_sb_d) / dt);
-        Vector<double> W_b_d_dot = (W_b_d - Omega_b_d_prev) / dt;
+        Vector<double> W_b_d_dot = (W_b_d - Omega_sb_d_prev) / dt;
 
         Vector<double> eR = 0.5 * _VeeMap(R_sb_d.Transpose() * R_sb - R_sb.Transpose() * R_sb_d);
         Vector<double> eW = W_b - R_sb.Transpose() * R_sb_d * W_b_d;
 
-        f = PIDGain * (R_sb * e3);
+        f = pidGain * (R_sb * e3);
         M = -kR * eR - kW * eW + _Cross(W_b, inertiaJ * W_b) - inertiaJ * (_HatMap(W_b) * R_sb.Transpose() * R_sb_d * W_b_d - R_sb.Transpose() * R_sb_d * W_b_d_dot);
 
         R_sb_d_prev = R_sb_d;
-        Omega_b_d_prev = W_b_d;
+        Omega_sb_d_prev = W_b_d;
 
+        return (f, M);
     }
     /// <summary>
     /// Stacks force scaler and moment vecotrs into single Vector
@@ -239,6 +245,26 @@ public class DroneController : MonoBehaviour
         for (int i = 0; i < propellers.Length; i++)
             propellersRPMs[i] = F[i] / propellers[i].RPMToForceMultiplier;
         return propellersRPMs;
+    }
+
+    /// <summary>
+    /// Applies RPMs to unity drone object 
+    ///
+    /// Ensures thats propellers does not have a negative RPM
+    /// </summary>
+    void ApplyRPMs(double [] propellersRPMs)
+    {
+        Debug.Log($"RPM: {propellersRPMs[0]:F2},{propellersRPMs[1]:F2},{propellersRPMs[2]:F2},{propellersRPMs[3]:F2}"); // desired position
+        for (int i = 0; i < propellers.Length; i++)
+        {
+            // Now, all props should always have positive rpms, but just in case...
+            if (propellersRPMs[i] < 0)
+            {
+                Debug.LogWarning("Propeller " + i + " has negative RPMs: " + propellersRPMs[i]);
+                propellersRPMs[i] = 0;
+            }
+            propellers[i].SetRpm(propellersRPMs[i]);
+        }
     }
 
     /// <summary>
