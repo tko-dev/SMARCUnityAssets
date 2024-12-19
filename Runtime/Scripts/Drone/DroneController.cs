@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Unity.Robotics.ROSTCPConnector.ROSGeometry;
+using DefaultNamespace.LookUpTable;
 using VehicleComponents.Actuators;
 using Rope;
 
@@ -32,7 +35,7 @@ public class DroneController : MonoBehaviour
     [Header("Basics")]
     [Tooltip("Baselink of drone")]
     public GameObject BaseLink;
-    public ArticulationBody baseLinkDroneAB;
+    ArticulationBody baseLinkDroneAB;
 
     [Header("Tracking")]
     [Tooltip("An object to follow for drone tracking control")]
@@ -99,6 +102,7 @@ public class DroneController : MonoBehaviour
         propellerForceToGlobalMapInverse = propellorForceToGlobalMap.Inverse();
 
         baseLinkDroneAB = BaseLink.GetComponent<ArticulationBody>();
+        massQuadrotor = baseLinkDroneAB.mass; // Quadrotor mass (kg)
 
         // Creating diagonal matrix of inertia
         double[] diagonal = { baseLinkDroneAB.inertiaTensor.x, baseLinkDroneAB.inertiaTensor.z, baseLinkDroneAB.inertiaTensor.y };
@@ -141,8 +145,7 @@ public class DroneController : MonoBehaviour
         }
 
         double [] currPropellerRPMs= ComputeRPMs(f,M);
-
-
+        ApplyRPMs(currPropellerRPMs);
 
     }
 
@@ -176,7 +179,7 @@ public class DroneController : MonoBehaviour
 
         x_s_d = TrackingTargetTF.position.To<NED>().ToDense();
         v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        a_s_d = DenseVector.OfArray(new double[] { 0, 0, 1/8 });
 
 
         // Control
@@ -184,7 +187,9 @@ public class DroneController : MonoBehaviour
         // FIXME: Hardcoded Error cap
         float DistanceErrorCap = 10f;
         Vector<double> errorTrackingPosition = (x_s - x_s_d) * Math.Min(DistanceErrorCap / (x_s - x_s_d).Norm(2), 1);
+        Debug.Log($"Error in tracking position {errorTrackingPosition}");
         Vector<double> errorTrackingVelocity = v_s - v_s_d;
+        Debug.Log($"Error in tracking velocity {errorTrackingVelocity}");
 
         Vector<double> pidGain = _ComputePIDTerm(kx,
             kv,
@@ -193,6 +198,8 @@ public class DroneController : MonoBehaviour
             a_s_d,
             errorTrackingPosition,
             errorTrackingVelocity);
+
+        Debug.Log($"PID Gain {pidGain}");
 
         Matrix<double> R_sb_d = _ComputeDesiredAttitudeVectors(pidGain);
 
@@ -203,7 +210,7 @@ public class DroneController : MonoBehaviour
         Vector<double> eR = 0.5 * _VeeMap(R_sb_d.Transpose() * R_sb - R_sb.Transpose() * R_sb_d);
         Vector<double> eW = W_b - R_sb.Transpose() * R_sb_d * W_b_d;
 
-        f = pidGain * (R_sb * e3);
+        f = -pidGain * (R_sb * e3);
         M = -kR * eR - kW * eW + _Cross(W_b, inertiaJ * W_b) - inertiaJ * (_HatMap(W_b) * R_sb.Transpose() * R_sb_d * W_b_d - R_sb.Transpose() * R_sb_d * W_b_d_dot);
 
         R_sb_d_prev = R_sb_d;
@@ -228,9 +235,11 @@ public class DroneController : MonoBehaviour
     {
 
         // Compute optimal propeller forces
+        Debug.Log($"Desired force [{f}], desired Moment [{M}]");
         Vector<double> globalForces = _StackForceMomentVector(f, M);
         Vector<double> F_star = propellerForceToGlobalMapInverse * globalForces;
         Vector<double> F = F_star;
+        Debug.Log($"Optimal forces computed as [{F_star}]");
 
         for (int i = 0; i < NUM_PROPS; i++)
         {
@@ -241,10 +250,10 @@ public class DroneController : MonoBehaviour
         }
 
         // Set propeller rpms
-        double[] propellersRPMs = { 0, 0, 0, 0 };
+        double[] currPropVals = { 0, 0, 0, 0 };
         for (int i = 0; i < propellers.Length; i++)
-            propellersRPMs[i] = F[i] / propellers[i].RPMToForceMultiplier;
-        return propellersRPMs;
+            currPropVals[i] = F[i] / propellers[i].RPMToForceMultiplier;
+        return currPropVals;
     }
 
     /// <summary>
@@ -281,6 +290,10 @@ public class DroneController : MonoBehaviour
     {
         // This is upper term of equation (12) from geometric tracking paper
         Vector<double> pid = -gainX * errorPosition - gainV * errorVelocity + mass * gravityMagnitude * e3 + mass * desiredAcceleration;
+        Debug.Log($"X Gain {-gainX * errorPosition}");
+        Debug.Log($"V Gain {-gainV * errorVelocity}");
+        Debug.Log($"Grav Gain {mass * gravityMagnitude * e3}");
+        Debug.Log($"Accel Gain {mass * desiredAcceleration}");
         return pid;
     }
 
@@ -294,7 +307,7 @@ public class DroneController : MonoBehaviour
     {
 
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2) / 2, -Math.Sqrt(2) / 2, 0 });
-        Vector<double> b3d = pid / pid.Norm(2);
+        Vector<double> b3d = -pid / pid.Norm(2);
         Vector<double> b2d = _Cross(b3d, b1d) / _Cross(b3d, b1d).Norm(2);
         b1d = _Cross(b2d, b3d);
         // NOTE: If needed can update for performance to just manually creating matrix like before can easily be reimplemented here
