@@ -83,6 +83,7 @@ public class DroneController : MonoBehaviour
     Vector<double> Omega_sb_c_prev;
 
 
+
     // Initialization function
     void Start()
     {
@@ -144,7 +145,7 @@ public class DroneController : MonoBehaviour
             Debug.Log("Controller state is outside possible states");
         }
 
-        double [] currPropellerRPMs= ComputeRPMs(f,M);
+        float [] currPropellerRPMs= ComputeRPMs(f,M);
         ApplyRPMs(currPropellerRPMs);
 
     }
@@ -177,9 +178,9 @@ public class DroneController : MonoBehaviour
         Vector<double> v_s_d;
         Vector<double> a_s_d;
 
-        x_s_d = TrackingTargetTF.position.To<NED>().ToDense();
+        x_s_d = TrackingTargetTF.position.To<ENU>().ToDense();
         v_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        a_s_d = DenseVector.OfArray(new double[] { 0, 0, 1/8 });
+        a_s_d = DenseVector.OfArray(new double[] { 0, 0, 0 });
 
 
         // Control
@@ -202,6 +203,7 @@ public class DroneController : MonoBehaviour
         Debug.Log($"PID Gain {pidGain}");
 
         Matrix<double> R_sb_d = _ComputeDesiredAttitudeVectors(pidGain);
+        Debug.Log($"Desired attitude Vectors: \n {R_sb_d}");
 
         // TODO: Abstract away computation of forces and moments if possible
         Vector<double> W_b_d = _VeeMap(_Logm3(R_sb_d_prev.Transpose() * R_sb_d) / dt);
@@ -210,12 +212,14 @@ public class DroneController : MonoBehaviour
         Vector<double> eR = 0.5 * _VeeMap(R_sb_d.Transpose() * R_sb - R_sb.Transpose() * R_sb_d);
         Vector<double> eW = W_b - R_sb.Transpose() * R_sb_d * W_b_d;
 
-        f = -pidGain * (R_sb * e3);
+        f = pidGain * (R_sb * e3);
         M = -kR * eR - kW * eW + _Cross(W_b, inertiaJ * W_b) - inertiaJ * (_HatMap(W_b) * R_sb.Transpose() * R_sb_d * W_b_d - R_sb.Transpose() * R_sb_d * W_b_d_dot);
 
         R_sb_d_prev = R_sb_d;
         Omega_sb_d_prev = W_b_d;
 
+        // f = massQuadrotor * g;
+        // M = DenseVector.OfArray(new double[] { 0, 0, 0 });
         return (f, M);
     }
     /// <summary>
@@ -231,7 +235,7 @@ public class DroneController : MonoBehaviour
     /// </summary>
     /// <param name="f"> Desired forces </param>
     /// <param name="M"> Desired moments </param>
-    double[] ComputeRPMs(double f, Vector<double> M)
+    float[] ComputeRPMs(double f, Vector<double> M)
     {
 
         // Compute optimal propeller forces
@@ -250,9 +254,9 @@ public class DroneController : MonoBehaviour
         }
 
         // Set propeller rpms
-        double[] currPropVals = { 0, 0, 0, 0 };
+        float[] currPropVals = { 0, 0, 0, 0 };
         for (int i = 0; i < propellers.Length; i++)
-            currPropVals[i] = F[i] / propellers[i].RPMToForceMultiplier;
+            currPropVals[i] = (float)F[i] / propellers[i].RPMToForceMultiplier;
         return currPropVals;
     }
 
@@ -261,7 +265,7 @@ public class DroneController : MonoBehaviour
     ///
     /// Ensures thats propellers does not have a negative RPM
     /// </summary>
-    void ApplyRPMs(double [] propellersRPMs)
+    void ApplyRPMs(float [] propellersRPMs)
     {
         Debug.Log($"RPM: {propellersRPMs[0]:F2},{propellersRPMs[1]:F2},{propellersRPMs[2]:F2},{propellersRPMs[3]:F2}"); // desired position
         for (int i = 0; i < propellers.Length; i++)
@@ -307,7 +311,7 @@ public class DroneController : MonoBehaviour
     {
 
         Vector<double> b1d = DenseVector.OfArray(new double[] { Math.Sqrt(2) / 2, -Math.Sqrt(2) / 2, 0 });
-        Vector<double> b3d = -pid / pid.Norm(2);
+        Vector<double> b3d = pid / pid.Norm(2);
         Vector<double> b2d = _Cross(b3d, b1d) / _Cross(b3d, b1d).Norm(2);
         b1d = _Cross(b2d, b3d);
         // NOTE: If needed can update for performance to just manually creating matrix like before can easily be reimplemented here
