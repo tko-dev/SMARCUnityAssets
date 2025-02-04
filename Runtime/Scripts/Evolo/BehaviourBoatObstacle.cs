@@ -7,11 +7,11 @@ public class NPCController : MonoBehaviour {
     public float maxYawRate = 20f; // Maximum yaw rate in degrees per second
     private float toNextDirection;
     private float currentYawRate;
-    private Rigidbody rigidbody;
+    private Rigidbody rb;
 
     // Use this for initialization
     public void Start() {
-        rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         ChangeYawRate();
     }
     
@@ -27,7 +27,7 @@ public class NPCController : MonoBehaviour {
         transform.Rotate(Vector3.up, currentYawRate * Time.deltaTime);
 
         // Maintain forward movement
-        rigidbody.velocity = transform.forward * 2;
+        rb.velocity = transform.forward * 2;
     }
 
     private void ChangeYawRate() {

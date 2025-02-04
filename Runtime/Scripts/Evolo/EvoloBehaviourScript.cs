@@ -20,6 +20,8 @@ public class BoatController : MonoBehaviour
     public bool LidarHighRes128=false;
     private int lastLidarUsed=1;
     public bool useROSCommands = true; // Default: Using ROS commands
+    public string subscribeTopic = "/evolo_cmd";
+    private string privateSubscribeTopic="/evolo_cmd";
     public float maxRollAceleration=15; //rad/s^2
     public float heightIncrease=0.0f; //rad/s^2
 
@@ -49,7 +51,8 @@ public class BoatController : MonoBehaviour
     void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
-        ros.Subscribe<TwistMsg>("/boat_cmd", UpdateBoatControl);
+        ros.Subscribe<TwistMsg>(subscribeTopic, UpdateBoatControl);
+        
         rb = GetComponent<Rigidbody>();
 
         // Find the water model in the scene
@@ -69,6 +72,13 @@ public class BoatController : MonoBehaviour
 
         }
         lidar_toogle();
+        if (privateSubscribeTopic!=subscribeTopic){ //alternate between topics to control evolo
+            ros.Unsubscribe(privateSubscribeTopic);
+            ros.Subscribe<TwistMsg>(subscribeTopic, UpdateBoatControl);
+            privateSubscribeTopic=subscribeTopic;
+            Debug.Log($"Changed topic on which evolo is controlled. Now listening to topic:  {subscribeTopic }");
+
+        }
         
             
         
@@ -78,8 +88,9 @@ public class BoatController : MonoBehaviour
     {
         if (useROSCommands) // Only update if ROS mode is enabled
         {
-            linearSpeedGoalKt = Mathf.Clamp((float)msg.linear.x, -5f, 13f);
-            rollAngleGoal = Mathf.Clamp((float)msg.angular.z, -30f, 30f);
+
+            float difference_speed= (float)msg.linear.x - linearSpeedGoalKt;
+            speed_roll_limits((float)msg.linear.x,difference_speed,(float)msg.angular.z);
         }
     }
 
@@ -218,31 +229,44 @@ public class BoatController : MonoBehaviour
             return boatOffsetZ;
         }
     }
+
+    void speed_roll_limits(float added_speed,float difference_speed,float added_roll)
+    {
+        if (linearSpeedGoalKt<0){
+            linearSpeedGoalKt = Mathf.Clamp(added_speed, minNegSpeed, 0f);
+        } else if (linearSpeedGoalKt==0){
+            if (difference_speed>0){
+                linearSpeedGoalKt = minSpeed;
+                } else {
+                linearSpeedGoalKt += difference_speed;
+            }
+        } else { //linearSpeedGoalKt >= 8
+            if (difference_speed<0 && linearSpeedGoalKt==minSpeed){
+                linearSpeedGoalKt = 0;
+                } else {
+                linearSpeedGoalKt = Mathf.Clamp(added_speed, minSpeed, maxSpeed);
+            }
+            
+        }
+        rollAngleGoal = Mathf.Clamp(added_roll, -maxRoll, maxRoll);
+        if (currentLinearSpeed<minSpeed-1){
+            rollAngleGoalprivate=0;
+            }else {
+                rollAngleGoalprivate = rollAngleGoal;
+            }
+    }
     void Unity_control_speed_yaw()
     {
         float unitySpeedInput = Input.GetAxis("Vertical")/5; // "W/S" keys
         float unityRollInput = -Input.GetAxis("Horizontal")/3; // "A/D" keys
+        
+        float added_speed = linearSpeedGoalKt+unitySpeedInput ;
+        float difference_speed = unitySpeedInput;
+        float added_roll = rollAngleGoal+unityRollInput;
 
-        if (linearSpeedGoalKt<0){
-            linearSpeedGoalKt = Mathf.Clamp(linearSpeedGoalKt+unitySpeedInput, minNegSpeed, 0f);
-        } else if (linearSpeedGoalKt==0){
-            if (unitySpeedInput>0){
-                linearSpeedGoalKt = minSpeed;
-                } else {
-                linearSpeedGoalKt += unitySpeedInput;
-            }
-        } else { //linearSpeedGoalKt >= 8
-            if (unitySpeedInput<0 && linearSpeedGoalKt==8){
-                linearSpeedGoalKt = 0;
-                } else {
-                linearSpeedGoalKt = Mathf.Clamp(linearSpeedGoalKt+unitySpeedInput, minSpeed, maxSpeed);
-            }
-            
-            
-        }
-        rollAngleGoal = Mathf.Clamp(rollAngleGoal+unityRollInput, -maxRoll, maxRoll);
-        if (currentLinearSpeed<minSpeed-1){rollAngleGoalprivate=0;}
-        else rollAngleGoalprivate = rollAngleGoal;
+        speed_roll_limits(added_speed,difference_speed,added_roll);
+
+        
     }
     void lidar_toogle(){
         if (LidarHighRes128 && lastLidarUsed!=2)
