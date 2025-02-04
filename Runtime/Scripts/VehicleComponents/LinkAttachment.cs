@@ -58,29 +58,7 @@ namespace VehicleComponents
             }
 
             transform.SetParent(attachedLink.transform);
-            /*
-            TryGetComponent<ArticulationBody>(out articulationBody);
-            attachedLink.TryGetComponent<ArticulationBody>(out parentArticulationBody);
-            if (articulationBody == null) articulationBody = parentArticulationBody;
             
-            // Use MixedBody to handle both ArticulationBody and Rigidbody cases
-            TryGetComponent<MixedBody>(out mixedBody);
-            attachedLink.TryGetComponent<MixedBody>(out parentMixedBody);
-            if (mixedBody == null) mixedBody = parentMixedBody;
-            
-            // Try to get either an ArticulationBody or a Rigidbody
-            if (!TryGetComponent(out articulationBody))
-            {
-                TryGetComponent(out rigidbodyComponent);
-            }
-
-            // Also check if the attached link has one of these components
-            if (articulationBody == null && rigidbodyComponent == null)
-            {
-                attachedLink.TryGetComponent(out articulationBody);
-                attachedLink.TryGetComponent(out rigidbodyComponent);
-            }*/
-
             ArticulationBody ab = GetComponent<ArticulationBody>();
             Rigidbody rb = GetComponent<Rigidbody>();
 
