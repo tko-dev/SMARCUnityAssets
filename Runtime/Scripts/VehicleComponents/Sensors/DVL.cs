@@ -75,7 +75,7 @@ namespace VehicleComponents.Sensors
             // If not enough hits, no velocity or altitude or anything...
             if(!bottomLock) return false;
 
-            velocity = articulationBody.transform.InverseTransformVector(articulationBody.velocity);
+            velocity = mixedBody.ab.transform.InverseTransformVector(mixedBody.ab.velocity);
             
             // Altitude is a little trickier since we're faking it
             // rather than doing the whole beams thing...
