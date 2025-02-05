@@ -69,7 +69,7 @@ namespace VehicleComponents.Actuators
 
             // Visualize the applied force
             
-            parentMixedBody.ab.AddForceAtPosition((float)r * parentMixedBody.transform.forward,
+            parentMixedBody.AddForceAtPosition((float)r * parentMixedBody.transform.forward,
                                                    parentMixedBody.transform.position,
                                                    ForceMode.Force);
             
@@ -81,12 +81,12 @@ namespace VehicleComponents.Actuators
                 int torque_sign = TorqueUp ? 1 : -1;
                 float torque = torque_sign * c_tau_f * (float)r;
                 Vector3 torqueVector = torque * transform.forward;
-                parentMixedBody.ab.AddTorque(torqueVector, ForceMode.Force);
+                parentMixedBody.AddTorque(torqueVector, ForceMode.Force);
             }
             else
             {
                 int direction = reverse? -1 : 1;
-                parentMixedBody.ab.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
+                parentMixedBody.SetDriveTargetVelocity(ArticulationDriveAxis.X, direction*(float)rpm);
             }
         }
 

@@ -6,8 +6,6 @@ using Force;  // Assuming MixedBody is in the Force namespace
 
 namespace VehicleComponents.Sensors
 {
-    //[RequireComponent(typeof(Rigidbody))]  
-    [RequireComponent(typeof(Transform))]  // Ensures Transform exists, no strict body requirement
     public class IMU : Sensor
     {
         // Mostly copied from https://github.com/MARUSimulator/marus-core/blob/21c003a384335777b9d9fb6805eeab1cdb93b2f0/Scripts/Sensors/Primitive/ImuSensor.cs
@@ -39,7 +37,7 @@ namespace VehicleComponents.Sensors
             }
 
             // Use MixedBody to handle both Rigidbody and ArticulationBody
-            localVelocity = mixedBody.transform.InverseTransformVector(mixedBody.ab ? mixedBody.ab.velocity : mixedBody.rb.velocity);
+            localVelocity = mixedBody.transform.InverseTransformVector(mixedBody.ab ? mixedBody.velocity : mixedBody.rb.velocity);
 
             if (deltaTime > 0)
             {
@@ -47,7 +45,7 @@ namespace VehicleComponents.Sensors
                 linearAcceleration = deltaLinearAcceleration / (float)deltaTime;
             }
 
-            angularVelocity = mixedBody.transform.InverseTransformVector(mixedBody.ab ? -1f * mixedBody.ab.angularVelocity : -1f * mixedBody.rb.angularVelocity);
+            angularVelocity = mixedBody.transform.InverseTransformVector(mixedBody.angularVelocity);
             eulerAngles = mixedBody.transform.rotation.eulerAngles;
             orientation = Quaternion.Euler(eulerAngles);
 
