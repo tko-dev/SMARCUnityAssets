@@ -367,9 +367,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 346867953822330000}
-  - component: {fileID: 2941421659098821832}
   - component: {fileID: 2592707985460998574}
   - component: {fileID: 3992738371043484597}
+  - component: {fileID: 1930056354418990966}
   m_Layer: 0
   m_Name: Odometry
   m_TagString: Untagged
@@ -392,72 +392,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6472821737728235512}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!171741748 &2941421659098821832
-ArticulationBody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1421192981530345592}
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Mass: 0.0000001
-  m_ParentAnchorPosition: {x: 0, y: 0, z: 0}
-  m_ParentAnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_AnchorPosition: {x: 0, y: 0, z: 0}
-  m_AnchorRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_MatchAnchors: 1
-  m_ArticulationJointType: 0
-  m_LinearX: 2
-  m_LinearY: 2
-  m_LinearZ: 2
-  m_SwingY: 2
-  m_SwingZ: 2
-  m_Twist: 2
-  m_XDrive:
-    lowerLimit: 0
-    upperLimit: 0
-    stiffness: 0
-    damping: 0
-    forceLimit: 3.4028235e+38
-    target: 0
-    targetVelocity: 0
-    driveType: 0
-  m_YDrive:
-    lowerLimit: 0
-    upperLimit: 0
-    stiffness: 0
-    damping: 0
-    forceLimit: 3.4028235e+38
-    target: 0
-    targetVelocity: 0
-    driveType: 0
-  m_ZDrive:
-    lowerLimit: 0
-    upperLimit: 0
-    stiffness: 0
-    damping: 0
-    forceLimit: 3.4028235e+38
-    target: 0
-    targetVelocity: 0
-    driveType: 0
-  m_LinearDamping: 0
-  m_AngularDamping: 0
-  m_JointFriction: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 0.000001, y: 0.000001, z: 0.000001}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 0
-  m_Immovable: 0
-  m_UseGravity: 0
-  m_CollisionDetectionMode: 0
 --- !u!114 &2592707985460998574
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,6 +464,33 @@ MonoBehaviour:
   topic: odom
   ignoreSensorState: 0
   useNED: 0
+--- !u!54 &1930056354418990966
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421192981530345592}
+  serializedVersion: 4
+  m_Mass: 0.0000001
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &2709208433084555680
 GameObject:
   m_ObjectHideFlags: 0
@@ -759,7 +720,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 10
-  topic: /cam_onboard/image_raw/compressed
+  topic: cam_onboard/image_raw/compressed
   ignoreSensorState: 0
   quality: 75
 --- !u!114 &159900018373524413
@@ -803,7 +764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 10
-  topic: /cam_onboard/image_raw
+  topic: cam_onboard/image_raw
   ignoreSensorState: 0
 --- !u!114 &1880510140677295215
 MonoBehaviour:
@@ -818,7 +779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 10
-  topic: /cam_onboard/camera_info
+  topic: cam_onboard/camera_info
   ignoreSensorState: 0
   k1: 1
   k2: 1
@@ -1057,7 +1018,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 8
-  topic: evolo/lidar/gps
+  topic: Lidar/gps
   ignoreSensorState: 0
 --- !u!1 &4460449224520514035
 GameObject:
@@ -1537,7 +1498,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 50
-  topic: evolo/Lidar/imu
+  topic: Lidar/imu
   ignoreSensorState: 0
   useNED: 0
 --- !u!54 &7339852671953610548
@@ -1778,7 +1739,7 @@ MonoBehaviour:
   useROSCommands: 0
   subscribeTopic: /evolo_cmd
   maxRollAceleration: 25
-  heightCorrection: -0.9
+  heightCorrection: -0.95
   speedMetersPerSecond: 0
 --- !u!54 &6194835650606903525
 Rigidbody:
@@ -1992,20 +1953,24 @@ PrefabInstance:
       propertyPath: m_Name
       value: LiDAR 128 channel res
       objectReference: {fileID: 0}
+    - target: {fileID: 4644458840646744339, guid: cf00a1b55e7fa11fc8e012af557d4715, type: 3}
+      propertyPath: _topicName
+      value: /Evolo/Lidar/HighRes
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3181709940334412837, guid: cf00a1b55e7fa11fc8e012af557d4715, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7538319220573292578}
+      addedObject: {fileID: 6461929673886366220}
   m_SourcePrefab: {fileID: 100100000, guid: cf00a1b55e7fa11fc8e012af557d4715, type: 3}
 --- !u!1 &3608618145735176638 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3181709940334412837, guid: cf00a1b55e7fa11fc8e012af557d4715, type: 3}
   m_PrefabInstance: {fileID: 2176319718072563099}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7538319220573292578
+--- !u!114 &6461929673886366220
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2014,7 +1979,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3608618145735176638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df0751c3f9b74af10a6c6d8cac24d330, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cc224755f938807d9f9ef16cbb86d5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: lidar_link
@@ -2036,6 +2001,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6472821737728235512}
     m_Modifications:
+    - target: {fileID: 146935429789508264, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
+      propertyPath: _topicName
+      value: /Evolo/Lidar/MidRes
+      objectReference: {fileID: 0}
     - target: {fileID: 7951630840362459038, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
       propertyPath: m_Name
       value: LiDAR 32 channel res
@@ -2086,7 +2055,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7951630840362459038, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7093191905781295569}
+      addedObject: {fileID: 824896685748087709}
   m_SourcePrefab: {fileID: 100100000, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
 --- !u!4 &6412888713693972900 stripped
 Transform:
@@ -2098,7 +2067,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7951630840362459038, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
   m_PrefabInstance: {fileID: 3938105748899173947}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7093191905781295569
+--- !u!114 &824896685748087709
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2107,7 +2076,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6412888713693972901}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df0751c3f9b74af10a6c6d8cac24d330, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cc224755f938807d9f9ef16cbb86d5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: lidar_link
@@ -2126,7 +2095,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 146935429789508264, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
       propertyPath: _topicName
-      value: /evolo/Lidar/LowRes
+      value: /Evolo/Lidar/LowRes
       objectReference: {fileID: 0}
     - target: {fileID: 7951630840362459038, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
       propertyPath: m_Name
@@ -2186,14 +2155,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7951630840362459038, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2549336850468177406}
+      addedObject: {fileID: 8893772857141036345}
   m_SourcePrefab: {fileID: 100100000, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
 --- !u!1 &4357557158302910202 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7951630840362459038, guid: 6825db6566afb4777a9c501573225c6b, type: 3}
   m_PrefabInstance: {fileID: 5918003943333648740}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2549336850468177406
+--- !u!114 &8893772857141036345
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2202,7 +2171,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4357557158302910202}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df0751c3f9b74af10a6c6d8cac24d330, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cc224755f938807d9f9ef16cbb86d5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkName: lidar_link
