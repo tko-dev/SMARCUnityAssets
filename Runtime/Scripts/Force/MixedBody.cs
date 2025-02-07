@@ -119,10 +119,10 @@ namespace Force
         } 
         public Vector3 velocity
         {
-            get {return ab ? ab.velocity : rb.velocity; }
+            get {return ab ? ab.linearVelocity : rb.linearVelocity; }
             set {
-                if(ab != null) ab.velocity = value;
-                else rb.velocity = value;
+                if(ab != null) ab.linearVelocity = value;
+                else rb.linearVelocity = value;
             }
         }
         
