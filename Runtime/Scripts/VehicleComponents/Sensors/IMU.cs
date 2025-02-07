@@ -30,7 +30,7 @@ namespace VehicleComponents.Sensors
         public override bool UpdateSensor(double deltaTime)
         {
             var ab = articulationBody;
-            localVelocity = ab.transform.InverseTransformVector(ab.velocity);
+            localVelocity = ab.transform.InverseTransformVector(ab.linearVelocity);
             
             if (deltaTime > 0)
             {

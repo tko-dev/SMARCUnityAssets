@@ -86,7 +86,7 @@ namespace DefaultNamespace
                     break;
             }
 
-            body.velocity = Vector3.zero;
+            body.linearVelocity = Vector3.zero;
             body.angularVelocity = Vector3.zero;
         }
     }
