@@ -9,8 +9,6 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
 
-using LinkAttachment = VehicleComponents.LinkAttachment;
-
 namespace VehicleComponents.ROS.Publishers
 {
     public class ROSTransformTreePublisher : LinkAttachment

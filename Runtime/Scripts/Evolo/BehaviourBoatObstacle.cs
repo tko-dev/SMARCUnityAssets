@@ -31,7 +31,7 @@ namespace Evolo
 
             // Maintain forward movement
             Vector3 forwardVelocity = transform.forward * 2;
-            rb.velocity = new Vector3(forwardVelocity.x, 0, forwardVelocity.z);
+            rb.linearVelocity = new Vector3(forwardVelocity.x, 0, forwardVelocity.z);
             
         }
 

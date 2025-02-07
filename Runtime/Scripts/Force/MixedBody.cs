@@ -1,10 +1,6 @@
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
-using DefaultNamespace.Water;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 
 namespace Force
@@ -98,19 +94,19 @@ namespace Force
 
         public float drag
         {
-            get {return ab ? ab.linearDamping : rb.drag; }
+            get {return ab ? ab.linearDamping : rb.linearDamping; }
             set {
                 if(ab != null) ab.linearDamping = value;
-                else rb.drag = value;
+                else rb.linearDamping = value;
             }
         }
 
         public float angularDrag
         {
-            get {return ab ? ab.angularDamping : rb.angularDrag; }
+            get {return ab ? ab.angularDamping : rb.angularDamping; }
             set {
                 if(ab != null) ab.angularDamping = value;
-                else rb.angularDrag = value;
+                else rb.angularDamping = value;
             }
         }
         public Vector3 angularVelocity
@@ -123,10 +119,10 @@ namespace Force
         } 
         public Vector3 velocity
         {
-            get {return ab ? ab.velocity : rb.velocity; }
+            get {return ab ? ab.linearVelocity : rb.linearVelocity; }
             set {
-                if(ab != null) ab.velocity = value;
-                else rb.velocity = value;
+                if(ab != null) ab.linearVelocity = value;
+                else rb.linearVelocity = value;
             }
         }
         
