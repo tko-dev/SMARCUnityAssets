@@ -72,6 +72,8 @@
     - [ROS Controls](#ros-controls-1)
     - [LiDARs](#lidars)
     - [UnitySensor and UnitySensorRos packages](#unitysensor-and-unitysensorros-packages)
+    - [Evolo Scene](#evolos-scene)
+
 
 - [Developer Environment Setup](#developer-environment-setup)
   - [CSharp SDK and LSP Setup](#csharp-sdk-and-lsp-setup)
@@ -1002,6 +1004,7 @@ In order to change these 2 parameters you have 3 options:
 - Publish a ROS topic of name “/evolo_cmd”
 
 ### Evolo's inspector window
+
 ![EvoloInspector](Media/EvoloInspector.png)
 
 
@@ -1084,6 +1087,11 @@ These packages were included in SMARCUnityHDRP and SMARCUnityStandard. These are
 - GNSS
 - (GroundTruth)
 - (TF)
+
+### Evolo's Scene
+This prefab is currently used in the `Evolo.unity` scene. 
+This scene includes Evolo, several buoys, and randomly moving boats that serve as obstacles. It also includes the same Asko terrain prefab and water that are used in the OneSamOneDroneInAsko scene.
+![EvoloScene](Media/EvoloScene.png)
 
 
 # Developer Environment Setup
