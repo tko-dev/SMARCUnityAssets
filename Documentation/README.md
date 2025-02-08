@@ -66,6 +66,7 @@
     - [Geometric Tracking Controller](#geometric-tracking-controller)
   - [GameUI](#gameui)
   - [WinchSystem](#winchsystem)
+  - [Evolo](#evolo)
 - [Developer Environment Setup](#developer-environment-setup)
   - [CSharp SDK and LSP Setup](#csharp-sdk-and-lsp-setup)
 
@@ -967,58 +968,63 @@ after instantiating one of these to use it.
 </p>
 
 
-Evolo is an autonomous hydrofoiling craft, belonging to the Maritime Robotics group at KTH. [Jakob Kuttenkeuler](https://www.kth.se/profile/jakob) is responsible for the project. 
-It is currently a stable platform that can be controlled either by following predefined waypoints or by an Rc controller. The mid-term goal is for it to have more autonomy, like being able to detect and avoid obstacles.
+[Evolo](https://www.youtube.com/watch?v=qcnbFDZcgbc&ab_channel=JakobKuttenkeuler) is an autonomous hydrofoiling craft, belonging to the Maritime Robotics group at KTH. [Jakob Kuttenkeuler](https://www.kth.se/profile/jakob) is responsible for the project. 
+It is currently a stable platform that can be controlled either by following predefined waypoints or by an Rc controller. The mid-term goal is for it to have more autonomy, for example being able to detect and avoid obstacles.
 
-This vehicle was implemented in the simulator and it's prefab is availiable under `SMARCUnityAssets/Runtime/Prefabs/Evolo.prefab`
+This vehicle was implemented in the simulator and its prefab is available under `SMARCUnityAssets/Runtime/Prefabs/Evolo.prefab`
 
 <p align="center">
   <img src="Media/EvoloSim.png" alt="EvoloSim" width="45%"/>
   <img src="Media/EvoloSim2.png" alt="EvoloSim2" width="45%"/>
 </p>
 
+Watch this prefab moving around its Unity scene on Youtube:
+
 [![YouTube Video](https://img.youtube.com/vi/zDlfj2JRouk/0.jpg)](https://www.youtube.com/watch?v=zDlfj2JRouk&list=PLS_kAMaDCf60yKCstIyLDDcZ6xkmtSgXz&ab_channel=AlexandreReis)
 
 
-The implementation of Evolo can be controlled via unity game with the parameters:
+The implementation of Evolo can be controlled with the parameters:
 
 - Goal for linear speed (knots)
 - Goal for roll angle (degrees)
 
-These are the same parameters that are used when the real Evolo is controlled with an RC controller.
+These are the same parameters used when the real Evolo is controlled with an RC controller.
 
-In order to change these 2 values you have 3 options:
+In order to change these 2 parameters you have 3 options:
 - Use keyboard arrows 
 - Change Unity inspector’s variables directly
 - Publish a ROS topic of name “/evolo_cmd”
 
+### Evolo's inspector window
+![EvoloInspector](Media/EvoloInspector.png)
+
+
 ### Collisions
 
 Evolo is a kinematic rigid body with box colliders defined around it's geometry.
-Currently, it does not simulate colisions, as the sim assumes that the speed of the vehicle is not affected by coliding with other objects.
+Currently, it can collide with other objects, but it does not simulate collisions. This is because the sim assumes that the speed of the vehicle is not affected by colliding with other objects.
 
 ### Dynamics
-In this implementation of Evolo, Unity physics engine is not used. Instead, we simulate the dynamics of the vehicle directly, aplying it's dynamics constraints directly to a kinematic rigid body. Let's understand what are those dynamic constrantis and equations:
+In this implementation of Evolo, the Unity physics engine is not used. Instead, we simulate the dynamics of the vehicle directly. Its dynamics constraints are applied to a kinematic rigid body. Let's understand what are those dynamic constraints and definitions:
 - **Speed** - The vehicle's speed is constrained to:
--   **[-3, 0] knots**: Reverse or stationary.
--   **[8, 13] knots**: Cruising speed.
--   Speeds in **(0, 8) knots** indicate acceleration to cruising speed or braking to stop. The real vehicle is not stable and has poor manuverability within these speeds
+  -  **[-3, 0] knots**: Reverse or stationary.
+  -  **[8, 13] knots**: Cruising speed.
+  -  Speeds WITHin **[0, 8] knots** can only occur when acceleration to cruising speed or braking to fully stop. The real vehicle is not stable and has poor maneuverability within these speeds
 
-- **Roll angle** roll only happens for speeds between 8-13knots. Maximum roll is 13 degrees.
--  **Yaw rate** is calculated given that the vehicle does coordinated tuns. This means that yaw rate is directly proportional to tan(roll_angle) and 1/speed.
-- **Height** increases with speed. At cruising speed it is usually around 35cm off the surface of the water.
+- **Roll angle** roll only happens for speeds between 8-13knots. The maximum roll is 13 degrees.
+-  **Yaw rate** is calculated given that the vehicle does coordinated turns. This means that the yaw rate is directly proportional to `tan(Roll Angle)` and the inverse of `speed`.
+- **Height** increases with `speed`. At cruising speed, it is usually around 35cm above the surface of the water.
 
 ### Keyboard Controller
 
-![EvoloInspector](Media/EvoloInspector.png)
 
 - **Keys**:
-  - **Up/Down arrows** changes the linear speed goal in knots
-  - **Left/Right arrows** changes the roll goal angle
+  - **Up/Down arrows** change the linear speed goal in knots
+  - **Left/Right arrows** change the roll goal angle
 
 ### ROS Controls
 
-In order for Evolo to follow the commands published to the topic “/evolo_cmd”, you need to activate the toggle “Use Ros commands” in the Inspector of Evolo.
+In order for Evolo to follow the commands published to the topic `/evolo_cmd`, you need to activate the toggle **Use Ros commands** in its [inspector](#evolos-inpector-window).
 
 You can also change the topic name that Evolo subscribes to.
 
@@ -1036,17 +1042,20 @@ The sim version has 3 implemented 360º Lidars:
 - 32 vertical channel Lidar
 - 128 vertical channel Lidar
 
-You can choose at any time which one you want to use by using the check boxes on the unity’s Evolo inspector. These activate and deactivate the Lidars in the Game and their corresponding ROS publishers.
+You can choose at any time which one you want to use by using the checkboxes on the unity’s Evolo [inspector](#evolos-inpector-window). These activate and deactivate the Lidars in the Game and their corresponding ROS publishers.
+
+![LidarInspector](Media/LidarInspector.png)
+
 
 You should run either one at a time or none of them. You should not, at this moment, run more than one Lidar simultaneously.
 
 The Lidars are heavy to run, so you should consider if your application needs a higher resolution Lidar. The default is the lower resolution 16 channel Lidar.
 
-These LiDARs publish ROS topics whose names can be altered in their gameObject's sensor. Currently they use the /Evolo namespace. **If you are going to use them in another vehicle, change this namespace manually to the name of your vehicle.** This is different in comparisson to other sensors in this simulator.
+These LiDARs publish ROS topics whose names can be altered in their GameObject's sensor. Currently they use the /Evolo namespace. **⚠️ IMPORTANT: If you are going to use them in another vehicle, change this namespace manually to the name of your vehicle.** This is different in comparisson to other sensors in this simulator.
 
 Each of these LiDARs publishes to a different ROS topic. For now, this is the appropriate way of doing it, so you do not have more than one publisher for the same topic.
 
-These LiDARs are all attached to a the `lidar_link`, which defines their pose.
+These LiDARs are all attached to the `lidar_link`, which defines their pose.
 
 ### Sensors
 This prefab has the following sensors:
@@ -1057,9 +1066,9 @@ This prefab has the following sensors:
 - **LiDAR** sensors from [UnitySensor and UnitySensorRos packages](https://github.com/Field-Robotics-Japan/UnitySensors)
 - **SidSideScanSonar** - SSS - (vehicle component sensor that already existed from SAM)
 
-All of the mentioned sensors have a corresponding link that defines their position, in the same way as what is done in other SMaRC unity sim vehicles.
+All of the mentioned sensors have a corresponding link that defines their position, similarly to what is done in other SMaRC unity sim vehicles.
 
-#### UnitySensor and UnitySensorRos packages###
+#### UnitySensor and UnitySensorRos packages
 These packages were included in SMARCUnityHDRP and SMARCUnityStandard. These are open source and use the Apache-2.0 license. They include the following sensors: 
 - Velodyne 3D LiDAR (Velodyne VLP-16, VLP-16-HiRes, VLP-32, HDL-32E, VLS-128)
 - Livox 3D LiDAR(Avia, Horizon, Mid40, Mid70, Tele, HAP, Mid360)
