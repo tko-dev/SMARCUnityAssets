@@ -7,10 +7,7 @@ using RosMessageTypes.Tf2;
 using Unity.Robotics.Core;
 using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
-using UnityEditor.PackageManager;
 using UnityEngine;
-
-using LinkAttachment = VehicleComponents.LinkAttachment;
 
 namespace VehicleComponents.ROS.Publishers
 {
@@ -100,7 +97,18 @@ namespace VehicleComponents.ROS.Publishers
         {
             var tfMessageList = new List<TransformStampedMsg>();
 
-            PopulateTFList(tfMessageList, m_TransformRoot);
+            try
+            {
+                PopulateTFList(tfMessageList, m_TransformRoot);
+            }catch(MissingReferenceException)
+            {
+                // If the object tree was modified after the TF Tree was built
+                // such as deleting a child object, this will throw an exception
+                // So we need to re-build the TF tree and skip the publish.
+                Debug.Log($"[{transform.name}] TF Tree was modified, re-building.");
+                m_TransformRoot = new TransformTreeNode(attachedLink);
+                return;
+            }
             foreach(TransformStampedMsg msg in tfMessageList)
             {
                 msg.header.frame_id = $"{prefix}/{msg.header.frame_id}";
