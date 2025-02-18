@@ -130,7 +130,7 @@ namespace DefaultNamespace
             var world_pos = mainBody.transform.position; 
             
             //Get and convert state vector from global to local reference point
-            var inverseTransformDirection = mainBody.transform.InverseTransformDirection(mainBody.velocity); // Local frame vel
+            var inverseTransformDirection = mainBody.transform.InverseTransformDirection(mainBody.linearVelocity); // Local frame vel
             var transformAngularVelocity = mainBody.transform.InverseTransformDirection(mainBody.angularVelocity); // Local frame angular vel (gives negative velocities)
             
             // Convert angles, angular velocities and velocities to OSBS coordinate system
