@@ -29,7 +29,7 @@ namespace VehicleComponents.Actuators
 
         [SerializeField] private ArticulationBody baseLinkArticulationBody;
         private float c_tau_f = 0.08f;
-        
+        private MixedBody baseLinkMixedBody; 
         
         public void SetRpm(double rpm)
         {
@@ -66,7 +66,6 @@ namespace VehicleComponents.Actuators
             // if(HoverDefault) Debug.Log("the value of 4xr is: " + r*4 );
 
             // Visualize the applied force
-            Debug.DrawRay(transform.position, (float)r * transform.forward, Color.red);
             
             parentMixedBody.AddForceAtPosition((float)r * parentMixedBody.transform.forward,
                                                    parentMixedBody.transform.position,
@@ -112,3 +111,4 @@ namespace VehicleComponents.Actuators
         }
         
     }
+}
