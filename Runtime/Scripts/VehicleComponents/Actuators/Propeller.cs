@@ -29,7 +29,7 @@ namespace VehicleComponents.Actuators
 
         public ArticulationBody baseLinkArticulationBody;
         public Rigidbody baseLinkRigidBody;
-        private float c_tau_f = 0.08f;
+        private float c_tau_f = 8.004e-4f;
         private MixedBody baseLinkMixedBody; 
         
         public void SetRpm(double rpm)

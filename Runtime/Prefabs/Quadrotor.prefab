@@ -63,6 +63,7 @@ MonoBehaviour:
   TorqueUp: 1
   DefaultHoverRPM: 0
   baseLinkArticulationBody: {fileID: 3179540796430959622}
+  baseLinkRigidBody: {fileID: 0}
 --- !u!114 &3657326355121176362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,20 +160,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1469583607899678}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dce2f56052cee050eb255beb97f3a150, type: 3}
+  m_Script: {fileID: 11500000, guid: 72405ca9a517fcf22b500022d32e0ba7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BaseLink: {fileID: 3939394929759449381}
-  ControlFrequency: 50
-  DistanceErrorCap: 10
   TrackingTargetTF: {fileID: 6110627571383574328}
-  Rope: {fileID: 0}
-  AttackTheBuoy: 0
-  LoadLinkTF: {fileID: 2328022698096168879}
-  PropFR: {fileID: 4705432896303098}
-  PropFL: {fileID: 4614207949718832}
-  PropBR: {fileID: 4529089676032114}
-  PropBL: {fileID: 4662283196533844}
+  rotorMomentArm: 0.315
+  torqueCoefficient: 0.08
+  propFR: {fileID: 4705432896303098}
+  propFL: {fileID: 4614207949718832}
+  propBR: {fileID: 4529089676032114}
+  propBL: {fileID: 4662283196533844}
+  controllerState: 0
+  debugLoggingController: 0
 --- !u!1 &1648915923807604
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,6 +440,7 @@ MonoBehaviour:
   TorqueUp: 0
   DefaultHoverRPM: 0
   baseLinkArticulationBody: {fileID: 3179540796430959622}
+  baseLinkRigidBody: {fileID: 0}
 --- !u!114 &7853213438659321280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -535,6 +536,7 @@ MonoBehaviour:
   TorqueUp: 0
   DefaultHoverRPM: 0
   baseLinkArticulationBody: {fileID: 3179540796430959622}
+  baseLinkRigidBody: {fileID: 0}
 --- !u!114 &7651963327394340505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -726,6 +728,7 @@ MonoBehaviour:
   TorqueUp: 1
   DefaultHoverRPM: 0
   baseLinkArticulationBody: {fileID: 3179540796430959622}
+  baseLinkRigidBody: {fileID: 0}
 --- !u!114 &2215589600718411196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1018,6 +1021,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1906,6 +1912,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2474,7 +2483,7 @@ GameObject:
   - component: {fileID: 7421537658124354695}
   - component: {fileID: 3997909223956313983}
   m_Layer: 0
-  m_Name: propeller_FR
+  m_Name: propeller_FR_viz
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2520,6 +2529,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -3030,6 +3042,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3155,7 +3170,7 @@ GameObject:
   - component: {fileID: 1493044030346310054}
   - component: {fileID: 8007511705631389260}
   m_Layer: 0
-  m_Name: propeller_FL
+  m_Name: propeller_FL_viz
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3201,6 +3216,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -4234,6 +4252,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4497,6 +4518,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -4740,7 +4764,7 @@ GameObject:
   - component: {fileID: 309967276944808155}
   - component: {fileID: 1763081566342015400}
   m_Layer: 0
-  m_Name: propeller_BL
+  m_Name: propeller_BL_viz
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4786,6 +4810,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -5016,7 +5043,7 @@ GameObject:
   - component: {fileID: 692367093631509055}
   - component: {fileID: 1016047920224819370}
   m_Layer: 0
-  m_Name: propeller_BR
+  m_Name: propeller_BR_viz
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5062,6 +5089,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
