@@ -10,16 +10,12 @@ namespace Evolo
     public class BoatController : MonoBehaviour
     {
         private ROSConnection ros;
-        private Rigidbody rb;
+        public Rigidbody BaseLinkRB;
 
         // Control Inputs
         public float linearSpeedGoalKt = 0f;  // Speed in knots (-X, 0, or 8-13 knots)
         public float rollAngleGoal = 0f;    // Roll input in rad
         private float rollAngleGoalprivate = 0f;    // Roll input in rad
-        public bool LidarLowRes16=true;
-        public bool LidarMidRes32=false; //toggle for lidar in use
-        public bool LidarHighRes128=false;
-        private int lastLidarUsed=1;
         public bool useROSCommands = true; // Default: Using ROS commands
         public string subscribeTopic = "/evolo_cmd";
         private string privateSubscribeTopic="/evolo_cmd";
@@ -28,7 +24,7 @@ namespace Evolo
 
 
         public float speedMetersPerSecond=0f;
-        private float RoolAngle;
+        private float RollAngle;
         //private float pitch = 0f;
         private const float knotsToMetersPerSecond = 0.51444f;
         private const float gravity = 9.81f;
@@ -44,9 +40,8 @@ namespace Evolo
         private const float maxBoatAceleration= 10 *knotsToMetersPerSecond / 5; //Acceleration/decelleration from 0 to 10kn is done in ~ 5 seconds
         private float currentLinearSpeed=0f;
         private float currentRollAngle =0f;
-        private GameObject Lidar128HighRes_object;
-        private GameObject Lidar32MidRes_object;
-        private GameObject Lidar16LowRes_object;
+
+        
 
 
         void Start()
@@ -54,15 +49,10 @@ namespace Evolo
             ros = ROSConnection.GetOrCreateInstance();
             ros.Subscribe<TwistMsg>(subscribeTopic, UpdateBoatControl);
             
-            rb = GetComponent<Rigidbody>();
-
             // Find the water model in the scene
             var waterModels = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None);
             if (waterModels.Length > 0)
                 waterModel = waterModels[0];
-            Lidar128HighRes_object = GameObject.Find("LiDAR 128 channel res");
-            Lidar32MidRes_object = GameObject.Find("LiDAR 32 channel res");
-            Lidar16LowRes_object = GameObject.Find("LiDAR 16 channel res");
         }
 
         void Update()
@@ -70,9 +60,7 @@ namespace Evolo
             if (!useROSCommands) // Unity control mode
             {
                 Unity_control_speed_yaw();
-
             }
-            lidar_toogle();
             if (privateSubscribeTopic!=subscribeTopic){ //alternate between topics to control evolo
                 ros.Unsubscribe(privateSubscribeTopic);
                 ros.Subscribe<TwistMsg>(subscribeTopic, UpdateBoatControl);
@@ -80,16 +68,12 @@ namespace Evolo
                 Debug.Log($"Changed topic on which evolo is controlled. Now listening to topic:  {subscribeTopic }");
 
             }
-            
-                
-            
         }
 
         void UpdateBoatControl(TwistMsg msg)
         {
             if (useROSCommands) // Only update if ROS mode is enabled
             {
-
                 float difference_speed= (float)msg.linear.x - linearSpeedGoalKt;
                 speed_roll_limits((float)msg.linear.x,difference_speed,(float)msg.angular.z);
             }
@@ -101,7 +85,7 @@ namespace Evolo
 
             speedMetersPerSecond = currentLinearSpeed * knotsToMetersPerSecond; //current speed
 
-            float currentRollDegrees = rb.rotation.eulerAngles.z;
+            float currentRollDegrees = BaseLinkRB.rotation.eulerAngles.z;
             if (currentRollDegrees > 180f) currentRollDegrees -= 360f; // Convert to [-180, 180]
 
             currentRollAngle = Compute_with_aceleration(currentRollDegrees, rollAngleGoalprivate, Time.fixedDeltaTime, maxRollAceleration);
@@ -113,7 +97,7 @@ namespace Evolo
 
             // Get water level at the boat's position
             if (waterModel != null)
-                waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
+                waterSurfaceLevel = waterModel.GetWaterLevelAt(BaseLinkRB.transform.position);
 
             MoveBoat(yawRate);
         }
@@ -124,17 +108,17 @@ namespace Evolo
             //Debug.Log($"speedMetersPerSecond  {speedMetersPerSecond }");
 
             // Update position (x, y) using forward velocity
-            Vector3 newPosition = rb.position + transform.forward * speedMetersPerSecond * Time.fixedDeltaTime;
+            Vector3 newPosition = BaseLinkRB.position + BaseLinkRB.transform.forward * speedMetersPerSecond * Time.fixedDeltaTime;
         
             // Update z position (height) to match water level
             newPosition.y = waterSurfaceLevel + currentBoatOffsetZ + heightCorrection;
 
             // Apply movement using Rigidbody (recommended for kinematic Rigidbody)
-            rb.MovePosition(newPosition);
+            BaseLinkRB.MovePosition(newPosition);
             
 
             // Get current yaw in radians
-            float currentYaw = rb.rotation.eulerAngles.y * Mathf.Deg2Rad;
+            float currentYaw = BaseLinkRB.rotation.eulerAngles.y * Mathf.Deg2Rad;
 
             // Compute new yaw angle
             float newYaw = currentYaw + (yawRate * Time.fixedDeltaTime);
@@ -143,11 +127,11 @@ namespace Evolo
             newYaw *= Mathf.Rad2Deg; 
 
             // Compute new rotation (yaw, pitch, roll)
-            Quaternion newRotation = Quaternion.Euler(rb.rotation.eulerAngles.x, newYaw, currentRollAngle);
+            Quaternion newRotation = Quaternion.Euler(BaseLinkRB.rotation.eulerAngles.x, newYaw, currentRollAngle);
             //Debug.Log($"newYaw  {newYaw }");
 
             // Apply rotation using Rigidbody
-            rb.MoveRotation(newRotation);
+            BaseLinkRB.MoveRotation(newRotation);
         }
 
         [ContextMenu("Toggle Control Mode")]
@@ -175,8 +159,6 @@ namespace Evolo
 
         float Compute_with_aceleration(float current, float goal, float delta_t, float max_accel)
         {
-            
-
             float goal_accel=goal - current;
 
             float delta= Mathf.Min(Mathf.Abs(goal_accel),max_accel*delta_t);
@@ -186,8 +168,9 @@ namespace Evolo
                 delta*=goal_accel/Mathf.Abs(goal_accel); //just to get sign from goal aceel
                 return current + delta;
             }
-            
         }
+
+
         /*float PIDRoll(float current_roll,float goal_roll, float delta_t)
         {   Does not currently work - needs a simulated sytem to be controlled, that represents a roll inertia
             float error = goal_roll - current_roll;
@@ -217,6 +200,8 @@ namespace Evolo
 
             return Kp*error + current_roll;
         }*/
+
+
         float OffsetZ(float speed)
         {
             if (speed<0){
@@ -266,46 +251,6 @@ namespace Evolo
             float added_roll = rollAngleGoal+unityRollInput;
 
             speed_roll_limits(added_speed,difference_speed,added_roll);
-
-            
-        }
-        void lidar_toogle(){
-            if (LidarHighRes128 && lastLidarUsed!=2)
-            {
-                lastLidarUsed=2;
-                Lidar128HighRes_object.SetActive(true);
-                Lidar32MidRes_object.SetActive(false);
-                Lidar16LowRes_object.SetActive(false);
-                LidarLowRes16=false;
-                LidarMidRes32=false; 
-
-            } else if (LidarMidRes32 && lastLidarUsed!=1)
-            {
-                lastLidarUsed=1;
-                Lidar128HighRes_object.SetActive(false);
-                Lidar32MidRes_object.SetActive(true);
-                Lidar16LowRes_object.SetActive(false);
-                LidarLowRes16=false;
-                LidarHighRes128=false; 
-            }   else if (LidarLowRes16 && lastLidarUsed!=0)
-            {
-                lastLidarUsed=0;
-                Lidar128HighRes_object.SetActive(false);
-                Lidar32MidRes_object.SetActive(false);
-                Lidar16LowRes_object.SetActive(true);
-                LidarMidRes32=false;
-                LidarHighRes128=false; 
-            }else if (LidarMidRes32 && LidarLowRes16 && LidarHighRes128 && lastLidarUsed!=4)     {//deactivate all
-                lastLidarUsed=4;
-                Lidar128HighRes_object.SetActive(false);
-                Lidar32MidRes_object.SetActive(false);
-                Lidar16LowRes_object.SetActive(false);
-                LidarLowRes16=false;
-                LidarMidRes32=false;
-                LidarHighRes128=false; 
-
-            }                      
-                 
         }
     }
 }
