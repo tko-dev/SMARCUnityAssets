@@ -27,7 +27,8 @@ namespace VehicleComponents.Actuators
         public bool TorqueUp = false;
         public double DefaultHoverRPM;
 
-        [SerializeField] private ArticulationBody baseLinkArticulationBody;
+        public ArticulationBody baseLinkArticulationBody;
+        public Rigidbody baseLinkRigidBody;
         private float c_tau_f = 0.08f;
         private MixedBody baseLinkMixedBody; 
         
@@ -39,9 +40,7 @@ namespace VehicleComponents.Actuators
         
         void Start()
         {
-            articulationBody = GetComponent<ArticulationBody>();
-            Rigidbody rigidBody = GetComponent<Rigidbody>();
-            baseLinkMixedBody = new MixedBody(articulationBody, rigidBody);
+            baseLinkMixedBody = new MixedBody(baseLinkArticulationBody, baseLinkRigidBody);
             if(HoverDefault) InitializeRPMToStayAfloat();
         }
 
