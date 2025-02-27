@@ -2244,7 +2244,7 @@ MonoBehaviour:
   yaw: 0
   m_GlobalFrameIds:
   - map
-  suffix: _obstacle
+  suffix: _gt
   frequency: 10
   ErrorOnPublish: 0
 --- !u!1 &9168536707088676784
