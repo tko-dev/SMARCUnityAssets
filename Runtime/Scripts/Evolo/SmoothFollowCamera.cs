@@ -20,6 +20,8 @@ namespace Evolo
 		public float heightDamping = 1f;
 		public float rotationDamping = 1f;
 
+		public bool rotateImage = true;
+
 		// Place the script in the Camera-Control group in the component menu
 		[AddComponentMenu("Camera-Control/Smooth Follow")]
 
@@ -53,6 +55,9 @@ namespace Evolo
 		
 			// Always look at the target
 			transform.LookAt(target);
+			// Fix upside-down issue by rotating 180 degrees around X-axis
+			if (rotateImage){
+			transform.Rotate(0, 0, 180);}
 		}
 	}
 }
