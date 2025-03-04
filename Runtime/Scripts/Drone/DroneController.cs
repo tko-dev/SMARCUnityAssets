@@ -23,7 +23,8 @@ namespace DroneController
         TrackingControl = 0,
         LoadControl = 1,
         TrackingControlMinSnap = 2,
-        TrackingControlNormalized = 3,
+        TrackingControlNormalizedXYZ = 3,
+        TrackingControlNormalizedXY = 4,
     }
 
     /// <summary>
@@ -107,7 +108,7 @@ namespace DroneController
         Propeller[] propellers;
 
         [Header("Control Mode")] [Tooltip("Currently only implemented controller is TrackingControl")]
-        public DroneControllerState controllerState = DroneControllerState.TrackingControlNormalized;
+        public DroneControllerState controllerState = DroneControllerState.TrackingControlNormalizedXYZ;
 
         ////////////////// SYSTEM SPECIFIC //////////////////
         double massQuadrotor;
@@ -190,11 +191,13 @@ namespace DroneController
             Vector<double> M = DenseVector.OfArray(new double[] { 0, 0, 0 });
             ControllerError controllerError = new ControllerError();
 
-            if (controllerState is DroneControllerState.TrackingControl or DroneControllerState.TrackingControlNormalized)
+            if (controllerState is DroneControllerState.TrackingControl
+                or DroneControllerState.TrackingControlNormalizedXYZ
+                or DroneControllerState.TrackingControlNormalizedXY)
             {
                 (f, M, controllerError) = ComputeTrackingControl();
             }
-            else if (controllerState == DroneControllerState.LoadControl )
+            else if (controllerState == DroneControllerState.LoadControl)
             {
                 // TODO: Implement me
                 Debug.LogWarning(
@@ -283,19 +286,42 @@ namespace DroneController
             // Control
 
             Vector<double> errorTrackingPosition = (dronePosition - targetPosition);
-            if (controllerState == DroneControllerState.TrackingControlNormalized){
+            if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ
+                or DroneControllerState.TrackingControlNormalizedXY)
+            {
+                int endIndex;
+                if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ)
+                {
+                    // Full normalization of entire vector
+                    endIndex = errorTrackingPosition.Count;
+                }
+                else 
+                {
+                    // If statement above guards for any other cases arriving here
+                    // Normalization of X,Y component only
+                    endIndex = errorTrackingPosition.Count - 1;
+                }
+
                 // Normalized error is better here
                 double distanceErrorCap = 2;
-                errorTrackingPosition = Math.Min(distanceErrorCap, errorTrackingPosition.Norm(2)) * errorTrackingPosition.Normalize(2);
+
+                Vector<double> errorTrackingPositionSubVec =
+                    errorTrackingPosition.SubVector(0, endIndex);
+                errorTrackingPositionSubVec =
+                    Math.Min(distanceErrorCap, errorTrackingPositionSubVec.Norm(2)) *
+                    errorTrackingPositionSubVec.Normalize(2);
+                errorTrackingPosition.SetSubVector(0, endIndex, errorTrackingPositionSubVec);
             }
-            else {
+            else
+            {
                 // Handles DroneControllerState.TrackingControl
                 // FIXME: Hardcoded Error cap on distance. May need fixing in the future
                 double distanceErrorCap = 10;
                 errorTrackingPosition = (dronePosition - targetPosition) *
-                                                       Math.Min(distanceErrorCap / (dronePosition - targetPosition).Norm(2),
-                                                           1);
+                                        Math.Min(distanceErrorCap / (dronePosition - targetPosition).Norm(2),
+                                            1);
             }
+
             Vector<double> errorTrackingVelocity = droneVelocity - targetVelocity;
 
             Vector<double> pidGain = _ComputePIDTerm(
