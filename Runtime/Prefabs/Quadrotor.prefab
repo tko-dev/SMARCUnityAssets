@@ -171,7 +171,7 @@ MonoBehaviour:
   propFL: {fileID: 4614207949718832}
   propBR: {fileID: 4529089676032114}
   propBL: {fileID: 4662283196533844}
-  controllerState: 3
+  controllerState: 4
   debugLoggingController: 0
 --- !u!1 &1648915923807604
 GameObject:
