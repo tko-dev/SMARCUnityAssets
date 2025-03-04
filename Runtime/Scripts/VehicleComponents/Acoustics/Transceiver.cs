@@ -41,6 +41,8 @@ namespace VehicleComponents.Acoustics
         public float MinChannelRadius = 0.2f;
         [Tooltip("If checked, transmission will work regardless of occlusions.")]
         public bool IgnoreOcclusions = false;
+        [Tooltip("If checked, transmission will work even if the source/target is not in water.")]
+        public bool WorkInAir = false;
 
 
         [Tooltip("Should there be secondary messages received depending on the channel shape?")]
@@ -155,7 +157,7 @@ namespace VehicleComponents.Acoustics
         {
             if(IgnoreOcclusions){
                 hit = new RaycastHit();
-                return true;
+                return false;
             }
 
             // SphereCast puts the center of the sphere at the start position
@@ -416,10 +418,13 @@ namespace VehicleComponents.Acoustics
         
         void Broadcast(string data)
         {
-            // Doesnt work out of water :(
-            float selfWaterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
-            float selfDepth = selfWaterSurfaceLevel - transform.position.y;
-            if(selfDepth < 0) return;
+            if(!WorkInAir)
+            {
+                // Doesnt work out of water :(
+                float selfWaterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
+                float selfDepth = selfWaterSurfaceLevel - transform.position.y;
+                if(selfDepth < 0) return; // not in water
+            }
 
             // TODO this could be parallelized
             foreach(Transceiver tx in allTransceivers)
@@ -430,9 +435,12 @@ namespace VehicleComponents.Acoustics
                 var dist = Vector3.Distance(transform.position, tx.transform.position);
                 if(dist > MaxRange) continue; // skip too far
 
-                float txWaterSurfaceLevel = waterModel.GetWaterLevelAt(tx.transform.position);
-                float txDepth = txWaterSurfaceLevel - tx.transform.position.y;
-                if(txDepth < 0) continue; // skip not-in-water
+                if(!tx.WorkInAir)
+                {
+                    float txWaterSurfaceLevel = waterModel.GetWaterLevelAt(tx.transform.position);
+                    float txDepth = txWaterSurfaceLevel - tx.transform.position.y;
+                    if(txDepth < 0) continue; // skip not-in-water
+                }
 
 
                 TransmitDirectPath(data, tx);
@@ -493,8 +501,8 @@ namespace VehicleComponents.Acoustics
         {
             if(testBroadcast)
             {
-                testBroadcast = false;
                 Write("Test broadcast from " + name);
+                testBroadcast = false;
             }
             // TODO tie this to some frequency as well.
             // modems usually have a limit, as a function of
