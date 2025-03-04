@@ -39,6 +39,8 @@ namespace VehicleComponents.Acoustics
         
         [Tooltip("Min radius of the unoccupied channel. Think of a tube between transceivers free of obstacles. How big should it be to transmit?")]
         public float MinChannelRadius = 0.2f;
+        [Tooltip("If checked, transmission will work regardless of occlusions.")]
+        public bool IgnoreOcclusions = false;
 
 
         [Tooltip("Should there be secondary messages received depending on the channel shape?")]
@@ -151,6 +153,11 @@ namespace VehicleComponents.Acoustics
 
         bool FrontSphereCast(Vector3 from, Vector3 to, out RaycastHit hit, float maxDist = Mathf.Infinity)
         {
+            if(IgnoreOcclusions){
+                hit = new RaycastHit();
+                return true;
+            }
+
             // SphereCast puts the center of the sphere at the start position
             // but want it to start/end a channel-radius away to avoid hitting things
             // that are behind the source/target
