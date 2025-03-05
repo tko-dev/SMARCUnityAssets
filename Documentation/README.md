@@ -67,14 +67,15 @@
   - [GameUI](#gameui)
   - [WinchSystem](#winchsystem)
   - [Evolo](#evolo)
+    - [Evolo's inspector window](#evolos-inspector-window)
+    - [Collisions](#collisions)
     - [Dynamics](#dynamics)
     - [Keyboard Controller](#keyboard-controller-2)
     - [ROS Controls](#ros-controls-1)
     - [LiDARs](#lidars)
-    - [UnitySensor and UnitySensorRos packages](#unitysensor-and-unitysensorros-packages)
-    - [Evolo Scene](#evolos-scene)
-
-
+    - [Sensors](#sensors-1)
+      - [UnitySensor and UnitySensorRos packages](#unitysensor-and-unitysensorros-packages)
+    - [Evolo's Scene](#evolos-scene)
 - [Developer Environment Setup](#developer-environment-setup)
   - [CSharp SDK and LSP Setup](#csharp-sdk-and-lsp-setup)
 
@@ -313,7 +314,10 @@ We implement the following "shotgun" approach:
 ![TX](Media/TX.png)
 
 - Sound Velocity: Used for propagation delays.
+- Max Range: Maximum total distance (including bounces, if any) transmission will happen.
 - Min Channel Radius: The minimum size of an opening to be considered occlusion-free between the source and target TXs. For sphere-casts, the radius of the sphere.
+- Ignore Occlusions: Ignores obstacles between transceivers when submitting.
+- Work In Air: _This_ transceiver can receive and submit in air. When submitting, it will check if receiver can work in air too.
 - Enable Echoing: Toggles bottom and surface echoes.
   - Remaining Range Ratio After Echo: Echoes absorb energy that affect the max range of a ping. After a bounce, how much of a pings energy is left to travel further.
   - Bottom Firing Opening Angle: The angle of the cone where bottom-echoes will have their rays fired within. The wider this is, the more likely far-away surfaces will produce a bounce.
@@ -322,6 +326,7 @@ We implement the following "shotgun" approach:
   - Bottom Echo Tolerance: On the horizontal plane of the target, how close do we allow bounced-rays to come to accept as a "hit". The larger, the more likely a bottom echo will reach targets but also less accurate to real life.
   - Single Ground Echo: Toggle bottom echoes separately.
 - Draw Signal Lines: Toggle drawing debug lines for all the rays cast.
+- Test Broadcast: Broadcasts a hard-coded string once. Acts like a button.
 
 
 ## Actuators
