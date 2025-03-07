@@ -27,11 +27,10 @@ namespace VehicleComponents.Actuators
         public bool TorqueUp = false;
         public double DefaultHoverRPM;
 
-        //[SerializeField] private ArticulationBody baseLinkArticulationBody;
-        [SerializeField] private MixedBody baseLinkMixedBody;  // Use MixedBody instead of ArticulationBody
-
+        public ArticulationBody baseLinkArticulationBody;
+        public Rigidbody baseLinkRigidBody;
         private float c_tau_f = 8.004e-4f;
-        
+        private MixedBody baseLinkMixedBody; 
         
         public void SetRpm(double rpm)
         {
@@ -41,24 +40,7 @@ namespace VehicleComponents.Actuators
         
         void Start()
         {
-            Transform current = transform;
-            while (current.parent != null)
-            {
-                current = current.parent;
-                ArticulationBody articulationBody = current.GetComponent<ArticulationBody>();
-                Rigidbody rigidBody = current.GetComponent<Rigidbody>();
-
-                /*if (articulationBody != null && articulationBody.name == "base_link")
-                {
-                   // Debug.Log("base_link articulation body found: " + articulationBody);
-                    baseLinkArticulationBody = articulationBody;
-                }*/
-                if ((articulationBody != null || rigidBody != null) && current.name == "base_link" ) //current, articulatedBody and RigidBody should all have same name
-                {
-                    baseLinkMixedBody = new MixedBody(articulationBody, rigidBody);
-                    break;
-                }
-            }
+            baseLinkMixedBody = new MixedBody(baseLinkArticulationBody, baseLinkRigidBody);
             if(HoverDefault) InitializeRPMToStayAfloat();
         }
 
