@@ -343,7 +343,7 @@ GameObject:
   - component: {fileID: 1015264551836550920}
   - component: {fileID: 4227494322149200810}
   m_Layer: 0
-  m_Name: KTHTank
+  m_Name: KTHTank-HDRP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
