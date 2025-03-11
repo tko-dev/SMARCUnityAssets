@@ -4,9 +4,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Unity.Mathematics;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 using VehicleComponents.Actuators;
 
 namespace DefaultNamespace
