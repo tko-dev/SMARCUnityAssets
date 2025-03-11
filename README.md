@@ -1,7 +1,4 @@
-# SMARC Unity Assets - SAABmarine edition
-This is the SMARC Unity Assets with additional features for SAABmarine. The purpose of these features is to create a simulation for the BlueROV2 heavy configuration. If you wish to run the exact setup as during the hk-demo, set both this repo and the project repo (SMARCUnityStandard) to branch `hk-demo`. 
-
----------------------------
+# SMARC Unity Assets
 This is a package containing all of the SMARC Unity assets and scripts including vehicles, dynamics, sensors and more. 
 
 ## Quick start
