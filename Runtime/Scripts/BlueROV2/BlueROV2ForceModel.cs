@@ -33,8 +33,6 @@ namespace DefaultNamespace
         
         
         //Variables
-        private Camera myCamera;
-        private Vector3 camera_offset;
         public bool Ardusub_mode;
         public bool Arusub_prep;
         public bool Controller_mode = true;
@@ -108,9 +106,6 @@ namespace DefaultNamespace
             prop_bot_back_left = GameObject.Find("prop_bot_back_left_link").GetComponent<ArticulationBody>();
             prop_bot_front_left = GameObject.Find("prop_bot_front_left_link").GetComponent<ArticulationBody>();
             
-            // Get camera and set camera offset
-            myCamera = Camera.main;
-            camera_offset = new Vector3(0f, 2f, -4f);
             
             // Get mass from unity + one time calculations
             m = mainBody.mass; // mass 13.5
@@ -236,8 +231,6 @@ namespace DefaultNamespace
             RestoringForce = NED.ConvertToRUF(RestoringForce);
             RestoringTorque = FRD.ConvertAngularVelocityToRUF(RestoringTorque);
             
-            // VVV UNCOMMENT FOR FOLLOWING CAMERA VVV
-            myCamera.transform.position = camera_offset + world_pos;
             
             // Reset input forces every fixed update
             Vector3 inputForce = Vector3.zero;
