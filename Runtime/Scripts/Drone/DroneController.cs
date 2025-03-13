@@ -432,19 +432,42 @@ namespace DroneController
             // Control
 
             Vector<double> errorTrackingPosition = (dronePosition - targetPosition);
-            if (controllerState == DroneControllerState.TrackingControlNormalized){
+            if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ
+                or DroneControllerState.TrackingControlNormalizedXY)
+            {
+                int endIndex;
+                if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ)
+                {
+                    // Full normalization of entire vector
+                    endIndex = errorTrackingPosition.Count;
+                }
+                else 
+                {
+                    // If statement above guards for any other cases arriving here
+                    // Normalization of X,Y component only
+                    endIndex = errorTrackingPosition.Count - 1;
+                }
+
                 // Normalized error is better here
                 double distanceErrorCap = 2;
-                errorTrackingPosition = Math.Min(distanceErrorCap, errorTrackingPosition.Norm(2)) * errorTrackingPosition.Normalize(2);
+
+                Vector<double> errorTrackingPositionSubVec =
+                    errorTrackingPosition.SubVector(0, endIndex);
+                errorTrackingPositionSubVec =
+                    Math.Min(distanceErrorCap, errorTrackingPositionSubVec.Norm(2)) *
+                    errorTrackingPositionSubVec.Normalize(2);
+                errorTrackingPosition.SetSubVector(0, endIndex, errorTrackingPositionSubVec);
             }
-            else {
+            else
+            {
                 // Handles DroneControllerState.TrackingControl
                 // FIXME: Hardcoded Error cap on distance. May need fixing in the future
                 double distanceErrorCap = 10;
                 errorTrackingPosition = (dronePosition - targetPosition) *
-                                                       Math.Min(distanceErrorCap / (dronePosition - targetPosition).Norm(2),
-                                                           1);
+                                        Math.Min(distanceErrorCap / (dronePosition - targetPosition).Norm(2),
+                                            1);
             }
+
             Vector<double> errorTrackingVelocity = droneVelocity - targetVelocity;
 
             Vector<double> pidGain = _ComputePIDTerm(
