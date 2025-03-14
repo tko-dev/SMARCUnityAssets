@@ -25,7 +25,7 @@ namespace DroneController
         TrackingControlMinSnap = 2,
         TrackingControlNormalizedXYZ = 3,
         TrackingControlNormalizedXY = 4,
-        VelocityControlMLagent = 5,
+        VelocityControl = 5,
     }
 
     /// <summary>
@@ -135,8 +135,9 @@ namespace DroneController
         ROSConnection ros;
         string topicName;
 
-        private Vector<double> targetVelocity = DenseVector.OfArray(new double[] { 0, 0, 0 });
-        private Vector<double> targetAccel = DenseVector.OfArray(new double[] { 0, 0, 0 });
+        [Header("Velocity control params")]
+        public Vector3 TargetVelocity = Vector3.zero;
+        public Vector3 TargetAccel = Vector3.zero;
 
         // Initialization function
         void Start()
@@ -185,26 +186,7 @@ namespace DroneController
                 ros.RegisterPublisher<StdMessages.Float64MultiArrayMsg>(topicName);
             }
         }
-
-
-        /// <summary>
-        /// SetVelocity method to receive velocity & acceleration from ML Agent 
-        /// </summary>
-        /// 
-
-        public void SetVelocity(Vector<double> newVelocity, Vector<double> newAcceleration)
-        {
-            if (controllerState == DroneControllerState.VelocityControlMLagent)
-            {
-                targetVelocity = newVelocity;
-                targetAccel = newAcceleration;
-                Console.WriteLine("Veocity and Acceleration are generated from ML Agent");
-            }
-            else
-            {
-                Console.WriteLine("Veocity and Acceleration are directly taken from the simulation");
-            }
-        }
+        
 
         /// <summary>
         /// Main control loop of the system running at the unity fixed update time step.
@@ -217,13 +199,10 @@ namespace DroneController
 
             if (controllerState is DroneControllerState.TrackingControl
                 or DroneControllerState.TrackingControlNormalizedXYZ
-                or DroneControllerState.TrackingControlNormalizedXY)
+                or DroneControllerState.TrackingControlNormalizedXY
+                or DroneControllerState.VelocityControl)
             {
                 (f, M, controllerError) = ComputeTrackingControl();
-            }
-            else if (controllerState == DroneControllerState.VelocityControlMLagent)       
-            {
-                (f, M, controllerError) = VelocityControlMLagent();
             }
             else if (controllerState == DroneControllerState.LoadControl)
             {
@@ -306,166 +285,60 @@ namespace DroneController
             Vector<double> targetVelocity;
             Vector<double> targetAccel;
 
-            targetPosition = TrackingTargetTF.position.To<ENU>().ToDense();
-            targetVelocity = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            targetAccel = DenseVector.OfArray(new double[] { 0, 0, 0 });
-
+            Vector<double> errorTrackingPosition;
 
             // Control
 
-            Vector<double> errorTrackingPosition = (dronePosition - targetPosition);
-            if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ
-                or DroneControllerState.TrackingControlNormalizedXY)
+            // Set the target velocity and acceleration if in velocity control mode
+            if (controllerState is DroneControllerState.VelocityControl)
             {
-                int endIndex;
-                if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ)
-                {
-                    // Full normalization of entire vector
-                    endIndex = errorTrackingPosition.Count;
-                }
-                else 
-                {
-                    // If statement above guards for any other cases arriving here
-                    // Normalization of X,Y component only
-                    endIndex = errorTrackingPosition.Count - 1;
-                }
-
-                // Normalized error is better here
-                double distanceErrorCap = 2;
-
-                Vector<double> errorTrackingPositionSubVec =
-                    errorTrackingPosition.SubVector(0, endIndex);
-                errorTrackingPositionSubVec =
-                    Math.Min(distanceErrorCap, errorTrackingPositionSubVec.Norm(2)) *
-                    errorTrackingPositionSubVec.Normalize(2);
-                errorTrackingPosition.SetSubVector(0, endIndex, errorTrackingPositionSubVec);
+                targetVelocity = TargetVelocity.To<ENU>().ToDense();
+                targetAccel = TargetAccel.To<ENU>().ToDense();
+                errorTrackingPosition = DenseVector.OfArray(new double[] { 0, 0, 0 });
             }
+            // otherwise compute them from the target position
             else
             {
-                // Handles DroneControllerState.TrackingControl
-                // FIXME: Hardcoded Error cap on distance. May need fixing in the future
-                double distanceErrorCap = 10;
-                errorTrackingPosition = (dronePosition - targetPosition) *
-                                        Math.Min(distanceErrorCap / (dronePosition - targetPosition).Norm(2),
-                                            1);
-            }
-
-            Vector<double> errorTrackingVelocity = droneVelocity - targetVelocity;
-
-            Vector<double> pidGain = _ComputePIDTerm(
-                kx,
-                kv,
-                g,
-                massQuadrotor,
-                targetAccel,
-                errorTrackingPosition,
-                errorTrackingVelocity);
-
-
-            Matrix<double> desiredAttitude = _ComputeDesiredAttitudeVectors(pidGain);
-
-            Vector<double> targetAngularVelocity = DenseVector.OfArray(new double[] { 0, 0, 0 });
-            Vector<double> targetAngularVelocityDot = (targetAngularVelocity - targetAngularVelocity_prev) / dt;
-
-            Vector<double> errorRotation = 0.5 * _VeeMap(desiredAttitude.Transpose() * currentAttitude -
-                                                         currentAttitude.Transpose() * desiredAttitude);
-            Vector<double> eOmega = droneAngularVelocity -
-                                    currentAttitude.Transpose() * desiredAttitude * targetAngularVelocity;
-            var controllerError =
-                new ControllerError(errorTrackingPosition, errorTrackingVelocity, errorRotation);
-
-            f = pidGain * (currentAttitude * e3);
-            M = -kR * errorRotation - kW * eOmega + _Cross(droneAngularVelocity, inertiaJ * droneAngularVelocity) -
-                inertiaJ * (_HatMap(droneAngularVelocity) * currentAttitude.Transpose() * desiredAttitude *
-                    targetAngularVelocity - currentAttitude.Transpose() * desiredAttitude * targetAngularVelocityDot);
-
-            // Updating trailing values needed at each computation
-            desiredAttitude_prev = desiredAttitude;
-            targetAngularVelocity_prev = targetAngularVelocity;
-
-            return (f, M, controllerError);
-        }
-
-
-        /// <summary> 
-        /// Tracking controller with the velocity from the ML agent  
-        /// </summary> 
-        /// 
-
-        (double, Vector<double>, ControllerError) VelocityControlMLagent()
-        {
-            double f;
-            Vector<double> M;
-
-            ////////////////// SYSTEM SPECIFIC //////////////////
-            // Gains
-            double kx = 13 * massQuadrotor;
-            double kv = 5.6 * massQuadrotor;
-            double kR = 8.81;
-            double kW = 1.54;
-            /////////////////////////////////////////////////////
-
-
-            // Quadrotor states
-            // NOTE: checked these
-            Vector<double> dronePosition = BaseLink.transform.position.To<ENU>().ToDense();
-            Vector<double> droneVelocity = baseLinkDroneAB.linearVelocity.To<ENU>().ToDense();
-            Matrix<double> currentAttitude = DenseMatrix.OfArray(new double[,]
-            {
-                { BaseLink.transform.right.x, BaseLink.transform.forward.x, BaseLink.transform.up.x },
-                { BaseLink.transform.right.z, BaseLink.transform.forward.z, BaseLink.transform.up.z },
-                { BaseLink.transform.right.y, BaseLink.transform.forward.y, BaseLink.transform.up.y }
-            });
-            Vector<double> droneAngularVelocity = -1f * BaseLink.transform
-                .InverseTransformDirection(baseLinkDroneAB.angularVelocity).To<ENU>().ToDense();
-
-            // Desired states
-            Vector<double> targetPosition;
-            //Vector<double> targetVelocity;
-            //Vector<double> targetAccel;
-
-            targetPosition = TrackingTargetTF.position.To<ENU>().ToDense();
-            // targetVelocity = DenseVector.OfArray(new double[] { 0, 0, 0 });  // we get the velocity from ml agent     
-            // targetAccel = DenseVector.OfArray(new double[] { 0, 0, 0 });     // we get the acceleration from ml agent 
-
-
-            // Control
-
-            Vector<double> errorTrackingPosition = (dronePosition - targetPosition);
-            if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ
-                or DroneControllerState.TrackingControlNormalizedXY)
-            {
-                int endIndex;
-                if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ)
+                targetPosition = TrackingTargetTF.position.To<ENU>().ToDense();
+                targetVelocity = DenseVector.OfArray(new double[] { 0, 0, 0 });
+                targetAccel = DenseVector.OfArray(new double[] { 0, 0, 0 });
+                errorTrackingPosition = dronePosition - targetPosition;
+                
+                if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ
+                    or DroneControllerState.TrackingControlNormalizedXY)
                 {
-                    // Full normalization of entire vector
-                    endIndex = errorTrackingPosition.Count;
+                    int endIndex;
+                    if (controllerState is DroneControllerState.TrackingControlNormalizedXYZ)
+                    {
+                        // Full normalization of entire vector
+                        endIndex = errorTrackingPosition.Count;
+                    }
+                    else 
+                    {
+                        // If statement above guards for any other cases arriving here
+                        // Normalization of X,Y component only
+                        endIndex = errorTrackingPosition.Count - 1;
+                    }
+
+                    // Normalized error is better here
+                    double distanceErrorCap = 2;
+
+                    Vector<double> errorTrackingPositionSubVec =
+                        errorTrackingPosition.SubVector(0, endIndex);
+                    errorTrackingPositionSubVec =
+                        Math.Min(distanceErrorCap, errorTrackingPositionSubVec.Norm(2)) *
+                        errorTrackingPositionSubVec.Normalize(2);
+                    errorTrackingPosition.SetSubVector(0, endIndex, errorTrackingPositionSubVec);
                 }
-                else 
+                else
                 {
-                    // If statement above guards for any other cases arriving here
-                    // Normalization of X,Y component only
-                    endIndex = errorTrackingPosition.Count - 1;
+                    // Handles DroneControllerState.TrackingControl
+                    // FIXME: Hardcoded Error cap on distance. May need fixing in the future
+                    double distanceErrorCap = 10;
+                    errorTrackingPosition = (dronePosition - targetPosition) *
+                                            Math.Min(distanceErrorCap / (dronePosition - targetPosition).Norm(2),
+                                                1);
                 }
-
-                // Normalized error is better here
-                double distanceErrorCap = 2;
-
-                Vector<double> errorTrackingPositionSubVec =
-                    errorTrackingPosition.SubVector(0, endIndex);
-                errorTrackingPositionSubVec =
-                    Math.Min(distanceErrorCap, errorTrackingPositionSubVec.Norm(2)) *
-                    errorTrackingPositionSubVec.Normalize(2);
-                errorTrackingPosition.SetSubVector(0, endIndex, errorTrackingPositionSubVec);
-            }
-            else
-            {
-                // Handles DroneControllerState.TrackingControl
-                // FIXME: Hardcoded Error cap on distance. May need fixing in the future
-                double distanceErrorCap = 10;
-                errorTrackingPosition = (dronePosition - targetPosition) *
-                                        Math.Min(distanceErrorCap / (dronePosition - targetPosition).Norm(2),
-                                            1);
             }
 
             Vector<double> errorTrackingVelocity = droneVelocity - targetVelocity;
