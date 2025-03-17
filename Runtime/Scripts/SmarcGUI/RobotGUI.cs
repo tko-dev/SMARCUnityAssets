@@ -139,10 +139,15 @@ namespace SmarcGUI
 
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
             {
-                if(robotname.ToLower().Contains("sam")) ghostTF = Instantiate(SAMGhostPrefab).transform;
-                if(robotname.ToLower().Contains("evolo")) ghostTF = Instantiate(EvoloGhostPrefab).transform;
-                else ghostTF = Instantiate(GenericGhostPrefab).transform;
-                ghostTF.name = $"{robotname} (Ghost)";
+                if(robotname.Contains("sam", System.StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(SAMGhostPrefab).transform;
+                else if(robotname.Contains("evolo", System.StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(EvoloGhostPrefab).transform;
+                else
+                {
+                    guiState.Log($"No specific ghost prefab for {robotname}, using generic arrow.");
+                    ghostTF = Instantiate(GenericGhostPrefab).transform;
+                }
+
+                ghostTF.name = $"Remote {robotname}";
                 ghostTF.SetParent(worldMarkersTF);
                 ghostTF.gameObject.SetActive(false);
                 ghostRB = ghostTF.GetComponent<Rigidbody>();
