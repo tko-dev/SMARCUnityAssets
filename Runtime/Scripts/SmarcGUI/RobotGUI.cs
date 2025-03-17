@@ -327,7 +327,17 @@ namespace SmarcGUI
 
         public void OnHeadingReceived(float heading)
         {
-            ghostTF.rotation = Quaternion.Euler(0, heading, 0);
+            ghostTF.rotation = Quaternion.Euler(ghostTF.rotation.eulerAngles.x, heading, ghostTF.rotation.eulerAngles.z);
+        }
+
+        public void OnPitchReceived(float pitch)
+        {
+            ghostTF.rotation = Quaternion.Euler(pitch, ghostTF.rotation.eulerAngles.y, ghostTF.rotation.eulerAngles.z);
+        }
+
+        public void OnRollReceived(float roll)
+        {
+            ghostTF.rotation = Quaternion.Euler(ghostTF.rotation.eulerAngles.x, ghostTF.rotation.eulerAngles.y, roll);
         }
 
         public void OnCourseReceived(float course)
@@ -342,6 +352,8 @@ namespace SmarcGUI
             if(ghostRB.linearVelocity.sqrMagnitude == 0) ghostRB.linearVelocity = ghostRB.transform.forward * speed;
             else ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
         }
+
+        
 
 
 

@@ -323,6 +323,14 @@ namespace SmarcGUI.Connections
                             float velocity = float.Parse(payload);
                             robotsGuis[agentName].OnSpeedReceived(velocity);
                             break;
+                        case "pitch":
+                            float pitch = float.Parse(payload);
+                            robotsGuis[agentName].OnPitchReceived(pitch);
+                            break;
+                        case "roll":
+                            float roll = float.Parse(payload);
+                            robotsGuis[agentName].OnRollReceived(roll);
+                            break;
                         default:
                             guiState.Log($"Received unhandled sensor info from {topic}");
                             break;
