@@ -137,7 +137,7 @@ namespace DroneController
 
         [Header("Velocity control params")]
         public Vector3 TargetVelocity = Vector3.zero;
-        public Vector3 TargetAccel = Vector3.zero;
+        Vector3 TargetAccel = Vector3.zero;
 
         // Initialization function
         void Start()
@@ -293,7 +293,7 @@ namespace DroneController
             if (controllerState is DroneControllerState.VelocityControl)
             {
                 targetVelocity = TargetVelocity.To<ENU>().ToDense();
-                targetAccel = TargetAccel.To<ENU>().ToDense();
+                targetAccel = DenseVector.OfArray(new double[] { 0, 0, 0 });
                 errorTrackingPosition = DenseVector.OfArray(new double[] { 0, 0, 0 });
             }
             // otherwise compute them from the target position
