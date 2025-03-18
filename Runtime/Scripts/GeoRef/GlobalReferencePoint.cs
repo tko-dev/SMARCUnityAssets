@@ -60,9 +60,10 @@ namespace GeoRef
 
         public (double, double) GetLatLonFromUTM(double easting, double northing)
         {
-                var utm = new UniversalTransverseMercator(band, zone, easting, northing);
-                var latlon = UniversalTransverseMercator.ConvertUTMtoLatLong(utm, el);
-                return (latlon.Latitude.ToDouble(), latlon.Longitude.ToDouble());
+            el ??= new(EagerLoadType.UTM_MGRS);
+            var utm = new UniversalTransverseMercator(band, zone, easting, northing);
+            var latlon = UniversalTransverseMercator.ConvertUTMtoLatLong(utm, el);
+            return (latlon.Latitude.ToDouble(), latlon.Longitude.ToDouble());
         }
 
         public (double easting, double northing, double lat, double lon) GetUTMLatLonOfObject(GameObject o)
@@ -80,6 +81,7 @@ namespace GeoRef
 
         public (float x, float z) GetUnityXZFromLatLon(double lat, double lon)
         {
+            el ??= new(EagerLoadType.UTM_MGRS);
             var latlon = new Coordinate(lat, lon, el);
             var eastingDiff = latlon.UTM.Easting - easting;
             var northingDiff = latlon.UTM.Northing - northing;

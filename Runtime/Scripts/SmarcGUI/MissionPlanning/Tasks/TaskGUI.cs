@@ -73,6 +73,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
 
         void InstantiateParam(Transform parent, Dictionary<string, object> taskParams, string paramKey)
         {
+            if(missionPlanStore == null) missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
             GameObject paramGO;
             GameObject paramPrefab = missionPlanStore.GetParamPrefab(taskParams[paramKey]);
             paramGO = Instantiate(paramPrefab, parent);
