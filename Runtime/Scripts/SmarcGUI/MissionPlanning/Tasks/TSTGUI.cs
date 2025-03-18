@@ -105,6 +105,8 @@ namespace SmarcGUI.MissionPlanning.Tasks
 
         void CreateTaskGUI(Task task)
         {
+            // sometimes this is called before awake is called /shrug
+            if(missionPlanStore == null) missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
             var taskGO = Instantiate(missionPlanStore.TaskPrefab, missionPlanStore.TasksScrollContent);
             var taskGUI = taskGO.GetComponent<TaskGUI>();
             taskGUI.SetTask(task, this);

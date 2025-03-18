@@ -65,7 +65,7 @@ namespace SmarcGUI.Connections
             ComUuid = Guid.NewGuid().ToString();
 
             ExecutionUnit = robot_name;
-            TaskUuid = Guid.NewGuid().ToString();
+            TaskUuid = task.TaskUuid;
             Task = task;    
         }
     }

@@ -56,16 +56,9 @@ namespace SmarcGUI.MissionPlanning
         Color RunMissionButtonOriginalColor;
         TMP_Text RunMissionButtonText;
 
-
-
         void Awake()
         {
             guiState = GetComponent<GUIState>();
-            // Desktop on win, user home on linux/mac
-            MissionStoragePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), Path.Combine("SMaRCUnity", "MissionPlans"));
-            Directory.CreateDirectory(MissionStoragePath);
-            LoadMissionPlans();
-
             NewMissionPlanButton.onClick.AddListener(OnNewTST);
             LoadMissionsButton.onClick.AddListener(LoadMissionPlans);
             SaveMissionsButton.onClick.AddListener(SaveMissionPlans);
@@ -77,7 +70,15 @@ namespace SmarcGUI.MissionPlanning
 
             RunMissionButtonImage = RunMissionButton.GetComponent<Image>();
             RunMissionButtonText = RunMissionButton.GetComponentInChildren<TMP_Text>();
-            RunMissionButtonOriginalColor = RunMissionButtonImage.color;
+            RunMissionButtonOriginalColor = RunMissionButtonImage.color;   
+        }
+
+        void Start()
+        {
+            // Documents on win, user home on linux/mac
+            MissionStoragePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), Path.Combine("SMaRCUnity", "MissionPlans"));
+            Directory.CreateDirectory(MissionStoragePath);
+            LoadMissionPlans();
         }
 
         void OnGUI()
