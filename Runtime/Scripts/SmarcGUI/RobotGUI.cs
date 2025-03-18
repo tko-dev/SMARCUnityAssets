@@ -469,7 +469,6 @@ namespace SmarcGUI
 
             if(isOld)
             {
-                guiState.Log($"Robot {RobotName} is old!");
                 TSTExecInfoReceived = false;
             }
         }
