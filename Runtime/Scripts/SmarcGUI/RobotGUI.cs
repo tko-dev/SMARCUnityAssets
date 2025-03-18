@@ -265,7 +265,13 @@ namespace SmarcGUI
             HashSet<string> newUuids = new();
             foreach (var task in newTasks)
             {
-                var taskUuid = task["uuid"];
+                if(!task.ContainsKey("task-uuid"))
+                {
+                    guiState.Log($"Task executing on robot {RobotName} has no task-uuid!");
+                    guiState.Log($"Task has keys: {task.Keys.Aggregate((acc, next) => acc + ", " + next)}");
+                    continue;
+                }
+                var taskUuid = task["task-uuid"];
                 newUuids.Add(taskUuid);
             }
 
@@ -284,8 +290,9 @@ namespace SmarcGUI
             // create new ones
             foreach (var taskUuid in newUuidsSet)
             {
-                var task = newTasks.Find(t => t["uuid"] == taskUuid);
-                var taskName = task["name"];
+                // hardcoded strings coming from waraps api.
+                var task = newTasks.Find(t => t["task-uuid"] == taskUuid);
+                var taskName = task["task-name"];
                 var execTaskGO = Instantiate(ExecutingTaskPrefab, ExecutingTasksScrollContent);
                 var execTaskGUI = execTaskGO.GetComponent<ExecutingTaskGUI>();
                 var taskSpec = msg.TasksAvailable.Find(t => t.Name == taskName);
@@ -470,6 +477,8 @@ namespace SmarcGUI
             if(isOld)
             {
                 TSTExecInfoReceived = false;
+                ghostRB.linearVelocity = Vector3.zero;
+                ghostRB.angularVelocity = Vector3.zero;
             }
         }
 

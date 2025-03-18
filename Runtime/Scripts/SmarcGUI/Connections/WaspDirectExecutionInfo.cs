@@ -79,9 +79,9 @@ namespace SmarcGUI.Connections
             };
             var tasksExecuting = new List<Dictionary<string, string>>
             {
-                new(){ {"name", "move-to"}, {"uuid", "123"} }, // for testing UI functions
-                new(){ {"name", "move-to"}, {"uuid", Guid.NewGuid().ToString()} },
-                new(){ {"name", "chilling"}, {"uuid", Guid.NewGuid().ToString()} }
+                new(){ {"task-name", "move-to"}, {"task-uuid", "123"} }, // for testing UI functions
+                new(){ {"task-name", "move-to"}, {"task-uuid", Guid.NewGuid().ToString()} },
+                new(){ {"task-name", "chilling"}, {"task-uuid", Guid.NewGuid().ToString()} }
             };
             msg = new(
                 name: waspHeartbeat.AgentName,
