@@ -374,14 +374,6 @@ namespace SmarcGUI
         /////////////////////////////////////////
         // GUI STUFF
         /////////////////////////////////////////
-        void OnKBControl()
-        {
-            IsSelected = true;
-            OnSelectedChange(true);
-            keyboardController.Enable();
-        }
-
-
         public void OnPointerClick(PointerEventData eventData)
         {
             if(eventData.button == PointerEventData.InputButton.Right)

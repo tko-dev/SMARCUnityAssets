@@ -81,7 +81,9 @@ namespace SmarcGUI.Connections
             {
                 new(){ {"task-name", "move-to"}, {"task-uuid", "123"} }, // for testing UI functions
                 new(){ {"task-name", "move-to"}, {"task-uuid", Guid.NewGuid().ToString()} },
-                new(){ {"task-name", "chilling"}, {"task-uuid", Guid.NewGuid().ToString()} }
+                new(){ {"task-name", "chilling"}, {"task-uuid", Guid.NewGuid().ToString()} },
+                new(){ {"task-name", "not-available-task"}, {"task-uuid", Guid.NewGuid().ToString()} },
+                new(){ {"task-name", "not-available-task2"}, {"task-uuid", Guid.NewGuid().ToString()} }
             };
             msg = new(
                 name: waspHeartbeat.AgentName,
