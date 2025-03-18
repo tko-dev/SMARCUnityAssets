@@ -183,7 +183,7 @@ namespace SmarcGUI
 
         public void SendSignalCommand(string taskUuid, string signal)
         {
-            var signalCommand = new SigntalTaskCommand(taskUuid, signal);
+            var signalCommand = new SigntalTaskCommand(taskUuid:taskUuid, signal:signal);
             switch(InfoSource)
             {
                 case InfoSource.SIM:
@@ -298,6 +298,13 @@ namespace SmarcGUI
                 var taskSpec = msg.TasksAvailable.Find(t => t.Name == taskName);
                 List<string> signals = new();
                 if(taskSpec != null) signals = new List<string>(taskSpec.Signals);
+                // abort must be available for tasks that have not been defined in tasks-available by the vehicle
+                // as a fallback, so that the user can always stop a task.
+                if(signals.Count == 0)
+                {
+                    guiState.Log($"No signals available for robot::task: {RobotName}::{taskName}, adding $abort as a fallback!");
+                    signals.Add("$abort");
+                }
                 execTaskGUI.SetExecTask(this, taskName, taskUuid, signals);
             }
 
@@ -367,14 +374,6 @@ namespace SmarcGUI
         /////////////////////////////////////////
         // GUI STUFF
         /////////////////////////////////////////
-        void OnKBControl()
-        {
-            IsSelected = true;
-            OnSelectedChange(true);
-            keyboardController.Enable();
-        }
-
-
         public void OnPointerClick(PointerEventData eventData)
         {
             if(eventData.button == PointerEventData.InputButton.Right)
