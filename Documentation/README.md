@@ -1253,6 +1253,27 @@ The GUI can be used to:
 - The exact method of control changes from vehicle to vehicle, best to check the vehicle's specific section!
 - To enable direct control, check the box labeled "Unity Control" next to the robot.
 - If you check "Publish Joy" under the ROS section, the gamepad-equivalent version of any controller will be published into ROS as well.
+- Controls are defined using Unity `input-system` and thus are easy to extend/modify as needed for specific use cases.
+
+- Defined control commands for robots:
+  - Forward/Backward
+    - Left stick vertical
+    - W/S keys
+  - Sideways
+    - Left stick horizontal
+    - A/D keys
+  - Thrust vectoring
+    - Right stick
+    - Arrow keys
+  - Vertical motion
+    - Left bumper/trigger
+    - C/Space keys
+  - Pitch
+    - Right bumper/trigger
+    - R/F keys
+  - Roll
+    - D-pad left/right
+    - Q/E keys
 
 
 ## External connections
