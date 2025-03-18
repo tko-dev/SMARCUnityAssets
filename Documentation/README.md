@@ -64,7 +64,6 @@
   - [Quadrotor](#quadrotor)
     - [Keyboard controller](#keyboard-controller-1)
     - [Geometric Tracking Controller](#geometric-tracking-controller)
-  - [GameUI](#gameui)
   - [WinchSystem](#winchsystem)
   - [Evolo](#evolo)
     - [Evolo's inspector window](#evolos-inspector-window)
@@ -76,6 +75,22 @@
     - [Sensors](#sensors-1)
       - [UnitySensor and UnitySensorRos packages](#unitysensor-and-unitysensorros-packages)
     - [Evolo's Scene](#evolos-scene)
+- [Mission Planning and Execution](#mission-planning-and-execution)
+  - [The Basics](#the-basics)
+    - [Camera controls](#camera-controls)
+    - [Follow and LookAt](#follow-and-lookat)
+    - [Interface Basics](#interface-basics)
+  - [Mission Planning and Execution](#mission-planning-and-execution-1)
+    - [Mission planning](#mission-planning)
+      - [Create a new mission/task](#create-a-new-missiontask)
+      - [Modify a mission/task](#modify-a-missiontask)
+      - [Managing missions as files](#managing-missions-as-files)
+      - [Run a mission or task](#run-a-mission-or-task)
+    - [Mission/Task monitoring](#missiontask-monitoring)
+  - [Controlling a vehicle](#controlling-a-vehicle)
+  - [External connections](#external-connections)
+    - [MQTT](#mqtt)
+    - [ROS](#ros-1)
 - [Developer Environment Setup](#developer-environment-setup)
   - [CSharp SDK and LSP Setup](#csharp-sdk-and-lsp-setup)
 
@@ -940,25 +955,6 @@ We have implemented a simple quadrotor drone, available as a prefab under `SMARC
   - **Load Link TF**: The transform where the rope's base is attached. Usually a part of another robot.
 
 
-## GameUI
-We have a very rudimentary UI for game mode, to change some settings easier while the sim is running.
-This is provided as a prefab under `SMARCUnityAssets/Runtime/Prefabs/GUI/GameUI`.
-
-![GUI](Media/UI.png)
-
-- This is designed for a 1080p game window. While it will work on other resolutions, it will probably look bad. You can set your game window to 1080p at the top bar.
-- **Panel**: Uncheck to hide the entire thing.
-- **Cam**: Cameras in the scene are listed here. You can change which one is rendered on the game window here.
-  - Cameras under `GameUI` have the same control scheme as Unity editor's cameras: *Right click* to look around. While holding *right click*, *WASD* to move around and *QE* to move up/down.
-- **TF**: If checked, and there is a ROS TF Publisher/Subscriber in the scene, it will be visualized as colored arrows in the game window.
-- **Robot Overlay**: If checked, objects tagged "#robot" will have their names displayed on the scene with small arrows, overlaid on their position on screen.
-- **Robot**: Objects tagged "#robot" will be listed here. The chosen one will have the following controls:
-  - **ROS/Unity**: Checking ROS will disable any keyboard controllers the robot might have to allow control through ROS while checking Unity will disable any [ActuatorSubscriber](#actuator-subscriber)s and enable the keyboard controllers. These two can not be checked at the same time.
-
-![Overlay](Media/overlay.png)
-
-- The names of the robots are displayed with yellow lines and background
-- The TF Tree of SAM is displayed with colored arrows.
 
 ## WinchSystem
 Found under: `SMARCUnityAssets/Runtime/Prefabs/Components` and is a part of [the Quadrotor prefab](#quadrotor).
@@ -1099,6 +1095,187 @@ This scene includes Evolo, several buoys, and randomly moving boats that serve a
 ![EvoloScene](Media/EvoloScene.png)
 
 
+# Mission Planning and Execution
+
+![GUI](Media/GUI/GUI-Empty.png)
+
+The GUI can be used to:
+- **Monitor** a real or simulated vehicle.
+- **Control** a real or simulated vehicle.
+- Plan **Missions** made of **Tasks**.
+
+## The Basics
+
+### Camera controls
+
+![Cameraselection](Media/GUI/Cameraselect.png)
+
+- Top-left corner has a dropdown to select a camera.
+  - Cameras that are _sensors_ are ignored.
+  - The format is `top-level-object / camera-name`
+- The `MainCamera` mimics the camera in the Unity Editor:
+  - It can be moved while holding right click.
+  - WASD keys to move and mouse itself to look around.
+  - QE to move up/down.
+  - Left Shift to go faster.
+- Water graphics can be toggled for visibility. Physics are not affected.
+
+
+### Follow and LookAt
+
+![FollowAndLookAt](Media/GUI/Camera-lookat%20follow.png)
+
+- The `MainCamera` can be made to follow or look at a robot:
+  - Right click a robot name, choose:
+    - "Follow" is nice and smooth, unlike most vehicle-attached cameras.
+    - "LookAt" puts the camera directly above the vehicle, looking down.
+- If `MainCamera` is not selected when you pick an option here, it will be selected automatically.
+
+
+### Interface Basics
+
+- The menus can be collapsed by clicking the dark-blue horizontal bars.
+  - The other menus will re-arrange to fill the space.
+
+![collapsed](Media/GUI/collapsed.png)
+
+- The frame rate can be limited to save resources. 
+  - Range: 10-144
+  - Default: 60
+
+![fpslimit](Media/GUI/fps%20limit.png)
+
+- A small arrow shows North on the MainCamera.
+
+![compass](Media/GUI/compass.png)
+
+
+- Every run, the game gets a new UUID. This is useful for when you interact with remote objects.
+- There is a log window.
+  - Most objects will use this to tell you what's going on.
+
+![log](Media/GUI/uuidlog.png)
+
+
+## Mission Planning and Execution
+
+- We use the [Wara-PS API](https://api-docs.waraps.org/#/) as our mission plan storage and communication method.
+  - This API has 4 levels:
+    - Level 1: Vehicle exists, reports its position
+    - Level 2: Vehicle can accept a single **Task**
+    - Level 3: Vehicle can accept a fully formed **Task Specification Tree(TST)**
+    - Level 4: Vehicle can accept a **partial** TST.
+  - We implement up to Level 3.
+    - And we implement only **Sequences** of tasks, without conditions and such at this time.
+  - A **sequence of Tasks** is a **Mission**.
+
+### Mission planning
+
+![MissionPlanning](Media/GUI/Mission%20planning.png)
+
+#### Create a new mission/task
+- Click New Mission
+  - A new line is added with the TST type (seq) and an editable description field.
+  - "An amazing mission" in the screenshot above.
+- Select the mission.
+  - The mission will have a red outline ("An amazing mission" is selected)
+- "Tasks:" will be populated with available task types.
+- Select one, click Add.
+- The task is added to the mission.
+  - If a Task contains a GeoPoint, the GeoPoint will be initialized where the red cross is pointing at.
+    - You can move the GeoPoint in the world by click on it (this will turn its background RED) and dragging the arrows that show up in the environment.
+    - The radius of the circle representing the GeoPoint is 1m.
+  - Currently supported **Tasks**:
+    - [move-to](https://api-docs.waraps.org/#/agent_communication/tasks/move_to)
+    - [move-path](https://api-docs.waraps.org/#/agent_communication/tasks/move_path)
+    - custom
+      - A simple Task that has a single string under the key "json-params".
+  - Currently supported **Task parameters**:
+    - Primitives: strings, numbers, bools.
+    - GeoPoints: Latitude, Longitude, Altitude triples. These are visualized in-world.
+    - List of GeoPoints.
+- GeoPoints included in the Tasks are visualized in-world, with a gradient line connecting them all in order.
+
+#### Modify a mission/task
+- **Right-click** a task or parameter:
+  - To change its order in the list.
+  - To delete it.
+
+#### Managing missions as files
+- You can save all missions to file by click "Save all".
+  - Missions are saved as JSON files into `Docuements/SMaRCUnity/MissionPlans` on Windows and `~/SMaRCUnity/MissionPlans` on Linux and MAC.
+  - You can edit these manually if desired.
+- You can load all missions from files with "Load all".
+    - If a mission with the exact same description exists, it will not be over-written.
+
+
+#### Run a mission or task
+- Select a robot.
+- Select a mission.
+- Click **Send+Start Mission** to run the whole mission or **Run** next to the single task you want to run.
+- Depending on the _source_ of the robot, MQTT or ROS will be used to send the mission to the robot.
+  - If the robot's _source_ is the sim, these buttons are disabled!
+  - **At this moment, only MQTT is implemented!**
+
+### Mission/Task monitoring
+- Vehicles are expected to report their states with:
+  - [Heartbeat](https://api-docs.waraps.org/#/agent_communication/topics/heartbeat)
+  - [Sensor messages](https://api-docs.waraps.org/#/agent_communication/topics/sensor) (position, heading, course, speed at minimum)
+  - [Direct Execution Info messages](https://api-docs.waraps.org/#/agent_communication/topics/direct_execution_info)
+  
+![monitoring](Media/GUI/monitoring.png)
+
+- The basics of the vehicle's pose are visualized in-world.
+  - If the vehicle has a model, this will be used.
+  - If the vehicle does not have a model, a generic yellow-and-black arrow will be used.
+  - If the camera is close:
+    - A bounding box is drawn.
+    - Name of vehicle and its source of information above the bounding box.
+  - If the camera is far:
+    - Heading and course are visualized as purple and green sticks.
+- The vehicle is added to the "Robots" section of the GUI.
+  - The red square is animated for every Heartbeat message received.
+  - Tasks defined in the **Direct Execution Info** are available as a dropdown, with a button to add it to the current mission plan in the GUI.
+  - If the vehicle has tasks that the sim is not aware of, these can be added as "custom" tasks.
+- Executing tasks are shown as a list
+  - Signals the task has defined under *tasks-available* in the dropdown.
+  - Button to send the selected signal to the task of the robot.
+
+
+## Controlling a vehicle
+
+![controller](Media/GUI/controller.png)
+
+- Vehicles can be controlled in multiple ways:
+  - A gamepad (such as xbox or playstaion controllers)
+  - Keyboard
+  - Virtual controller
+- The exact method of control changes from vehicle to vehicle, best to check the vehicle's specific section!
+- To enable direct control, check the box labeled "Unity Control" next to the robot.
+- If you check "Publish Joy" under the ROS section, the gamepad-equivalent version of any controller will be published into ROS as well.
+
+
+## External connections
+
+### MQTT
+
+![mqtt](Media/GUI/mqtt.png)
+
+- You can connect to an MQTT broker of your choice
+  - TLS is supported, simply check the box
+  - Username/password not supported yet
+- Topics are published according to [wara-ps naming conventions](https://api-docs.waraps.org/#/agent_communication/topics/basic_naming_conventions)
+  - Context is the first part, use this to separate your sim from other users on the same broker!
+  - Sim/Real checkboxes are another way to filter out topics on the same broker.
+
+### ROS
+
+![ros](Media/GUI/ros.png)
+
+- You can connect to a ROS2 network, see: [ROS](#ros)
+
+
+
 # Developer Environment Setup
 
 ## CSharp SDK and LSP Setup
@@ -1115,3 +1292,4 @@ To alleviate this problem, here is the general process for setting up the dotnet
 3. Check to ensure dotnet-sdk installed with `dotnet --list-sdks`
     -  Example output: `9.0.100 [/usr/lib/dotnet/sdk]`
 4. Restart your editor of choice and should be able to access LSP features
+ 
