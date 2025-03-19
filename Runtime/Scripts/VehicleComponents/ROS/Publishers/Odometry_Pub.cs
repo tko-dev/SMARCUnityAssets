@@ -15,6 +15,9 @@ namespace VehicleComponents.ROS.Publishers
         [Tooltip("If false, orientation is in ENU in ROS.")]
         public bool useNED = false;
 
+        [Header("Debug")]
+        public Vector3 ROSPosition;
+
         public OdometryMsg GetRosMsg()
         {
             return ROSMsg;
@@ -23,6 +26,7 @@ namespace VehicleComponents.ROS.Publishers
         {
             ROSMsg.header.frame_id = "map_gt";
             ROSMsg.child_frame_id = sensor.linkName;
+            ROSPosition = Vector3.zero;
         }
 
         protected override void UpdateMessage()
@@ -39,6 +43,10 @@ namespace VehicleComponents.ROS.Publishers
                 ROSMsg.pose.pose.orientation = sensor.orientation.To<ENU>();
                 ROSMsg.pose.pose.position = sensor.transform.position.To<ENU>();
             } 
+
+            ROSPosition.x = (float)ROSMsg.pose.pose.position.x;
+            ROSPosition.y = (float)ROSMsg.pose.pose.position.y;
+            ROSPosition.z = (float)ROSMsg.pose.pose.position.z;
 
             ROSMsg.twist.twist.linear = sensor.localVelocity.To<FLU>();
             ROSMsg.twist.twist.angular = sensor.angularVelocity.To<FLU>();
