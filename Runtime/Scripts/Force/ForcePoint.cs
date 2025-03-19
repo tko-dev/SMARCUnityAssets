@@ -40,6 +40,8 @@ namespace Force
         [Tooltip("Angular Drag applied while underwater. Sets the connected body's drag/linearDamping value when above water. Set to -1 to use the starting drag value of the body for this.")]
         public float AirAngularDrag = -1f;
         public bool IsUnderwater = false;
+        public bool IsSubmerged = false;
+        public float CurrentDepth{get; private set;}
 
 
         [Header("Gravity")]
@@ -66,7 +68,7 @@ namespace Force
         {
             Vector3 appliedForce = Vector3.zero;
             bool enabled = true;
-            if(onlyAboveWater) enabled = !IsUnderwater;
+            if(onlyAboveWater) enabled = !IsSubmerged;
             if(onlyUnderWater) enabled = IsUnderwater;
             if(onlyAboveWater && onlyUnderWater) enabled = false;
 
@@ -122,17 +124,18 @@ namespace Force
             if (Volume == 0 && VolumeMesh != null) Volume = MeshVolume.CalculateVolumeOfMesh(VolumeMesh, VolumeObject.transform.lossyScale);
         }
 
-        float GetDepth()
+        void UpdateDepth()
         {
             if(waterModel == null) 
             {
                 var waterModels = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None);
-                if(waterModels.Length <= 0) return -1;
+                if(waterModels.Length <= 0) return;
                 waterModel = waterModels[0];
             }
             float waterSurfaceLevel = waterModel.GetWaterLevelAt(transform.position);
-            float depth = Mathf.Max(0, waterSurfaceLevel - transform.position.y);
-            return depth;
+            CurrentDepth = waterSurfaceLevel - transform.position.y;
+            IsSubmerged = CurrentDepth >= DepthBeforeSubmerged;
+            IsUnderwater = CurrentDepth > 0;
         }
 
         // Volume * Density * Gravity
@@ -147,32 +150,29 @@ namespace Force
             }
 
 
-            var depth = GetDepth();
-            if(depth != -1)
+            UpdateDepth();
+
+            if (IsUnderwater)
             {
-                IsUnderwater = depth > 0f;
-                if (IsUnderwater)
-                {
-                    float displacementMultiplier = Mathf.Clamp01(depth / DepthBeforeSubmerged);
-                    var buoyancyForceMag = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier;
-                    buoyancyForceMag = Mathf.Min(MaxBuoyancyForce, buoyancyForceMag);
-                    var buoyancyForce =  new Vector3(0, buoyancyForceMag, 0);
+                float displacementMultiplier = Mathf.Clamp01(CurrentDepth / DepthBeforeSubmerged);
+                var buoyancyForceMag = Volume * WaterDensity * Math.Abs(Physics.gravity.y) * displacementMultiplier;
+                buoyancyForceMag = Mathf.Min(MaxBuoyancyForce, buoyancyForceMag);
+                var buoyancyForce =  new Vector3(0, buoyancyForceMag, 0);
 
-                    AppliedBuoyancyForce = ApplyForce(buoyancyForce, onlyUnderWater: true);
-                    
-                    if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+AppliedBuoyancyForce, Color.blue, 0.1f);
-                }
-
-                // change the drag of the body to underwater if any is submerged. This is a ad-hoc way to 
-                // simulate the sticktion water usually applies to objects
-                // also, some objects might need to be useful under AND over water (like ropes...)
-                // and their drag really should reflect where they are moment to moment
-                // yes, all of the points will do the same thing. but this makes it so we dont need
-                // a central forcepoint controller or sth
-                var anySubmerged = allForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
-                body.drag = anySubmerged? UnderwaterDrag:AirDrag;
-                body.angularDrag = anySubmerged? UnderwaterAngularDrag:AirAngularDrag;
+                AppliedBuoyancyForce = ApplyForce(buoyancyForce, onlyUnderWater: true);
+                
+                if(DrawForces) Debug.DrawLine(forcePointPosition, forcePointPosition+AppliedBuoyancyForce, Color.blue, 0.1f);
             }
+
+            // change the drag of the body to underwater if any is point is. This is a ad-hoc way to 
+            // simulate the sticktion water usually applies to objects
+            // also, some objects might need to be useful under AND over water (like ropes...)
+            // and their drag really should reflect where they are moment to moment
+            // yes, all of the points will do the same thing. but this makes it so we dont need
+            // a central forcepoint controller or sth
+            var anyUnderwater = allForcePoints.Select(p => p.IsUnderwater).Aggregate(false, (s, v) => s || v);
+            body.drag = anyUnderwater? UnderwaterDrag:AirDrag;
+            body.angularDrag = anyUnderwater? UnderwaterAngularDrag:AirAngularDrag;
 
 
             // And lastly, whatever custom force was set.
