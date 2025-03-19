@@ -39,9 +39,11 @@ namespace Force
 
         [Tooltip("Angular Drag applied while underwater. Sets the connected body's drag/linearDamping value when above water. Set to -1 to use the starting drag value of the body for this.")]
         public float AirAngularDrag = -1f;
+
+        [Header("Current state wrt water level")]
         public bool IsUnderwater = false;
         public bool IsSubmerged = false;
-        public float CurrentDepth{get; private set;}
+        public float CurrentDepth;
 
 
         [Header("Gravity")]
