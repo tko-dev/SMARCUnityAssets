@@ -12,8 +12,8 @@ namespace Editor.Scripts
 
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
             container = (GeoReference) target;
+            DrawDefaultInspector();
 
             if(GUILayout.Button("Place in World from Lat/Lon"))
             {

@@ -41,7 +41,15 @@ namespace Evolo
         private float currentLinearSpeed=0f;
         private float currentRollAngle =0f;
 
-        
+
+        void OnValidate()
+        {
+            Debug.LogWarning("This is OnValidate on EvoloBehaviourScript. It needs to be cleaned up and inspected. Use at your own risk!");
+            // the topic switching is weird?!
+            // Unity control and ROS Control in the same script?!?!?!
+            // Unity control not using input manager?!?!!?!?!?!?!?!?!?
+            // lots of todos here....
+        }
 
 
         void Start()

@@ -6,7 +6,8 @@ namespace SmarcGUI.WorldSpace
 	public class StartLookingAtRobots : MonoBehaviour
     {
         public float StartHeight = 10;
-        void Start()
+
+        public void Look()
         {
             var cam = GetComponent<Camera>();
             // Find all objects tagged robot in the scene
@@ -26,6 +27,11 @@ namespace SmarcGUI.WorldSpace
             // Put the camera 10m above this point, looking down
             cam.transform.position = center + new Vector3(0, StartHeight, 0);
             cam.transform.LookAt(center);
+        }
+        
+        void Start()
+        {
+            Look();
         }
     }
 }

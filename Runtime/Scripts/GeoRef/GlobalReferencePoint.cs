@@ -27,14 +27,9 @@ namespace GeoRef
 
         EagerLoad el;
 
+
         void OnValidate()
         {
-            var refpoints = FindObjectsByType<GlobalReferencePoint>(FindObjectsSortMode.None);
-            if(refpoints.Length > 1)
-            {
-                Debug.LogWarning("Found too many GlobalReferencePoint in the scene, there should only be one!");
-            }
-
             if(OriginMode == OriginMode.LatLon)
             {
                 var latlon = new Coordinate(Lat, Lon);
@@ -56,6 +51,12 @@ namespace GeoRef
             // passed to things that work with Coordinate objects
             // Hopefully cuts down on processing time _a little_ for things in a loop :)
             el = new(EagerLoadType.UTM_MGRS);
+
+            var refpoints = FindObjectsByType<GlobalReferencePoint>(FindObjectsSortMode.None);
+            if(refpoints.Length > 1)
+            {
+                Debug.LogWarning("Found too many GlobalReferencePoint in the scene, there should only be one!");
+            }
         }
 
         void OnDrawGizmos()
@@ -67,6 +68,21 @@ namespace GeoRef
             Gizmos.DrawSphere(top, 10f);
             Gizmos.DrawSphere(bottom, 10f);
             Gizmos.DrawLine(top, bottom);
+        }
+
+        public void UpdateGeoRefObjects()
+        {
+            var gtfers = FindObjectsByType<GeoReferenceTransformer>(FindObjectsSortMode.None);
+            foreach (var gtfer in gtfers)
+            {
+                gtfer.TransformFromTwoPoints();
+            }
+
+            var georefs = FindObjectsByType<GeoReference>(FindObjectsSortMode.None);
+            foreach (var georef in georefs)
+            {
+                georef.Place();
+            }
         }
 
         public (double, double) GetLatLonFromUTM(double easting, double northing)

@@ -9,18 +9,32 @@ namespace GeoRef
 
         GlobalReferencePoint globalRef;
 
-        void OnValidate()
+        void Awake()
         {
-            var refpoints = FindObjectsByType<GlobalReferencePoint>(FindObjectsSortMode.None);
-            if(refpoints.Length != 1)
+            globalRef = FindFirstObjectByType<GlobalReferencePoint>();
+            if(globalRef == null)
             {
-                Debug.LogWarning($"Found {refpoints.Length} GlobalReferencePoint in the scene, there should only be one!");
+                Debug.LogWarning("No GlobalReferencePoint found in the scene!");
+                return;
+            }
+            var (x,z) = globalRef.GetUnityXZFromLatLon(Lat, Lon);
+            var e = 0.001f;
+            var xdif = Mathf.Abs(x-transform.position.x);
+            var zdif = Mathf.Abs(z-transform.position.z);
+            if(xdif > e ||zdif > e)
+            {
+                Debug.LogWarning($"Position of GeoReference:{transform.root.name}/{transform.name} does not match the lat/lon values! xdif:{xdif} zdif:{zdif}");
             }
         }
 
         public void Place()
         {
             globalRef = FindFirstObjectByType<GlobalReferencePoint>();
+            if(globalRef == null)
+            {
+                Debug.LogWarning("No GlobalReferencePoint found in the scene!");
+                return;
+            }
             var (x,z) = globalRef.GetUnityXZFromLatLon(Lat, Lon);
             transform.position = new Vector3(x, transform.position.y, z);
         }

@@ -12,10 +12,10 @@ namespace Editor.Scripts
 
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
             container = (GeoReferenceTransformer) target;
+            DrawDefaultInspector();
 
-            if(GUILayout.Button("Scale from Distance"))
+            if(GUILayout.Button("Scale to RequiredDistanceBetweenUnityPoints"))
             {
                 container.ScaleFromDistance();
             }
@@ -25,7 +25,7 @@ namespace Editor.Scripts
                 container.PlaceWorldPoints();
             }
 
-            if(GUILayout.Button("Transform from Two Points"))
+            if(GUILayout.Button("Transform to Match Earth Points"))
             {
                 container.TransformFromTwoPoints();
             }
