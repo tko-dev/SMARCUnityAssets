@@ -52,7 +52,7 @@ namespace VehicleComponents.ROS.Publishers
 
         void CreateMsg()
         {
-            string utm_zone_band = $"utm_{gpsRef.zone}_{gpsRef.band}";
+            string utm_zone_band = $"utm_{gpsRef.UTMZone}_{gpsRef.UTMBand}";
             // this is the position of unity-world in utm coordinates
             double lat, lon, originEasting, originNorthing;
             (originEasting, originNorthing, lat, lon) = gpsRef.GetUTMLatLonOfObject(gameObject);
