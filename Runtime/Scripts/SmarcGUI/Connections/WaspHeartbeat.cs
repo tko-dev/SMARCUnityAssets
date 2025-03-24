@@ -32,6 +32,11 @@ namespace SmarcGUI.Connections
             Stamp = (DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds;
             return JsonConvert.SerializeObject(this);
         }
+
+        public WaspHeartbeatMsg(string jsonString)
+        {
+            JsonConvert.PopulateObject(jsonString, this);
+        }
     }
 
     public class WaspHeartbeat : MQTTPublisher

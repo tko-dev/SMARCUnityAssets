@@ -161,6 +161,7 @@ namespace SmarcGUI
             {
                 LogText.text = LogText.text[..1000];
             }
+            Debug.Log(text);
         }
 
 

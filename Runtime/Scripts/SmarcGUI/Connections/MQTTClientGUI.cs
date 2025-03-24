@@ -265,6 +265,21 @@ namespace SmarcGUI.Connections
             var topic = topicPayload.Item1;
             var payload = topicPayload.Item2;
 
+            try
+            {
+                HandleWaspMQTTMsg(topic, payload);
+            }
+            catch(Exception e)
+            {
+                guiState.Log($"Error while handling MQTT message on topic: {topic}");
+                guiState.Log(e.Message);
+            }
+
+        }
+
+
+        void HandleWaspMQTTMsg(string topic, string payload)
+        {
             // wara stuff is formatted like: smarc/unit/subsurface/simulation/sam1/heartbeat
             // {context}/unit/{air,ground,surface,subsurface}/{real,simulation,playback}/{agentName}/{topic}
             var topicParts = topic.Split('/');
@@ -273,7 +288,7 @@ namespace SmarcGUI.Connections
             var realism = topicParts[3];
             var agentName = topicParts[4];
             var messageType = topicParts[5];
-
+            
             if(!robotsGuis.ContainsKey(agentName))
             {
                 string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}/";
@@ -285,7 +300,8 @@ namespace SmarcGUI.Connections
             switch(messageType)
             {
                 case "heartbeat":
-                    robotsGuis[agentName].OnHeartbeatReceived();
+                    WaspHeartbeatMsg heartbeat = new(payload);
+                    robotsGuis[agentName].OnHeartbeatReceived(heartbeat);
                     break;
                 case "sensor_info":
                     WaspSensorInfoMsg sensorInfo = new(payload);
@@ -298,6 +314,44 @@ namespace SmarcGUI.Connections
                 case "tst_execution_info":
                     WaspTSTExecutionInfoMsg tstExecutionInfo = new(payload);
                     robotsGuis[agentName].OnTSTExecutionInfoReceived(tstExecutionInfo);
+                    break;
+                case "exec":
+                    var exec_type = topicParts[6];
+                    switch(exec_type)
+                    {
+                        case "command":
+                            BaseCommand cmd = new(payload);
+                            switch(cmd.Command)
+                            {
+                                case "ping":
+                                    PingCommand pingCmd = new(payload);
+                                    robotsGuis[agentName].OnPingCmdReceived(pingCmd);
+                                    break;
+                                default:
+                                    guiState.Log($"Received unhandled exec/command from mqtt: {topic}");
+                                    break;
+                            }
+                            break;
+                        case "response":
+                            BaseResponse response = new(payload);
+                            switch(response.Response)
+                            {
+                                case "pong":
+                                    PongResponse pong = new(payload);
+                                    robotsGuis[agentName].OnPongResponseReceived(pong);
+                                    break;
+                                default:
+                                    guiState.Log($"Received unhandled exec/response from mqtt: {topic}");
+                                    break;
+                            }
+                            break;  
+                        case "feedback":
+                            guiState.Log($"Received unhandled exec/feedback from mqtt: {topic}");
+                            break;
+                        default:
+                            guiState.Log($"Received unhandled exec from mqtt: {topic}");
+                            break;
+                    }
                     break;
                 case "sensor":
                     // there could be _many_ different kinds of sensors,

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using GeoRef;
 using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
@@ -68,6 +69,8 @@ namespace SmarcGUI
         public List<string> TasksAvailableNames = new();
         public HashSet<string> TasksExecutingUuids = new();
 
+        public string AgentUuid{get; private set;}
+
         public bool TSTExecInfoReceived = false;
 
         public string RobotName => RobotNameText.text;
@@ -131,6 +134,9 @@ namespace SmarcGUI
                 mqttClient.SubToTopic(robotNamespace+"sensor/heading");
                 mqttClient.SubToTopic(robotNamespace+"sensor/course");
                 mqttClient.SubToTopic(robotNamespace+"sensor/speed");
+                mqttClient.SubToTopic(robotNamespace+"exec/command");
+                mqttClient.SubToTopic(robotNamespace+"exec/response");
+                mqttClient.SubToTopic(robotNamespace+"exec/feedback");
                 AvailTasksPanelRT.gameObject.SetActive(true);
                 ExecTasksPanelRT.gameObject.SetActive(true);
                 rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight + AvailTasksPanelRT.sizeDelta.y + ExecTasksPanelRT.sizeDelta.y);
@@ -180,6 +186,7 @@ namespace SmarcGUI
                     break;
             }
         }
+
 
         public void SendSignalCommand(string taskUuid, string signal)
         {
@@ -234,10 +241,11 @@ namespace SmarcGUI
             return startTSTCommand;
         }
 
-        public void OnHeartbeatReceived()
+        public void OnHeartbeatReceived(WaspHeartbeatMsg msg)
         {
             HeartRT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             lastHeartbeatTime = Time.time;
+            AgentUuid = msg.AgentUuid;
         }
 
         public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
@@ -367,7 +375,19 @@ namespace SmarcGUI
             else ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
         }
 
-        
+        public void OnPingCmdReceived(PingCommand pingCmd)
+        {
+            var pongResponse = new PongResponse(pingCmd);
+            mqttClient.Publish(robotNamespace+"exec/response", pongResponse.ToJson());
+        }
+
+        public void OnPongResponseReceived(PongResponse pongResponse)
+        {
+            var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var diff = now - pongResponse.TimeStamp;
+            var total = diff + pongResponse.PingDelay;
+            guiState.Log($"[{RobotName}] Ping-Pong delay: {total} ({pongResponse.PingDelay}+{diff}) ms.");
+        }
 
 
 
