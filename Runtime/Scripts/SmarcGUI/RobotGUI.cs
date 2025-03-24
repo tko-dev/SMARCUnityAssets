@@ -501,5 +501,12 @@ namespace SmarcGUI
             }
         }
 
+        public void OnDisconnected()
+        {
+            if(ghostTF != null) Destroy(ghostTF.gameObject);
+            if(robotOverlayGO != null) Destroy(robotOverlayGO);
+            Destroy(gameObject);
+        }
+
     }
 }

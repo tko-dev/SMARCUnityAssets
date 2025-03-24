@@ -98,7 +98,7 @@ namespace SmarcGUI.Connections
             return SystemTask.CompletedTask;
         }
 
-        void OnConnetionMade()
+        void OnConnectionMade()
         {
             if(SubToRealToggle.isOn) SubToHeartbeats("real");
             if(SubToSimToggle.isOn) SubToHeartbeats("simulation");
@@ -108,13 +108,28 @@ namespace SmarcGUI.Connections
             }
         }
 
-        void OnconnectionLost()
+        void OnConnectionLost()
         {
             foreach(var publisher in publishers)
             {
                 publisher.StopPublishing();
             }
             subscribedTopics.Clear();
+
+            List<string> toRemove = new();
+            foreach(var robotgui in robotsGuis.Values)
+            {
+                if(robotgui.InfoSource == InfoSource.MQTT)
+                {
+                    toRemove.Add(robotgui.RobotName);
+                    robotgui.OnDisconnected();
+                }
+            }
+            foreach(var robotName in toRemove)
+            {
+                guiState.RemoveRobotGUI(robotsGuis[robotName]);
+                robotsGuis.Remove(robotName);
+            }
         }
 
 
@@ -185,7 +200,7 @@ namespace SmarcGUI.Connections
             }
             guiState.Log($"Connected to broker on {ServerAddress}:{ServerPort}!");
 
-            OnConnetionMade();
+            OnConnectionMade();
         }
 
         async void DisconnectFromBroker()
@@ -204,7 +219,7 @@ namespace SmarcGUI.Connections
             }
             ConnectionInputsInteractable(true);
             guiState.Log($"Disconnected from broker on {ServerAddress}:{ServerPort}!");
-            OnconnectionLost();
+            OnConnectionLost();
         }
 
     

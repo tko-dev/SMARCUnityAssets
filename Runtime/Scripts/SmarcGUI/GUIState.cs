@@ -109,6 +109,11 @@ namespace SmarcGUI
             return robotGui;
         }
 
+        public void RemoveRobotGUI(RobotGUI robotGui)
+        {
+            robotGUIs.Remove(robotGui);
+        }
+
         void InitRobotGuis()
         {
             GameObject[] robots = GameObject.FindGameObjectsWithTag("robot");
