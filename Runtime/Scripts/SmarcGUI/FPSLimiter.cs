@@ -3,23 +3,26 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class FPSLimiter : MonoBehaviour 
+namespace SmarcGUI
 {
-    public Slider slider;
-    public TMP_Text text;
-
-	void Start()
-	{
-        slider.onValueChanged.AddListener(OnSliderValueChanged);
-		QualitySettings.vSyncCount = 0;
-        OnSliderValueChanged(slider.value);
-	}
-
-    void OnSliderValueChanged(float value)
+public class FPSLimiter : MonoBehaviour 
     {
-        Application.targetFrameRate = (int)value;
-        text.text = Application.targetFrameRate.ToString();
+        public Slider slider;
+        public TMP_Text text;
+
+        void Start()
+        {
+            slider.onValueChanged.AddListener(OnSliderValueChanged);
+            QualitySettings.vSyncCount = 0;
+            OnSliderValueChanged(slider.value);
+        }
+
+        void OnSliderValueChanged(float value)
+        {
+            Application.targetFrameRate = (int)value;
+            text.text = Application.targetFrameRate.ToString();
+        }
+
+
     }
-
-
 }

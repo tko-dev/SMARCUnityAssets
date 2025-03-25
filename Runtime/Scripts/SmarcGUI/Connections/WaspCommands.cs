@@ -18,16 +18,31 @@ namespace SmarcGUI.Connections
         {
             return JsonConvert.SerializeObject(this);
         }
+
+        public BaseCommand(){}
+
+        public BaseCommand(string jsonString)
+        {
+            JsonConvert.PopulateObject(jsonString, this);
+        }
     }
 
     public class PingCommand : BaseCommand
     {
+        public long TimeStamp;
         public PingCommand()
         {
             Command = "ping";
             ComUuid = Guid.NewGuid().ToString();
+            TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        public PingCommand(string jsonString)
+        {
+            JsonConvert.PopulateObject(jsonString, this);
         }
     }
+
 
     public static class WaspSignals
     {

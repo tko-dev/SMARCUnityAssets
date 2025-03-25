@@ -70,7 +70,7 @@ namespace SmarcGUI.Connections
                 float heading = body.rotation.eulerAngles.y;
                 mqttClient.Publish(waspHeartbeat.TopicBase+"sensor/heading", heading.ToString());
 
-                float course = body.velocity.magnitude > 0.1f ? Mathf.Atan2(body.velocity.x, body.velocity.z) * Mathf.Rad2Deg : heading;
+                float course = body.velocity.sqrMagnitude > 0.05*0.05 ? Mathf.Atan2(body.velocity.x, body.velocity.z) * Mathf.Rad2Deg : heading;
                 mqttClient.Publish(waspHeartbeat.TopicBase+"sensor/course", course.ToString());
 
                 float speed = body.velocity.magnitude;

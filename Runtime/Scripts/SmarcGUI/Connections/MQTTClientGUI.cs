@@ -58,7 +58,6 @@ namespace SmarcGUI.Connections
 
         MQTTPublisher[] publishers;
 
-        Dictionary<string, RobotGUI> robotsGuis = new();
         Queue<Tuple<string, string>> mqttInbox = new();
         HashSet<string> subscribedTopics = new();
 
@@ -92,13 +91,16 @@ namespace SmarcGUI.Connections
 
         SystemTask OnMsgReceived(MqttApplicationMessageReceivedEventArgs e)
         {
+            // we cant do anything in this thread, because all the things we want to do,
+            // are tied to unity objects in multiple ways. and unity objects are not thread safe.
+            // so we just enqueue the message and handle it in the main thread in Update()
             var topic = e.ApplicationMessage.Topic;
             var payload = e.ApplicationMessage.ConvertPayloadToString();
             mqttInbox.Enqueue(new Tuple<string, string>(topic, payload));
             return SystemTask.CompletedTask;
         }
 
-        void OnConnetionMade()
+        void OnConnectionMade()
         {
             if(SubToRealToggle.isOn) SubToHeartbeats("real");
             if(SubToSimToggle.isOn) SubToHeartbeats("simulation");
@@ -108,13 +110,27 @@ namespace SmarcGUI.Connections
             }
         }
 
-        void OnconnectionLost()
+        void OnConnectionLost()
         {
             foreach(var publisher in publishers)
             {
                 publisher.StopPublishing();
             }
             subscribedTopics.Clear();
+
+            List<string> toRemove = new();
+            foreach(var robotgui in guiState.RobotGuis.Values)
+            {
+                if(robotgui.InfoSource == InfoSource.MQTT)
+                {
+                    toRemove.Add(robotgui.RobotName);
+                    robotgui.OnDisconnected();
+                }
+            }
+            foreach(var robotName in toRemove)
+            {
+                guiState.RemoveRobotGUI(robotName);
+            }
         }
 
 
@@ -185,7 +201,7 @@ namespace SmarcGUI.Connections
             }
             guiState.Log($"Connected to broker on {ServerAddress}:{ServerPort}!");
 
-            OnConnetionMade();
+            OnConnectionMade();
         }
 
         async void DisconnectFromBroker()
@@ -204,7 +220,7 @@ namespace SmarcGUI.Connections
             }
             ConnectionInputsInteractable(true);
             guiState.Log($"Disconnected from broker on {ServerAddress}:{ServerPort}!");
-            OnconnectionLost();
+            OnConnectionLost();
         }
 
     
@@ -265,6 +281,21 @@ namespace SmarcGUI.Connections
             var topic = topicPayload.Item1;
             var payload = topicPayload.Item2;
 
+            try
+            {
+                HandleWaspMQTTMsg(topic, payload);
+            }
+            catch(Exception e)
+            {
+                guiState.Log($"Error while handling MQTT message on topic: {topic}");
+                guiState.Log(e.Message);
+            }
+
+        }
+
+
+        void HandleWaspMQTTMsg(string topic, string payload)
+        {
             // wara stuff is formatted like: smarc/unit/subsurface/simulation/sam1/heartbeat
             // {context}/unit/{air,ground,surface,subsurface}/{real,simulation,playback}/{agentName}/{topic}
             var topicParts = topic.Split('/');
@@ -273,31 +304,69 @@ namespace SmarcGUI.Connections
             var realism = topicParts[3];
             var agentName = topicParts[4];
             var messageType = topicParts[5];
-
-            if(!robotsGuis.ContainsKey(agentName))
+            
+            if(!guiState.RobotGuis.ContainsKey(agentName))
             {
                 string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}/";
-                var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
-                robotsGuis.Add(agentName, robotgui);
-                guiState.Log($"Created new RobotGUI for {agentName}");
+                guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
             }
-
+            
+            var robotgui = guiState.RobotGuis[agentName];
             switch(messageType)
             {
                 case "heartbeat":
-                    robotsGuis[agentName].OnHeartbeatReceived();
+                    WaspHeartbeatMsg heartbeat = new(payload);
+                    robotgui.OnHeartbeatReceived(heartbeat);
                     break;
                 case "sensor_info":
                     WaspSensorInfoMsg sensorInfo = new(payload);
-                    robotsGuis[agentName].OnSensorInfoReceived(sensorInfo);
+                    robotgui.OnSensorInfoReceived(sensorInfo);
                     break;
                 case "direct_execution_info":
                     WaspDirectExecutionInfoMsg directExecutionInfo = new(payload);
-                    robotsGuis[agentName].OnDirectExecutionInfoReceived(directExecutionInfo);
+                    robotgui.OnDirectExecutionInfoReceived(directExecutionInfo);
                     break;
                 case "tst_execution_info":
                     WaspTSTExecutionInfoMsg tstExecutionInfo = new(payload);
-                    robotsGuis[agentName].OnTSTExecutionInfoReceived(tstExecutionInfo);
+                    robotgui.OnTSTExecutionInfoReceived(tstExecutionInfo);
+                    break;
+                case "exec":
+                    var exec_type = topicParts[6];
+                    switch(exec_type)
+                    {
+                        case "command":
+                            BaseCommand cmd = new(payload);
+                            switch(cmd.Command)
+                            {
+                                case "ping":
+                                    PingCommand pingCmd = new(payload);
+                                    robotgui.OnPingCmdReceived(pingCmd);
+                                    break;
+                                default:
+                                    guiState.Log($"Received unhandled exec/command from mqtt: {topic}");
+                                    break;
+                            }
+                            break;
+                        case "response":
+                            BaseResponse response = new(payload);
+                            switch(response.Response)
+                            {
+                                case "pong":
+                                    PongResponse pong = new(payload);
+                                    robotgui.OnPongResponseReceived(pong);
+                                    break;
+                                default:
+                                    guiState.Log($"Received unhandled exec/response from mqtt: {topic}");
+                                    break;
+                            }
+                            break;  
+                        case "feedback":
+                            guiState.Log($"Received unhandled exec/feedback from mqtt: {topic}");
+                            break;
+                        default:
+                            guiState.Log($"Received unhandled exec from mqtt: {topic}");
+                            break;
+                    }
                     break;
                 case "sensor":
                     // there could be _many_ different kinds of sensors,
@@ -309,27 +378,27 @@ namespace SmarcGUI.Connections
                     {
                         case "position":
                             GeoPoint pos = new(payload);
-                            robotsGuis[agentName].OnPositionReceived(pos);
+                            robotgui.OnPositionReceived(pos);
                             break;
                         case "heading":
                             float heading = float.Parse(payload);
-                            robotsGuis[agentName].OnHeadingReceived(heading);
+                            robotgui.OnHeadingReceived(heading);
                             break;
                         case "course":
                             float course = float.Parse(payload);
-                            robotsGuis[agentName].OnCourseReceived(course);
+                            robotgui.OnCourseReceived(course);
                             break;
                         case "speed":
                             float velocity = float.Parse(payload);
-                            robotsGuis[agentName].OnSpeedReceived(velocity);
+                            robotgui.OnSpeedReceived(velocity);
                             break;
                         case "pitch":
                             float pitch = float.Parse(payload);
-                            robotsGuis[agentName].OnPitchReceived(pitch);
+                            robotgui.OnPitchReceived(pitch);
                             break;
                         case "roll":
                             float roll = float.Parse(payload);
-                            robotsGuis[agentName].OnRollReceived(roll);
+                            robotgui.OnRollReceived(roll);
                             break;
                         default:
                             guiState.Log($"Received unhandled sensor info from {topic}");
@@ -341,8 +410,8 @@ namespace SmarcGUI.Connections
                     break;
             }
         }
-        
-        void FixedUpdate()
+
+        void Update()
         {
             if(mqttInbox.Count == 0) return;
             while(mqttInbox.Count > 0) HandleMQTTMsg(mqttInbox.Dequeue());

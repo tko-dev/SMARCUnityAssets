@@ -124,7 +124,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             HighlightRT.gameObject.SetActive(true);
         }
 
-        void OnGUI()
+        void LateUpdate()
         {
             if(needsHeightUpdate) ActuallyUpdateHeight();
             RunButton.interactable = guiState.SelectedRobotGUI != null;

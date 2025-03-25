@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using GeoRef;
 using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
@@ -43,6 +44,8 @@ namespace SmarcGUI
         public string WorldMarkerName = "WorldMarkers";
         public RectTransform ExecutingTasksScrollContent;
         public RectTransform ExecTasksPanelRT;
+        public Button PingButton;
+        TMP_Text PingButtonText;
 
         [Header("Prefabs")]
         public GameObject ContextMenuPrefab;
@@ -57,7 +60,7 @@ namespace SmarcGUI
 
         Transform worldMarkersTF;
         Transform ghostTF;
-        Rigidbody ghostRB;
+        WorldspaceGhost ghost;
         GameObject simRobotGO;
         Transform simRobotBaseLinkTF;
 
@@ -67,6 +70,8 @@ namespace SmarcGUI
         List<TaskSpec> tasksAvailable => directExecutionInfo.TasksAvailable;
         public List<string> TasksAvailableNames = new();
         public HashSet<string> TasksExecutingUuids = new();
+
+        public string AgentUuid{get; private set;}
 
         public bool TSTExecInfoReceived = false;
 
@@ -95,6 +100,7 @@ namespace SmarcGUI
             worldMarkersTF = GameObject.Find(WorldMarkerName).transform;
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
             AddTaskButton.onClick.AddListener(() => OnTaskAdded(TasksAvailableDropdown.value));
+            PingButton.onClick.AddListener(SendPing);
             rt = GetComponent<RectTransform>();
             minHeight = rt.sizeDelta.y;
             AvailTasksPanelRT.gameObject.SetActive(false);
@@ -131,16 +137,22 @@ namespace SmarcGUI
                 mqttClient.SubToTopic(robotNamespace+"sensor/heading");
                 mqttClient.SubToTopic(robotNamespace+"sensor/course");
                 mqttClient.SubToTopic(robotNamespace+"sensor/speed");
+                mqttClient.SubToTopic(robotNamespace+"exec/command");
+                mqttClient.SubToTopic(robotNamespace+"exec/response");
+                mqttClient.SubToTopic(robotNamespace+"exec/feedback");
                 AvailTasksPanelRT.gameObject.SetActive(true);
                 ExecTasksPanelRT.gameObject.SetActive(true);
+                PingButton.gameObject.SetActive(true);
+                PingButtonText = PingButton.GetComponentInChildren<TMP_Text>();
+                PingButtonText.text = "Ping!";
                 rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight + AvailTasksPanelRT.sizeDelta.y + ExecTasksPanelRT.sizeDelta.y);
                 HeartRT.gameObject.SetActive(true);
             }
 
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
             {
-                if(robotname.Contains("sam", System.StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(SAMGhostPrefab).transform;
-                else if(robotname.Contains("evolo", System.StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(EvoloGhostPrefab).transform;
+                if(robotname.Contains("sam", StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(SAMGhostPrefab).transform;
+                else if(robotname.Contains("evolo", StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(EvoloGhostPrefab).transform;
                 else
                 {
                     guiState.Log($"No specific ghost prefab for {robotname}, using generic arrow.");
@@ -150,7 +162,7 @@ namespace SmarcGUI
                 ghostTF.name = $"Remote {robotname}";
                 ghostTF.SetParent(worldMarkersTF);
                 ghostTF.gameObject.SetActive(false);
-                ghostRB = ghostTF.GetComponent<Rigidbody>();
+                ghost = ghostTF.GetComponent<WorldspaceGhost>();
 
                 robotOverlayGO = Instantiate(RobotGUIOverlayPrefab);
                 robotOverlayGO.name = $"{robotname}_Overlay";
@@ -180,6 +192,7 @@ namespace SmarcGUI
                     break;
             }
         }
+
 
         public void SendSignalCommand(string taskUuid, string signal)
         {
@@ -234,10 +247,11 @@ namespace SmarcGUI
             return startTSTCommand;
         }
 
-        public void OnHeartbeatReceived()
+        public void OnHeartbeatReceived(WaspHeartbeatMsg msg)
         {
             HeartRT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             lastHeartbeatTime = Time.time;
+            AgentUuid = msg.AgentUuid;
         }
 
         public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
@@ -336,38 +350,48 @@ namespace SmarcGUI
             if(ghostTF == null) return;
             if(ghostTF.gameObject.activeSelf == false) ghostTF.gameObject.SetActive(true);
             var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(pos.latitude, pos.longitude);
-            ghostTF.position = new Vector3(x, pos.altitude, z);
+            ghost.UpdatePosition(new Vector3(x, pos.altitude, z));
         }
 
         public void OnHeadingReceived(float heading)
         {
-            ghostTF.rotation = Quaternion.Euler(ghostTF.rotation.eulerAngles.x, heading, ghostTF.rotation.eulerAngles.z);
+            ghost.UpdateHeading(heading);
         }
 
         public void OnPitchReceived(float pitch)
         {
-            ghostTF.rotation = Quaternion.Euler(pitch, ghostTF.rotation.eulerAngles.y, ghostTF.rotation.eulerAngles.z);
+            ghost.UpdatePitch(pitch);
         }
 
         public void OnRollReceived(float roll)
         {
-            ghostTF.rotation = Quaternion.Euler(ghostTF.rotation.eulerAngles.x, ghostTF.rotation.eulerAngles.y, roll);
+            ghost.UpdateRoll(roll);
         }
 
         public void OnCourseReceived(float course)
         {
-            var speed = ghostRB.linearVelocity.magnitude;
-            // waraps really isnt made for things that move in 3D space, so we'll just set the velocity in the xz plane...
-            ghostRB.linearVelocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
+            ghost.UpdateCourse(course);
         }
 
         public void OnSpeedReceived(float speed)
         {
-            if(ghostRB.linearVelocity.sqrMagnitude == 0) ghostRB.linearVelocity = ghostRB.transform.forward * speed;
-            else ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
+           ghost.UpdateSpeed(speed);
         }
 
-        
+        public void OnPingCmdReceived(PingCommand pingCmd)
+        {
+            var pongResponse = new PongResponse(pingCmd);
+            mqttClient.Publish(robotNamespace+"exec/response", pongResponse.ToJson());
+        }
+
+        public void OnPongResponseReceived(PongResponse pongResponse)
+        {
+            var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var diff = now - pongResponse.TimeStamp;
+            var total = diff + pongResponse.PingDelay;
+            guiState.Log($"[{RobotName}] Ping-Pong delay: {total} ({pongResponse.PingDelay}+{diff}) ms.");
+            PingButtonText.text = $"Ping:{total}";
+        }
 
 
 
@@ -458,7 +482,7 @@ namespace SmarcGUI
         }
 
 
-        public void OnGUI()
+        void LateUpdate()
         {
             AddTaskButton.interactable = missionPlanStore.SelectedTSTGUI != null;
             if(keyboardController != null) keyboardController.enabled = UserInputToggle.isOn && InfoSource == InfoSource.SIM;
@@ -476,9 +500,15 @@ namespace SmarcGUI
             if(isOld)
             {
                 TSTExecInfoReceived = false;
-                ghostRB.linearVelocity = Vector3.zero;
-                ghostRB.angularVelocity = Vector3.zero;
+                ghost.Freeze();
             }
+        }
+
+        public void OnDisconnected()
+        {
+            if(ghostTF != null) Destroy(ghostTF.gameObject);
+            if(robotOverlayGO != null) Destroy(robotOverlayGO);
+            Destroy(gameObject);
         }
 
     }

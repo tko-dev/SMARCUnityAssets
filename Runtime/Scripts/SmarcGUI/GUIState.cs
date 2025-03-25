@@ -43,7 +43,7 @@ namespace SmarcGUI
 
         Dictionary<string, string> cameraTextToObjectPath;
         public Camera CurrentCam { get; private set; }
-        List<RobotGUI> robotGUIs = new();
+        public Dictionary<string, RobotGUI> RobotGuis = new();
         public RobotGUI SelectedRobotGUI {get; private set;}
         public string SelectedRobotName => SelectedRobotGUI?.RobotName;
         
@@ -105,8 +105,14 @@ namespace SmarcGUI
         {
             var robotGui = Instantiate(RobotGuiPrefab, RobotsScrollContent).GetComponent<RobotGUI>();
             robotGui.SetRobot(robotName, infoSource, robotNamespace);
-            robotGUIs.Add(robotGui);
+            RobotGuis[robotName] = robotGui;
+            Log($"Created new RobotGUI for {robotName}");
             return robotGui;
+        }
+
+        public void RemoveRobotGUI(string robotName)
+        {
+            RobotGuis.Remove(robotName);
         }
 
         void InitRobotGuis()
@@ -146,9 +152,9 @@ namespace SmarcGUI
         public void OnRobotSelectionChanged(RobotGUI robotgui)
         {
             SelectedRobotGUI = robotgui.IsSelected? robotgui : null;
-            foreach(var r in robotGUIs)
+            foreach(var r in RobotGuis)
             {
-                if(r != robotgui) r.Deselect();
+                if(r.Value.RobotName != robotgui.RobotName) r.Value.Deselect();
             }
         }
         
@@ -161,6 +167,7 @@ namespace SmarcGUI
             {
                 LogText.text = LogText.text[..1000];
             }
+            Debug.Log(text);
         }
 
 
@@ -202,21 +209,6 @@ namespace SmarcGUI
                     toggle.ToggleWaterRender(renderWaters);
                 }
             });
-        }
-
-    
-        void OnGUI()
-        {
-            // UUID
-            GUI.color = Color.white;
-            GUI.Label(new Rect(0, Screen.height - 20, 400, 20), $"UUID: {UUID}");
-
-            // Cursor position a small plus sign
-            GUI.color = Color.red;
-            float cursorSize = 30;
-            float cursorWidth = 5;
-            GUI.DrawTexture(new Rect(cursorX - cursorSize/2, cursorY - cursorWidth/2, cursorSize, cursorWidth), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(cursorX - cursorWidth/2, cursorY - cursorSize/2, cursorWidth, cursorSize), Texture2D.whiteTexture);
         }
 
         public void OnPointerExit(PointerEventData eventData)
