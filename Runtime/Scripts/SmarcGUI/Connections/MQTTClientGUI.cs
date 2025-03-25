@@ -91,6 +91,9 @@ namespace SmarcGUI.Connections
 
         SystemTask OnMsgReceived(MqttApplicationMessageReceivedEventArgs e)
         {
+            // we cant do anything in this thread, because all the things we want to do,
+            // are tied to unity objects in multiple ways. and unity objects are not thread safe.
+            // so we just enqueue the message and handle it in the main thread in Update()
             var topic = e.ApplicationMessage.Topic;
             var payload = e.ApplicationMessage.ConvertPayloadToString();
             mqttInbox.Enqueue(new Tuple<string, string>(topic, payload));
@@ -406,8 +409,8 @@ namespace SmarcGUI.Connections
                     break;
             }
         }
-        
-        void FixedUpdate()
+
+        void Update()
         {
             if(mqttInbox.Count == 0) return;
             while(mqttInbox.Count > 0) HandleMQTTMsg(mqttInbox.Dequeue());
