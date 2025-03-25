@@ -63,9 +63,12 @@ namespace SmarcGUI
 
             UpdateArrows();
 
-            bool faraway = Vector3.SqrMagnitude(robotTF.position - guiState.CurrentCam.transform.position) > farDistSq;
-            BoundingBoxRT.gameObject.SetActive(!faraway);
-            FarawayVisualsRT.gameObject.SetActive(faraway);
+            Vector3 posDiff = robotTF.position - guiState.CurrentCam.transform.position;
+            bool faraway = posDiff.sqrMagnitude > farDistSq;
+            bool tooClose = posDiff.sqrMagnitude < 1;
+            bool camTooLow = guiState.CurrentCam.transform.position.y < 2;
+            BoundingBoxRT.gameObject.SetActive(!faraway && !tooClose);
+            FarawayVisualsRT.gameObject.SetActive(faraway && !camTooLow);
             if (faraway)
             {
                 UpdateArrows();
