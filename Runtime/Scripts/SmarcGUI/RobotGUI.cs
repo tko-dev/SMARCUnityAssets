@@ -58,7 +58,7 @@ namespace SmarcGUI
 
         Transform worldMarkersTF;
         Transform ghostTF;
-        Rigidbody ghostRB;
+        WorldspaceGhost ghost;
         GameObject simRobotGO;
         Transform simRobotBaseLinkTF;
 
@@ -145,8 +145,8 @@ namespace SmarcGUI
 
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
             {
-                if(robotname.Contains("sam", System.StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(SAMGhostPrefab).transform;
-                else if(robotname.Contains("evolo", System.StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(EvoloGhostPrefab).transform;
+                if(robotname.Contains("sam", StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(SAMGhostPrefab).transform;
+                else if(robotname.Contains("evolo", StringComparison.InvariantCultureIgnoreCase)) ghostTF = Instantiate(EvoloGhostPrefab).transform;
                 else
                 {
                     guiState.Log($"No specific ghost prefab for {robotname}, using generic arrow.");
@@ -156,7 +156,7 @@ namespace SmarcGUI
                 ghostTF.name = $"Remote {robotname}";
                 ghostTF.SetParent(worldMarkersTF);
                 ghostTF.gameObject.SetActive(false);
-                ghostRB = ghostTF.GetComponent<Rigidbody>();
+                ghost = ghostTF.GetComponent<WorldspaceGhost>();
 
                 robotOverlayGO = Instantiate(RobotGUIOverlayPrefab);
                 robotOverlayGO.name = $"{robotname}_Overlay";
@@ -344,35 +344,32 @@ namespace SmarcGUI
             if(ghostTF == null) return;
             if(ghostTF.gameObject.activeSelf == false) ghostTF.gameObject.SetActive(true);
             var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(pos.latitude, pos.longitude);
-            ghostTF.position = new Vector3(x, pos.altitude, z);
+            ghost.UpdatePosition(new Vector3(x, pos.altitude, z));
         }
 
         public void OnHeadingReceived(float heading)
         {
-            ghostTF.rotation = Quaternion.Euler(ghostTF.rotation.eulerAngles.x, heading, ghostTF.rotation.eulerAngles.z);
+            ghost.UpdateHeading(heading);
         }
 
         public void OnPitchReceived(float pitch)
         {
-            ghostTF.rotation = Quaternion.Euler(pitch, ghostTF.rotation.eulerAngles.y, ghostTF.rotation.eulerAngles.z);
+            ghost.UpdatePitch(pitch);
         }
 
         public void OnRollReceived(float roll)
         {
-            ghostTF.rotation = Quaternion.Euler(ghostTF.rotation.eulerAngles.x, ghostTF.rotation.eulerAngles.y, roll);
+            ghost.UpdateRoll(roll);
         }
 
         public void OnCourseReceived(float course)
         {
-            var speed = ghostRB.linearVelocity.magnitude;
-            // waraps really isnt made for things that move in 3D space, so we'll just set the velocity in the xz plane...
-            ghostRB.linearVelocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
+            ghost.UpdateCourse(course);
         }
 
         public void OnSpeedReceived(float speed)
         {
-            if(ghostRB.linearVelocity.sqrMagnitude == 0) ghostRB.linearVelocity = ghostRB.transform.forward * speed;
-            else ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
+           ghost.UpdateSpeed(speed);
         }
 
         public void OnPingCmdReceived(PingCommand pingCmd)
@@ -496,8 +493,7 @@ namespace SmarcGUI
             if(isOld)
             {
                 TSTExecInfoReceived = false;
-                ghostRB.linearVelocity = Vector3.zero;
-                ghostRB.angularVelocity = Vector3.zero;
+                ghost.Freeze();
             }
         }
 

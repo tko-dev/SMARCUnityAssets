@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DefaultNamespace;
+using SmarcGUI.WorldSpace;
 
 namespace SmarcGUI
 {
@@ -38,6 +39,7 @@ namespace SmarcGUI
         Transform robotTF;
         Rigidbody robotRB;
         ArticulationBody robotAB;
+        WorldspaceGhost robotGhost;
 
         Renderer[] robotRenderers;
         GUIState guiState;
@@ -85,7 +87,15 @@ namespace SmarcGUI
             PositionImg.rectTransform.anchoredPosition = screenPos;
             
             // first, find the heading of the robot
-            var worldHeading = robotTF.forward;
+            Vector3 worldHeading;
+            if(robotGhost != null)
+            {
+                worldHeading = robotGhost.ModelTF.forward;
+            }
+            else
+            {
+                worldHeading = robotTF.forward;
+            }
             // then, project it onto y=0 plane
             worldHeading.y = 0;
             // then, project the tip of that vector to screen space
@@ -107,12 +117,23 @@ namespace SmarcGUI
             {
                 worldVel = robotRB.linearVelocity;
             }
+            else if (robotGhost != null)
+            {
+                worldVel = robotGhost.velocity;
+            }
             else
             {
                 VelocityArrowRT.gameObject.SetActive(false);
                 return;
             }
 
+            if(worldVel.sqrMagnitude < 0.01*0.01)
+            {
+                VelocityArrowRT.gameObject.SetActive(false);
+                return;
+            }
+
+            VelocityArrowRT.gameObject.SetActive(true);
             worldVel.y = 0;
             var worldVelTip = robotTF.position + worldVel;
             var screenVelTip = Utils.WorldToCanvasPosition(underlayCanvas, guiState.CurrentCam, worldVelTip);
@@ -185,6 +206,7 @@ namespace SmarcGUI
             this.robotTF = robotTF;
             if(robotTF.gameObject.TryGetComponent(out Rigidbody rb)) robotRB = rb;
             if(robotTF.gameObject.TryGetComponent(out ArticulationBody ab)) robotAB = ab;
+            if(robotTF.gameObject.TryGetComponent(out WorldspaceGhost wsGhost)) robotGhost = wsGhost;
 
             robotRenderers = robotTF.GetComponentsInChildren<Renderer>();
             switch (infoSource)
