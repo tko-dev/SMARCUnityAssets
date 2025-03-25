@@ -29,7 +29,6 @@
     - [DepthPressure](#depthpressure)
     - [DVL](#dvl)
     - [GPS](#gps)
-      - [GPSReferencePoint](#gpsreferencepoint)
     - [IMU](#imu)
       - [Accuracy tests](#accuracy-tests)
     - [Leak](#leak)
@@ -51,6 +50,10 @@
       - [CurrentWP\_Sub](#currentwp_sub)
       - [Actuator Subscriber](#actuator-subscriber)
 - [Utilities](#utilities)
+  - [GeoReferencing](#georeferencing)
+    - [GlobalReferencePoint](#globalreferencepoint)
+    - [GeoReference](#georeference)
+    - [GeoReferenceTransformer](#georeferencetransformer)
   - [Rope](#rope)
     - [Rope Winch and Pulley](#rope-winch-and-pulley)
       - [Winch](#winch)
@@ -58,6 +61,8 @@
       - [RopeHook](#ropehook)
   - [Importer](#importer)
 - [Prefabs](#prefabs)
+  - [AskoWorld](#askoworld)
+  - [GUI](#gui)
   - [SAM AUV](#sam-auv)
     - [Keyboard Controller](#keyboard-controller)
     - [ROS Controls](#ros-controls)
@@ -462,22 +467,11 @@ Uses [a water query](#water) to determine submersion and does not update if subm
 
 Since Unity does not have a model of the globe, we must identify a position in Unity coordinates as a global position.
 GPS uses this reference point to calculate its relative position in UTM coordinates, then converts the UTM coordinates into Lat/Lon as its output.
+See: [GlobalReferencePoint](#globalreferencepoint).
 
 ![GPS](Media/GPS.png)
 
 - **Fix**: Filled by the sensor when it is above water.
-
-#### GPSReferencePoint
-Provides every GPS object in the Unity scene a global reference point.
-We usually attach this to geo-referenced objects, like a terrain scan with known coordinates.
-The global position can be given in Lat/Lon or UTM coordinates.
-
-There must be exactly one such script in a scene.
-
-![GPSRef](Media/GPSRef.png)
-
-- **Origin is Lat Lon**: If checked, the Lat/Lon fields are used to calculate the UTM fields and vice-versa.
-- **Draw Line To Reference Point**: If checked, each GPS object will draw a line to the origin defined here. Can be useful to see sometimes.
 
 
 ### IMU
@@ -754,6 +748,53 @@ We have some useful things that make life easier when developing a vehicle or a 
 These are mostly intended to be used by scene creators to produce prefabs and objects for later use and will likely will never have a game UI parallel.
 
 
+## GeoReferencing
+Editor scripts to place objects in reference to lat/lon coordinates.
+
+See [AskoWorld](#askoworld) as an example of how to use these.
+
+### GlobalReferencePoint
+
+![Globalref](Media/GlobalGeoRef.png)
+
+An object that defines its own Unity-position as the editor-given Lat/Lon coordinates.
+
+**There should be exactly one such object in the scene!**
+There will be warnings otherwise.
+
+- **Origin Mode:** Use the lat/lon or utm properties to define the point. The non-chosen one will be updated according to the chosen option.
+- **Update Geo-referenced objects in scene** button. Finds all [GeoRefTransformer](#georeferencetransformer) and [GeoRef](#georeference) scripts in the scene and calls their `Place` or `Transform` methods, such that they all update their Unity-transforms to fit **THIS**.
+
+### GeoReference
+
+![georef](Media/georef.png)
+
+Pressing the button places the GameObject where it needs to be wrt. to a [GlobalReferencePoint](#globalreferencepoint).
+
+### GeoReferenceTransformer
+
+![georefxformer](Media/georeftransformer.png)
+
+Transforms a given object by scaling, rotating and moving it to match 2 unity-corners to 2 georef-corners.
+Requires a [GlobalRefPoint](#globalreferencepoint) in the scene.
+
+- **Unity Space**
+  - Untiy SW/NE: South-west and North-east corners of the object in Unity. Place these two objects on the model where you know the lat/lon of.
+  - Unity Water Level: Only the Y component of this transform is used to move the object such that this transform ends up with Y=0
+- **Scale Only**
+  - If you set this, the object can be scaled such that the distance between the Unity Space points matches this value.
+- **Earth Space**
+  - Earth SW/NE: Same thing as its Unity Space cousins, but these require GeoReference components.
+- **Target**: The object that will be transformed. Should be the direct parent of this component's object. Unity terrains are supported as well!
+
+A prefab is available under `SMaRCUnityAssets/Runtime/Prefabs/Environment/GeoReferenced` that has the expected object structure:
+
+![georefxformerstr](Media/georeftransformer_structure.png)
+
+
+
+
+
 ## Rope
 
 ![RopeFancy](Media/RopeFancy.png)
@@ -895,9 +936,25 @@ URDF into Unity, JSON out of Unity
 
 
 
-
-
 # Prefabs
+
+## AskoWorld
+
+![AskoWorld](Media/AskoWorld.png)
+
+Found under `SMaRCUnityAssets/Runtime/Prefabs/Environment/GeoReferenced`.
+
+A geo-referenced terrain of Asko.
+The global reference point is placed where we usually conduct tests.
+
+## GUI
+
+![justgui](Media/JustGUI.png)
+
+Found under `SMaRCUnityAssets/Runtime/Prefabs/SmarcGUI`.
+
+Includes ROS-related singletons.
+
 
 ## SAM AUV
 
