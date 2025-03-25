@@ -58,7 +58,6 @@ namespace SmarcGUI.Connections
 
         MQTTPublisher[] publishers;
 
-        Dictionary<string, RobotGUI> robotsGuis = new();
         Queue<Tuple<string, string>> mqttInbox = new();
         HashSet<string> subscribedTopics = new();
 
@@ -117,7 +116,7 @@ namespace SmarcGUI.Connections
             subscribedTopics.Clear();
 
             List<string> toRemove = new();
-            foreach(var robotgui in robotsGuis.Values)
+            foreach(var robotgui in guiState.RobotGuis.Values)
             {
                 if(robotgui.InfoSource == InfoSource.MQTT)
                 {
@@ -127,8 +126,7 @@ namespace SmarcGUI.Connections
             }
             foreach(var robotName in toRemove)
             {
-                guiState.RemoveRobotGUI(robotsGuis[robotName]);
-                robotsGuis.Remove(robotName);
+                guiState.RemoveRobotGUI(robotName);
             }
         }
 
@@ -304,31 +302,29 @@ namespace SmarcGUI.Connections
             var agentName = topicParts[4];
             var messageType = topicParts[5];
             
-            if(!robotsGuis.ContainsKey(agentName))
+            if(!guiState.RobotGuis.ContainsKey(agentName))
             {
                 string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}/";
                 var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
-                robotsGuis.Add(agentName, robotgui);
-                guiState.Log($"Created new RobotGUI for {agentName}");
             }
 
             switch(messageType)
             {
                 case "heartbeat":
                     WaspHeartbeatMsg heartbeat = new(payload);
-                    robotsGuis[agentName].OnHeartbeatReceived(heartbeat);
+                    guiState.RobotGuis[agentName].OnHeartbeatReceived(heartbeat);
                     break;
                 case "sensor_info":
                     WaspSensorInfoMsg sensorInfo = new(payload);
-                    robotsGuis[agentName].OnSensorInfoReceived(sensorInfo);
+                    guiState.RobotGuis[agentName].OnSensorInfoReceived(sensorInfo);
                     break;
                 case "direct_execution_info":
                     WaspDirectExecutionInfoMsg directExecutionInfo = new(payload);
-                    robotsGuis[agentName].OnDirectExecutionInfoReceived(directExecutionInfo);
+                    guiState.RobotGuis[agentName].OnDirectExecutionInfoReceived(directExecutionInfo);
                     break;
                 case "tst_execution_info":
                     WaspTSTExecutionInfoMsg tstExecutionInfo = new(payload);
-                    robotsGuis[agentName].OnTSTExecutionInfoReceived(tstExecutionInfo);
+                    guiState.RobotGuis[agentName].OnTSTExecutionInfoReceived(tstExecutionInfo);
                     break;
                 case "exec":
                     var exec_type = topicParts[6];
@@ -340,7 +336,7 @@ namespace SmarcGUI.Connections
                             {
                                 case "ping":
                                     PingCommand pingCmd = new(payload);
-                                    robotsGuis[agentName].OnPingCmdReceived(pingCmd);
+                                    guiState.RobotGuis[agentName].OnPingCmdReceived(pingCmd);
                                     break;
                                 default:
                                     guiState.Log($"Received unhandled exec/command from mqtt: {topic}");
@@ -353,7 +349,7 @@ namespace SmarcGUI.Connections
                             {
                                 case "pong":
                                     PongResponse pong = new(payload);
-                                    robotsGuis[agentName].OnPongResponseReceived(pong);
+                                    guiState.RobotGuis[agentName].OnPongResponseReceived(pong);
                                     break;
                                 default:
                                     guiState.Log($"Received unhandled exec/response from mqtt: {topic}");
@@ -378,27 +374,27 @@ namespace SmarcGUI.Connections
                     {
                         case "position":
                             GeoPoint pos = new(payload);
-                            robotsGuis[agentName].OnPositionReceived(pos);
+                            guiState.RobotGuis[agentName].OnPositionReceived(pos);
                             break;
                         case "heading":
                             float heading = float.Parse(payload);
-                            robotsGuis[agentName].OnHeadingReceived(heading);
+                            guiState.RobotGuis[agentName].OnHeadingReceived(heading);
                             break;
                         case "course":
                             float course = float.Parse(payload);
-                            robotsGuis[agentName].OnCourseReceived(course);
+                            guiState.RobotGuis[agentName].OnCourseReceived(course);
                             break;
                         case "speed":
                             float velocity = float.Parse(payload);
-                            robotsGuis[agentName].OnSpeedReceived(velocity);
+                            guiState.RobotGuis[agentName].OnSpeedReceived(velocity);
                             break;
                         case "pitch":
                             float pitch = float.Parse(payload);
-                            robotsGuis[agentName].OnPitchReceived(pitch);
+                            guiState.RobotGuis[agentName].OnPitchReceived(pitch);
                             break;
                         case "roll":
                             float roll = float.Parse(payload);
-                            robotsGuis[agentName].OnRollReceived(roll);
+                            guiState.RobotGuis[agentName].OnRollReceived(roll);
                             break;
                         default:
                             guiState.Log($"Received unhandled sensor info from {topic}");

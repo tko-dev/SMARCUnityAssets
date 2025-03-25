@@ -7,6 +7,7 @@ using VehicleComponents.Sensors;
 using UnityEngine.EventSystems;
 using SmarcGUI.Water;
 using UnityEngine.UI;
+using PlasticGui.WorkspaceWindow;
 
 
 namespace SmarcGUI
@@ -43,7 +44,7 @@ namespace SmarcGUI
 
         Dictionary<string, string> cameraTextToObjectPath;
         public Camera CurrentCam { get; private set; }
-        List<RobotGUI> robotGUIs = new();
+        public Dictionary<string, RobotGUI> RobotGuis = new();
         public RobotGUI SelectedRobotGUI {get; private set;}
         public string SelectedRobotName => SelectedRobotGUI?.RobotName;
         
@@ -105,13 +106,14 @@ namespace SmarcGUI
         {
             var robotGui = Instantiate(RobotGuiPrefab, RobotsScrollContent).GetComponent<RobotGUI>();
             robotGui.SetRobot(robotName, infoSource, robotNamespace);
-            robotGUIs.Add(robotGui);
+            RobotGuis[robotName] = robotGui;
+            Log($"Created new RobotGUI for {robotName}");
             return robotGui;
         }
 
-        public void RemoveRobotGUI(RobotGUI robotGui)
+        public void RemoveRobotGUI(string robotName)
         {
-            robotGUIs.Remove(robotGui);
+            RobotGuis.Remove(robotName);
         }
 
         void InitRobotGuis()
@@ -151,9 +153,9 @@ namespace SmarcGUI
         public void OnRobotSelectionChanged(RobotGUI robotgui)
         {
             SelectedRobotGUI = robotgui.IsSelected? robotgui : null;
-            foreach(var r in robotGUIs)
+            foreach(var r in RobotGuis)
             {
-                if(r != robotgui) r.Deselect();
+                if(r.Value.RobotName != robotgui.RobotName) r.Value.Deselect();
             }
         }
         
