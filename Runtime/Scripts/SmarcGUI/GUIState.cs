@@ -210,21 +210,6 @@ namespace SmarcGUI
             });
         }
 
-    
-        void OnGUI()
-        {
-            // UUID
-            GUI.color = Color.white;
-            GUI.Label(new Rect(0, Screen.height - 20, 400, 20), $"UUID: {UUID}");
-
-            // Cursor position a small plus sign
-            GUI.color = Color.red;
-            float cursorSize = 30;
-            float cursorWidth = 5;
-            GUI.DrawTexture(new Rect(cursorX - cursorSize/2, cursorY - cursorWidth/2, cursorSize, cursorWidth), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(cursorX - cursorWidth/2, cursorY - cursorSize/2, cursorWidth, cursorSize), Texture2D.whiteTexture);
-        }
-
         public void OnPointerExit(PointerEventData eventData)
         {
             MouseOnGUI = false;
