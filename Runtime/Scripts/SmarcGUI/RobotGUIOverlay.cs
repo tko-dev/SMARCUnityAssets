@@ -61,8 +61,6 @@ namespace SmarcGUI
                 return;  
             }
 
-            UpdateArrows();
-
             Vector3 posDiff = robotTF.position - guiState.CurrentCam.transform.position;
             bool faraway = posDiff.sqrMagnitude > farDistSq;
             bool tooClose = posDiff.sqrMagnitude < 1;
