@@ -478,7 +478,7 @@ namespace SmarcGUI
         }
 
 
-        public void OnGUI()
+        void LateUpdate()
         {
             AddTaskButton.interactable = missionPlanStore.SelectedTSTGUI != null;
             if(keyboardController != null) keyboardController.enabled = UserInputToggle.isOn && InfoSource == InfoSource.SIM;

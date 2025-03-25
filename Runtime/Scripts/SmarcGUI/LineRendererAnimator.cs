@@ -49,7 +49,7 @@ namespace SmarcGUI
             return newIntersectionColor;
         }
 
-        void OnGUI()
+        void Update()
         {
             if(!animate) return;
             List<GradientColorKey> currentColorKeys = RemoveFirstAndLast(lineRendererToChange.colorGradient);

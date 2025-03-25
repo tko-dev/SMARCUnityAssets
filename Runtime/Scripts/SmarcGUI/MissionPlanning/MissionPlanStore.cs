@@ -81,7 +81,7 @@ namespace SmarcGUI.MissionPlanning
             LoadMissionPlans();
         }
 
-        void OnGUI()
+        void LateUpdate()
         {
             RunMissionButton.interactable = SelectedTSTGUI != null &&
                                             guiState.SelectedRobotGUI != null &&
