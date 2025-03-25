@@ -308,26 +308,27 @@ namespace SmarcGUI.Connections
             if(!guiState.RobotGuis.ContainsKey(agentName))
             {
                 string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}/";
-                var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
+                guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
             }
-
+            
+            var robotgui = guiState.RobotGuis[agentName];
             switch(messageType)
             {
                 case "heartbeat":
                     WaspHeartbeatMsg heartbeat = new(payload);
-                    guiState.RobotGuis[agentName].OnHeartbeatReceived(heartbeat);
+                    robotgui.OnHeartbeatReceived(heartbeat);
                     break;
                 case "sensor_info":
                     WaspSensorInfoMsg sensorInfo = new(payload);
-                    guiState.RobotGuis[agentName].OnSensorInfoReceived(sensorInfo);
+                    robotgui.OnSensorInfoReceived(sensorInfo);
                     break;
                 case "direct_execution_info":
                     WaspDirectExecutionInfoMsg directExecutionInfo = new(payload);
-                    guiState.RobotGuis[agentName].OnDirectExecutionInfoReceived(directExecutionInfo);
+                    robotgui.OnDirectExecutionInfoReceived(directExecutionInfo);
                     break;
                 case "tst_execution_info":
                     WaspTSTExecutionInfoMsg tstExecutionInfo = new(payload);
-                    guiState.RobotGuis[agentName].OnTSTExecutionInfoReceived(tstExecutionInfo);
+                    robotgui.OnTSTExecutionInfoReceived(tstExecutionInfo);
                     break;
                 case "exec":
                     var exec_type = topicParts[6];
@@ -339,7 +340,7 @@ namespace SmarcGUI.Connections
                             {
                                 case "ping":
                                     PingCommand pingCmd = new(payload);
-                                    guiState.RobotGuis[agentName].OnPingCmdReceived(pingCmd);
+                                    robotgui.OnPingCmdReceived(pingCmd);
                                     break;
                                 default:
                                     guiState.Log($"Received unhandled exec/command from mqtt: {topic}");
@@ -352,7 +353,7 @@ namespace SmarcGUI.Connections
                             {
                                 case "pong":
                                     PongResponse pong = new(payload);
-                                    guiState.RobotGuis[agentName].OnPongResponseReceived(pong);
+                                    robotgui.OnPongResponseReceived(pong);
                                     break;
                                 default:
                                     guiState.Log($"Received unhandled exec/response from mqtt: {topic}");
@@ -377,27 +378,27 @@ namespace SmarcGUI.Connections
                     {
                         case "position":
                             GeoPoint pos = new(payload);
-                            guiState.RobotGuis[agentName].OnPositionReceived(pos);
+                            robotgui.OnPositionReceived(pos);
                             break;
                         case "heading":
                             float heading = float.Parse(payload);
-                            guiState.RobotGuis[agentName].OnHeadingReceived(heading);
+                            robotgui.OnHeadingReceived(heading);
                             break;
                         case "course":
                             float course = float.Parse(payload);
-                            guiState.RobotGuis[agentName].OnCourseReceived(course);
+                            robotgui.OnCourseReceived(course);
                             break;
                         case "speed":
                             float velocity = float.Parse(payload);
-                            guiState.RobotGuis[agentName].OnSpeedReceived(velocity);
+                            robotgui.OnSpeedReceived(velocity);
                             break;
                         case "pitch":
                             float pitch = float.Parse(payload);
-                            guiState.RobotGuis[agentName].OnPitchReceived(pitch);
+                            robotgui.OnPitchReceived(pitch);
                             break;
                         case "roll":
                             float roll = float.Parse(payload);
-                            guiState.RobotGuis[agentName].OnRollReceived(roll);
+                            robotgui.OnRollReceived(roll);
                             break;
                         default:
                             guiState.Log($"Received unhandled sensor info from {topic}");

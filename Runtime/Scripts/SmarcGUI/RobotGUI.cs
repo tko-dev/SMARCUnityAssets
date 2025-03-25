@@ -44,6 +44,8 @@ namespace SmarcGUI
         public string WorldMarkerName = "WorldMarkers";
         public RectTransform ExecutingTasksScrollContent;
         public RectTransform ExecTasksPanelRT;
+        public Button PingButton;
+        TMP_Text PingButtonText;
 
         [Header("Prefabs")]
         public GameObject ContextMenuPrefab;
@@ -98,6 +100,7 @@ namespace SmarcGUI
             worldMarkersTF = GameObject.Find(WorldMarkerName).transform;
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
             AddTaskButton.onClick.AddListener(() => OnTaskAdded(TasksAvailableDropdown.value));
+            PingButton.onClick.AddListener(SendPing);
             rt = GetComponent<RectTransform>();
             minHeight = rt.sizeDelta.y;
             AvailTasksPanelRT.gameObject.SetActive(false);
@@ -139,6 +142,9 @@ namespace SmarcGUI
                 mqttClient.SubToTopic(robotNamespace+"exec/feedback");
                 AvailTasksPanelRT.gameObject.SetActive(true);
                 ExecTasksPanelRT.gameObject.SetActive(true);
+                PingButton.gameObject.SetActive(true);
+                PingButtonText = PingButton.GetComponentInChildren<TMP_Text>();
+                PingButtonText.text = "Ping!";
                 rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight + AvailTasksPanelRT.sizeDelta.y + ExecTasksPanelRT.sizeDelta.y);
                 HeartRT.gameObject.SetActive(true);
             }
@@ -384,6 +390,7 @@ namespace SmarcGUI
             var diff = now - pongResponse.TimeStamp;
             var total = diff + pongResponse.PingDelay;
             guiState.Log($"[{RobotName}] Ping-Pong delay: {total} ({pongResponse.PingDelay}+{diff}) ms.");
+            PingButtonText.text = $"Ping:{total}";
         }
 
 
