@@ -9,6 +9,7 @@ namespace GeoRef
         public Transform UnitySW;
         public Transform UnityNE;
         public Transform UnityWaterLevel;
+        public Renderer BoundsObject;
         
 
         [Header("Scale Only")]
@@ -69,15 +70,27 @@ namespace GeoRef
             ScaleTerrain();
         }
 
+        public void SetUnityFromBounds()
+        {
+            if(BoundsObject == null || UnitySW == null || UnityNE == null)
+            {
+                Debug.LogWarning($"{transform.root.name}/{transform.name}: Bounds object or Unity points not set!");
+                return;
+            }
+            UnitySW.position = new Vector3(BoundsObject.bounds.min.x, 0, BoundsObject.bounds.min.z);
+            UnityNE.position = new Vector3(BoundsObject.bounds.max.x, 0, BoundsObject.bounds.max.z);
+        }
+
         void ScaleTerrain()
         {
+            if(UnitySW == null || UnityNE == null)
+            {
+                Debug.LogWarning($"{transform.root.name}/{transform.name}: Unity points not set!");
+                return;
+            }
+
             if(TargetObject.gameObject.TryGetComponent(out Terrain terrain))
             {
-                if(UnitySW == null || UnityNE == null)
-                {
-                    Debug.LogWarning($"{transform.root.name}/{transform.name}: Unity points are not set!");
-                    return;
-                }
                 // terrain objects have a locked rotation and scale
                 // as in, even if you change, it wont have an effect ON THE TERRAIN
                 // but any children are still affected by the scale and rotation
@@ -101,11 +114,12 @@ namespace GeoRef
 
         public void TransformFromTwoPoints()
         {
-            if(EarthSW == null || EarthNE == null || UnitySW == null || UnityNE == null || TargetObject == null)
+            if(EarthSW == null || EarthNE == null || TargetObject == null || UnitySW == null || UnityNE == null)
             {
-                Debug.LogWarning($"{transform.root.name}/{transform.name}: One or more of the required fields are not set!");
+                Debug.LogWarning($"{transform.root.name}/{transform.name}: We need all 5 transforms to function!");
                 return;
             }
+            
             // so that we dont need have any offsets...
             TargetObject.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 

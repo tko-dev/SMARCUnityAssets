@@ -25,6 +25,11 @@ namespace Editor.Scripts
                 container.PlaceWorldPoints();
             }
 
+            if(GUILayout.Button("Set Unity Points to Bounds"))
+            {
+                container.SetUnityFromBounds();
+            }
+
             if(GUILayout.Button("Transform to Match Earth Points"))
             {
                 container.TransformFromTwoPoints();
