@@ -36,7 +36,7 @@ namespace GeoRef
                 return;
             }
             var (x,z) = globalRef.GetUnityXZFromLatLon(Lat, Lon);
-            transform.position = new Vector3(x, transform.position.y, z);
+            transform.position = new Vector3(x, 0, z);
         }
 
         void OnDrawGizmos()
