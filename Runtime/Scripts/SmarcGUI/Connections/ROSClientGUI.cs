@@ -20,6 +20,7 @@ namespace SmarcGUI.Connections
         InputAction lstick, rstick, lb, rb, lt, rt, north, south, east, west, dpad;
 
         ROSConnection rosCon;
+        public bool IsConnected = false;
 
         string ServerAddress => ServerAddressInput.text;
         int ServerPort => int.Parse(PortInput.text);
@@ -66,12 +67,14 @@ namespace SmarcGUI.Connections
             {
                 rosCon.RegisterPublisher<JoyMsg>(JoyTopic);
             }
+            IsConnected = true;
         }
 
         void OnDisconnect()
         {
             rosCon.Disconnect();
             ConnectionInputsInteractable(true);
+            IsConnected = false;
         }
 
         void Update()

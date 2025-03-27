@@ -4,6 +4,7 @@ using System.Linq;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
 using RosMessageTypes.Tf2;
+using SmarcGUI.Connections;
 using Unity.Robotics.Core;
 using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
@@ -30,6 +31,7 @@ namespace VehicleComponents.ROS.Publishers
         double lastTime;
 
         ROSConnection ros;
+        ROSClientGUI rosClientGUI;
         string topic = "/tf";
 
 
@@ -48,6 +50,9 @@ namespace VehicleComponents.ROS.Publishers
             m_TransformRoot = new TransformTreeNode(attachedLink);
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<TFMessageMsg>(topic);
+            rosClientGUI = FindFirstObjectByType<ROSClientGUI>();
+
+            InvokeRepeating("Publish", 1f, period);
         }
 
         static void PopulateTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)
@@ -138,13 +143,11 @@ namespace VehicleComponents.ROS.Publishers
             }
         }
 
-        void FixedUpdate()
+        void Publish()
         {
             if(ros == null) return;
-            var deltaTime = Clock.NowTimeInSeconds - lastTime;
-            if(deltaTime < period) return;
+            if(rosClientGUI != null && !rosClientGUI.IsConnected) return;
             PublishMessage();
-            lastTime = Clock.NowTimeInSeconds;
         }
     }
 }

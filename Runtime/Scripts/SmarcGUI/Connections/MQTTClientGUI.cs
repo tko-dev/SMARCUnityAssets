@@ -278,6 +278,9 @@ namespace SmarcGUI.Connections
 
         void HandleMQTTMsg(Tuple<string, string> topicPayload)
         {
+            if(topicPayload == null) return;
+            if(topicPayload.Item1 == null || topicPayload.Item2 == null) return;
+            
             var topic = topicPayload.Item1;
             var payload = topicPayload.Item2;
 

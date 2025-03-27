@@ -3,6 +3,7 @@ using UnityEngine;
 using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector;
 using ROSMessage = Unity.Robotics.ROSTCPConnector.MessageGeneration.Message;
+using SmarcGUI.Connections;
 
 
 namespace VehicleComponents.ROS.Core
@@ -13,6 +14,7 @@ namespace VehicleComponents.ROS.Core
         where PublishableType: IROSPublishable
     {
         ROSConnection ros;
+        ROSClientGUI rosClientGUI;
         public float frequency = 10f;
         float period => 1.0f/frequency;
 
@@ -44,11 +46,12 @@ namespace VehicleComponents.ROS.Core
 
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<RosMsgType>(topic);
+            rosClientGUI = FindFirstObjectByType<ROSClientGUI>();
 
-            
             InitializePublication();
 
             InvokeRepeating("Publish", 1f, period);
+
         }
 
         protected virtual void UpdateMessage()
@@ -63,6 +66,7 @@ namespace VehicleComponents.ROS.Core
 
         void Publish()
         {
+            if(rosClientGUI != null && !rosClientGUI.IsConnected) return;
             // If the underlying sensor does not have new data
             // do not publish anything.
             if(sensor.HasNewData() || ignoreSensorState)

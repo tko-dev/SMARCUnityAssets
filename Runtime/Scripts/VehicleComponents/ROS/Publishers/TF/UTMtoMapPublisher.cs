@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
@@ -6,9 +5,9 @@ using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
 using RosMessageTypes.Tf2;
 using Unity.Robotics.Core;
-using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 using GPSRef = GeoRef.GlobalReferencePoint;
+using SmarcGUI.Connections;
 
 
 namespace VehicleComponents.ROS.Publishers
@@ -17,11 +16,12 @@ namespace VehicleComponents.ROS.Publishers
     {
         public float frequency = 1f;
         float period => 1.0f/frequency;
-        double lastTime;
         GPSRef gpsRef;
         ROSConnection ros;
+        ROSClientGUI rosClientGUI;
         string topic = "/tf";
         TFMessageMsg ROSMsg;
+
 
 
         void Start()
@@ -48,6 +48,10 @@ namespace VehicleComponents.ROS.Publishers
             transform.localPosition = Vector3.zero;
             ros = ROSConnection.GetOrCreateInstance();
             ros.RegisterPublisher<TFMessageMsg>(topic);
+
+            rosClientGUI = FindFirstObjectByType<ROSClientGUI>();
+
+            InvokeRepeating("Publish", 1f, period);
         }
 
         void CreateMsg()
@@ -87,15 +91,11 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
         }
 
-        void FixedUpdate()
+        void Publish()
         {
-            var deltaTime = Clock.NowTimeInSeconds - lastTime;
-            if(deltaTime < period) return;
-
+            if(rosClientGUI != null && !rosClientGUI.IsConnected) return;
             CreateMsg();
-
             ros.Publish(topic, ROSMsg);
-            lastTime = Clock.NowTimeInSeconds;
         }
     }
 }
