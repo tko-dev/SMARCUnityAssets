@@ -722,7 +722,7 @@ Nothing else is modified, such as Articulation drives, poses etc.
 1. Modify Unity object to include `Teleporter_Sub` script on desired object for teleportation.
   - `Teleporter_Sub` has useful tooltips to guide you through which body the teleportation should be assigned to.
 2. Defining topic:
-  - Topic currently must be manually defined in Unity. Strongly advice sticking with the naming convention in the repository
+  - Topic currently must be manually defined in Unity. Strongly advise sticking with the naming convention in the repository
     - Recommend adding the selected topic to the appropriate Robot Topics Message for easier access across many nodes in the future
     - Python ex: `f"{robot_name}/{DRONE_TOPICS.YOUR_TOPIC_NAME}"`
 
