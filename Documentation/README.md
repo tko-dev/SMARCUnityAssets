@@ -47,6 +47,7 @@
       - [TF](#tf)
     - [Subscribers](#subscribers)
       - [Teleporter\_Sub](#teleporter_sub)
+        - [Teleporter Sub Instruction](#teleporter_sub_instruction)
       - [CurrentWP\_Sub](#currentwp_sub)
       - [Actuator Subscriber](#actuator-subscriber)
 - [Utilities](#utilities)
@@ -716,6 +717,14 @@ Useful when you want to move an object around from ROS, either to modify a scene
 All velocities of the object will be set to 0 after teleportation.
 
 Nothing else is modified, such as Articulation drives, poses etc.
+
+##### Teleporter Sub Instruction
+1. Modify Unity object to include `Teleporter_Sub` script on desired object for teleportation.
+  - `Teleporter_Sub` has useful tooltips to guide you through which body the teleportation should be assigned to.
+2. Defining topic:
+  - Topic currently must be manually defined in Unity. Strongly advice sticking with the naming convention in the repository
+    - Recommend adding the selected topic to the appropriate Robot Topics Message for easier access across many nodes in the future
+    - Python ex: `f"{robot_name}/{DRONE_TOPICS.YOUR_TOPIC_NAME}"`
 
 
 #### CurrentWP_Sub
