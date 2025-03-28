@@ -63,11 +63,13 @@ namespace SmarcGUI.Connections
 
         IEnumerator PublishCoroutine()
         {
+            var wait = new WaitForSeconds(1.0f / Rate);
             while (publish)
             {
+                if(!waspHeartbeat.HasPublihed) yield return wait;
                 msg.Name = waspHeartbeat.AgentName;
                 mqttClient.Publish(waspHeartbeat.TopicBase+"tst_execution_info", msg.ToJson());
-                yield return new WaitForSeconds(1.0f / Rate);
+                yield return wait;
             }
         }
     }

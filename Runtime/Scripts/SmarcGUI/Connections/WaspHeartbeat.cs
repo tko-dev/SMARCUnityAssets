@@ -43,7 +43,7 @@ namespace SmarcGUI.Connections
     public class WaspHeartbeat : MQTTPublisher
     {
         public WaspUnitType UnitType;
-        public string Context = "smarc";
+        public string Context;
         public string AgentType;
         public string AgentName;
         public string TopicBase;
@@ -55,23 +55,13 @@ namespace SmarcGUI.Connections
 
         public bool HasPublihed = false;
 
+        GameObject robotGO;
+
         void Awake()
         {
-            var robotGO = Utils.FindParentWithTag(gameObject, "robot", false);
-            AgentName = $"{Environment.UserName}_Unity_{robotGO.name}";
-            AgentType = UnitType.ToString();
-            
-            TopicBase = $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
-
-            AgentUUID = Guid.NewGuid().ToString();
             mqttClient = FindFirstObjectByType<MQTTClientGUI>();
-
-            msg = new WaspHeartbeatMsg(
-                agentType: AgentType,
-                agentUuid: AgentUUID,
-                levels: new string[]{WaspLevels.sensor.ToString(), WaspLevels.direct_execution.ToString(), WaspLevels.tst_execution.ToString()},
-                name: AgentName,
-                rate: HeartbeatRate);            
+            robotGO = Utils.FindParentWithTag(gameObject, "robot", false);
+            AgentUUID = Guid.NewGuid().ToString();     
         }
 
         void Start()
@@ -86,7 +76,19 @@ namespace SmarcGUI.Connections
 
         public override void StartPublishing()
         {
+            AgentName = $"{Environment.UserName}_Unity_{robotGO.name}";
+            AgentType = UnitType.ToString();
             Context = mqttClient.Context;
+
+            msg = new WaspHeartbeatMsg(
+                agentType: AgentType,
+                agentUuid: AgentUUID,
+                levels: new string[]{WaspLevels.sensor.ToString(), WaspLevels.direct_execution.ToString(), WaspLevels.tst_execution.ToString()},
+                name: AgentName,
+                rate: HeartbeatRate);       
+
+            TopicBase = $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
+
             publish = true;
             StartCoroutine(HeartbeatCoroutine());
             HasPublihed = true;
@@ -99,10 +101,11 @@ namespace SmarcGUI.Connections
 
         IEnumerator HeartbeatCoroutine()
         {
+            var wait = new WaitForSeconds(1.0f / HeartbeatRate);
             while (publish)
             {
                 mqttClient.Publish(TopicBase + "heartbeat", msg.ToJson());
-                yield return new WaitForSeconds(HeartbeatRate);
+                yield return wait;
             }
         }
     }

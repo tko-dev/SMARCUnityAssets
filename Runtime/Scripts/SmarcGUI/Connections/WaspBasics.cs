@@ -58,8 +58,10 @@ namespace SmarcGUI.Connections
 
         IEnumerator PublishCoroutine()
         {
+            var wait = new WaitForSeconds(1.0f / Rate);
             while (publish)
             {
+                if(!waspHeartbeat.HasPublihed) yield return wait;
                 var (lat, lon) = globalReferencePoint.GetLatLonFromUnityXZ(body.position.x, body.position.z);
                 posGP.latitude = lat;
                 posGP.longitude = lon;
@@ -76,7 +78,7 @@ namespace SmarcGUI.Connections
                 float speed = body.velocity.magnitude;
                 mqttClient.Publish(waspHeartbeat.TopicBase+"sensor/speed", speed.ToString());
                 
-                yield return new WaitForSeconds(1.0f/Rate);
+                yield return wait;
             }
         }
 
