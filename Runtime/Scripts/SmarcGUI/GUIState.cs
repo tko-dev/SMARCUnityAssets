@@ -7,6 +7,7 @@ using VehicleComponents.Sensors;
 using UnityEngine.EventSystems;
 using SmarcGUI.Water;
 using UnityEngine.UI;
+using Unity.Robotics.UrdfImporter;
 
 
 namespace SmarcGUI
@@ -57,7 +58,15 @@ namespace SmarcGUI
 
         string CameraTextFromCamera(Camera c)
         {
-            return $"{c.transform.root.name}/{c.name}";
+            var robot = Utils.FindParentWithTag(c.gameObject, "robot", false);
+            if(robot == null)
+            {
+                return $"{c.transform.parent.name}/{c.name}";
+            }
+            else
+            {
+                return $"{robot.name}/{c.name}";
+            }
         }
 
         void InitCameraDropdown()
@@ -118,7 +127,10 @@ namespace SmarcGUI
         void InitRobotGuis()
         {
             GameObject[] robots = GameObject.FindGameObjectsWithTag("robot");
-            foreach (var robot in robots) CreateNewRobotGUI(robot.transform.root.name, InfoSource.SIM, "-");
+            foreach (var robot in robots) 
+            {
+                CreateNewRobotGUI(robot.name, InfoSource.SIM, "-");
+            }   
         }
 
 

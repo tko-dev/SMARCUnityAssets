@@ -12,6 +12,7 @@ using StdMessages = RosMessageTypes.Std;
 using VehicleComponents.Actuators;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using DefaultNamespace.LookUpTable;
+using DefaultNamespace;
 
 namespace DroneController
 {
@@ -182,7 +183,8 @@ namespace DroneController
             if (debugLoggingController)
             {
                 ros = ROSConnection.GetOrCreateInstance();
-                topicName = $"/{BaseLink.transform.root.name}/controller_tuning/error";
+                var robotGO = Utils.FindParentWithTag(BaseLink, "robot", false);
+                topicName = $"/{robotGO.name}/controller_tuning/error";
                 ros.RegisterPublisher<StdMessages.Float64MultiArrayMsg>(topicName);
             }
         }

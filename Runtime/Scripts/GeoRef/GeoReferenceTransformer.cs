@@ -30,7 +30,7 @@ namespace GeoRef
         {
             if(EarthSW == null || EarthNE == null)
             {
-                Debug.LogWarning($"{transform.root.name}/{transform.name}: Earth points are not set!");
+                Debug.LogWarning($"{transform.parent.name}/{transform.name}: Earth points are not set!");
                 return;
             }
             EarthSW.Place();
@@ -42,12 +42,12 @@ namespace GeoRef
         {
             if(UnitySW == null || UnityNE == null || TargetObject == null)
             {
-                Debug.LogWarning($"{transform.root.name}/{transform.name}: Unity points or Target object are not set!");
+                Debug.LogWarning($"{transform.parent.name}/{transform.name}: Unity points or Target object are not set!");
                 return;
             }
             if(Vector3.Distance(UnitySW.position, UnityNE.position) == 0)
             {
-                Debug.LogWarning($"{transform.root.name}/{transform.name}: Unity points are at the same position!");
+                Debug.LogWarning($"{transform.parent.name}/{transform.name}: Unity points are at the same position!");
                 return;
             }
             TargetObject.localScale = Vector3.one;
@@ -74,7 +74,7 @@ namespace GeoRef
         {
             if(BoundsObject == null || UnitySW == null || UnityNE == null)
             {
-                Debug.LogWarning($"{transform.root.name}/{transform.name}: Bounds object or Unity points not set!");
+                Debug.LogWarning($"{transform.parent.name}/{transform.name}: Bounds object or Unity points not set!");
                 return;
             }
             UnitySW.position = new Vector3(BoundsObject.bounds.min.x, 0, BoundsObject.bounds.min.z);
@@ -85,7 +85,7 @@ namespace GeoRef
         {
             if(UnitySW == null || UnityNE == null)
             {
-                Debug.LogWarning($"{transform.root.name}/{transform.name}: Unity points not set!");
+                Debug.LogWarning($"{transform.parent.name}/{transform.name}: Unity points not set!");
                 return;
             }
 
@@ -116,7 +116,7 @@ namespace GeoRef
         {
             if(EarthSW == null || EarthNE == null || TargetObject == null || UnitySW == null || UnityNE == null)
             {
-                Debug.LogWarning($"{transform.root.name}/{transform.name}: We need all 5 transforms to function!");
+                Debug.LogWarning($"{transform.parent.name}/{transform.name}: We need all 5 transforms to function!");
                 return;
             }
             

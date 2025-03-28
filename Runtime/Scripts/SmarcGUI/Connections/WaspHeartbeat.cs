@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using DefaultNamespace;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -43,9 +44,9 @@ namespace SmarcGUI.Connections
     {
         public WaspUnitType UnitType;
         public string Context = "smarc";
-        public string AgentType => UnitType.ToString();
-        public string AgentName => $"{Environment.UserName}__{transform.root.name}";
-        public string TopicBase => $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
+        public string AgentType;
+        public string AgentName;
+        public string TopicBase;
 
         WaspHeartbeatMsg msg;
 
@@ -56,6 +57,11 @@ namespace SmarcGUI.Connections
 
         void Awake()
         {
+            var robotGO = Utils.FindParentWithTag(gameObject, "robot", false);
+            AgentName = $"{Environment.UserName}_Unity_{robotGO.name}";
+            TopicBase = $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
+            AgentType = UnitType.ToString();
+
             AgentUUID = Guid.NewGuid().ToString();
             mqttClient = FindFirstObjectByType<MQTTClientGUI>();
 

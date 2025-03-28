@@ -6,6 +6,8 @@ using Unity.Robotics.Core; //Clock
 using DefaultNamespace.Water; // WaterQueryModel
 using Icosphere = DefaultNamespace.IcoSphere;
 using VehicleComponents.ROS.Core;
+using SmarcGUI;
+using DefaultNamespace;
 
 namespace VehicleComponents.Acoustics
 {
@@ -86,6 +88,7 @@ namespace VehicleComponents.Acoustics
 
         WaterQueryModel waterModel;
         Transceiver[] allTransceivers;
+        public GameObject SelfRobotGO {get; private set;}
 
 
         // cant send/receive a million things
@@ -103,12 +106,12 @@ namespace VehicleComponents.Acoustics
 
         void Awake()
         {
-            allTransceivers = GameObject.FindObjectsByType<Transceiver>(FindObjectsSortMode.None);
-            waterModel = FindObjectsByType<WaterQueryModel>(FindObjectsSortMode.None)[0];
+            allTransceivers = FindObjectsByType<Transceiver>(FindObjectsSortMode.None);
+            waterModel = FindFirstObjectByType<WaterQueryModel>();
             if(TerrainGO == null)
             {
                 Debug.LogWarning("Terrain game object not set, trying to find one myself...");
-                TerrainGO = FindObjectsByType<Terrain>(FindObjectsSortMode.None)[0].gameObject;
+                TerrainGO = FindFirstObjectByType<Terrain>().gameObject;
             }
             terrainColliderID = TerrainGO.GetComponent<Collider>().GetInstanceID();
             if(terrainColliderID == 0)
@@ -123,6 +126,8 @@ namespace VehicleComponents.Acoustics
 
             sendQueue = new Queue<string>();
             receiveQueue = new Queue<StringStamped>();
+
+            SelfRobotGO = Utils.FindParentWithTag(gameObject, "robot", false);
         }
 
         void OnValidate()
@@ -130,6 +135,15 @@ namespace VehicleComponents.Acoustics
             // so you can play with the opening angle live without doing this every update
             FilterCompleteSphere(); 
         }
+
+        bool HitTargetTx(RaycastHit hit, Transceiver tx)
+        {
+            var hitRobotGO = Utils.FindParentWithTag(hit.transform.gameObject, "robot", false);
+            if(hitRobotGO == null) return false; // not a robot
+            if(hitRobotGO == tx.SelfRobotGO) return true; // hit something that belongs to the target tx
+            return false; // hit another robot lol
+        }
+
 
         void FilterCompleteSphere()
         {
@@ -179,7 +193,7 @@ namespace VehicleComponents.Acoustics
             if(FrontSphereCast(transform.position, tx.transform.position, out hit))
             {
                 // ignore the body that ONLY the target tx is attached to
-                if(hit.transform.root.name != tx.transform.root.name)
+                if(!HitTargetTx(hit, tx))
                 {
                     // There is no open corridor of given radius between objects.
                     if(DrawSignalLines) Debug.DrawLine(transform.position, hit.point, Color.red, 1);
@@ -285,7 +299,7 @@ namespace VehicleComponents.Acoustics
             if(FrontSphereCast(echoPoint, tx.transform.position, out surfaceToTargetHit, remainingRangeAfterEcho))
             {
                 // ignore the body that ONLY the target tx is attached to
-                if(surfaceToTargetHit.transform.root.name != tx.transform.root.name)
+                if(!HitTargetTx(surfaceToTargetHit, tx))
                 {
                     // there is a hit, no echo
                     if(DrawSignalLines) Debug.DrawLine(echoPoint, surfaceToTargetHit.point, Color.red, 0.1f);
@@ -357,7 +371,7 @@ namespace VehicleComponents.Acoustics
                 if(Physics.SphereCast(groundHit.point, MinChannelRadius, echoDirection, out occlusionHit, remainingRangeAfterEcho))
                 {
                     // hit something that isnt the target, abort
-                    if(occlusionHit.transform.root.name != tx.transform.root.name) continue;
+                    if(!HitTargetTx(occlusionHit, tx)) continue;
                     // hit the target tx
                     targetHitPoint = occlusionHit.point; // if the small one hit the target, we can skip the large spherecast :D
                     hitTarget = true;

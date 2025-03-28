@@ -23,7 +23,7 @@ namespace GeoRef
             var zdif = Mathf.Abs(z-transform.position.z);
             if(xdif > e ||zdif > e)
             {
-                Debug.LogWarning($"Position of GeoReference:{transform.root.name}/{transform.name} does not match the lat/lon values! xdif:{xdif} zdif:{zdif}");
+                Debug.LogWarning($"Position of GeoReference:{transform.parent.name}/{transform.name} does not match the lat/lon values! xdif:{xdif} zdif:{zdif}");
             }
         }
 
