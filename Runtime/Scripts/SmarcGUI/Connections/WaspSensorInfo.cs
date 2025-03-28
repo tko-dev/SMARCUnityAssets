@@ -69,6 +69,7 @@ namespace SmarcGUI.Connections
         {
             while (publish)
             {
+                msg.Name = waspHeartbeat.AgentName;
                 mqttClient.Publish(waspHeartbeat.TopicBase+"sensor_info", msg.ToJson());
                 yield return new WaitForSeconds(SensorInfoRate);
             }

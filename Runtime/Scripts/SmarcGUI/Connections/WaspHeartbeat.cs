@@ -59,8 +59,9 @@ namespace SmarcGUI.Connections
         {
             var robotGO = Utils.FindParentWithTag(gameObject, "robot", false);
             AgentName = $"{Environment.UserName}_Unity_{robotGO.name}";
-            TopicBase = $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
             AgentType = UnitType.ToString();
+            
+            TopicBase = $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
 
             AgentUUID = Guid.NewGuid().ToString();
             mqttClient = FindFirstObjectByType<MQTTClientGUI>();
