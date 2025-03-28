@@ -11,7 +11,7 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(SensorPressure))]
     class DepthPressure_Pub: ROSPublisher<FluidPressureMsg, SensorPressure>
     { 
-        protected override void StartROS()
+        protected override void InitPublisher()
         {
             ROSMsg.header.frame_id = sensor.linkName;
         }

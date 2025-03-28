@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
@@ -44,8 +45,11 @@ namespace VehicleComponents.ROS.Publishers
             }
         }
 
-        void Onable()
+        protected override void StartROS()
         {
+            m_TransformRoot = new TransformTreeNode(TFTreeRootGO);
+            rosCon.RegisterPublisher<TFMessageMsg>(topic);
+
             var robotGO = Utils.FindParentWithTag(gameObject, "robot", false);
             if(robotGO == null)
             {
@@ -61,12 +65,6 @@ namespace VehicleComponents.ROS.Publishers
                 enabled = false;
                 return;
             }
-        }
-
-        protected override void StartROS()
-        {
-            m_TransformRoot = new TransformTreeNode(TFTreeRootGO);
-            rosCon.RegisterPublisher<TFMessageMsg>(topic);
         }
 
         static void PopulateTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)
@@ -115,7 +113,6 @@ namespace VehicleComponents.ROS.Publishers
         void PopulateMessage()
         {
             var tfMessageList = new List<TransformStampedMsg>();
-
             try
             {
                 PopulateTFList(tfMessageList, m_TransformRoot);

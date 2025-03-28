@@ -11,12 +11,13 @@ namespace VehicleComponents.ROS.Publishers
     public class PropellerFeedback_Pub: ROSPublisher<ThrusterFeedbackMsg, Propeller>
     {
         Propeller prop;
-        protected override void StartROS()
+        protected override void InitPublisher()
         {
             prop = GetComponent<Propeller>();
             if(prop == null)
             {
                 Debug.Log("No propeller found!");
+                enabled = false;
                 return;
             }
         }

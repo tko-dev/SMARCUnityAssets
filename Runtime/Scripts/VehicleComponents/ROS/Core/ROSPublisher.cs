@@ -30,6 +30,7 @@ namespace VehicleComponents.ROS.Core
             sensor = GetComponent<PublishableType>();
             ROSMsg = new RosMsgType();
             rosCon.RegisterPublisher<RosMsgType>(topic);
+            InitPublisher();
         }
 
         /// <summary>
@@ -37,6 +38,12 @@ namespace VehicleComponents.ROS.Core
         /// This method is called in Update, so that the message can be published at a fixed frequency.
         /// </summary>
         protected abstract void UpdateMessage();
+
+        /// <summary>
+        /// Override this method to initialize the ROS message.
+        /// This method is called in StartROS which is called in Start, so that the message can be published at a fixed frequency.
+        /// </summary>
+        protected virtual void InitPublisher(){}
 
         /// <summary>
         /// Publish the message to ROS.

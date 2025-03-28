@@ -660,10 +660,15 @@ This will also disable the script at `Start` time, ROS Scripts should be explici
 Base class of most publishers.
 Handling of publishing frequency is done here.
 
+Will call `InitPublisher` virtual method at `Start` time. Override this to initliaze any messages and fields you might want to cache.
+
+Will call `UpdateMessage` at the requested frequency at `Update` time. You MUST override this and fill in `ROSMsg` with new values. `ROSmsg` is created for you according to the types passed in.
+
 ![Publisher](Media/Publisher.png)
 
 - **Frequency**: Independent of the sensor that it is publishing and `Time.fixedDeltaTime`, the publisher can be set to an arbitrary frequency. While it won't stop you from publishing faster than the physics updates, this is probably not going to be useful.
 - **Ignore Sensor State**: If checked, the topic will be published at the given frequency and topic regardless of the sensor having any updated data. Uncheck if your sensor only produces a message when it has measured something new.
+
 
 ### Publishers
 These  publishers are named as `{SensorName}_Pub` to make it clear in the editor which is which.

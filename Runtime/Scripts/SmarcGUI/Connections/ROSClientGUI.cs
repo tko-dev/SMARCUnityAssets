@@ -38,6 +38,7 @@ namespace SmarcGUI.Connections
                     }
                 }
                 joyPub = joyPubs[0];
+                joyPub.enabled = false;
             }
         }
 

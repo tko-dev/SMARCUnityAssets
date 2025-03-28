@@ -12,12 +12,13 @@ namespace VehicleComponents.ROS.Publishers
     public class PercentageFeedback_Pub: ROSPublisher<PercentStampedMsg, IPercentageActuator>
     {
         IPercentageActuator act;
-        protected override void StartROS()
+        protected override void InitPublisher()
         {
             act = GetComponent<IPercentageActuator>();
             if(act == null)
             {
                 Debug.Log("No IPercentageActuator found!");
+                enabled = false;
                 return;
             }
         }

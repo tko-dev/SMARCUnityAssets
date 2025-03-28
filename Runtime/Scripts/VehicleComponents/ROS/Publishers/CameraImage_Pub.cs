@@ -10,7 +10,7 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(CameraImageSensor))]
     class CameraImage_Pub: ROSPublisher<ImageMsg, CameraImageSensor>
     {
-        protected override void StartROS()
+        protected override void InitPublisher()
         {
             var textureHeight = sensor.textureHeight;
             var textureWidth = sensor.textureWidth;

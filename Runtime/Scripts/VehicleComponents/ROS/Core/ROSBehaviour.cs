@@ -13,35 +13,52 @@ namespace VehicleComponents.ROS.Core
     {
         [Header("ROS Behaviour")]
         protected ROSConnection rosCon;
-        public string topic = "default_topic";
+        public string topic = "";
+
 
         void OnEnable()
         {
-            if (topic == null || topic == "")
+            // we gotta check this stuff all the time
+            // beacuse we can enable and disable this component at runtime.
+            // and we need to make sure we have a connection to ROS and a topic name.
+            if(rosCon == null)
             {
-                Debug.LogError($"ROS topic is not set for {gameObject.name}! Disabling.");
+                Debug.Log($"ROS connection hasnt been made for {gameObject.name}. Disabling.");
                 enabled = false;
                 return;
             }
+            
         }
+
 
         void Start()
         {
-            rosCon = ROSConnection.GetOrCreateInstance();
-            // Aldready in root namespace, dont touch.
-            if(topic[0] == '/') return;
-
-            // We namespace the topic with the robot name
-            string robot_name = Utils.FindParentWithTag(gameObject, "robot", false).name;
-            if(robot_name == null)
+            if (topic == null || topic == "")
             {
-                Debug.LogWarning($"ROS topic is not namespaced with a robot name for {gameObject.name}! It will be under `/`");
-                topic = $"/{topic}";
+                Debug.Log($"ROS topic is not set for {gameObject.name}! Disabling.");
+                enabled = false;
+                return;
             }
-            else topic = $"/{robot_name}/{topic}";
 
+            // this is the earliest we can call this, because unity...
+            rosCon = ROSConnection.GetOrCreateInstance();
+            
+            // Aldready in root namespace, dont touch.
+            if(topic[0] != '/')
+            {
+                // We namespace the topic with the robot name
+                string robot_name = Utils.FindParentWithTag(gameObject, "robot", false).name;
+                if(robot_name == null)
+                {
+                    Debug.LogWarning($"ROS topic is not namespaced with a robot name for {gameObject.name}! It will be under `/`");
+                    topic = $"/{topic}";
+                }
+                else topic = $"/{robot_name}/{topic}";
+            }
             StartROS();
 
+            // ROS stuff should be off by default, but we still want to init them if they were enabled on game start
+            // and THEN disable them
             enabled = false;
         }
 
