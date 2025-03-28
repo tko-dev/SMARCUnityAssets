@@ -5,6 +5,7 @@ using UnityEngine;
 using Unity.Robotics.Core; //Clock
 using DefaultNamespace.Water; // WaterQueryModel
 using Icosphere = DefaultNamespace.IcoSphere;
+using VehicleComponents.ROS.Core;
 
 namespace VehicleComponents.Acoustics
 {
@@ -29,7 +30,7 @@ namespace VehicleComponents.Acoustics
 
 
     [RequireComponent(typeof(MeshFilter))]
-    public class Transceiver : MonoBehaviour, ISoundVelocityUser
+    public class Transceiver : MonoBehaviour, ISoundVelocityUser, IROSPublishable
     {   
         [Tooltip("Speed of sound underwater, defaults to 1500m/s.")]
         public float SoundVelocity = 1500f;
@@ -526,5 +527,9 @@ namespace VehicleComponents.Acoustics
             sendQueue.Enqueue(data);
         }
 
+        public bool HasNewData()
+        {
+            return receiveQueue.Count > 0;
+        }
     }
 }

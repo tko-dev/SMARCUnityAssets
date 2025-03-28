@@ -1,31 +1,31 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
 using RosMessageTypes.Tf2;
 using Unity.Robotics.Core;
 
 using GPSRef = GeoRef.GlobalReferencePoint;
-using SmarcGUI.Connections;
+using VehicleComponents.ROS.Core;
+
 
 
 namespace VehicleComponents.ROS.Publishers
 {
-    public class UTMtoMapPublisher: MonoBehaviour
+    public class UTMtoMapPublisher: ROSBehaviour
     {
         public float frequency = 1f;
         float period => 1.0f/frequency;
+        double lastUpdate = 0f;
         GPSRef gpsRef;
-        ROSConnection ros;
-        ROSClientGUI rosClientGUI;
-        string topic = "/tf";
-        TFMessageMsg ROSMsg;
+        TFMessageMsg tfMessage;
+        TransformStampedMsg utmToMapMsg, utmZBToUtmMsg;
+        TransformMsg originTf;
 
 
-
-        void Start()
+        protected override void StartROS()
         {
+            topic = "/tf";
             var utmpubs = FindObjectsByType<UTMtoMapPublisher>(FindObjectsSortMode.None);
             if(utmpubs.Length > 1)
             {
@@ -46,56 +46,52 @@ namespace VehicleComponents.ROS.Publishers
             // in the scene to publish a "global" frame that is map_gt
             // and they wont need to do any origin shenanigans that way
             transform.localPosition = Vector3.zero;
-            ros = ROSConnection.GetOrCreateInstance();
-            ros.RegisterPublisher<TFMessageMsg>(topic);
+            rosCon.RegisterPublisher<TFMessageMsg>(topic);
 
-            rosClientGUI = FindFirstObjectByType<ROSClientGUI>();
-
-            InvokeRepeating("Publish", 1f, period);
-        }
-
-        void CreateMsg()
-        {
-            string utm_zone_band = $"utm_{gpsRef.UTMZone}_{gpsRef.UTMBand}";
             // this is the position of unity-world in utm coordinates
-            double lat, lon, originEasting, originNorthing;
-            (originEasting, originNorthing, lat, lon) = gpsRef.GetUTMLatLonOfObject(gameObject);
-            // create transform message from utm to map_gt
-            var tf = new TransformMsg();
-            tf.translation.x = (float)originEasting;
-            tf.translation.y = (float)originNorthing;
-            var utmToMap = new TransformStampedMsg
-            (
+            var (originEasting, originNorthing, _, _) = gpsRef.GetUTMLatLonOfObject(gameObject);
+            var utm_zone_band = $"utm_{gpsRef.UTMZone}_{gpsRef.UTMBand}";
+
+            utmToMapMsg = new TransformStampedMsg(
                 new HeaderMsg(new TimeStamp(Clock.time), "utm"), //header
                 "map_gt", //child frame_id
-                tf //transform
+                new TransformMsg() // 0-transform
             );
 
             // also create a dummy utm_Z_B -> utm tf for people
             // that do not care about actual global location...
-            var utmZBToUtm = new TransformStampedMsg
+            utmZBToUtmMsg = new TransformStampedMsg
             (
                 new HeaderMsg(new TimeStamp(Clock.time), utm_zone_band), //header
                 "utm", //child frame_id
                 new TransformMsg() // 0-transform
             );
 
-            var tfMessageList = new List<TransformStampedMsg>
+            // create transform message from utm to map_gt
+            originTf = new TransformMsg();
+            originTf.translation.x = originEasting;
+            originTf.translation.y = originNorthing;
+            List<TransformStampedMsg> tfMessageList = new List<TransformStampedMsg>
             {
-                utmZBToUtm,
-                utmToMap
+                utmZBToUtmMsg,
+                utmToMapMsg
             };
-
             // These transforms never change during play mode
             // so we can publish the same message all the time
-            ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
+            tfMessage = new TFMessageMsg(tfMessageList.ToArray());
         }
 
-        void Publish()
+        void Update()
         {
-            if(rosClientGUI != null && !rosClientGUI.IsConnected) return;
-            CreateMsg();
-            ros.Publish(topic, ROSMsg);
+            if (Clock.time - lastUpdate < period) return;
+            lastUpdate = Clock.time;
+
+            // these are static transforms, they just change stamps...
+            var stamp = new TimeStamp(Clock.time);
+            utmToMapMsg.header.stamp = stamp;
+            utmZBToUtmMsg.header.stamp = stamp;
+
+            rosCon.Publish(topic, tfMessage);
         }
     }
 }

@@ -25,6 +25,5 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.latitude = lat;
             ROSMsg.longitude = lon;
         }
-        protected override void InitializePublication(){}
     }
 }

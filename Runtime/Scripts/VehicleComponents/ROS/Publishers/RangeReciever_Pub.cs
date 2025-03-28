@@ -10,12 +10,6 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(RangeReciever))]
     class RangeReciever_Pub : ROSPublisher<Float32Msg, RangeReciever>
     { 
-
-        protected override void InitializePublication()
-        {
-            
-        }
-
         protected override void UpdateMessage()
         {
             

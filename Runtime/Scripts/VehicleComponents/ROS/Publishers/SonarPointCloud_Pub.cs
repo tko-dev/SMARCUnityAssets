@@ -13,7 +13,7 @@ namespace VehicleComponents.ROS.Publishers
     class SonarPointCloud_Pub: ROSPublisher<PointCloud2Msg, Sonar>
     { 
         public string frame_id="map_gt";
-        protected override void InitializePublication()
+        protected override void StartROS()
         {
             ROSMsg.header.frame_id = frame_id;
 

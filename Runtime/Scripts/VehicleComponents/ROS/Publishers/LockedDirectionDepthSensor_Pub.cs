@@ -11,11 +11,6 @@ namespace VehicleComponents.ROS.Publishers
     class LockedDirectionDepthSensor_Pub : ROSPublisher<Float32Msg, SensorDepth>
     { 
 
-        protected override void InitializePublication()
-        {
-            
-        }
-
         protected override void UpdateMessage()
         {
             

@@ -13,7 +13,7 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(SideScanSonar))]
     class SSS_Pub: ROSPublisher<SidescanMsg, SideScanSonar>
     { 
-        protected override void InitializePublication()
+        protected override void StartROS()
         {
             ROSMsg.header.frame_id = sensor.linkName;
             ROSMsg.port_channel = new byte[sensor.NumBucketsPerBeam];

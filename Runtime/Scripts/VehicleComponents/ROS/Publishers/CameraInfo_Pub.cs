@@ -27,7 +27,7 @@ namespace VehicleComponents.ROS.Publishers
         Camera cam;
 
 
-        protected override void InitializePublication()
+        protected override void StartROS()
         {
             ROSMsg.distortion_model = "plumb_bob";
             ROSMsg.D = new double[5];

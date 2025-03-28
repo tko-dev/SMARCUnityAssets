@@ -17,7 +17,7 @@ namespace VehicleComponents.ROS.Publishers
         [Range(1,100)]
         public int quality = 75;
 
-        protected override void InitializePublication()
+        protected override void StartROS()
         {
             ROSMsg.format = "rgb8;jpeg compressed rgb8";
             ROSMsg.header.frame_id = sensor.linkName;

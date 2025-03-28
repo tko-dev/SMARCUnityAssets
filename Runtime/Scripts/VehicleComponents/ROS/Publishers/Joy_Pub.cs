@@ -1,19 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Unity.Robotics.ROSTCPConnector;
-using RosMessageTypes.Sensor; //Clock
+using RosMessageTypes.Sensor;
+using VehicleComponents.ROS.Core; //Clock
 
 
 namespace VehicleComponents.ROS.Publishers
 {
-    class Joy_Pub: MonoBehaviour
+    class Joy_Pub: ROSBehaviour
     {
-        public string JoyTopic = "/joy";
         InputAction lstick, rstick, lb, rb, lt, rt, north, south, east, west, dpad;
-        ROSConnection rosCon;
 
-        void Awake()
+        protected override void StartROS()
         {
+            rosCon.RegisterPublisher<JoyMsg>(topic);
             lstick = InputSystem.actions.FindAction("VirtualJoy/LeftStick");
             rstick = InputSystem.actions.FindAction("VirtualJoy/RightStick");
             lb = InputSystem.actions.FindAction("VirtualJoy/LB");
@@ -27,18 +26,12 @@ namespace VehicleComponents.ROS.Publishers
             dpad = InputSystem.actions.FindAction("VirtualJoy/Dpad");
         }
 
-        void Start()
-        {
-            rosCon = ROSConnection.GetOrCreateInstance();
-            rosCon.RegisterPublisher<JoyMsg>(JoyTopic);
-        }
-
         void Update()
         {
             var dpadVal = dpad.ReadValue<Vector2>();
             var leftval = lstick.ReadValue<Vector2>();
             var rightval = rstick.ReadValue<Vector2>();
-            rosCon.Publish(JoyTopic, new JoyMsg
+            rosCon.Publish(topic, new JoyMsg
             {
                 // https://docs.ros.org/en/iron/p/joy/
                 axes = new float[] 

@@ -11,9 +11,6 @@ namespace VehicleComponents.ROS.Publishers
     [RequireComponent(typeof(SensorGPS))]
     class GPS_Pub: ROSPublisher<NavSatFixMsg, SensorGPS>
     { 
-
-        protected override void InitializePublication(){}
-
         protected override void UpdateMessage()
         {
             ROSMsg.header.stamp = new TimeStamp(Clock.time);

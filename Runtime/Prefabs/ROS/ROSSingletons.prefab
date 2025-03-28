@@ -61,6 +61,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee81888241533583a9d98e158a029d69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  topic: /tf
   frequency: 1
 --- !u!114 &1049777862564182728
 MonoBehaviour:
@@ -74,4 +75,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72e340880f8dbff49a22db0cce1570b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  JoyTopic: /joy
+  topic: /joy

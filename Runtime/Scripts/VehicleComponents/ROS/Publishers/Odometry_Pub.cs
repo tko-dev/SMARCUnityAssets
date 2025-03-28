@@ -22,7 +22,7 @@ namespace VehicleComponents.ROS.Publishers
         {
             return ROSMsg;
         }
-        protected override void InitializePublication()
+        protected override void StartROS()
         {
             ROSMsg.header.frame_id = "map_gt";
             ROSMsg.child_frame_id = sensor.linkName;
