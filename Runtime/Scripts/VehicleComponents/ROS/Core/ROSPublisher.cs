@@ -51,8 +51,8 @@ namespace VehicleComponents.ROS.Core
         /// </summary>
         void Update()
         {
-            if (Clock.time - lastUpdate < period) return;
-            lastUpdate = Clock.time;
+            if (Clock.Now - lastUpdate < period) return;
+            lastUpdate = Clock.Now;
             if(!(sensor.HasNewData() || ignoreSensorState)) return;
             UpdateMessage();
             rosCon.Publish(topic, ROSMsg);
