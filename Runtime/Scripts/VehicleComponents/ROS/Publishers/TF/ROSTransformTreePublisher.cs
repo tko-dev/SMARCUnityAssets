@@ -1,58 +1,72 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using DefaultNamespace;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
 using RosMessageTypes.Tf2;
-using SmarcGUI.Connections;
 using Unity.Robotics.Core;
-using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using UnityEngine;
+using VehicleComponents.ROS.Core;
 
 namespace VehicleComponents.ROS.Publishers
 {
-    public class ROSTransformTreePublisher : LinkAttachment
+    public class ROSTransformTreePublisher : ROSBehaviour
     {
         [SerializeField]
         List<string> m_GlobalFrameIds = new List<string> { "map" };
         TransformTreeNode m_TransformRoot;
         string prefix;
+
         
         [Header("TF Tree")]
         [Tooltip("Suffix to add to all published TF links.")]
-        public string suffix = "_gt";
+        public string Suffix = "_gt";
+        [Tooltip("The name of the object that is under the robot that the TF tree will start at.")]
+        public string TransformTreeRootName = "odom";
+        GameObject TFTreeRootGO;
 
-        public float frequency = 10f;
-        [Tooltip("Will be checked true if publishing tf did not happen.")]
-        public bool ErrorOnPublish = false;
+        public float Frequency = 10f;
+
         
-        float period => 1.0f/frequency;
-        double lastTime;
+        float period => 1.0f/Frequency;
+        double lastUpdate;
 
-        ROSConnection ros;
-        ROSClientGUI rosClientGUI;
-        string topic = "/tf";
+        TFMessageMsg finalMsg;
 
 
         void OnValidate()
         {
             if(period < Time.fixedDeltaTime)
             {
-                Debug.LogWarning($"TF Publisher update frequency set to {frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting to Unity's fixedDeltaTime!");
-                frequency = 1f/Time.fixedDeltaTime;
+                Debug.LogWarning($"TF Publisher update frequency set to {Frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting to Unity's fixedDeltaTime!");
+                Frequency = 1f/Time.fixedDeltaTime;
             }
         }
 
-        void Start()
+        void Onable()
         {
-            prefix = transform.root.name;
-            m_TransformRoot = new TransformTreeNode(attachedLink);
-            ros = ROSConnection.GetOrCreateInstance();
-            ros.RegisterPublisher<TFMessageMsg>(topic);
-            rosClientGUI = FindFirstObjectByType<ROSClientGUI>();
+            var robotGO = Utils.FindParentWithTag(gameObject, "robot", false);
+            if(robotGO == null)
+            {
+                Debug.LogError($"No #robot tagged parent found for {gameObject.name}! Disabling.");
+                enabled = false;
+            }
+            prefix = robotGO.name;
 
-            InvokeRepeating("Publish", 1f, period);
+            TFTreeRootGO = Utils.FindDeepChildWithName(robotGO, TransformTreeRootName);
+            if(TFTreeRootGO == null)
+            {
+                Debug.LogError($"No object with name {TransformTreeRootName} found under {robotGO.name}! Disabling.");
+                enabled = false;
+                return;
+            }
+        }
+
+        protected override void StartROS()
+        {
+            m_TransformRoot = new TransformTreeNode(TFTreeRootGO);
+            rosCon.RegisterPublisher<TFMessageMsg>(topic);
         }
 
         static void PopulateTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)
@@ -98,7 +112,7 @@ namespace VehicleComponents.ROS.Publishers
             }
         }
 
-        void PublishMessage()
+        void PopulateMessage()
         {
             var tfMessageList = new List<TransformStampedMsg>();
 
@@ -111,7 +125,7 @@ namespace VehicleComponents.ROS.Publishers
                 // such as deleting a child object, this will throw an exception
                 // So we need to re-build the TF tree and skip the publish.
                 Debug.Log($"[{transform.name}] TF Tree was modified, re-building.");
-                m_TransformRoot = new TransformTreeNode(attachedLink);
+                m_TransformRoot = new TransformTreeNode(TFTreeRootGO);
                 return;
             }
             foreach(TransformStampedMsg msg in tfMessageList)
@@ -126,28 +140,19 @@ namespace VehicleComponents.ROS.Publishers
             // and finally, suffix _everything_
             foreach(TransformStampedMsg msg in tfMessageList)
             {
-                msg.header.frame_id = $"{msg.header.frame_id}{suffix}";
-                msg.child_frame_id = $"{msg.child_frame_id}{suffix}";
+                msg.header.frame_id = $"{msg.header.frame_id}{Suffix}";
+                msg.child_frame_id = $"{msg.child_frame_id}{Suffix}";
             }
 
-            var ROSMsg = new TFMessageMsg(tfMessageList.ToArray());
-            try
-            {
-                ros.Publish(topic, ROSMsg);
-                ErrorOnPublish = false;
-            }
-            catch(Exception)
-            {
-                ErrorOnPublish = true;
-                return;
-            }
+            finalMsg = new TFMessageMsg(tfMessageList.ToArray());
         }
 
-        void Publish()
+        void Update()
         {
-            if(ros == null) return;
-            if(rosClientGUI != null && !rosClientGUI.IsConnected) return;
-            PublishMessage();
+            if (Clock.time - lastUpdate < period) return;
+            lastUpdate = Clock.time;
+            PopulateMessage();
+            rosCon.Publish(topic, finalMsg);
         }
     }
 }
