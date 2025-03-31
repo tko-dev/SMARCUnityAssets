@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Robotics.ROSTCPConnector;
 using VehicleComponents.ROS.Publishers;
+using VehicleComponents.ROS.Core;
 
 
 namespace SmarcGUI.Connections
@@ -22,6 +23,8 @@ namespace SmarcGUI.Connections
         string ServerAddress => ServerAddressInput.text;
         int ServerPort => int.Parse(PortInput.text);
 
+        ROSBehaviour[] rosBehaviours;
+
         Joy_Pub joyPub;
 
         void Awake()
@@ -40,6 +43,8 @@ namespace SmarcGUI.Connections
                 joyPub = joyPubs[0];
                 joyPub.enabled = false;
             }
+
+            rosBehaviours = FindObjectsByType<ROSBehaviour>(FindObjectsSortMode.None);
         }
 
         void Start()
@@ -65,16 +70,28 @@ namespace SmarcGUI.Connections
 
         void OnConnect()
         {
+            Debug.Log($"Connecting to ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
             rosCon.Connect(ServerAddress, ServerPort);
             ConnectionInputsInteractable(false);
             IsConnected = true;
+            foreach(var b in rosBehaviours)
+            {
+                Debug.Log($"Enabling: {b.gameObject.name} ros behaviour.");
+                b.enabled = true;
+            }
         }
 
         void OnDisconnect()
         {   
+            Debug.Log($"Disconnecting from ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
             rosCon.Disconnect();
             ConnectionInputsInteractable(true);
             IsConnected = false;
+            foreach(var b in rosBehaviours)
+            {
+                Debug.Log($"Disabling: {b.gameObject.name} ros behaviour.");
+                b.enabled = false;
+            }
         }
 
     }

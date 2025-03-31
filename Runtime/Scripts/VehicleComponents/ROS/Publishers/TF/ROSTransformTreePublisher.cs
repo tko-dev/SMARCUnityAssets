@@ -34,6 +34,7 @@ namespace VehicleComponents.ROS.Publishers
         double lastUpdate;
 
         TFMessageMsg finalMsg;
+        bool registered = false;
 
 
         void OnValidate()
@@ -47,9 +48,6 @@ namespace VehicleComponents.ROS.Publishers
 
         protected override void StartROS()
         {
-            m_TransformRoot = new TransformTreeNode(TFTreeRootGO);
-            rosCon.RegisterPublisher<TFMessageMsg>(topic);
-
             var robotGO = Utils.FindParentWithTag(gameObject, "robot", false);
             if(robotGO == null)
             {
@@ -65,6 +63,14 @@ namespace VehicleComponents.ROS.Publishers
                 enabled = false;
                 return;
             }
+            m_TransformRoot = new TransformTreeNode(TFTreeRootGO);
+
+            if(!registered)
+            {
+                rosCon.RegisterPublisher<TFMessageMsg>(topic);
+                registered = true;
+            }
+            
         }
 
         static void PopulateTFList(List<TransformStampedMsg> tfList, TransformTreeNode tfNode)

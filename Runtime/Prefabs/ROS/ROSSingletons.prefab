@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef787a990b1312bd91c7fb5eda8f458, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  topic: /clock
   m_ClockMode: 0
   m_LastSetClockMode: 0
   m_PublishRateHz: 100

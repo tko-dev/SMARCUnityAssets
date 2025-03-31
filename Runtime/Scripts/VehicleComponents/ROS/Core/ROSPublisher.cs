@@ -21,6 +21,8 @@ namespace VehicleComponents.ROS.Core
         protected PublishableType sensor;
         protected RosMsgType ROSMsg;
 
+        bool registered = false;
+
         
         [Tooltip("If true, we will publish regardless, even if the underlying sensor says no data.")]
         public bool ignoreSensorState = false;
@@ -29,7 +31,11 @@ namespace VehicleComponents.ROS.Core
         {
             sensor = GetComponent<PublishableType>();
             ROSMsg = new RosMsgType();
-            rosCon.RegisterPublisher<RosMsgType>(topic);
+            if(!registered)
+            {
+                rosCon.RegisterPublisher<RosMsgType>(topic);
+                registered = true;
+            }
             InitPublisher();
         }
 

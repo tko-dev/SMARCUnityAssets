@@ -10,9 +10,10 @@ namespace VehicleComponents.ROS.Publishers
     {
         InputAction lstick, rstick, lb, rb, lt, rt, north, south, east, west, dpad;
 
-        protected override void StartROS()
+        bool registered = false;
+
+        void Awake()
         {
-            rosCon.RegisterPublisher<JoyMsg>(topic);
             lstick = InputSystem.actions.FindAction("VirtualJoy/LeftStick");
             rstick = InputSystem.actions.FindAction("VirtualJoy/RightStick");
             lb = InputSystem.actions.FindAction("VirtualJoy/LB");
@@ -24,6 +25,15 @@ namespace VehicleComponents.ROS.Publishers
             east = InputSystem.actions.FindAction("VirtualJoy/East");
             west = InputSystem.actions.FindAction("VirtualJoy/West");
             dpad = InputSystem.actions.FindAction("VirtualJoy/Dpad");
+        }
+
+        protected override void StartROS()
+        {
+            if(!registered)
+            {
+                rosCon.RegisterPublisher<JoyMsg>(topic);
+                registered = true;
+            }
         }
 
         void Update()

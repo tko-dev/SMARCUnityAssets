@@ -22,6 +22,8 @@ namespace VehicleComponents.ROS.Publishers
         TransformStampedMsg utmToMapMsg, utmZBToUtmMsg;
         TransformMsg originTf;
 
+        bool registered = false;
+
 
         protected override void StartROS()
         {
@@ -46,7 +48,11 @@ namespace VehicleComponents.ROS.Publishers
             // in the scene to publish a "global" frame that is map_gt
             // and they wont need to do any origin shenanigans that way
             transform.localPosition = Vector3.zero;
-            rosCon.RegisterPublisher<TFMessageMsg>(topic);
+            if(!registered)
+            {
+                rosCon.RegisterPublisher<TFMessageMsg>(topic);
+                registered = true;
+            }
 
             // this is the position of unity-world in utm coordinates
             var (originEasting, originNorthing, _, _) = gpsRef.GetUTMLatLonOfObject(gameObject);
