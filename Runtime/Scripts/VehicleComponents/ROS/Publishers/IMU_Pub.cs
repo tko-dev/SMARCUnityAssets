@@ -14,7 +14,7 @@ namespace VehicleComponents.ROS.Publishers
     { 
         [Tooltip("If false, orientation is in ENU in ROS.")]
         public bool useNED = false;
-        protected override void InitializePublication()
+        protected override void InitPublisher()
         {
             ROSMsg.header.frame_id = sensor.linkName;
         }

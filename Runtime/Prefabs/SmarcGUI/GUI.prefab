@@ -2277,7 +2277,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93d3e47410db7eea1b3721db62d0f3e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fpsText: {fileID: 5938944185889507951}
+  Text: {fileID: 5938944185889507951}
+  DeltaType: 0
 --- !u!1 &1083062813899685306
 GameObject:
   m_ObjectHideFlags: 0
@@ -9957,7 +9958,7 @@ MonoBehaviour:
   ConnectButton: {fileID: 2849775834117179177}
   DisconnectButton: {fileID: 3711728549212503410}
   PublishControllerToRosToggle: {fileID: 6349740137699103465}
-  JoyTopic: /joy
+  IsConnected: 0
 --- !u!1 &5637790961574300601
 GameObject:
   m_ObjectHideFlags: 0

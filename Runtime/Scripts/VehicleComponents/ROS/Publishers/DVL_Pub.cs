@@ -1,9 +1,7 @@
 using UnityEngine;
-using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using RosMessageTypes.Smarc;
-using RosMessageTypes.Std;
 
 using SensorDVL = VehicleComponents.Sensors.DVL;
 using VehicleComponents.ROS.Core;
@@ -17,7 +15,7 @@ namespace VehicleComponents.ROS.Publishers
 
         DVLBeamMsg[] beamMsgs;
 
-        protected override void InitializePublication()
+        protected override void InitPublisher()
         {
             ROSMsg.header.frame_id = sensor.linkName;
             beamMsgs = new DVLBeamMsg[sensor.numBeams];

@@ -1,3 +1,4 @@
+using DefaultNamespace;
 using UnityEngine;
 
 
@@ -25,7 +26,8 @@ namespace Rope
         {
             if(AttachToRopeLinkAfterStart && RopeLinkBuoy != null)
             {
-                var theRope = RopeLinkBuoy.OtherSideOfTheRope.transform.root.Find("Rope");
+                var theRobot = Utils.FindParentWithTag(RopeLinkBuoy.OtherSideOfTheRope.gameObject, "robot", false);
+                var theRope = theRobot.transform.Find("Rope");
                 AttachDroneToRopeLink(RopeLinkBuoy);
                 // clean up.
                 Destroy(theRope.gameObject);
@@ -38,8 +40,7 @@ namespace Rope
 
         bool TestRopeGrab(Collision collision)
         {
-            RopeLink rl;
-            if(collision.gameObject.TryGetComponent(out rl))
+            if (collision.gameObject.TryGetComponent(out RopeLink rl))
             {
                 // we want to ignore collisions with the rope depending on the "up" direction of the
                 // hook and the velocity of the collision
@@ -50,7 +51,7 @@ namespace Rope
                 Vector3 hookUp = transform.up;
                 Vector3 forceDirection = collision.impulse.normalized;
 
-                if(DrawForces)
+                if (DrawForces)
                 {
                     Debug.DrawRay(collision.contacts[0].point, forceDirection, Color.red, 1.0f);
                     Debug.DrawRay(collision.contacts[0].point, hookUp, Color.green, 1.0f);

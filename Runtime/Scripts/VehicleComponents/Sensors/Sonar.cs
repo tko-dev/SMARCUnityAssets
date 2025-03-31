@@ -377,7 +377,7 @@ namespace VehicleComponents.Sensors
 
             var t1 = Time.realtimeSinceStartup;
             TimeShareInFixedUpdate = (t1-t0)/Time.fixedDeltaTime;
-            if(TimeShareInFixedUpdate > 0.5f) Debug.LogWarning($"Sonar in {transform.root.name}/{transform.name} took more than half the time in a fixedUpdate!");
+            if(TimeShareInFixedUpdate > 0.5f) Debug.LogWarning($"Sonar in {transform.parent.name}/{transform.name} took more than half the time in a fixedUpdate!");
 
             return true;
         }

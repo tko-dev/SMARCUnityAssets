@@ -4,19 +4,16 @@ using DefaultNamespace; // ResetArticulationBody() extension
 
 using RosMessageTypes.Geometry;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry; 
-using Unity.Robotics.ROSTCPConnector;
+using VehicleComponents.ROS.Core;
 
 
 namespace VehicleComponents.ROS.Subscribers
 {
-    public class Teleporter_Sub : MonoBehaviour
+    public class Teleporter_Sub : ROSBehaviour
     {
-        [Tooltip("The topic will be namespaced under the root objects name if the given topic does not start with '/'.")]
-        public string topic;
+        [Header("Teleporter")]
         [Tooltip("The object to teleport around. Can handle Arti. Bodies too.")]
         public Transform Target;
-
-        ROSConnection ros;
 
         ArticulationBody[] ABparts;
         Rigidbody[] RBparts;
@@ -29,27 +26,30 @@ namespace VehicleComponents.ROS.Subscribers
         public bool ResetDebugInput = false;
         public Vector3 ROSCoordInput;
 
-        void OnValidate()
-        {
-            if(Target.TryGetComponent(out ArticulationBody targetAb))
-                if(!targetAb.isRoot) Debug.LogWarning($"Assigned target object is an Arti. body, but it is not the root. Non-root articulation bodies can not be teleported!");
-        }
 
-        void Start()
+        protected override void StartROS()
         {
             ABparts = Target.gameObject.GetComponentsInChildren<ArticulationBody>();
             RBparts = Target.gameObject.GetComponentsInChildren<Rigidbody>();
             ROSCoordInput = ENU.ConvertFromRUF(Target.position);
 
-            if(topic == null) return;
-            if(topic[0] != '/') topic = $"/{transform.root.name}/{topic}";
-            ros = ROSConnection.GetOrCreateInstance();
-            ros.Subscribe<PoseMsg>(topic, UpdateMessage);
+            rosCon.Subscribe<PoseMsg>(topic, UpdateMessage);
         }
 
 
         void UpdateMessage(PoseMsg pose)
         {
+            if(Target.TryGetComponent(out ArticulationBody targetAb))
+            {
+                if(!targetAb.isRoot)
+                {
+                    Debug.LogWarning($"[{transform.name}] Assigned target object is an Arti. body, but it is not the root. Non-root articulation bodies can not be teleported! Disabling.");
+                    enabled = false;
+                    rosCon.Unsubscribe(topic);
+                    return;
+                }
+            }
+
             // if its an articulation body, we need to use a specific method
             // otherwise just setting local position/rotation is enough.
             var unityPosi = ENU.ConvertToRUF(
@@ -65,9 +65,8 @@ namespace VehicleComponents.ROS.Subscribers
                             (float)pose.orientation.z,
                             (float)pose.orientation.w));
 
-            if (Target.TryGetComponent(out ArticulationBody targetAb))
+            if (Target.TryGetComponent(out ArticulationBody _))
             {
-                if (!targetAb.isRoot) return;
                 targetAb.immovable = true;
                 immovableStage = 0;
                 targetAb.TeleportRoot(unityPosi, unityOri);

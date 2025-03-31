@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Utils = DefaultNamespace.Utils;
 using Force;
@@ -34,11 +32,18 @@ namespace VehicleComponents
 
         protected void Attach()
         {
-            attachedLink = Utils.FindDeepChildWithName(transform.root.gameObject, linkName);
+            var theRobot = Utils.FindParentWithTag(gameObject, "robot", false);
+            if (theRobot == null)
+            {
+                Debug.Log($"[{transform.name}] No robot found to attach to a part of! Disabling {gameObject.name}.");
+                gameObject.SetActive(false);
+                return;
+            }
+            attachedLink = Utils.FindDeepChildWithName(theRobot, linkName);
             if (attachedLink == null)
             {
-                Debug.Log($"Object with name [{linkName}] not found under parent [{transform.root.name}]. Disabling {this.name}.");
-                enabled = false;
+                Debug.Log($"Object with name [{linkName}] not found under parent [{theRobot.name}]. Disabling {this.name}.");
+                gameObject.SetActive(false);
                 return;
             }
 

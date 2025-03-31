@@ -42,12 +42,13 @@
     - [Core](#core)
       - [RosMessages](#rosmessages)
       - [Clock](#clock)
+      - [ROSBehaviour](#rosbehaviour)
       - [ROSPublisher](#rospublisher)
     - [Publishers](#publishers)
       - [TF](#tf)
     - [Subscribers](#subscribers)
       - [Teleporter\_Sub](#teleporter_sub)
-        - [Teleporter Sub Instruction](#teleporter_sub_instruction)
+        - [Teleporter Sub Instruction](#teleporter-sub-instruction)
       - [CurrentWP\_Sub](#currentwp_sub)
       - [Actuator Subscriber](#actuator-subscriber)
 - [Utilities](#utilities)
@@ -646,15 +647,30 @@ Any simulation-interacting ROS node should be setting `use_sim_time=true` in the
 
 The reason for publishing clock separately from system time is that the simulation could be faster or slower than real time, thus any node that relies on time must be aware of this discrepency.
 
+#### ROSBehaviour
+Base class of ALL ros-related scripts. Handles the topic namespacing.
+
+If the **topic** string does not start with `/`, this will search all parents for an object tagged `robot` and use its name as a namespace.
+
+Will call `StartROS` virtual method after acuiring a connection object to the `ros-tcp-bridge`. 
+Override this method for any message initializations, publisher/subscriber registrations etc.
+`StartROS` is called `onEnable` so every time someone re-connects, it will be called for your ROS object. 
+
+This will also disable the script at `Start` time, ROS Scripts should be explicitly enabled by a manager!
+
 #### ROSPublisher
 Base class of most publishers.
-Handling of publishing frequency, topic and namespacing is done here.
+Handling of publishing frequency is done here.
+
+Will call `InitPublisher` virtual method at `Start` time. Override this to initliaze any messages and fields you might want to cache.
+
+Will call `UpdateMessage` at the requested frequency at `Update` time. You MUST override this and fill in `ROSMsg` with new values. `ROSmsg` is created for you according to the types passed in.
 
 ![Publisher](Media/Publisher.png)
 
 - **Frequency**: Independent of the sensor that it is publishing and `Time.fixedDeltaTime`, the publisher can be set to an arbitrary frequency. While it won't stop you from publishing faster than the physics updates, this is probably not going to be useful.
-- **Topic**: If the topic does not start with `/`, then it is treated as relative, otherwise it is treated as absolute. If relative, then the name of the _root_ object will be prepended to this topic. For example if there is an object in the Unity object hierarchy `sam0/SAMSensors/Battery` with topic `core/battery` the final topic will be `/sam0/core/battery`.
 - **Ignore Sensor State**: If checked, the topic will be published at the given frequency and topic regardless of the sensor having any updated data. Uncheck if your sensor only produces a message when it has measured something new.
+
 
 ### Publishers
 These  publishers are named as `{SensorName}_Pub` to make it clear in the editor which is which.

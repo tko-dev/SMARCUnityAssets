@@ -16,7 +16,5 @@ namespace VehicleComponents.ROS.Publishers
             ROSMsg.percentage = sensor.currentPercent;
             ROSMsg.header.stamp = new TimeStamp(Clock.time);
         }
-
-        protected override void InitializePublication(){}
     }
 }

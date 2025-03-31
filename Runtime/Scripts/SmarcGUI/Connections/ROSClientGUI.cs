@@ -2,9 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Robotics.ROSTCPConnector;
-using UnityEngine.InputSystem;
+using VehicleComponents.ROS.Publishers;
+using VehicleComponents.ROS.Core;
 
-using RosMessageTypes.Sensor;
 
 namespace SmarcGUI.Connections
 {
@@ -16,27 +16,35 @@ namespace SmarcGUI.Connections
         public Button ConnectButton;
         public Button DisconnectButton;
         public Toggle PublishControllerToRosToggle;
-        public string JoyTopic = "/joy";
-        InputAction lstick, rstick, lb, rb, lt, rt, north, south, east, west, dpad;
 
         ROSConnection rosCon;
+        public bool IsConnected = false;
 
         string ServerAddress => ServerAddressInput.text;
         int ServerPort => int.Parse(PortInput.text);
 
+        ROSBehaviour[] rosBehaviours;
+
+        Joy_Pub joyPub;
+
         void Awake()
         {
-            lstick = InputSystem.actions.FindAction("VirtualJoy/LeftStick");
-            rstick = InputSystem.actions.FindAction("VirtualJoy/RightStick");
-            lb = InputSystem.actions.FindAction("VirtualJoy/LB");
-            rb = InputSystem.actions.FindAction("VirtualJoy/RB");
-            lt = InputSystem.actions.FindAction("VirtualJoy/LT");
-            rt = InputSystem.actions.FindAction("VirtualJoy/RT");
-            north = InputSystem.actions.FindAction("VirtualJoy/North");
-            south = InputSystem.actions.FindAction("VirtualJoy/South");
-            east = InputSystem.actions.FindAction("VirtualJoy/East");
-            west = InputSystem.actions.FindAction("VirtualJoy/West");
-            dpad = InputSystem.actions.FindAction("VirtualJoy/Dpad");
+            var joyPubs = FindObjectsByType<Joy_Pub>(FindObjectsSortMode.None);
+            if(joyPubs.Length >= 1)
+            {   
+                if(joyPubs.Length > 1)
+                {
+                    Debug.LogWarning("Multiple Joy_Pub components found in the scene. Using the first one and disabling the rest.");
+                    for(int i = 1; i < joyPubs.Length; i++)
+                    {
+                        joyPubs[i].enabled = false;
+                    }
+                }
+                joyPub = joyPubs[0];
+                joyPub.enabled = false;
+            }
+
+            rosBehaviours = FindObjectsByType<ROSBehaviour>(FindObjectsSortMode.None);
         }
 
         void Start()
@@ -46,6 +54,8 @@ namespace SmarcGUI.Connections
             PortInput.text = rosCon.RosPort.ToString();
             ConnectButton.onClick.AddListener(OnConnect);
             DisconnectButton.onClick.AddListener(OnDisconnect);
+            if(joyPub!=null) PublishControllerToRosToggle.onValueChanged.AddListener(value => joyPub.enabled = value);
+            else PublishControllerToRosToggle.interactable = false;
             rosCon.ShowHud = false;
         }
 
@@ -60,64 +70,27 @@ namespace SmarcGUI.Connections
 
         void OnConnect()
         {
+            Debug.Log($"Connecting to ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
             rosCon.Connect(ServerAddress, ServerPort);
             ConnectionInputsInteractable(false);
-            if(PublishControllerToRosToggle.isOn)
+            IsConnected = true;
+            foreach(var b in rosBehaviours)
             {
-                rosCon.RegisterPublisher<JoyMsg>(JoyTopic);
+                Debug.Log($"Enabling: {b.gameObject.name} ros behaviour.");
+                b.enabled = true;
             }
         }
 
         void OnDisconnect()
-        {
+        {   
+            Debug.Log($"Disconnecting from ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
             rosCon.Disconnect();
             ConnectionInputsInteractable(true);
-        }
-
-        void Update()
-        {
-            if(PublishControllerToRosToggle.isOn)
+            IsConnected = false;
+            foreach(var b in rosBehaviours)
             {
-                var dpadVal = dpad.ReadValue<Vector2>();
-                var leftval = lstick.ReadValue<Vector2>();
-                var rightval = rstick.ReadValue<Vector2>();
-                rosCon.Publish(JoyTopic, new JoyMsg
-                {
-                    // https://docs.ros.org/en/iron/p/joy/
-                    axes = new float[] 
-                    {
-                        leftval.x,
-                        leftval.y,
-                        rightval.x,
-                        rightval.y,
-                        lt.ReadValue<float>(),
-                        rt.ReadValue<float>(),    
-                    },
-                    buttons = new int[] 
-                    {
-                        south.ReadValue<int>(),
-                        east.ReadValue<int>(),
-                        west.ReadValue<int>(),
-                        north.ReadValue<int>(),
-                        0, // BACK(SELECT)
-                        0, // GUIDE (Xbox button?)
-                        0, // START
-                        0, // Left stick click
-                        0, // Right stick click
-                        lb.IsPressed()? 1 : 0,
-                        rb.IsPressed()? 1 : 0,
-                        dpadVal.y > 0? 1 : 0, //dpad up
-                        dpadVal.y < 0? 1 : 0, //dpad down
-                        dpadVal.x < 0? 1 : 0, //dpad left
-                        dpadVal.x > 0? 1 : 0, //dpad right
-                        0, // rest is weird stuff like paddles...
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    }
-                });
+                Debug.Log($"Disabling: {b.gameObject.name} ros behaviour.");
+                b.enabled = false;
             }
         }
 
