@@ -652,7 +652,9 @@ Base class of ALL ros-related scripts. Handles the topic namespacing.
 
 If the **topic** string does not start with `/`, this will search all parents for an object tagged `robot` and use its name as a namespace.
 
-Will call `StartROS` virtual method after acuiring a connection object to the `ros-tcp-bridge`. Override this method for any message initializations, publisher/subscriber registrations etc.
+Will call `StartROS` virtual method after acuiring a connection object to the `ros-tcp-bridge`. 
+Override this method for any message initializations, publisher/subscriber registrations etc.
+`StartROS` is called `onEnable` so every time someone re-connects, it will be called for your ROS object. 
 
 This will also disable the script at `Start` time, ROS Scripts should be explicitly enabled by a manager!
 
