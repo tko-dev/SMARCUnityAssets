@@ -72,6 +72,7 @@
     - [Keyboard controller](#keyboard-controller-1)
     - [Geometric Tracking Controller](#geometric-tracking-controller)
   - [WinchSystem](#winchsystem)
+    - [Starting attached to a rope](#starting-attached-to-a-rope)
   - [Evolo](#evolo)
     - [Evolo's inspector window](#evolos-inspector-window)
     - [Collisions](#collisions)
@@ -1049,6 +1050,14 @@ You need to assign:
 after instantiating one of these to use it.
 
 ![WinchSys](Media/WinchSys.png)
+
+### Starting attached to a rope
+
+![Hookconfig](Media/hookConfig.png)
+
+If you check the **Attach To Rope Link** checkbox and assign the **Buoy** object of a rope setup to the **Rope Link Buoy**, the winch system will start already attached to the rope (This is the final state of it). 
+
+This could be useful if you are working on a suspended load controller or similar, and don't want to spend time cathcing the rope.
 
 
 ## Evolo
