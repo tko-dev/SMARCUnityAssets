@@ -106,9 +106,13 @@ namespace SmarcGUI.MissionPlanning.Params
             float selfHeight = 5;
             foreach(Transform child in transform)
                 selfHeight += child.GetComponent<RectTransform>().sizeDelta.y;
+            
+            // can happen if someone (like load missions) calls this before awake lol.
+            if(rt == null) rt = GetComponent<RectTransform>();
+
             rt.sizeDelta = new Vector2(rt.sizeDelta.x, selfHeight);
 
-            transform.parent.GetComponentInParent<IHeightUpdatable>().UpdateHeight();
+            transform.parent.GetComponentInParent<IHeightUpdatable>()?.UpdateHeight();
         }
 
         void OnDisable()
