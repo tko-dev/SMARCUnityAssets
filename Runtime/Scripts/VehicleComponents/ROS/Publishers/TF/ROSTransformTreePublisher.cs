@@ -44,6 +44,12 @@ namespace VehicleComponents.ROS.Publishers
                 Debug.LogWarning($"TF Publisher update frequency set to {Frequency}Hz but Unity updates physics at {1f/Time.fixedDeltaTime}Hz. Setting to Unity's fixedDeltaTime!");
                 Frequency = 1f/Time.fixedDeltaTime;
             }
+
+            if(topic != "/tf")
+            {
+                Debug.LogWarning($"TF Publisher topic set to {topic} but should be /tf. Setting to /tf!");
+                topic = "/tf";
+            }
         }
 
         protected override void StartROS()
