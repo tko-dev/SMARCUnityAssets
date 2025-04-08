@@ -348,7 +348,9 @@ namespace SmarcGUI
         {
             if(globalReferencePoint == null) return;
             if(ghostTF == null) return;
+            if(pos.latitude == 0 && pos.longitude == 0) return;
             if(ghostTF.gameObject.activeSelf == false) ghostTF.gameObject.SetActive(true);
+            
             var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(pos.latitude, pos.longitude);
             ghost.UpdatePosition(new Vector3(x, pos.altitude, z));
         }
