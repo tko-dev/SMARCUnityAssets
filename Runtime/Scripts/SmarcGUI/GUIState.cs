@@ -29,6 +29,7 @@ namespace SmarcGUI
         public TMP_Text LogText;
         public RectTransform RobotsScrollContent;
         public Button ToggleWaterRenderButton;
+        public TMP_Text ComapssText;
 
         [Header("Prefabs")]
         public GameObject RobotGuiPrefab;
@@ -231,6 +232,33 @@ namespace SmarcGUI
         public void OnPointerEnter(PointerEventData eventData)
         {
             MouseOnGUI = true;
+        }
+
+        void LateUpdate()
+        {
+            // Update the compass text WRT the current camera
+            if(CurrentCam == null) ComapssText.text = "NO CAM";
+            else
+            {
+                Vector3 camForward = CurrentCam.transform.forward;
+                // check if camera is looking straight up or down
+                // if camForward.y is 0, then the camera is looking straight up or down
+                if(Mathf.Abs(camForward.x) < 0.1f && Mathf.Abs(camForward.z) < 0.1f)
+                {
+                    // camera looking straigh up or down...
+                    ComapssText.text = "UP/DOWN";
+                    return;
+                }
+                // calculate the angle the camera is looking towards
+                // and turn it into a compass direction
+                // project forward onto the xz plane
+                camForward.y = 0;
+                float angle = Vector3.SignedAngle(Vector3.forward, camForward, Vector3.up);
+                // convert to compass direction
+                string[] compassDirections = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
+                int index = Mathf.RoundToInt((angle + 360) / 45) % 8;
+                ComapssText.text = $"{angle:F1}° ({compassDirections[index]})";
+            }
         }
 
 

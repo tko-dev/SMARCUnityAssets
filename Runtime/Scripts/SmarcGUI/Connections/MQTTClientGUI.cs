@@ -43,7 +43,7 @@ namespace SmarcGUI.Connections
         public Toggle TLSToggle;
 
         public Button ConnectButton;
-        public Button DisconnectButton;
+        public TMP_Text ConnectButtonText;
 
         // mostly a wrapper for: https://github.com/dotnet/MQTTnet/blob/release/4.x.x/Samples/Client/Client_Connection_Samples.cs
         // Notice we use the 4.x branch because dotnet of unity (:
@@ -72,20 +72,17 @@ namespace SmarcGUI.Connections
         {
             ServerAddressInput.text = "20.240.40.232";
             PortInput.text = "1884";
-            ConnectButton.onClick.AddListener(ConnectToBroker);
-            DisconnectButton.onClick.AddListener(DisconnectFromBroker);
+            ConnectButton.onClick.AddListener(ToggleConnection);
             ConnectionInputsInteractable(true);
         }
 
         void ConnectionInputsInteractable(bool interactable)
         {
-            ConnectButton.interactable = interactable;
             ServerAddressInput.interactable = interactable;
             PortInput.interactable = interactable;
             ContextInput.interactable = interactable;
             SubToRealToggle.interactable = interactable;
             SubToSimToggle.interactable = interactable;
-            DisconnectButton.interactable = !interactable;
         }
 
 
@@ -108,6 +105,7 @@ namespace SmarcGUI.Connections
             {
                 publisher.StartPublishing();
             }
+            ConnectButtonText.text = "Disconnect";
         }
 
         void OnConnectionLost()
@@ -130,6 +128,22 @@ namespace SmarcGUI.Connections
             foreach(var robotName in toRemove)
             {
                 guiState.RemoveRobotGUI(robotName);
+            }
+
+            ConnectButtonText.text = "Connect";
+        }
+
+        async void ToggleConnection()
+        {
+            if(mqttClient is null || !mqttClient.IsConnected)
+            {
+                Debug.Log($"Connecting to MQTT broker at: {ServerAddress}:{ServerPort}");
+                ConnectToBroker();
+            }
+            else
+            {
+                Debug.Log($"Disconnecting from MQTT broker at: {ServerAddress}:{ServerPort}");
+                DisconnectFromBroker();
             }
         }
 

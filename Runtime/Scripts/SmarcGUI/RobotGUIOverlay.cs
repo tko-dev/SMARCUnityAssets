@@ -64,7 +64,7 @@ namespace SmarcGUI
             Vector3 posDiff = robotTF.position - guiState.CurrentCam.transform.position;
             bool faraway = posDiff.sqrMagnitude > farDistSq;
             bool tooClose = posDiff.sqrMagnitude < 1;
-            bool camTooLow = guiState.CurrentCam.transform.position.y < 2;
+            bool camTooLow = Mathf.Abs(posDiff.y) < 10;
             BoundingBoxRT.gameObject.SetActive(!faraway && !tooClose);
             FarawayVisualsRT.gameObject.SetActive(faraway && !camTooLow);
             if (faraway)

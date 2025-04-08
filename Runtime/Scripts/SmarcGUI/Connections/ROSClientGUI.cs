@@ -14,7 +14,7 @@ namespace SmarcGUI.Connections
         public TMP_InputField ServerAddressInput;
         public TMP_InputField PortInput;
         public Button ConnectButton;
-        public Button DisconnectButton;
+        public TMP_Text ConnectButtonText;
         public Toggle PublishControllerToRosToggle;
 
         ROSConnection rosCon;
@@ -52,8 +52,7 @@ namespace SmarcGUI.Connections
             rosCon = ROSConnection.GetOrCreateInstance();
             ServerAddressInput.text = rosCon.RosIPAddress.ToString();
             PortInput.text = rosCon.RosPort.ToString();
-            ConnectButton.onClick.AddListener(OnConnect);
-            DisconnectButton.onClick.AddListener(OnDisconnect);
+            ConnectButton.onClick.AddListener(ToggleConnection);
             if(joyPub!=null) PublishControllerToRosToggle.onValueChanged.AddListener(value => joyPub.enabled = value);
             else PublishControllerToRosToggle.interactable = false;
             rosCon.ShowHud = false;
@@ -61,37 +60,34 @@ namespace SmarcGUI.Connections
 
         void ConnectionInputsInteractable(bool interactable)
         {
-            ConnectButton.interactable = interactable;
             ServerAddressInput.interactable = interactable;
             PortInput.interactable = interactable;
-            DisconnectButton.interactable = !interactable;
             PublishControllerToRosToggle.interactable = interactable;
         }
 
-        void OnConnect()
+        void ToggleConnection()
         {
-            Debug.Log($"Connecting to ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
-            rosCon.Connect(ServerAddress, ServerPort);
-            ConnectionInputsInteractable(false);
-            IsConnected = true;
-            foreach(var b in rosBehaviours)
+            if(IsConnected)
             {
-                Debug.Log($"Enabling: {b.gameObject.name} ros behaviour.");
-                b.enabled = true;
+                Debug.Log($"Disconnecting from ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
+                rosCon.Disconnect();
+                IsConnected = false;
+                ConnectButtonText.text = "Connect";
             }
-        }
+            else
+            {
+                Debug.Log($"Connecting to ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
+                rosCon.Connect(ServerAddress, ServerPort);
+                IsConnected = true;
+                ConnectButtonText.text = "Disconnect";
+            }
 
-        void OnDisconnect()
-        {   
-            Debug.Log($"Disconnecting from ROS-TCP bridge at: {ServerAddress}:{ServerPort}");
-            rosCon.Disconnect();
-            ConnectionInputsInteractable(true);
-            IsConnected = false;
+            ConnectionInputsInteractable(!IsConnected);
             foreach(var b in rosBehaviours)
             {
-                Debug.Log($"Disabling: {b.gameObject.name} ros behaviour.");
-                b.enabled = false;
+                b.enabled = IsConnected;
             }
+
         }
 
     }
