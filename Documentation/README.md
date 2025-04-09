@@ -863,7 +863,7 @@ This component
   - **Rope Color**: You can pick any color for your rope.
 - **Debug**
   - **Draw Gizmos**: If checked, rope will visualize some stuff as gizmos.
-- **(Re)Generate Rope**: This will create an object called `Rope` as a child of the object the component is attached to and place all the rope links in there. If the `Rope` object exists, it will delete it and re-create it with the currently set parameters.
+- **(Re)Generate Rope**: This will create an object called `Rope` as a child of the object the component is attached to and place all the rope links in there. If the `Rope` object exists, it will delete it and re-create it with the currently set parameters. **Use when the game is NOT RUNNING.**
 
 A rope link prefab must contain this component:
 
