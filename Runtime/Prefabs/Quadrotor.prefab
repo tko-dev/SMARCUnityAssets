@@ -76,8 +76,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/prop_2/feedback
+  frequency: 10
   ignoreSensorState: 0
 --- !u!114 &4652147038755289220
 MonoBehaviour:
@@ -130,7 +130,6 @@ Transform:
   - {fileID: 8597457138550415401}
   - {fileID: 6650294322077738963}
   - {fileID: 3051417882854025666}
-  - {fileID: 6110627571383574328}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8030836169684092610
@@ -150,7 +149,6 @@ MonoBehaviour:
   backrightPropGo: {fileID: 1840569289547034}
   backleftPropGo: {fileID: 1971563020570084}
   MotionRPM: 1500
-  LiftingRPM: 1500
 --- !u!114 &8902112791058481484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,6 +171,7 @@ MonoBehaviour:
   propBL: {fileID: 4662283196533844}
   controllerState: 4
   debugLoggingController: 0
+  TargetVelocity: {x: 0, y: 0, z: 0}
 --- !u!1 &1648915923807604
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,8 +314,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b6639050ad5a83f6a4f0de5e9d7e935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/fpcamera/image
+  frequency: 10
   ignoreSensorState: 0
 --- !u!114 &4189383651776858490
 MonoBehaviour:
@@ -330,8 +329,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fb87cf5579908965bd1e8fd9984c1f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/fpcamera/image_compressed
+  frequency: 10
   ignoreSensorState: 0
   quality: 75
 --- !u!114 &4980747270019049236
@@ -346,8 +345,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99998e432c125662d8991183cac37e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/fpcamera/cam_info
+  frequency: 10
   ignoreSensorState: 0
   k1: 1
   k2: 1
@@ -453,8 +452,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/prop_3/feedback
+  frequency: 10
   ignoreSensorState: 0
 --- !u!114 &3447326158202569815
 MonoBehaviour:
@@ -549,8 +548,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/prop_1/feedback
+  frequency: 10
   ignoreSensorState: 0
 --- !u!114 &8072892641558167324
 MonoBehaviour:
@@ -741,8 +740,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10a8919bb6be9cfc88e08395412d871b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/prop_4/feedback
+  frequency: 10
   ignoreSensorState: 0
 --- !u!114 &1992350392436928981
 MonoBehaviour:
@@ -1101,8 +1100,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32ccbfb20e694c726875aa7c68c0bca7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/imu
+  frequency: 10
   ignoreSensorState: 0
   useNED: 0
 --- !u!1 &650710955635849821
@@ -1415,8 +1414,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50782596dcf966f40ae63f48da21ae0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/range
+  frequency: 10
   ignoreSensorState: 0
 --- !u!1 &1375616254144021247
 GameObject:
@@ -1462,17 +1461,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78564e3e0c2d8c65cb6601a38bee530d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linkName: odom
-  retryUntilSuccess: 1
-  rotateForROSCamera: 0
-  roll: 0
-  pitch: 0
-  yaw: 0
+  topic: /tf
   m_GlobalFrameIds:
   - map
-  suffix: _gt
-  frequency: 50
-  ErrorOnPublish: 0
+  Suffix: _gt
+  TransformTreeRootName: odom
+  Frequency: 10
 --- !u!1 &1421537895179305450
 GameObject:
   m_ObjectHideFlags: 0
@@ -1793,10 +1787,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0488af2a38628407dba8adb3eb1a253b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: odom_gt
+  frequency: 10
   ignoreSensorState: 1
   useNED: 0
+  ROSPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &1914096618894252363
 GameObject:
   m_ObjectHideFlags: 0
@@ -1827,6 +1822,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 135919806119038934}
+  - {fileID: 6110627571383574328}
   m_Father: {fileID: 4800906380731054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1962916537185346603
@@ -2921,6 +2917,7 @@ GameObject:
   - component: {fileID: 6110627571383574328}
   - component: {fileID: 8826866181995455972}
   - component: {fileID: 8217577289146457395}
+  - component: {fileID: 4097220763685838162}
   m_Layer: 0
   m_Name: DroneTarget
   m_TagString: Untagged
@@ -2936,12 +2933,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4818855960593909349}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.38272214, z: 0, w: 0.92386353}
+  m_LocalRotation: {x: -0, y: -0.38272214, z: -0, w: 0.92386353}
   m_LocalPosition: {x: 0, y: 0.78, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4800906380731054}
+  m_Father: {fileID: 8597457138550415401}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8826866181995455972
 MonoBehaviour:
@@ -2973,6 +2970,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 1, g: 0.80166054, b: 0, a: 0.16470589}
   radius: 0.1
+--- !u!114 &4097220763685838162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4818855960593909349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231f68cb232aa5bd6ad168c7a19ccfd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topic: go_to_setpoint
+  Target: {fileID: 6110627571383574328}
+  TeleportLocal: 1
+  UseDebugInput: 0
+  ResetDebugInput: 0
+  ROSCoordInput: {x: 0, y: 0, z: 0}
 --- !u!1 &5210603609411448684
 GameObject:
   m_ObjectHideFlags: 0
@@ -3751,8 +3766,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a06dc68a151992784af390882f2a2331, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/depth
+  frequency: 10
   ignoreSensorState: 0
 --- !u!1 &6537089427650706406
 GameObject:
@@ -4392,8 +4407,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eee95b5d1413e86d4bed3e951d06a085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 10
   topic: core/gps
+  frequency: 10
   ignoreSensorState: 0
 --- !u!1 &9077322942405327421
 GameObject:
