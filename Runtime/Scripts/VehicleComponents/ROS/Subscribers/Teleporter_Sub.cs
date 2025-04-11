@@ -20,6 +20,9 @@ namespace VehicleComponents.ROS.Subscribers
 
         int immovableStage = 2;
 
+        [Tooltip("Choose whether to teleport object in local transform versus global transform")]
+        public bool TeleportLocal = false;
+
 
         [Header("Debug")]
         public bool UseDebugInput = false;
@@ -75,7 +78,8 @@ namespace VehicleComponents.ROS.Subscribers
             }
             else
             {
-                Target.SetPositionAndRotation(unityPosi, unityOri);
+                if (!TeleportLocal) Target.SetPositionAndRotation(unityPosi, unityOri);
+                else Target.SetLocalPositionAndRotation(unityPosi, unityOri);
             }
 
 
